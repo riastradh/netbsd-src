@@ -13,7 +13,7 @@ set -Ceu
 find . -name '*.h' \
 | while read f; do
 	cleantags "$f"
-	(printf '/*\t$NetBSD: prepare-import.sh,v 1.1 2018/08/27 00:46:21 riastradh Exp $\t*/\n\n' && cat -- "$f") > "$f".tmp
+	(printf '/*\t%c%s%c\t*/\n\n' '$' NetBSD '$' && cat -- "$f") > "$f".tmp
 	mv -f -- "$f".tmp "$f"
 done
 
