@@ -324,7 +324,7 @@ file	external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_soc15.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_sync.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_test.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_tonga_ih.c	amdgpu
-file	external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_trace_points.c	amdgpu
+#file	external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_trace_points.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_ttm.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_ucode.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_umc.c	amdgpu
