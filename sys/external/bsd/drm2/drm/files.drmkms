@@ -126,7 +126,7 @@ file	external/bsd/drm2/dist/drm/drm_vma_manager.c	drmkms
 file	external/bsd/drm2/dist/drm/drm_vm.c	drmkms
 file	external/bsd/drm2/dist/drm/drm_writeback.c	drmkms
 file	external/bsd/drm2/drm/drm_cache.c	drmkms
-file	external/bsd/drm2/drm/drm_fops.c	drmkms
+file	external/bsd/drm2/drm/drm_file.c	drmkms
 file	external/bsd/drm2/drm/drm_gem_framebuffer_helper.c	drmkms
 file	external/bsd/drm2/drm/drm_lease.c	drmkms
 file	external/bsd/drm2/drm/drm_lock.c	drmkms
