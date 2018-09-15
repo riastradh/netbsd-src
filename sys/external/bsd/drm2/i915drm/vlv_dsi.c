@@ -35,6 +35,6 @@ __KERNEL_RCSID(0, "$NetBSD: intel_dsi.c,v 1.2 2018/08/27 15:09:35 riastradh Exp 
 #include "intel_drv.h"
 
 void
-intel_dsi_init(struct drm_device *dev)
+vlv_dsi_init(struct drm_i915_private *dev_priv)
 {
 }
