@@ -44,6 +44,7 @@
 #include <asm/div64.h>
 
 #include <linux/bitops.h>
+#include <linux/compiler.h>
 #include <linux/log2.h>
 #include <linux/printk.h>
 #include <linux/slab.h>
