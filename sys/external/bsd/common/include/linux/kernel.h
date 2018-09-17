@@ -249,4 +249,11 @@ kasprintf(gfp_t gfp, const char *fmt, ...)
 	return str;
 }
 
+static inline void __user *
+u64_to_user_ptr(uint64_t addr)
+{
+
+	return (void __user *)(uintptr_t)addr;
+}
+
 #endif  /* _LINUX_KERNEL_H_ */
