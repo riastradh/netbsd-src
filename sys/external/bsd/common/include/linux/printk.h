@@ -55,6 +55,11 @@
 #define	KERN_DEBUG	"kern debug: "
 #define	KERN_CONT	""
 
+struct va_format {
+	const char	*fmt;
+	va_list		*va;
+};
+
 #define	DUMP_PREFIX_NONE	0
 #define	DUMP_PREFIX_OFFSET	1
 #define	DUMP_PREFIX_ADDRESS	2
