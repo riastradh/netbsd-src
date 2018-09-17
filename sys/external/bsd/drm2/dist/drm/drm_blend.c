@@ -503,7 +503,7 @@ int drm_atomic_normalize_zpos(struct drm_device *dev,
 {
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
-	struct drm_plane *plane;
+	struct drm_plane *plane __unused;
 	struct drm_plane_state *old_plane_state, *new_plane_state;
 	int i, ret = 0;
 
