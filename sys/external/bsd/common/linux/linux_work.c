@@ -119,6 +119,7 @@ static specificdata_key_t workqueue_key __read_mostly;
 struct workqueue_struct	*system_wq __read_mostly;
 struct workqueue_struct	*system_long_wq __read_mostly;
 struct workqueue_struct	*system_power_efficient_wq __read_mostly;
+struct workqueue_struct	*system_unbound_wq __read_mostly;
 
 static inline uintptr_t
 atomic_cas_uintptr(volatile uintptr_t *p, uintptr_t old, uintptr_t new)
@@ -160,10 +161,17 @@ linux_workqueue_init0(void)
 		goto fail3;
 	}
 
+	system_unbound_wq = alloc_ordered_workqueue("lnxubdwq", 0);
+	if (system_unbound_wq == NULL) {
+		error = ENOMEM;
+		goto fail4;
+	}
+
 	return 0;
 
-fail4: __unused
-	destroy_workqueue(system_power_efficient_wq);
+fail5: __unused
+	destroy_workqueue(system_unbound_wq);
+fail4:	destroy_workqueue(system_power_efficient_wq);
 fail3:	destroy_workqueue(system_long_wq);
 fail2:	destroy_workqueue(system_wq);
 fail1:	lwp_specific_key_delete(workqueue_key);
