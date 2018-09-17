@@ -155,7 +155,7 @@ linux_workqueue_init0(void)
 	}
 
 	system_power_efficient_wq = alloc_ordered_workqueue("lnxpwrwq", 0);
-	if (system_long_wq == NULL) {
+	if (system_power_efficient_wq == NULL) {
 		error = ENOMEM;
 		goto fail3;
 	}
