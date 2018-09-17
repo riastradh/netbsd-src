@@ -33,11 +33,18 @@
 #define	_DRM_DRM_WRITEBACK_H_
 
 struct dma_fence;
+struct drm_connector;
 struct drm_framebuffer;
+struct drm_writeback_connector;
 
 struct drm_writeback_job {
 	struct drm_framebuffer	*fb;
 	struct dma_fence	*out_fence;
 };
+
+struct drm_writeback_connector *
+	drm_connector_to_writeback(struct drm_connector *);
+struct dma_fence *
+	drm_writeback_get_out_fence(struct drm_writeback_connector *);
 
 #endif	/* _DRM_DRM_WRITEBACK_H_ */
