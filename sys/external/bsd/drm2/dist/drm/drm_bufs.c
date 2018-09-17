@@ -266,7 +266,7 @@ static int drm_addmap_core(struct drm_device *dev, resource_size_t offset,
 			if (dev->master->lock.hw_lock != NULL) {
 				vfree(map->handle);
 				kfree(map);
-				spin_unlock(&dev->primary->master->lock.spinlock);
+				spin_unlock(&dev->master->lock.spinlock);
 				return -EBUSY;
 			}
 			spin_unlock(&dev->primary->master->lock.spinlock);
