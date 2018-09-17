@@ -34,6 +34,7 @@
 
 #include <sys/types.h>
 #include <sys/cdefs.h>
+#include <sys/errno.h>
 #include <sys/null.h>
 
 #include <linux/slab.h>
@@ -91,6 +92,27 @@ kstrdup(const char *src, gfp_t gfp)
 	if (src == NULL)
 		return NULL;
 	return kstrndup(src, strlen(src), gfp);
+}
+
+static inline ssize_t
+strscpy(char *dst, const char *src, size_t dstsize)
+{
+	size_t n = dstsize;
+
+	/* If no space for a NUL terminator, fail.  */
+	if (n == 0)
+		return -E2BIG;
+
+	/* Copy until we get a NUL terminator or the end of the buffer.  */
+	while ((*dst++ = *src++) != '\0') {
+		if (__predict_false(--n == 0)) {
+			dst[-1] = '\0'; /* NUL-terminate */
+			return -E2BIG;
+		}
+	}
+
+	/* Return the number of bytes copied, excluding NUL.  */
+	return dstsize - n;
 }
 
 #endif  /* _LINUX_STRING_H_ */
