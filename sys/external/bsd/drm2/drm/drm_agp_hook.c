@@ -39,7 +39,8 @@ __KERNEL_RCSID(0, "$NetBSD: drm_agp_hook.c,v 1.3 2018/08/30 22:39:54 mrg Exp $")
 #include <sys/once.h>
 
 #include <drm/drmP.h>
-#include <drm/drm_internal.h>
+
+#include "../dist/drm/drm_internal.h"
 
 static struct {
 	kmutex_t			lock;

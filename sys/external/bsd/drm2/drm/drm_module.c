@@ -46,9 +46,10 @@ __KERNEL_RCSID(0, "$NetBSD: drm_module.c,v 1.17 2020/01/03 21:01:16 jmcneill Exp
 
 #include <drm/drmP.h>
 #include <drm/drm_encoder_slave.h>
-#include <drm/drm_internal.h>
 #include <drm/drm_sysctl.h>
 #include <drm/drm_panel.h>
+
+#include "../dist/drm/drm_internal.h"
 
 /*
  * XXX This is stupid.
