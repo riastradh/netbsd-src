@@ -38,6 +38,10 @@ struct rb_root {
 	struct rb_tree	rbr_tree;
 };
 
+struct rb_root_cached {
+	struct rb_root	rbrc_root;
+};
+
 static inline bool
 RB_EMPTY_ROOT(struct rb_root *root)
 {
