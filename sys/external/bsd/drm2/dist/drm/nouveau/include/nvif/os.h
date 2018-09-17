@@ -36,7 +36,6 @@
 #include <linux/kernel.h>
 #include <linux/kref.h>
 #include <linux/list.h>
-#include <linux/spinlock.h>
 #include <linux/math64.h>
 #include <linux/errno.h>
 #include <linux/workqueue.h>
