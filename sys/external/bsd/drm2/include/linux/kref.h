@@ -140,6 +140,17 @@ kref_put_mutex(struct kref *kref, void (*release)(struct kref *),
 	return 0;
 }
 
+static inline unsigned
+kref_read(const struct kref *kref)
+{
+	unsigned v;
+
+	v = kref->kr_count;
+	__insn_barrier();
+
+	return v;
+}
+
 /*
  * Not native to Linux.  Mostly used for assertions...
  */
