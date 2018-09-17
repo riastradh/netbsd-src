@@ -41,9 +41,8 @@
 #include <linux/list.h>
 #include <linux/spinlock.h>
 
-#define	__acquires(lock)			/* XXX lockdep stuff */
-#define	__releases(lock)			/* XXX lockdep stuff */
-#define might_lock(lock) do {} while(0) 	/* XXX lockdep stuff */
+#define	__acquires(lock)	/* XXX lockdep annotation */
+#define	__releases(lock)	/* XXX lockdep annotation */
 
 struct mutex {
 	kmutex_t mtx_lock;
@@ -113,9 +112,12 @@ mutex_lock_nest_lock(struct mutex *mutex, struct mutex *already)
 	mutex_lock(mutex);
 }
 
-#define	__lockdep_used		__unused
-#define	lockdep_assert_held(m)	do {} while (0)
-#define	lockdep_is_held(m)	1
+#define	__lockdep_used			__diagused
+#define	lockdep_assert_held(m)		KASSERT(mutex_owned(&(m)->mtx_lock))
+#define	lockdep_assert_held_once(m)	KASSERT(mutex_owned(&(m)->mtx_lock))
+#define	lockdep_is_held(m)		mutex_owned(&(m)->mtx_lock)
+
+#define	might_lock(m)			KDASSERT(mutex_ownable(&(m)->mtx_lock))
 
 #define	SINGLE_DEPTH_NESTING	0
 
