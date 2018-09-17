@@ -39,6 +39,7 @@
 #include <asm/processor.h>
 
 #include <linux/list.h>
+#include <linux/spinlock.h>
 
 #define	__acquires(lock)			/* XXX lockdep stuff */
 #define	__releases(lock)			/* XXX lockdep stuff */
