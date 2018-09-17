@@ -165,7 +165,7 @@ drm_agp_fini(struct drm_device *dev)
 }
 
 void
-drm_agp_clear(struct drm_device *dev)
+drm_legacy_agp_clear(struct drm_device *dev)
 {
 
 	if (dev->agp == NULL)
