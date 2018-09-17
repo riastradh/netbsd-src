@@ -32,4 +32,17 @@
 #ifndef _LINUX_RBTREE_H_
 #define _LINUX_RBTREE_H_
 
+#include <sys/rbtree.h>
+
+struct rb_root {
+	struct rb_tree	rbr_tree;
+};
+
+static inline bool
+RB_EMPTY_ROOT(struct rb_root *root)
+{
+
+	return RB_TREE_MIN(&root->rbr_tree) == NULL;
+}
+
 #endif  /* _LINUX_RBTREE_H_ */
