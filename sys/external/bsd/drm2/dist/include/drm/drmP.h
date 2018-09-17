@@ -85,7 +85,6 @@
 #include <drm/drm_os_linux.h>
 #endif
 
-#include <drm/drm.h>
 #include <drm/drm_agpsupport.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_global.h>
