@@ -24,6 +24,10 @@
 #ifndef __DRM_DEBUGFS_CRC_H__
 #define __DRM_DEBUGFS_CRC_H__
 
+#include <linux/spinlock.h>
+
+struct drm_crtc;
+
 #define DRM_MAX_CRC_NR		10
 
 /**
@@ -59,7 +63,9 @@ struct drm_crtc_crc {
 	struct drm_crtc_crc_entry *entries;
 	int head, tail;
 	size_t values_cnt;
+#ifndef __NetBSD__
 	wait_queue_head_t wq;
+#endif
 };
 
 #if defined(CONFIG_DEBUG_FS)
