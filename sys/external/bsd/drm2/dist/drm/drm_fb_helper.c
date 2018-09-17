@@ -615,11 +615,8 @@ void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 	mutex_lock(&kernel_fb_helper_lock);
 	if (!list_empty(&fb_helper->kernel_fb_list)) {
 		list_del(&fb_helper->kernel_fb_list);
-		if (list_empty(&kernel_fb_helper_list)) {
-#ifndef __NetBSD__		/* XXX drm sysrq */
+		if (list_empty(&kernel_fb_helper_list))
 			unregister_sysrq_key('v', &sysrq_drm_fb_helper_restore_op);
-#endif
-		}
 	}
 	mutex_unlock(&kernel_fb_helper_lock);
 
