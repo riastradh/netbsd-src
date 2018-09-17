@@ -35,7 +35,16 @@
 #include <sys/types.h>
 #include <sys/rbtree.h>
 
-#include <drm/drm_crtc.h>
+#include <drm/drm_connector.h>
+#include <drm/drm_encoder.h>
+
+struct drm_connector;
+struct drm_device;
+struct drm_display_mode;
+struct drm_encoder;
+struct drm_property;
+struct i2c_client;
+struct module;
 
 struct drm_encoder_slave_funcs {
 	void	(*set_config)(struct drm_encoder *, void *);
