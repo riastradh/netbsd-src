@@ -40,6 +40,10 @@
 
 #include <drm/drm_prime.h>
 
+#ifdef __NetBSD__		/* XXX */
+#include <drm/drm_wait_netbsd.h>
+#endif
+
 struct dma_fence;
 struct drm_file;
 struct drm_device;
