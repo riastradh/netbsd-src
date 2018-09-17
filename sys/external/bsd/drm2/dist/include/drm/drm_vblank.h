@@ -29,6 +29,7 @@
 #include <linux/seqlock.h>
 #include <linux/idr.h>
 #include <linux/poll.h>
+#include <linux/timer.h>
 
 #include <drm/drm_file.h>
 #include <drm/drm_modes.h>
