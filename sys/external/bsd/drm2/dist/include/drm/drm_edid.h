@@ -349,6 +349,7 @@ struct edid *drm_load_edid_firmware(struct drm_connector *connector);
 int __drm_set_edid_firmware_path(const char *path);
 int __drm_get_edid_firmware_path(char *buf, size_t bufsize);
 #else
+#include <linux/err.h>
 static inline struct edid *
 drm_load_edid_firmware(struct drm_connector *connector)
 {
