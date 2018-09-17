@@ -12,7 +12,6 @@ device	nouveaufb: nouveaufbbus, drmfb, drmfb_pci, wsemuldisplaydev
 attach	nouveaufb at nouveaufbbus
 
 # Local additions.  External sources are listd below.
-file	external/bsd/drm2/nouveau/nouveau_sysfs.c		nouveau
 file	external/bsd/drm2/nouveau/nouveau_vga.c			nouveau
 file	external/bsd/drm2/nouveau/nouveaufb.c			nouveaufb
 
