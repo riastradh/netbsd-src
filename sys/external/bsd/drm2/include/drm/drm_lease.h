@@ -51,6 +51,7 @@ struct drm_master *drm_lease_owner(struct drm_master *);
 bool	drm_lease_held(struct drm_file *, int);
 bool	_drm_lease_held(struct drm_file *, int);
 void	drm_lease_revoke(struct drm_master *);
+void	drm_lease_destroy(struct drm_master *);
 uint32_t drm_lease_filter_crtcs(struct drm_file *, uint32_t);
 
 #endif	/* _DRM_DRM_LEASE_H_ */
