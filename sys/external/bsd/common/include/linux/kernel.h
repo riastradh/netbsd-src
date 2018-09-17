@@ -89,8 +89,8 @@
 #define	min(X, Y)	MIN(X, Y)
 #define	max(X, Y)	MAX(X, Y)
 
-#define	max_t(T, X, Y)	MAX(X, Y)
-#define	min_t(T, X, Y)	MIN(X, Y)
+#define	max_t(T, X, Y)	MAX((T)(X), (T)(Y))
+#define	min_t(T, X, Y)	MIN((T)(X), (T)(Y))
 
 #define	clamp_t(T, X, MIN, MAX)	min_t(T, max_t(T, X, MIN), MAX)
 #define	clamp(X, MN, MX)	MIN(MAX(X, MN), MX)
