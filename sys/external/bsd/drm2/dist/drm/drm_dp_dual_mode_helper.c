@@ -125,7 +125,7 @@ ssize_t drm_dp_dual_mode_write(struct i2c_adapter *adapter,
 	msg.buf = data;
 
 	memcpy(data, &offset, 1);
-	memcpy(data + 1, buffer, size);
+	memcpy((char *)data + 1, buffer, size);
 
 	ret = i2c_transfer(adapter, &msg, 1);
 
