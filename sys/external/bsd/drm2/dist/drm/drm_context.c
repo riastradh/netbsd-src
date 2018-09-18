@@ -389,7 +389,7 @@ int drm_legacy_addctx(struct drm_device *dev, void *data,
 		tmp_handle = drm_legacy_ctxbitmap_next(dev);
 	}
 	DRM_DEBUG("%d\n", tmp_handle);
-	if (tmp_handle < 0) {
+	if ((int)ctx->handle < 0) {
 		DRM_DEBUG("Not enough free contexts.\n");
 		/* Should this return -EBUSY instead? */
 		return tmp_handle;
