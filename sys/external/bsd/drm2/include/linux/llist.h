@@ -110,7 +110,7 @@ llist_del_first(struct llist_head *head)
 		    (membar_datadep_consumer(),				      \
 			(TMP) = list_entry((ENTRY)->FIELD.llh_next,	      \
 			    typeof(*(ENTRY)), FIELD),			      \
-			1),						      \
+			1);						      \
 		 (ENTRY) = (TMP))
 
 #endif	/* _LINUX_LLIST_H_ */
