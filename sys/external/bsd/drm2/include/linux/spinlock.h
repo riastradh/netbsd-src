@@ -36,11 +36,10 @@
 #include <sys/mutex.h>
 
 #include <machine/limits.h>
-#include <linux/irqflags.h>
-#include <linux/preempt.h>
 
-#define	__acquires(lock)	/* XXX lockdep stuff */
-#define	__releases(lock)	/* XXX lockdep stuff */
+#include <linux/irqflags.h>
+#include <linux/lockdep.h>
+#include <linux/preempt.h>
 
 typedef struct spinlock {
 	kmutex_t sl_lock;
