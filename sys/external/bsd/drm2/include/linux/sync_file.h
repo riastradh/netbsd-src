@@ -32,4 +32,12 @@
 #ifndef	_LINUX_SYNC_FILE_H_
 #define	_LINUX_SYNC_FILE_H_
 
+struct dma_fence;
+struct sync_file;
+
+struct sync_file *
+	sync_file_create(struct dma_fence *);
+struct dma_fence *
+	sync_file_get_fence(int);
+
 #endif	/* _LINUX_SYNC_FILE_H_ */
