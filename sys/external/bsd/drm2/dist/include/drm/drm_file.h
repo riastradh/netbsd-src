@@ -332,7 +332,12 @@ struct drm_file {
 	int event_space;
 
 	/** @event_read_lock: Serializes drm_read(). */
+#ifdef __NetBSD__
+	struct lwp *event_read_lock;
+	drm_waitqueue_t event_read_wq;
+#else
 	struct mutex event_read_lock;
+#endif
 
 	/**
 	 * @prime:
