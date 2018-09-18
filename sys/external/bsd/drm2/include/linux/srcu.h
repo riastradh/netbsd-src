@@ -32,4 +32,28 @@
 #ifndef	_LINUX_SRCU_H_
 #define	_LINUX_SRCU_H_
 
+#include <sys/types.h>
+#include <sys/condvar.h>
+#include <sys/mutex.h>
+
+struct lwp;
+struct percpu;
+
+struct srcu {
+	struct percpu		*srcu_percpu;	/* struct srcu_cpu */
+	kmutex_t		srcu_lock;
+	kcondvar_t		srcu_cv;
+	struct lwp		*srcu_sync;
+	int64_t			srcu_total;
+	volatile unsigned	srcu_gen;
+};
+
+void	srcu_init(struct srcu *, const char *);
+void	srcu_fini(struct srcu *);
+
+int	srcu_read_lock(struct srcu *);
+void	srcu_read_unlock(struct srcu *, int);
+
+void	synchronize_srcu(struct srcu *);
+
 #endif	/* _LINUX_SRCU_H_ */
