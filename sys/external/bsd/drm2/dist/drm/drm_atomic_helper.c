@@ -1469,7 +1469,7 @@ drm_atomic_helper_wait_for_vblanks(struct drm_device *dev,
 		spin_lock(&dev->vbl_lock);
 		DRM_SPIN_WAIT_ON(ret, &dev->vblank[i].queue, &dev->vbl_lock,
 		    msecs_to_jiffies(50),
-		    (old_crtc_state->last_vblank_count !=
+		    (old_state->crtcs[i].last_vblank_count !=
 			drm_crtc_vblank_count(crtc)));
 		spin_unlock(&dev->vbl_lock);
 #else
