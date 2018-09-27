@@ -32,4 +32,15 @@
 #ifndef _LINUX_FILE_H_
 #define _LINUX_FILE_H_
 
+#include <sys/filedesc.h>
+#include <sys/proc.h>
+
+struct file;
+
+static inline void
+fd_install(int fd, struct file *fp)
+{
+	fd_affix(curproc, fp, fd);
+}
+
 #endif  /* _LINUX_FILE_H_ */
