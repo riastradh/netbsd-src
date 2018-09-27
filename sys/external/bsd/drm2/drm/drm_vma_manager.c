@@ -88,7 +88,7 @@ static int
 drm_vma_file_compare_key(void *cookie __unused, const void *vf, const void *vk)
 {
 	const struct drm_vma_offset_file *const f = vf;
-	const struct file *const k = vk;
+	const struct drm_file *const k = vk;
 
 	if (f->vof_file < k)
 		return -1;
@@ -264,7 +264,7 @@ out:	rw_exit(&mgr->vom_lock);
 }
 
 int
-drm_vma_node_allow(struct drm_vma_offset_node *node, struct file *file)
+drm_vma_node_allow(struct drm_vma_offset_node *node, struct drm_file *file)
 {
 	struct drm_vma_offset_file *new, *old;
 
@@ -284,7 +284,7 @@ drm_vma_node_allow(struct drm_vma_offset_node *node, struct file *file)
 }
 
 void
-drm_vma_node_revoke(struct drm_vma_offset_node *node, struct file *file)
+drm_vma_node_revoke(struct drm_vma_offset_node *node, struct drm_file *file)
 {
 
 	rw_enter(&node->von_lock, RW_WRITER);
@@ -298,7 +298,8 @@ drm_vma_node_revoke(struct drm_vma_offset_node *node, struct file *file)
 }
 
 bool
-drm_vma_node_is_allowed(struct drm_vma_offset_node *node, struct file *file)
+drm_vma_node_is_allowed(struct drm_vma_offset_node *node,
+    struct drm_file *file)
 {
 
 	rw_enter(&node->von_lock, RW_READER);
@@ -310,7 +311,8 @@ drm_vma_node_is_allowed(struct drm_vma_offset_node *node, struct file *file)
 }
 
 int
-drm_vma_node_verify_access(struct drm_vma_offset_node *node, struct file *file)
+drm_vma_node_verify_access(struct drm_vma_offset_node *node,
+    struct drm_file *file)
 {
 
 	if (!drm_vma_node_is_allowed(node, file))
