@@ -37,6 +37,7 @@
 #include <uvm/uvm_extern.h>
 
 #include <linux/mm_types.h>
+#include <linux/overflow.h>
 
 #include <asm/page.h>
 
