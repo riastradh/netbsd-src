@@ -37,6 +37,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem.h>
+#include <drm/drm_gem_framebuffer_helper.h>
+#include <drm/drm_modeset_helper.h>
 
 #include <uapi/drm/drm_mode.h>
 
@@ -118,8 +120,8 @@ drm_gem_fb_create_with_funcs(struct drm_device *dev, struct drm_file *file,
 
 	/* Get the object for each plane.  */
 	for (plane = 0; plane < fb->format->num_planes; plane++) {
-		unsigned vsub = (plane > 0 ? info->vsub : 1); /* XXX ? */
-		unsigned hsub = (plane > 0 ? info->hsub : 1); /* XXX ? */
+		unsigned vsub = (plane > 0 ? fb->format->vsub : 1); /* XXX ? */
+		unsigned hsub = (plane > 0 ? fb->format->hsub : 1); /* XXX ? */
 		unsigned handle = mode_cmd->handles[plane];
 		unsigned size;
 
