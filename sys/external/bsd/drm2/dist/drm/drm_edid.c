@@ -2039,12 +2039,18 @@ EXPORT_SYMBOL(drm_get_edid);
 struct edid *drm_get_edid_switcheroo(struct drm_connector *connector,
 				     struct i2c_adapter *adapter)
 {
+#ifndef __NetBSD__		/* XXX vga switcheroo */
 	struct pci_dev *pdev = connector->dev->pdev;
+#endif
 	struct edid *edid;
 
+#ifndef __NetBSD__		/* XXX vga switcheroo */
 	vga_switcheroo_lock_ddc(pdev);
+#endif
 	edid = drm_get_edid(connector, adapter);
+#ifndef __NetBSD__		/* XXX vga switcheroo */
 	vga_switcheroo_unlock_ddc(pdev);
+#endif
 
 	return edid;
 }
