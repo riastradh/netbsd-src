@@ -736,7 +736,11 @@ int drm_framebuffer_init(struct drm_device *dev, struct drm_framebuffer *fb,
 	INIT_LIST_HEAD(&fb->filp_head);
 
 	fb->funcs = funcs;
+#ifdef __NetBSD__
+	strlcpy(fb->comm, curproc->p_comm, sizeof fb->comm);
+#else
 	strcpy(fb->comm, current->comm);
+#endif
 
 	ret = __drm_mode_object_add(dev, &fb->base, DRM_MODE_OBJECT_FB,
 				    false, drm_framebuffer_free);
