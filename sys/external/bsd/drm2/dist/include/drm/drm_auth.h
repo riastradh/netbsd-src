@@ -37,6 +37,21 @@
 struct drm_file;
 struct drm_hw_lock;
 
+#include <linux/idr.h>
+#include <linux/kref.h>
+#include <linux/list.h>
+#include <linux/spinlock.h>
+#include <linux/types.h>
+
+#ifdef __NetBSD__
+#include <drm/drm_wait_netbsd.h>
+#endif
+
+struct drm_device;
+struct drm_file;
+struct drm_hw_lock;
+struct drm_master;
+
 /*
  * Legacy DRI1 locking data structure. Only here instead of in drm_legacy.h for
  * include ordering reasons.
