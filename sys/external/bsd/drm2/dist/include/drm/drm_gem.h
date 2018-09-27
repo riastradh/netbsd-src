@@ -39,6 +39,8 @@
 #ifdef __NetBSD__
 #include <uvm/uvm.h>
 #endif
+
+#include <linux/types.h>
 #include <linux/kref.h>
 #include <linux/dma-resv.h>
 
