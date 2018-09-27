@@ -600,12 +600,13 @@ drm_gem_get_pages(struct drm_gem_object *obj)
 	struct pglist pglist;
 	struct vm_page *vm_page;
 	struct page **pages;
-	unsigned i;
+	unsigned i, npages;
 	int ret;
 
 	KASSERT((obj->size & (PAGE_SIZE - 1)) != 0);
 
-	pages = drm_malloc_ab(obj->size >> PAGE_SHIFT, sizeof(*pages));
+	npages = obj->size >> PAGE_SHIFT;
+	pages = kvmalloc_array(npages, sizeof(*pages), GFP_KERNEL);
 	if (pages == NULL) {
 		ret = -ENOMEM;
 		goto fail0;
@@ -623,7 +624,7 @@ drm_gem_get_pages(struct drm_gem_object *obj)
 
 	return pages;
 
-fail1:	drm_free_large(pages);
+fail1:	kvfree(pages);
 fail0:	return ERR_PTR(ret);
 }
 #else
