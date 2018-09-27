@@ -3165,7 +3165,7 @@ add_detailed_modes(struct drm_connector *connector, struct edid *edid,
  */
 static u8 *drm_find_edid_extension(const struct edid *edid, int ext_id)
 {
-	u8 *edid_ext = NULL;
+	const u8 *edid_ext = NULL;
 	int i;
 
 	/* No EDID or EDID extensions */
