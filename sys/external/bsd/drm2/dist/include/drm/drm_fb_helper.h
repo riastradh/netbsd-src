@@ -32,6 +32,7 @@
 #ifndef DRM_FB_HELPER_H
 #define DRM_FB_HELPER_H
 
+struct apertures_struct;
 struct drm_fb_helper;
 
 #include <drm/drm_client.h>
