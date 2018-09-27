@@ -173,8 +173,17 @@ void
 idr_init(struct idr *idr)
 {
 
+	idr_init_base(idr, 0);
+}
+
+void
+idr_init_base(struct idr *idr, int base)
+{
+
 	mutex_init(&idr->idr_lock, MUTEX_DEFAULT, IPL_VM);
 	rb_tree_init(&idr->idr_tree, &idr_rb_ops);
+	idr->idr_base = base;
+
 	SDT_PROBE1(sdt, linux, idr, init,  idr);
 }
 
