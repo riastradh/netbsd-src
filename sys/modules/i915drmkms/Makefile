@@ -26,6 +26,8 @@ CPPFLAGS+=	-DNVGA=1
 
 CWARNFLAGS+=	-Wno-shadow
 CWARNFLAGS+=	-Wno-pointer-arith
+CWARNFLAGS.clang+=	-Wno-error=enum-conversion
+CWARNFLAGS.clang+=	-Wno-error=unused-function
 
 # Code imported from Linux - expects signed overflow to be OK.
 COPTS+=		-fwrapv
