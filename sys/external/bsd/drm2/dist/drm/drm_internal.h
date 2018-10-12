@@ -247,3 +247,6 @@ int drm_framebuffer_debugfs_init(struct drm_minor *minor);
 /* drm_hdcp.c */
 int drm_setup_hdcp_srm(struct class *drm_class);
 void drm_teardown_hdcp_srm(struct class *drm_class);
+
+/* drm_fb_helper.c */
+extern struct mutex drm_kernel_fb_helper_lock;
