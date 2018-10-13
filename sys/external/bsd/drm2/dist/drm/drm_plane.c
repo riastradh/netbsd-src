@@ -111,7 +111,7 @@ static int create_in_format_blob(struct drm_device *dev, struct drm_plane *plane
 	 * should be naturally aligned to 8B.
 	 */
 	BUILD_BUG_ON(sizeof(struct drm_format_modifier_blob) % 8);
-	blob_size += ALIGN(formats_size, 8);
+	blob_size += round_up(formats_size, 8);
 	blob_size += modifiers_size;
 
 	blob = drm_property_create_blob(dev, blob_size, NULL);
@@ -125,7 +125,7 @@ static int create_in_format_blob(struct drm_device *dev, struct drm_plane *plane
 	blob_data->count_modifiers = plane->modifier_count;
 
 	blob_data->modifiers_offset =
-		ALIGN(blob_data->formats_offset + formats_size, 8);
+		round_up(blob_data->formats_offset + formats_size, 8);
 
 	memcpy(formats_ptr(blob_data), plane->format_types, formats_size);
 
