@@ -40,16 +40,12 @@
 #include <linux/jiffies.h>
 #include <linux/time.h>
 
-union ktime {
-	int64_t kt_nsec;
-};
-
-typedef union ktime ktime_t;
+typedef int64_t	ktime_t;
 
 static inline int64_t
 ktime_to_ns(ktime_t kt)
 {
-	return kt.kt_nsec;
+	return kt;
 }
 
 static inline int64_t
@@ -61,7 +57,7 @@ ktime_to_us(ktime_t kt)
 static inline ktime_t
 ns_to_ktime(int64_t nsec)
 {
-	return (ktime_t) { .kt_nsec = nsec };
+	return nsec;
 }
 
 static inline ktime_t
