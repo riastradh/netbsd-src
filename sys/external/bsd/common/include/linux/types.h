@@ -95,4 +95,9 @@ typedef off_t loff_t;
 /* Definition copied in <linux/kernel.h> for convenience.  */
 #define	__user
 
+struct list_head {
+	struct list_head *prev;
+	struct list_head *next;
+};
+
 #endif  /* _LINUX_TYPES_H_ */

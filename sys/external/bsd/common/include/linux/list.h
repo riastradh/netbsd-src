@@ -49,15 +49,11 @@
 #include <sys/queue.h>
 
 #include <linux/kernel.h>
+#include <linux/types.h>
 
 /*
- * Doubly-linked lists.
+ * Doubly-linked lists.  Type defined in <linux/types.h>.
  */
-
-struct list_head {
-	struct list_head *prev;
-	struct list_head *next;
-};
 
 #define	LIST_HEAD_INIT(name)	{ .prev = &(name), .next = &(name) }
 
