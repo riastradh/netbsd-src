@@ -105,7 +105,11 @@ static inline void __tasklet_disable_sync_once(struct tasklet_struct *t)
 
 static inline bool __tasklet_is_enabled(const struct tasklet_struct *t)
 {
+#ifdef __NetBSD__
+	return tasklet_is_enabled(t);
+#else
 	return !atomic_read(&t->count);
+#endif
 }
 
 static inline bool __tasklet_enable(struct tasklet_struct *t)
