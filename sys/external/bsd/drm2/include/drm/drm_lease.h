@@ -42,7 +42,7 @@ int	drm_mode_create_lease_ioctl(struct drm_device *, void *,
 	    struct drm_file *);
 int	drm_mode_get_lease_ioctl(struct drm_device *, void *,
 	    struct drm_file *);
-int	drm_mode_list_leases_ioctl(struct drm_device *, void *,
+int	drm_mode_list_lessees_ioctl(struct drm_device *, void *,
 	    struct drm_file *);
 int	drm_mode_revoke_lease_ioctl(struct drm_device *, void *,
 	    struct drm_file *);
