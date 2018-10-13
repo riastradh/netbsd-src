@@ -382,6 +382,7 @@ tasklet_disable(struct tasklet_struct *tasklet)
 	/* Increment the disable count.  */
 	disablecount = atomic_inc_uint_nv(&tasklet->tl_disablecount);
 	KASSERT(disablecount < UINT_MAX);
+	KASSERT(disablecount != 0);
 
 	/* Wait for it to finish running, if it was running.  */
 	while (tasklet->tl_state & TASKLET_RUNNING)
