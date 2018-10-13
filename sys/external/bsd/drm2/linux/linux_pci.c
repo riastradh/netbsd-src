@@ -47,12 +47,16 @@ pci_dev_dev(struct pci_dev *pdev)
 	return pdev->pd_dev;
 }
 
-/* XXX Nouveau kludge!  */
-struct drm_device *
+void
+pci_set_drvdata(struct pci_dev *pdev, void *drvdata)
+{
+	pdev->pd_drvdata = drvdata;
+}
+
+void *
 pci_get_drvdata(struct pci_dev *pdev)
 {
-
-	return pdev->pd_drm_dev;
+	return pdev->pd_drvdata;
 }
 
 void
@@ -82,6 +86,7 @@ linux_pci_dev_init(struct pci_dev *pdev, device_t dev, device_t parent,
 #endif
 	pdev->pd_saved_state = NULL;
 	pdev->pd_intr_handles = NULL;
+	pdev->pd_drvdata = NULL;
 	pdev->bus = kmem_zalloc(sizeof(*pdev->bus), KM_NOSLEEP);
 	pdev->bus->pb_pc = pa->pa_pc;
 	pdev->bus->pb_dev = parent;
