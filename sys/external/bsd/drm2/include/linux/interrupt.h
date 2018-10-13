@@ -36,6 +36,7 @@
 
 #include <linux/hardirq.h>
 #include <linux/kernel.h>
+#include <linux/tasklet.h>
 
 #define	in_interrupt()	(cpu_intr_p() || cpu_softintr_p())
 
