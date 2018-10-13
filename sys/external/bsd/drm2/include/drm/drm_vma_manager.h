@@ -52,6 +52,9 @@ struct drm_vma_offset_node {
 	vmem_size_t	von_npages;
 	struct rb_tree	von_files;
 	struct rb_node	von_rb_node;
+
+	/* Linux API names */
+	bool		readonly;
 };
 
 static inline unsigned long
