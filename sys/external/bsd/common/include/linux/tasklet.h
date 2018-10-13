@@ -33,13 +33,13 @@
 #define	_LINUX_TASKLET_H_
 
 /* namespace */
-#define	tasklet_disable		linux_tasklet_disable
-#define	tasklet_enable		linux_tasklet_enable
-#define	tasklet_hi_schedule	linux_tasklet_hi_schedule
-#define	tasklet_init		linux_tasklet_init
-#define	tasklet_kill		linux_tasklet_kill
-#define	tasklet_schedule	linux_tasklet_schedule
-#define	tasklet_struct		linux_tasklet_struct
+#define	tasklet_disable			linux_tasklet_disable
+#define	tasklet_enable			linux_tasklet_enable
+#define	tasklet_hi_schedule		linux_tasklet_hi_schedule
+#define	tasklet_init			linux_tasklet_init
+#define	tasklet_kill			linux_tasklet_kill
+#define	tasklet_schedule		linux_tasklet_schedule
+#define	tasklet_struct			linux_tasklet_struct
 
 struct tasklet_struct {
 	SIMPLEQ_ENTRY(tasklet_struct)	tl_entry;
