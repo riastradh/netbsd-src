@@ -114,6 +114,8 @@
 #define	DIV_ROUND_UP(X, N)	(((X) + (N) - 1) / (N))
 #define	DIV_ROUND_UP_ULL(X, N)	DIV_ROUND_UP((unsigned long long)(X), (N))
 
+#define	DIV_ROUND_DOWN_ULL(X,N)	((unsigned long long)(X) / (N))
+
 /*
  * Rounding to powers of two -- carefully avoiding multiple evaluation
  * of arguments and pitfalls with C integer arithmetic rules.
