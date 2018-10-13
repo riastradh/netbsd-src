@@ -57,6 +57,15 @@
 	(P);								      \
 })
 
+#define	rcu_access_pointer(P) ({					      \
+	__typeof__(*(P)) *__rcu_access_pointer_tmp = (P);		      \
+	__insn_barrier();						      \
+	__rcu_access_pointer_tmp;					      \
+})
+
+/* kill_dependency */
+#define	rcu_pointer_handoff(P)	(P)
+
 struct rcu_head {
 	void		(*rcuh_callback)(struct rcu_head *);
 	struct rcu_head	*rcuh_next;
