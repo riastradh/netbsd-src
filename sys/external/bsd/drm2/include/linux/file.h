@@ -37,6 +37,13 @@
 
 struct file;
 
+/* fget translates; fput(fp) doesn't because we have fd_putfile(fd).  */
+static inline struct file *
+fget(int fd)
+{
+	return fd_getfile(fd);
+}
+
 static inline void
 fd_install(int fd, struct file *fp)
 {
