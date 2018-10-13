@@ -169,12 +169,20 @@ gc_thread(void *cookie)
 			mutex_enter(&gc.lock);
 			gc.gen++;		/* done running */
 			cv_broadcast(&gc.cv);	/* notify rcu_barrier */
+
+			/*
+			 * Go back to the top and get more work before
+			 * deciding whether to stop so that we
+			 * guarantee to run all callbacks.
+			 */
+			continue;
 		}
 
 		/* If we're asked to close shop, do so.  */
 		if (gc.dying)
 			break;
 	}
+	KASSERT(gc.first == NULL);
 	mutex_exit(&gc.lock);
 
 	kthread_exit(0);
