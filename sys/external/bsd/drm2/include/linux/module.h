@@ -64,5 +64,6 @@ __link_set_add_rodata(linux_module_param_desc, PARAMETER ## _desc)
 #define	KBUILD_MODNAME	__file__
 
 #define	__MODULE_STRING(x)	__STRING(x)
+#define	__stringify(x)		__STRING(x)
 
 #endif  /* _LINUX_MODULE_H_ */
