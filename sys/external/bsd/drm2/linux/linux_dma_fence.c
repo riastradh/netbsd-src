@@ -352,7 +352,7 @@ dma_fence_add_callback(struct dma_fence *fence, struct dma_fence_cb *fcb,
 		goto out1;
 
 	/* Insert the callback.  */
-	fcb->fcb_func = fn;
+	fcb->func = fn;
 	TAILQ_INSERT_TAIL(&fence->f_callbacks, fcb, fcb_entry);
 	fcb->fcb_onqueue = true;
 
@@ -510,7 +510,7 @@ dma_fence_signal_locked(struct dma_fence *fence)
 	TAILQ_FOREACH_SAFE(fcb, &fence->f_callbacks, fcb_entry, next) {
 		TAILQ_REMOVE(&fence->f_callbacks, fcb, fcb_entry);
 		fcb->fcb_onqueue = false;
-		(*fcb->fcb_func)(fence, fcb);
+		(*fcb->func)(fence, fcb);
 	}
 
 	/* Success! */
