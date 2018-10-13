@@ -61,6 +61,12 @@ ns_to_ktime(int64_t nsec)
 }
 
 static inline ktime_t
+ktime_add(ktime_t a, ktime_t b)
+{
+	return ns_to_ktime(ktime_to_ns(a) + ktime_to_ns(b));
+}
+
+static inline ktime_t
 ktime_add_ns(ktime_t kt, int64_t nsec)
 {
 	return ns_to_ktime(ktime_to_ns(kt) + nsec);
