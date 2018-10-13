@@ -38,6 +38,11 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/pci.h>
 #include <linux/uaccess.h>
 
+#ifdef __NetBSD__
+#include <sys/types.h>
+#include <sys/file.h>
+#endif
+
 #include <drm/drm_agpsupport.h>
 #include <drm/drm_auth.h>
 #include <drm/drm_crtc.h>
@@ -779,7 +784,11 @@ static const struct drm_ioctl_desc drm_ioctls[] = {
 long drm_ioctl_kernel(struct file *file, drm_ioctl_t *func, void *kdata,
 		      u32 flags)
 {
+#ifdef __NetBSD__
+	struct drm_file *file_priv = file->f_data;
+#else
 	struct drm_file *file_priv = file->private_data;
+#endif
 	struct drm_device *dev = file_priv->minor->dev;
 	int retcode;
 
