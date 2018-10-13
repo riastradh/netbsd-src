@@ -39,6 +39,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/list.h>
 #include <linux/list_sort.h>
 #include <linux/export.h>
+#include <asm/div64.h>
 
 #ifdef CONFIG_VIDEOMODE_HELPERS
 #ifdef CONFIG_OF
