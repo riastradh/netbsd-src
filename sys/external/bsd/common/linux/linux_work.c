@@ -538,6 +538,19 @@ work_claimed(struct work_struct *work, struct workqueue_struct *wq)
 }
 
 /*
+ * work_pending(work)
+ *
+ *	True if work is currently claimed by any workqueue, scheduled
+ *	to run on that workqueue.
+ */
+bool
+work_pending(struct work_struct *work)
+{
+
+	return work->work_owner & 1;
+}
+
+/*
  * work_queue(work)
  *
  *	Return the last queue that work was queued on, or NULL if it
@@ -1525,4 +1538,16 @@ flush_delayed_work(struct delayed_work *dw)
 	mutex_exit(&wq->wq_lock);
 
 	return waited;
+}
+
+/*
+ * delayed_work_pending(dw)
+ *
+ *	True if dw is currently scheduled to execute, false if not.
+ */
+bool
+delayed_work_pending(struct delayed_work *dw)
+{
+
+	return work_pending(&dw->work);
 }
