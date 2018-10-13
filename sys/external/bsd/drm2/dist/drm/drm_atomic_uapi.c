@@ -1104,7 +1104,7 @@ static int setup_out_fence(struct drm_out_fence_state *fence_state,
 
 	/* Prepare to transmit it to user.  */
 	/* XXX errno NetBSD->Linux */
-	ret = -copyout(&fence_state->fd, &fd, sizeof fd);
+	ret = -copyout(&fd, fence_state->out_fence_ptr, sizeof fd);
 	if (ret)
 		goto out;
 
