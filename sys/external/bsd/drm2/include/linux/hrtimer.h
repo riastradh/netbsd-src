@@ -32,4 +32,7 @@
 #ifndef _LINUX_HRTIMER_H_
 #define _LINUX_HRTIMER_H_
 
+struct hrtimer {
+};
+
 #endif  /* _LINUX_HRTIMER_H_ */
