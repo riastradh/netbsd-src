@@ -34,6 +34,8 @@
 
 #include <sys/time.h>
 
+#define	timespec64	timespec	/* take that, 2038 */
+
 #define NSEC_PER_MSEC	1000000L
 
 /*
