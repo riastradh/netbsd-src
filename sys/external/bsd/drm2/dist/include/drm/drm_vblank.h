@@ -30,6 +30,7 @@
 #include <linux/idr.h>
 #include <linux/poll.h>
 #include <linux/timer.h>
+#include <linux/ktime.h>
 
 #include <drm/drm_file.h>
 #include <drm/drm_modes.h>
