@@ -38,6 +38,8 @@
 
 #define	__rcu
 
+#define	RCU_INIT_POINTER(P, V)	((P) = (V))
+
 #define	rcu_assign_pointer(P, V) do {					      \
 	membar_producer();						      \
 	(P) = (V);							      \
