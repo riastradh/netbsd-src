@@ -127,7 +127,7 @@ drm_pci_attach(device_t self, const struct pci_attach_args *pa,
 
 	/* Set up AGP stuff if requested.  */
 	if (drm_core_check_feature(dev, DRIVER_USE_AGP)) {
-		if (drm_pci_device_is_agp(dev))
+		if (pci_find_capability(dev->pdev, PCI_CAP_ID_AGP))
 			dev->agp = drm_agp_init(dev);
 		if (dev->agp)
 			dev->agp->agp_mtrr = arch_phys_wc_add(dev->agp->base,
