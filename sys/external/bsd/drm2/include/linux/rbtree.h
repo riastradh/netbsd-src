@@ -49,4 +49,19 @@ RB_EMPTY_ROOT(struct rb_root *root)
 	return RB_TREE_MIN(&root->rbr_tree) == NULL;
 }
 
+static inline void
+rb_erase(struct rb_root *root, struct rb_node *rbnode)
+{
+	struct rb_tree *tree = &root->rbr_tree;
+	void *node = (char *)rbnode - tree->rbt_ops->rbto_node_offset;
+
+	rb_tree_remove_node(tree, node);
+}
+
+static inline void
+rb_erase_cached(struct rb_root_cached *root, struct rb_node *rbnode)
+{
+	rb_erase(&root->rbrc_root, rbnode);
+}
+
 #endif  /* _LINUX_RBTREE_H_ */
