@@ -47,16 +47,18 @@ struct timer_list {
 	struct callout tl_callout;
 };
 
+#define	from_timer(V, T, F)	container_of(T, __typeof__(*(V)), F)
+
 static inline void
-setup_timer(struct timer_list *timer, void (*fn)(unsigned long),
-    unsigned long arg)
+timer_setup(struct timer_list *timer, void (*fn)(struct timer_list *),
+    unsigned flags)
 {
 
 	callout_init(&timer->tl_callout, 0);
 
 	/* XXX Super-sketchy casts!  */
 	callout_setfunc(&timer->tl_callout, (void (*)(void *))(void *)fn,
-	    (void *)(uintptr_t)arg);
+	    (void *)arg);
 }
 
 static inline void
