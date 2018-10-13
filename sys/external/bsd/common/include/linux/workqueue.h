@@ -57,6 +57,7 @@
 #define	schedule_work			linux_schedule_work
 #define	system_long_wq			linux_system_long_wq
 #define	system_power_efficient_wq	linux_system_power_efficient_wq
+#define	system_unbound_wq		linux_system_unbound_wq
 #define	system_wq			linux_system_wq
 #define	to_delayed_work			linux_to_delayed_work
 
