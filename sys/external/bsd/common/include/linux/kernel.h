@@ -74,6 +74,7 @@
 #endif
 #define	__always_unused	__unused
 #define	noinline	__noinline
+#define	__deprecated	/* nothing */
 
 #define	barrier()	__insn_barrier()
 #define	likely(X)	__predict_true(X)
