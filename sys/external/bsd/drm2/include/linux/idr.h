@@ -69,7 +69,7 @@ bool	idr_is_empty(struct idr *);
 void	*idr_find(struct idr *, int);
 void	*idr_get_next(struct idr *, int *);
 void	*idr_replace(struct idr *, void *, int);
-void	idr_remove(struct idr *, int);
+void	*idr_remove(struct idr *, int);
 void	idr_preload(gfp_t);
 int	idr_alloc(struct idr *, void *, int, int, gfp_t);
 void	idr_preload_end(void);
