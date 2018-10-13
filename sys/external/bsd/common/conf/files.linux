@@ -4,4 +4,5 @@ define	linux
 
 makeoptions 	linux	CPPFLAGS+="-I$S/external/bsd/common/include"
 
+file	external/bsd/common/linux/linux_tasklet.c	linux
 file	external/bsd/common/linux/linux_work.c		linux

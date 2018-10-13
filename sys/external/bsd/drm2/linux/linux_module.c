@@ -43,6 +43,7 @@ __KERNEL_RCSID(0, "$NetBSD: linux_module.c,v 1.9 2018/08/27 15:08:54 riastradh E
 #include <linux/io.h>
 #include <linux/mutex.h>
 #include <linux/rcupdate.h>
+#include <linux/tasklet.h>
 #include <linux/workqueue.h>
 
 MODULE(MODULE_CLASS_MISC, drmkms_linux, "i2cexec");
@@ -89,10 +90,17 @@ linux_init(void)
 		goto fail5;
 	}
 
+	error = linux_tasklets_init();
+	if (error) {
+		printf("linux: unable to initialize tasklets: %d\n", error);
+		goto fail6;
+	}
+
 	return 0;
 
-fail6: __unused
-	linux_atomic64_fini();
+fail7: __unused
+	linux_tasklets_fini();
+fail6:	linux_atomic64_fini();
 fail5:	linux_writecomb_fini();
 fail4:	linux_workqueue_fini();
 fail3:	linux_rcu_gc_fini();
@@ -118,6 +126,7 @@ static void
 linux_fini(void)
 {
 
+	linux_tasklets_fini();
 	linux_atomic64_fini();
 	linux_writecomb_fini();
 	linux_workqueue_fini();
