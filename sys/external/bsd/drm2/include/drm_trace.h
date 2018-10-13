@@ -35,13 +35,14 @@
 #include <sys/types.h>
 
 static inline void
-trace_drm_vblank_event_delivered(pid_t pid __unused, int pipe __unused,
-    uint32_t sequence __unused)
+trace_drm_vblank_event_delivered(struct drm_file *fp __unused,
+    int pipe __unused, uint32_t sequence __unused)
 {
 }
 
 static inline void
-trace_drm_vblank_event_queued(pid_t pid __unused, int pipe __unused,
+trace_drm_vblank_event_queued(struct drm_file *file __unused,
+    int pipe __unused,
     uint32_t sequence __unused)
 {
 }
