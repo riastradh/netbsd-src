@@ -184,10 +184,11 @@ dma_buf_attach(struct dma_buf *dmabuf, struct device *dev)
 
 	attach = kmem_zalloc(sizeof(*attach), KM_SLEEP);
 	attach->dmabuf = dmabuf;
+	attach->dev = dev;
 
 	mutex_enter(&dmabuf->db_lock);
 	if (dmabuf->ops->attach)
-		ret = dmabuf->ops->attach(dmabuf, dev, attach);
+		ret = dmabuf->ops->attach(dmabuf, attach);
 	mutex_exit(&dmabuf->db_lock);
 	if (ret)
 		goto fail0;
