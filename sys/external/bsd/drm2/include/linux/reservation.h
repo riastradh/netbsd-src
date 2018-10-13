@@ -122,4 +122,10 @@ int	reservation_object_poll(struct reservation_object *, int,
 int	reservation_object_kqfilter(struct reservation_object *,
 	    struct knote *, struct reservation_poll *);
 
+static inline bool
+reservation_object_has_excl_fence(struct reservation_object *robj)
+{
+	return robj->robj_fence != NULL;
+}
+
 #endif	/* _LINUX_RESERVATION_H_ */
