@@ -148,16 +148,16 @@ drm_mode_get_lease_ioctl(struct drm_device *dev, void *data,
 }
 
 /*
- * drm_mode_list_leases_ioctl(dev, data, file)
+ * drm_mode_list_lessees_ioctl(dev, data, file)
  *
- *	DRM_IOCTL_MODE_LIST_LEASES(struct drm_mode_list_leases) ioctl
+ *	DRM_IOCTL_MODE_LIST_LESSEES(struct drm_mode_list_lessees) ioctl
  *	implementation.
  */
 int
-drm_mode_list_leases_ioctl(struct drm_device *dev, void *data,
+drm_mode_list_lessees_ioctl(struct drm_device *dev, void *data,
     struct drm_file *file)
 {
-	struct drm_mode_list_leases *args __unused = data;
+	struct drm_mode_list_lessees *args __unused = data;
 
 	/* XXX not yet implemented */
 	return -ENODEV;
