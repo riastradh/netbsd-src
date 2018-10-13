@@ -201,6 +201,52 @@ dma_fence_get_rcu(struct dma_fence *fence)
 	return fence;
 }
 
+/*
+ * dma_fence_get_rcu_safe(fencep)
+ *
+ *	Attempt to acquire a reference to the fence *fencep, which may
+ *	be about to be destroyed, during a read section.  If the value
+ *	of *fencep changes after we read *fencep but before we
+ *	increment its reference count, retry.  Return *fencep on
+ *	success, or NULL on failure.
+ */
+struct dma_fence *
+dma_fence_get_rcu_safe(struct dma_fence **fencep)
+{
+	struct dma_fence *fence, *fence0;
+
+retry:
+	fence = *fencep;
+
+	/* Load fence only once.  */
+	__insn_barrier();
+
+	/* If there's nothing there, give up.  */
+	if (fence == NULL)
+		return NULL;
+
+	/* Make sure we don't load stale fence guts.  */
+	membar_datadep_consumer();
+
+	/* Try to acquire a reference.  If we can't, try again.  */
+	if (!dma_fence_get_rcu(fence))
+		goto retry;
+
+	/*
+	 * Confirm that it's still the same fence.  If not, release it
+	 * and retry.
+	 */
+	fence0 = *fencep;
+	__insn_barrier();
+	if (fence != fence0) {
+		dma_fence_put(fence);
+		goto retry;
+	}
+
+	/* Success!  */
+	return fence;
+}
+
 static void
 dma_fence_release(struct kref *refcount)
 {
