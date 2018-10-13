@@ -120,7 +120,64 @@ reservation_object_fini(struct reservation_object *robj)
 }
 
 /*
- * reservation_object_held(roj)
+ * reservation_object_lock(robj, ctx)
+ *
+ *	Acquire a reservation object's lock.  Return 0 on success,
+ *	-EALREADY if caller already holds it, -EDEADLK if a
+ *	higher-priority owner holds it and the caller must back out and
+ *	retry.
+ */
+int
+reservation_object_lock(struct reservation_object *robj,
+    struct ww_acquire_ctx *ctx)
+{
+
+	return ww_mutex_lock(&robj->lock, ctx);
+}
+
+/*
+ * reservation_object_lock_interruptible(robj, ctx)
+ *
+ *	Acquire a reservation object's lock.  Return 0 on success,
+ *	-EALREADY if caller already holds it, -EDEADLK if a
+ *	higher-priority owner holds it and the caller must back out and
+ *	retry, -ERESTART/-EINTR if interrupted.
+ */
+int
+reservation_object_lock_interruptible(struct reservation_object *robj,
+    struct ww_acquire_ctx *ctx)
+{
+
+	return ww_mutex_lock_interruptible(&robj->lock, ctx);
+}
+
+/*
+ * reservation_object_trylock(robj)
+ *
+ *	Try to acquire a reservation object's lock without blocking.
+ *	Return true on success, false on failure.
+ */
+bool
+reservation_object_trylock(struct reservation_object *robj)
+{
+
+	return ww_mutex_trylock(&robj->lock);
+}
+
+/*
+ * reservation_object_unlock(robj)
+ *
+ *	Release a reservation object's lock.
+ */
+void
+reservation_object_unlock(struct reservation_object *robj)
+{
+
+	return ww_mutex_unlock(&robj->lock);
+}
+
+/*
+ * reservation_object_held(robj)
  *
  *	True if robj is locked.
  */
