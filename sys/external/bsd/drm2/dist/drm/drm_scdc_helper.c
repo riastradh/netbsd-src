@@ -114,7 +114,7 @@ ssize_t drm_scdc_write(struct i2c_adapter *adapter, u8 offset,
 	msg.buf = data;
 
 	memcpy(data, &offset, sizeof(offset));
-	memcpy(data + 1, buffer, size);
+	memcpy((char *)data + 1, buffer, size);
 
 	err = i2c_transfer(adapter, &msg, 1);
 
