@@ -125,12 +125,17 @@ ktime_get_real(void)
 	return timespec_to_ktime(ts);
 }
 
+static inline ktime_t
+ktime_get_raw(void)
+{
+	/* XXX */
+	return ktime_get();
+}
+
 static inline uint64_t
 ktime_get_raw_ns(void)
 {
-
-	/* XXX */
-	return ktime_to_ns(ktime_get());
+	return ktime_to_ns(ktime_get_raw());
 }
 
 static inline ktime_t
