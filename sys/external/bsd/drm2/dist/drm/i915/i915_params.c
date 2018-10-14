@@ -203,7 +203,7 @@ static __always_inline void _print_param(struct drm_printer *p,
 	else if (!__builtin_strcmp(type, "unsigned long"))
 		drm_printf(p, "i915.%s=%lu\n", name, *(const unsigned long *)x);
 	else if (!__builtin_strcmp(type, "char *"))
-		drm_printf(p, "i915.%s=%s\n", name, *(const char **)x);
+		drm_printf(p, "i915.%s=%s\n", name, *(const char *const *)x);
 	else
 		WARN_ONCE(1, "no printer defined for param type %s (i915.%s)\n",
 			  type, name);
