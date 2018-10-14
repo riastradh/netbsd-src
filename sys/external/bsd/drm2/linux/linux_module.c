@@ -44,6 +44,7 @@ __KERNEL_RCSID(0, "$NetBSD: linux_module.c,v 1.9 2018/08/27 15:08:54 riastradh E
 #include <linux/mutex.h>
 #include <linux/rcupdate.h>
 #include <linux/tasklet.h>
+#include <linux/wait_bit.h>
 #include <linux/workqueue.h>
 
 MODULE(MODULE_CLASS_MISC, drmkms_linux, "i2cexec");
@@ -96,10 +97,17 @@ linux_init(void)
 		goto fail6;
 	}
 
+	error = linux_wait_bit_init();
+	if (error) {
+		printf("linux: unable to initialize wait_bit: %d\n", error);
+		goto fail7;
+	}
+
 	return 0;
 
-fail7: __unused
-	linux_tasklets_fini();
+fail8: __unused
+	linux_wait_bit_fini();
+fail7:	linux_tasklets_fini();
 fail6:	linux_atomic64_fini();
 fail5:	linux_writecomb_fini();
 fail4:	linux_workqueue_fini();
@@ -126,6 +134,7 @@ static void
 linux_fini(void)
 {
 
+	linux_wait_bit_fini();
 	linux_tasklets_fini();
 	linux_atomic64_fini();
 	linux_writecomb_fini();
