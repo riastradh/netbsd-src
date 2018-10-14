@@ -53,8 +53,7 @@ struct radix_tree_iter {
 
 void	INIT_RADIX_TREE(struct radix_tree_root *, gfp_t);
 
-int	radix_tree_insert(struct radix_tree_root *, unsigned long, unsigned,
-	    void *);
+int	radix_tree_insert(struct radix_tree_root *, unsigned long, void *);
 void	radix_tree_iter_delete(struct radix_tree_root *,
 	    struct radix_tree_iter *, void **);
 void *	radix_tree_delete(struct radix_tree_root *, unsigned long);
