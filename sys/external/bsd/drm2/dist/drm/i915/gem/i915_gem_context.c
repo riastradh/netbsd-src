@@ -803,14 +803,24 @@ static int gem_context_register(struct i915_gem_context *ctx,
 		WRITE_ONCE(vm->file, fpriv); /* XXX */
 	mutex_unlock(&ctx->mutex);
 
+#ifdef __NetBSD__
+	ctx->pid = NULL;
+#else
 	ctx->pid = get_task_pid(current, PIDTYPE_PID);
+#endif
 	snprintf(ctx->name, sizeof(ctx->name), "%s[%d]",
+#ifdef __NetBSD__
+		 curproc->p_comm, (int)curproc->p_pid));
+#else
 		 current->comm, pid_nr(ctx->pid));
+#endif
 
 	/* And finally expose ourselves to userspace via the idr */
 	ret = xa_alloc(&fpriv->context_xa, id, ctx, xa_limit_32b, GFP_KERNEL);
+#ifndef __NetBSD__
 	if (ret)
 		put_pid(fetch_and_zero(&ctx->pid));
+#endif
 
 	return ret;
 }

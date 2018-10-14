@@ -1465,7 +1465,13 @@ static bool __i915_spin_request(const struct i915_request * const rq,
 
 struct request_wait {
 	struct dma_fence_cb cb;
+#ifdef __NetBSD__
+	bool complete;
+	kcondvar_t cv;
+	/* XXX lock, condvar, ...?  */
+#else
 	struct task_struct *tsk;
+#endif
 };
 
 static void request_wait_wake(struct dma_fence *fence, struct dma_fence_cb *cb)

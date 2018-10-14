@@ -147,7 +147,7 @@ static inline void i915_vma_put(struct i915_vma *vma)
 
 static __always_inline ptrdiff_t ptrdiff(const void *a, const void *b)
 {
-	return a - b;
+	return (const char *)a - (const char *)b;
 }
 
 static inline long
@@ -309,7 +309,13 @@ void i915_vma_unpin_iomap(struct i915_vma *vma);
 static inline struct page *i915_vma_first_page(struct i915_vma *vma)
 {
 	GEM_BUG_ON(!vma->pages);
+#ifdef __NetBSD__
+	GEM_BUG_ON(!vma->segs);
+	return container_of(PHYS_TO_VM_PAGE(vma->segs[0].ds_addr), struct page,
+	    p_vmp);
+#else
 	return sg_page(vma->pages->sgl);
+#endif
 }
 
 /**

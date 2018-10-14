@@ -130,12 +130,14 @@ vma_create(struct drm_i915_gem_object *obj,
 
 	i915_active_init(&vma->active, __i915_vma_active, __i915_vma_retire);
 
+#ifndef __NetBSD__		/* XXX fs reclaim */
 	/* Declare ourselves safe for use inside shrinkers */
 	if (IS_ENABLED(CONFIG_LOCKDEP)) {
 		fs_reclaim_acquire(GFP_KERNEL);
 		might_lock(&vma->active.mutex);
 		fs_reclaim_release(GFP_KERNEL);
 	}
+#endif
 
 	INIT_LIST_HEAD(&vma->closed_link);
 
@@ -423,6 +425,10 @@ int i915_vma_bind(struct i915_vma *vma,
 	return 0;
 }
 
+#ifdef __NetBSD__
+#  define	__iomem		__i915_vma_iomem
+#endif
+
 void __iomem *i915_vma_pin_iomap(struct i915_vma *vma)
 {
 	void __iomem *ptr;
@@ -468,6 +474,10 @@ err_unpin:
 err:
 	return IO_ERR_PTR(err);
 }
+
+#ifdef __NetBSD__
+#  undef	__iomem
+#endif
 
 void i915_vma_flush_writes(struct i915_vma *vma)
 {

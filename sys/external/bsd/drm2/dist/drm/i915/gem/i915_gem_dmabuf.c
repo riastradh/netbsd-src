@@ -41,7 +41,8 @@ static struct sg_table *i915_gem_map_dma_buf(struct dma_buf_attachment *attachme
 		goto err;
 
 #ifdef __NetBSD__
-	st = drm_prime_pglist_to_sg(&obj->pageq, obj->base.size >> PAGE_SHIFT);
+	st = drm_prime_pglist_to_sg(&obj->mm.pageq,
+	    obj->base.size >> PAGE_SHIFT);
 	if (IS_ERR(st))
 		goto err_unpin;
 #else
@@ -116,11 +117,29 @@ static void i915_gem_dmabuf_vunmap(struct dma_buf *dma_buf, void *vaddr)
 	i915_gem_object_unpin_map(obj);
 }
 
+#ifdef __NetBSD__
+static int i915_gem_dmabuf_mmap(struct dma_buf *dma_buf, off_t *offp,
+    size_t size, int prot, int *flagsp, int *advicep,
+    struct uvm_object **uobjp, int *maxprotp)
+#else
 static int i915_gem_dmabuf_mmap(struct dma_buf *dma_buf, struct vm_area_struct *vma)
+#endif
 {
 	struct drm_i915_gem_object *obj = dma_buf_to_obj(dma_buf);
 	int ret;
 
+#ifdef __NetBSD__
+	__USE(ret);
+	if (obj->base.size < size)
+		return -EINVAL;
+	if (!obj->base.filp)
+		return -ENODEV;
+	/* XXX review mmap refcount */
+	drm_gem_object_reference(&obj->base);
+	*advicep = UVM_ADV_RANDOM;
+	*uobjp = &obj->base.gemo_uvmobj;
+	*maxprotp = prot;
+#else
 	if (obj->base.size < vma->vm_end - vma->vm_start)
 		return -EINVAL;
 
@@ -133,6 +152,7 @@ static int i915_gem_dmabuf_mmap(struct dma_buf *dma_buf, struct vm_area_struct *
 
 	fput(vma->vm_file);
 	vma->vm_file = get_file(obj->base.filp);
+#endif
 
 	return 0;
 }

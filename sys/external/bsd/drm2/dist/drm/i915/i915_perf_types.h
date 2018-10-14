@@ -52,9 +52,11 @@ struct i915_oa_config {
 	const struct i915_oa_reg *flex_regs;
 	u32 flex_regs_len;
 
+#ifndef __NetBSD__		/* XXX sysfs */
 	struct attribute_group sysfs_metric;
 	struct attribute *attrs[2];
 	struct device_attribute sysfs_metric_id;
+#endif
 
 	struct kref ref;
 	struct rcu_head rcu;
