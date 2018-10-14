@@ -39,7 +39,7 @@
 
 struct reservation_object {
 	struct ww_mutex		lock;
-	struct seqcount		count;
+	struct seqcount		seq;
 
 	struct dma_fence __rcu			*robj_fence;
 	struct reservation_object_list __rcu	*robj_list;
