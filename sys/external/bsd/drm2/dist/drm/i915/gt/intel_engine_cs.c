@@ -417,6 +417,7 @@ void intel_engines_free(struct intel_gt *gt)
 	enum intel_engine_id id;
 
 	for_each_engine(engine, gt, id) {
+		seqlock_destroy(&engine->stats.lock);
 		kfree(engine);
 		gt->engine[id] = NULL;
 	}
