@@ -42,6 +42,8 @@
 #include <linux/gfp.h>
 #include <linux/rcupdate.h>
 
+#define	ARCH_KMALLOC_MINALIGN	4 /* XXX ??? */
+
 /* XXX Should use kmem, but Linux kfree doesn't take the size.  */
 
 static inline int
