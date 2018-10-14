@@ -47,6 +47,12 @@ struct resource {
 	bus_space_handle_t r_bsh;
 };
 
+static inline bus_size_t
+resource_size(struct resource *resource)
+{
+	return resource->size;
+}
+
 static inline void
 release_resource(struct resource *resource)
 {
