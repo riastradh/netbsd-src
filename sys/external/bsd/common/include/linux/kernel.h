@@ -83,6 +83,8 @@
 
 #define	might_sleep	ASSERT_SLEEPABLE
 
+#define	DEFINE_STATIC_KEY_FALSE(N)	bool N __unused = false
+
 /*
  * XXX Linux kludge to work around GCC uninitialized variable warning.
  * Linux does `x = x', which is bollocks.
