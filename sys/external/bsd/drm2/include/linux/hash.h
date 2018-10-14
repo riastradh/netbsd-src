@@ -43,4 +43,10 @@ hash_long(unsigned long value, unsigned int bits)
 	return ((value * factor) >> ((CHAR_BIT * sizeof(value)) - bits));
 }
 
+static inline uint32_t
+hash_32(uint32_t value, unsigned int bits)
+{
+	return (value * 0x61c88647) >> (32 - bits);
+}
+
 #endif  /* _LINUX_HASH_H_ */
