@@ -77,7 +77,6 @@ drm_pci_attach(device_t self, const struct pci_attach_args *pa,
 	}
 
 	dev->pdev = pdev;
-	pdev->pd_drm_dev = dev;	/* XXX Nouveau kludge.  */
 
 	/* XXX Set the power state to D0?  */
 
