@@ -155,7 +155,11 @@ static const struct drm_i915_gem_object_ops i915_gem_phys_ops = {
 
 int i915_gem_object_attach_phys(struct drm_i915_gem_object *obj, int align)
 {
+#ifdef __NetBSD__
+	bus_dmamap_t pages;
+#else
 	struct sg_table *pages;
+#endif
 	int err;
 
 	if (align > obj->base.size)
@@ -209,7 +213,13 @@ int i915_gem_object_attach_phys(struct drm_i915_gem_object *obj, int align)
 err_xfer:
 	obj->ops = &i915_gem_shmem_ops;
 	if (!IS_ERR_OR_NULL(pages)) {
+#ifdef __NetBSD__
+		unsigned int sg_page_sizes = 0, seg;
+		for (seg = 0; seg < pages->dm_nsegs; seg++)
+			sg_page_sizes |= pages->dm_segs[seg].ds_len;
+#else
 		unsigned int sg_page_sizes = i915_sg_page_sizes(pages->sgl);
+#endif
 
 		__i915_gem_object_set_pages(obj, pages, sg_page_sizes);
 	}

@@ -75,8 +75,10 @@ void i915_gem_object_init(struct drm_i915_gem_object *obj,
 	obj->ops = ops;
 
 	obj->mm.madv = I915_MADV_WILLNEED;
+#ifndef __NetBSD__
 	INIT_RADIX_TREE(&obj->mm.get_page.radix, GFP_KERNEL | __GFP_NOWARN);
 	mutex_init(&obj->mm.get_page.lock);
+#endif
 }
 
 /**
