@@ -52,6 +52,8 @@
 	__rcu_dereference_tmp;						      \
 })
 
+#define	rcu_dereference_raw	rcu_dereference
+
 #define	rcu_dereference_protected(P, C) ({				      \
 	WARN_ON(!(C));							      \
 	(P);								      \
