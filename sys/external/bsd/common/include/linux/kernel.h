@@ -73,6 +73,7 @@
 #define	__must_check	/* nothing */
 #endif
 #define	__always_unused	__unused
+#define	__maybe_unused	__unused
 #define	noinline	__noinline
 #define	__deprecated	/* nothing */
 
@@ -87,6 +88,8 @@
  * Linux does `x = x', which is bollocks.
  */
 #define	uninitialized_var(x)	x = 0
+
+#define	typecheck(T, X)	({(1 + 0*sizeof((T *)0 - &(X)));})
 
 /* XXX These will multiply evaluate their arguments.  */
 #define	min(X, Y)	MIN(X, Y)
