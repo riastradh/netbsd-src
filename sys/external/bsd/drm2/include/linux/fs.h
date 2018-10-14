@@ -34,5 +34,6 @@
 
 #include <linux/capability.h>
 #include <linux/err.h>
+#include <linux/wait_bit.h>
 
 #endif  /* _LINUX_FS_H_ */
