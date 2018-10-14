@@ -546,7 +546,7 @@ work_claimed(struct work_struct *work, struct workqueue_struct *wq)
  *	to run on that workqueue.
  */
 bool
-work_pending(struct work_struct *work)
+work_pending(const struct work_struct *work)
 {
 
 	return work->work_owner & 1;
@@ -1577,7 +1577,7 @@ flush_delayed_work(struct delayed_work *dw)
  *	True if dw is currently scheduled to execute, false if not.
  */
 bool
-delayed_work_pending(struct delayed_work *dw)
+delayed_work_pending(const struct delayed_work *dw)
 {
 
 	return work_pending(&dw->work);
