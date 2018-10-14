@@ -32,8 +32,16 @@
 #ifndef	_LINUX_DMA_FENCE_ARRAY_H_
 #define	_LINUX_DMA_FENCE_ARRAY_H_
 
+#define	dma_fence_is_array		linux_dma_fence_is_array
+#define	to_dma_fence_array		linux_to_dma_fence_array
+
 struct dma_fence_array {
+	struct dma_fence	**fences;
 	unsigned		num_fences;
 };
+
+bool	dma_fence_is_array(struct dma_fence *);
+struct dma_fence_array *
+	to_dma_fence_array(struct dma_fence *);
 
 #endif	/* _LINUX_DMA_FENCE_ARRAY_H_ */
