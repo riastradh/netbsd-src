@@ -503,7 +503,7 @@ static void gen8_ppgtt_insert_huge(struct i915_vma *vma,
 
 		do {
 #ifdef __NetBSD__
-			GEM_BUG_ON((iter->map->ds_seg[iter->seg].ds_len -
+			GEM_BUG_ON((iter->map->ds_segs[iter->seg].ds_len -
 				iter->off) < page_size);
 #else
 			GEM_BUG_ON(iter->sg->length < page_size);
