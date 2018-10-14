@@ -115,7 +115,7 @@ bool	queue_work(struct workqueue_struct *, struct work_struct *);
 bool	cancel_work(struct work_struct *);
 bool	cancel_work_sync(struct work_struct *);
 bool	flush_work(struct work_struct *);
-bool	work_pending(struct work_struct *);
+bool	work_pending(const struct work_struct *);
 
 void	INIT_DELAYED_WORK(struct delayed_work *,
 	    void (*)(struct work_struct *));
@@ -127,7 +127,7 @@ bool	mod_delayed_work(struct workqueue_struct *, struct delayed_work *,
 bool	cancel_delayed_work(struct delayed_work *);
 bool	cancel_delayed_work_sync(struct delayed_work *);
 bool	flush_delayed_work(struct delayed_work *);
-bool	delayed_work_pending(struct delayed_work *);
+bool	delayed_work_pending(const struct delayed_work *);
 
 struct work_struct *
 	current_work(void);
