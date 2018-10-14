@@ -1298,6 +1298,13 @@ drm_io_mapping_create_wc(struct drm_device *dev, resource_size_t addr,
 	return bus_space_io_mapping_create_wc(dev->bst, addr, size);
 }
 
+static inline bool
+drm_io_mapping_init_wc(struct drm_device *dev, struct io_mapping *mapping,
+    resource_size_t addr, unsigned long size)
+{
+	return bus_space_io_mapping_init_wc(dev->bst, mapping, addr, size);
+}
+
 #endif	/* defined(__NetBSD__) */
 
 #ifdef __NetBSD__
