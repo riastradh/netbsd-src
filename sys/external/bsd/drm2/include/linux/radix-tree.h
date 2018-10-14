@@ -57,6 +57,7 @@ int	radix_tree_insert(struct radix_tree_root *, unsigned long, unsigned,
 	    void *);
 void	radix_tree_iter_delete(struct radix_tree_root *,
 	    struct radix_tree_iter *, void **);
+void *	radix_tree_delete(struct radix_tree_root *, unsigned long);
 
 bool	radix_tree_empty(struct radix_tree_root *);
 void *	radix_tree_lookup(const struct radix_tree_root *, unsigned long);
