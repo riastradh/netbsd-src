@@ -61,10 +61,17 @@ void i915_unreserve_fence(struct i915_fence_reg *fence);
 
 void i915_gem_restore_fences(struct i915_ggtt *ggtt);
 
+#ifdef __NetBSD__
+void i915_gem_object_do_bit_17_swizzle(struct drm_i915_gem_object *obj,
+				       struct pglist *pages);
+void i915_gem_object_save_bit_17_swizzle(struct drm_i915_gem_object *obj,
+					 struct pglist *pages);
+#else
 void i915_gem_object_do_bit_17_swizzle(struct drm_i915_gem_object *obj,
 				       struct sg_table *pages);
 void i915_gem_object_save_bit_17_swizzle(struct drm_i915_gem_object *obj,
 					 struct sg_table *pages);
+#endif
 
 void i915_ggtt_init_fences(struct i915_ggtt *ggtt);
 
