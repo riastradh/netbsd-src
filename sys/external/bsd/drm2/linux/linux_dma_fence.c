@@ -463,6 +463,23 @@ dma_fence_is_signaled_locked(struct dma_fence *fence)
 }
 
 /*
+ * dma_fence_set_error(fence, error)
+ *
+ *	Set an error code prior to dma_fence_signal for use by a
+ *	waiter to learn about success or failure of the fence.
+ */
+void
+dma_fence_set_error(struct dma_fence *fence, int error)
+{
+
+	KASSERT(!(fence->flags & (1u << DMA_FENCE_FLAG_SIGNALED_BIT)));
+	KASSERTMSG(error >= -MAX_ERRNO, "%d", error);
+	KASSERTMSG(error < 0, "%d", error);
+
+	fence->error = error;
+}
+
+/*
  * dma_fence_signal(fence)
  *
  *	Signal the fence.  If it has already been signalled, return
