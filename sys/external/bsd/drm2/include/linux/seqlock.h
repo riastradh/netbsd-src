@@ -117,6 +117,17 @@ read_seqcount_retry(struct seqcount *seqcount, unsigned gen)
 	return __read_seqcount_retry(seqcount, gen);
 }
 
+static inline unsigned
+raw_read_seqcount(struct seqcount *seqcount)
+{
+	unsigned gen;
+
+	gen = seqcount->sqc_gen;
+	membar_consumer();
+
+	return gen;
+}
+
 struct seqlock {
 	kmutex_t		sql_lock;
 	struct seqcount		sql_count;
