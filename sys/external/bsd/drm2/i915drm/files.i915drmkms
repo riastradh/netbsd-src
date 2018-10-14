@@ -184,7 +184,7 @@ file	external/bsd/drm2/dist/drm/i915/i915_getparam.c	i915drmkms
 file	external/bsd/drm2/dist/drm/i915/i915_globals.c	i915drmkms
 file	external/bsd/drm2/dist/drm/i915/i915_irq.c	i915drmkms
 file	external/bsd/drm2/dist/drm/i915/i915_memcpy.c	i915drmkms
-file	external/bsd/drm2/dist/drm/i915/i915_mm.c	i915drmkms
+#file	external/bsd/drm2/dist/drm/i915/i915_mm.c	i915drmkms
 file	external/bsd/drm2/dist/drm/i915/i915_params.c	i915drmkms
 file	external/bsd/drm2/dist/drm/i915/i915_pci.c	i915drmkms
 file	external/bsd/drm2/dist/drm/i915/i915_perf.c	i915drmkms
