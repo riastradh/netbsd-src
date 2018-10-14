@@ -34,9 +34,12 @@
 
 #include <sys/time.h>
 
+#include <linux/math64.h>
+
 #define	timespec64	timespec	/* take that, 2038 */
 
 #define NSEC_PER_MSEC	1000000L
+#define	NSEC_PER_SEC	1000000000L
 
 /*
  * XXX get_seconds as implemented by Linux is a Y2038 bug waiting to
