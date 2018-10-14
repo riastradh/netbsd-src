@@ -163,6 +163,13 @@ atomic_or(int value, atomic_t *atomic)
 }
 
 static inline void
+atomic_andnot(int value, atomic_t *atomic)
+{
+	/* no membar */
+	atomic_and_uint(&atomic->a_u.au_uint, ~value);
+}
+
+static inline void
 atomic_set_mask(unsigned long mask, atomic_t *atomic)
 {
 	/* no membar */
