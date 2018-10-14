@@ -69,6 +69,13 @@ typedef int gfp_t;
  */
 #define	__GFP_NOFAIL		0
 
+/*
+ * Pretend these are the same.  __GFP_RETRY_MAYFAIL is supposed to do
+ * more than just __GFP_NORETRY, but should not hang forever like
+ * __GFP_WAIT.
+ */
+#define	__GFP_RETRY_MAYFAIL	__GFP_NORETRY
+
 struct page;
 
 #endif	/* _LINUX_GFP_H_ */
