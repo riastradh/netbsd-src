@@ -115,6 +115,38 @@ wake_up_bit(const volatile unsigned long *bitmap, unsigned bit)
 }
 
 int
+wait_on_bit(const volatile unsigned long *bitmap, unsigned bit, int flags)
+{
+	struct waitbitentry *wbe;
+	int error, ret;
+
+	if (test_bit(bit, bitmap))
+		return 0;
+
+	wbe = wait_bit_enter(bitmap, bit);
+
+	while (!test_bit(bit, bitmap)) {
+		if (flags & TASK_UNINTERRUPTIBLE) {
+			cv_wait(&wbe->cv, &wbe->lock);
+		} else {
+			error = cv_wait_sig(&wbe->cv, &wbe->lock);
+			if (error == EINTR || error == ERESTART)
+				ret = -ERESTARTSYS;
+			else if (error != 0)
+				ret = -error;
+			if (ret)
+				goto out;
+		}
+	}
+
+	/* Bit is set.  Return zero on success.   */
+	ret = 0;
+
+out:	wait_bit_exit(wbe);
+	return ret;
+}
+
+int
 wait_on_bit_timeout(const volatile unsigned long *bitmap, unsigned bit,
     int flags, unsigned long timeout)
 {
