@@ -32,6 +32,8 @@
 #ifndef	_LINUX_DMA_FENCE_ARRAY_H_
 #define	_LINUX_DMA_FENCE_ARRAY_H_
 
+#include <sys/stdbool.h>
+
 #define	dma_fence_is_array		linux_dma_fence_is_array
 #define	to_dma_fence_array		linux_to_dma_fence_array
 
