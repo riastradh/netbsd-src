@@ -989,12 +989,14 @@ static int i915_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (PCI_FUNC(pdev->devfn))
 		return -ENODEV;
 
+#ifndef __NetBSD__		/* XXX vga switcheroo */
 	/*
 	 * apple-gmux is needed on dual GPU MacBook Pro
 	 * to probe the panel if we're the inactive GPU.
 	 */
 	if (vga_switcheroo_client_probe_defer(pdev))
 		return -EPROBE_DEFER;
+#endif
 
 	err = i915_driver_probe(pdev, ent);
 	if (err)

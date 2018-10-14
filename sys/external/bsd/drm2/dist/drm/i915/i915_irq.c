@@ -2408,7 +2408,7 @@ static inline void gen8_master_intr_enable(void __iomem * const regs)
 	raw_reg_write(regs, GEN8_MASTER_IRQ, GEN8_MASTER_IRQ_CONTROL);
 }
 
-static irqreturn_t gen8_irq_handler(int irq, void *arg)
+static irqreturn_t gen8_irq_handler(DRM_IRQ_ARGS)
 {
 	struct drm_i915_private *dev_priv = arg;
 	u32 master_ctl;
