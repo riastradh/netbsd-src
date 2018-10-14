@@ -473,7 +473,7 @@ dma_fence_set_error(struct dma_fence *fence, int error)
 {
 
 	KASSERT(!(fence->flags & (1u << DMA_FENCE_FLAG_SIGNALED_BIT)));
-	KASSERTMSG(error >= -MAX_ERRNO, "%d", error);
+	KASSERTMSG(error >= -ELAST, "%d", error);
 	KASSERTMSG(error < 0, "%d", error);
 
 	fence->error = error;
