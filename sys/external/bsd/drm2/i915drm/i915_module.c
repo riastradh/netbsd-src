@@ -50,11 +50,6 @@ MODULE(MODULE_CLASS_DRIVER, i915drmkms, "drmkms,drmkms_pci"); /* XXX drmkms_i2c 
 #include "ioconf.c"
 #endif
 
-/* XXX Kludge to get these from i915_drv.c.  */
-extern struct drm_driver *const i915_drm_driver;
-extern const struct pci_device_id *const i915_device_ids;
-extern const size_t i915_n_device_ids;
-
 struct drm_sysctl_def i915_def = DRM_SYSCTL_INIT();
 
 static int
@@ -65,10 +60,6 @@ i915drmkms_init(void)
 	error = drm_guarantee_initialized();
 	if (error)
 		return error;
-
-	i915_drm_driver->num_ioctls = i915_max_ioctl;
-	i915_drm_driver->driver_features |= DRIVER_MODESET;
-	i915_drm_driver->driver_features &= ~DRIVER_USE_AGP;
 
 	drm_sysctl_init(&i915_def);
 	spin_lock_init(&mchdev_lock);
