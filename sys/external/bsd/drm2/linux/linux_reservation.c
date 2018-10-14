@@ -38,6 +38,7 @@ __KERNEL_RCSID(0, "$NetBSD: linux_reservation.c,v 1.14 2021/08/02 23:14:15 riast
 
 #include <linux/dma-fence.h>
 #include <linux/reservation.h>
+#include <linux/seqlock.h>
 #include <linux/ww_mutex.h>
 
 DEFINE_WW_CLASS(reservation_ww_class __cacheline_aligned);
@@ -90,7 +91,7 @@ reservation_object_init(struct reservation_object *robj)
 {
 
 	ww_mutex_init(&robj->lock, &reservation_ww_class);
-	robj->robj_version = 0;
+	seqcount_init(&robj->count);
 	robj->robj_fence = NULL;
 	robj->robj_list = NULL;
 	robj->robj_prealloc = NULL;
@@ -289,7 +290,6 @@ reservation_object_reserve_shared(struct reservation_object *robj)
 }
 
 struct reservation_object_write_ticket {
-	unsigned version;
 };
 
 /*
@@ -308,8 +308,7 @@ reservation_object_write_begin(struct reservation_object *robj,
 
 	KASSERT(reservation_object_held(robj));
 
-	ticket->version = robj->robj_version |= 1;
-	membar_producer();
+	write_seqcount_begin(&robj->count);
 }
 
 /*
@@ -326,11 +325,8 @@ reservation_object_write_commit(struct reservation_object *robj,
 {
 
 	KASSERT(reservation_object_held(robj));
-	KASSERT(ticket->version == robj->robj_version);
-	KASSERT((ticket->version & 1) == 1);
 
-	membar_producer();
-	robj->robj_version = ticket->version + 1;
+	write_seqcount_end(&robj->count);
 }
 
 struct reservation_object_read_ticket {
@@ -349,9 +345,7 @@ reservation_object_read_begin(struct reservation_object *robj,
     struct reservation_object_read_ticket *ticket)
 {
 
-	while ((ticket->version = robj->robj_version) & 1)
-		SPINLOCK_BACKOFF_HOOK;
-	membar_consumer();
+	ticket->version = read_seqcount_begin(&robj->count);
 }
 
 /*
@@ -366,8 +360,7 @@ reservation_object_read_valid(struct reservation_object *robj,
     struct reservation_object_read_ticket *ticket)
 {
 
-	membar_consumer();
-	return ticket->version == robj->robj_version;
+	return !read_seqcount_retry(&robj->count, ticket->version);
 }
 
 /*
