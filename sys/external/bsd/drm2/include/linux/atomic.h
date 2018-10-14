@@ -207,6 +207,7 @@ atomic_add_unless(atomic_t *atomic, int addend, int zero)
 	smp_mb__before_atomic();
 	do {
 		value = atomic->a_u.au_int;
+		__insn_barrier();
 		if (value == zero)
 			break;
 	} while (atomic_cas_uint(&atomic->a_u.au_uint, value, (value + addend))
@@ -389,6 +390,7 @@ atomic_long_add_unless(struct atomic_long *a, long addend, long zero)
 	smp_mb__before_atomic();
 	do {
 		value = (long)a->al_v;
+		__insn_barrier();
 		if (value == zero)
 			break;
 	} while (atomic_cas_ulong(&a->al_v, (unsigned long)value,
