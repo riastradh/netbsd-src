@@ -146,7 +146,7 @@ wait_on_bit_timeout(const volatile unsigned long *bitmap, unsigned bit,
 		}
 
 		/* If we were interrupted, return -ERESTARTSYS.  */
-		if (error == EINTR || error == EWOULDBLOCK) {
+		if (error == EINTR || error == ERESTART) {
 			ret = -ERESTARTSYS;
 			goto out;
 		}
