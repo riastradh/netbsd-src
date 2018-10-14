@@ -29,6 +29,7 @@
 
 #include <linux/bug.h>
 #include <linux/interrupt.h>
+#include <linux/stringify.h>
 
 #include <drm/drm_drv.h>
 
