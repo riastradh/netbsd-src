@@ -46,6 +46,11 @@
 #  define	smp_mb__after_atomic()		__insn_barrier()
 #endif
 
+#define	xchg(P, V)							      \
+	(sizeof(*(P)) == 4 ? atomic_swap_32((volatile uint32_t *)P, V)	      \
+	    : sizeof(*(P)) == 8 ? atomic_swap_64((volatile uint64_t *)P, V)   \
+	    : (__builtin_abort(), 0))
+
 /*
  * atomic (u)int operations
  *
