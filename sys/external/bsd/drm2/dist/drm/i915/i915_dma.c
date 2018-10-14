@@ -956,7 +956,8 @@ int i915_driver_load(struct drm_device *dev, unsigned long flags)
 	dev_priv->regs = pci_iomap(dev->pdev, mmio_bar, mmio_size);
 #ifdef __NetBSD__
 	if (!dev_priv->regs)
-		dev_priv->regs = drm_agp_borrow(dev, mmio_bar, mmio_size);
+		dev_priv->regs = drm_agp_borrow(&dev_priv->drm, mmio_bar,
+		    mmio_size);
 #endif
 	if (!dev_priv->regs) {
 		DRM_ERROR("failed to map registers\n");

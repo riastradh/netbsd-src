@@ -13,13 +13,34 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "i915_drv.h"
 #include "i915_utils.h"
 
+#ifdef __NetBSD__
+#define	NBSD_BUG_URL "https://gnats.NetBSD.org/"
+#define	NBSD_BUG_MSG							      \
+	"Please file a bug at " NBSD_BUG_URL " in category kern"	      \
+	" providing the dmesg log by booting with debug/verbose"	      \
+	" as in `boot -vx'."
+#else
 #define FDO_BUG_URL "https://gitlab.freedesktop.org/drm/intel/-/wikis/How-to-file-i915-bugs"
 #define FDO_BUG_MSG "Please file a bug on drm/i915; see " FDO_BUG_URL " for details."
+#endif
 
 void
 __i915_printk(struct drm_i915_private *dev_priv, const char *level,
 	      const char *fmt, ...)
 {
+#ifdef __NetBSD__
+	static volatile unsigned done = 0;
+	va_list va;
+
+	va_start(va, fmt);
+	printf("%s: %s ", device_xname(dev_priv->drm.dev), level);
+	vprintf(fmt, va);
+	va_end(va);
+
+	if (strncmp(level, KERN_ERR, strlen(KERN_ERR)) == 0 &&
+	    atomic_swap_uint(&done, 1) == 0)
+		printf("%s\n", NBSD_BUG_MSG);
+#else
 	static bool shown_bug_once;
 	struct device *kdev = dev_priv->drm.dev;
 	bool is_error = level[1] <= KERN_ERR[1];
@@ -53,6 +74,7 @@ __i915_printk(struct drm_i915_private *dev_priv, const char *level,
 			dev_notice(kdev, "%s", FDO_BUG_MSG);
 		shown_bug_once = true;
 	}
+#endif
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG)

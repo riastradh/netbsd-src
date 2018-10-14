@@ -158,6 +158,12 @@ struct i915_ggtt_view {
 	};
 };
 
+
+#ifdef __NetBSD__
+#  define	__i915_vma_iomem	/* write-combining */
+#  define	__iomem			__i915_vma_iomem
+#endif
+
 /**
  * DOC: Virtual Memory Address
  *
@@ -177,7 +183,13 @@ struct i915_vma {
 	struct drm_i915_gem_object *obj;
 	struct dma_resv *resv; /** Alias of obj->resv */
 
+#ifdef __NetBSD__
+	bus_dma_segment_t *segs;
+	int nsegs;
+	bus_dmamap_t pages;
+#else
 	struct sg_table *pages;
+#endif
 	void __iomem *iomap;
 	void *private; /* owned by creator */
 
@@ -291,6 +303,10 @@ struct i915_vma {
 	struct hlist_node exec_node;
 	u32 exec_handle;
 };
+
+#ifdef __NetBSD__
+#  undef	__iomem
+#endif
 
 #endif
 

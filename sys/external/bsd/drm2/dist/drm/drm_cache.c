@@ -161,7 +161,11 @@ drm_clflush_virt_range(void *addr, unsigned long length)
 {
 #if defined(CONFIG_X86)
 	if (static_cpu_has(X86_FEATURE_CLFLUSH)) {
+#ifdef __NetBSD__
+		const int size = cpu_info_primary.ci_cflush_lsize;
+#else
 		const int size = boot_cpu_data.x86_clflush_size;
+#endif
 		void *end = addr + length;
 
 		addr = (void *)(((unsigned long)addr) & -size);
