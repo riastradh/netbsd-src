@@ -47,6 +47,12 @@ struct linux_module_param_info {
 #define MTYPE_charp	2
 #define MTYPE_uint	3
 
+/*
+ * In case of accidental cpp expansion, break glass to raise alarm and
+ * reach antizombie chainsaw.
+ */
+#define	MTYPE__Bool	MTYPE_bool
+
 #define	module_param_named(NAME, VAR, TYPE, MODE) \
 static __attribute__((__used__)) struct linux_module_param_info info_ ## NAME = { \
 	.dname = # NAME, \
