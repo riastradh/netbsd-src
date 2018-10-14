@@ -79,4 +79,11 @@
 
 #define	dev_name	device_xname
 
+#define	DPM_FLAG_NEVER_SKIP	0
+
+static inline void
+dev_pm_set_driver_flags(struct device *dev, uint32_t flags)
+{
+}
+
 #endif  /* _LINUX_DEVICE_H_ */
