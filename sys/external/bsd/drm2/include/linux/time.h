@@ -141,4 +141,10 @@ set_normalized_timespec(struct timespec *ts, time_t sec, int64_t nsec)
 	ts->tv_nsec = nsec;
 }
 
+static inline bool
+time_after32(uint32_t a, uint32_t b)
+{
+	return (int32_t)(b - a) < 0;
+}
+
 #endif  /* _LINUX_TIME_H_ */
