@@ -208,7 +208,16 @@ struct drm_i915_gem_object {
 		 */
 		struct list_head region_link;
 
+#ifdef __NetBSD__
+		struct pglist pageq;    /* wired pages of normal objects */
+		struct sg_table *sg;    /* drm prime objects */
+		bus_dma_segment_t *segs;/* internal objects */
+		unsigned nsegs;
+		int rsegs;
+		bus_dmamap_t pages;     /* expedient misnomer */
+#else
 		struct sg_table *pages;
+#endif
 		void *mapping;
 
 		struct i915_page_sizes {
