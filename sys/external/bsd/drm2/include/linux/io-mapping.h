@@ -100,10 +100,12 @@ io_mapping_free(struct io_mapping *mapping)
 }
 
 static inline void *
-io_mapping_map_wc(struct io_mapping *mapping, unsigned long offset)
+io_mapping_map_wc(struct io_mapping *mapping, bus_addr_t offset,
+    bus_size_t size)
 {
 	paddr_t cookie;
 
+	KASSERT(size == PAGE_SIZE);
 	KASSERT(0 == (offset & (PAGE_SIZE - 1)));
 	KASSERT(PAGE_SIZE <= mapping->diom_size);
 	KASSERT(offset <= (mapping->diom_size - PAGE_SIZE));
@@ -140,7 +142,7 @@ static inline void *
 io_mapping_map_atomic_wc(struct io_mapping *mapping, unsigned long offset)
 {
 
-	return io_mapping_map_wc(mapping, offset);
+	return io_mapping_map_wc(mapping, offset, PAGE_SIZE);
 }
 
 static inline void
