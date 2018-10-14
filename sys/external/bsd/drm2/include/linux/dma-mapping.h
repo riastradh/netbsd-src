@@ -36,7 +36,7 @@
 
 #include <machine/limits.h>
 
-typedef bus_addr_t dma_addr_t;
+#include <linux/types.h>
 
 static inline uintmax_t
 DMA_BIT_MASK(unsigned nbits)
