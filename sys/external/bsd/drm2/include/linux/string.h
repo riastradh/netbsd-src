@@ -115,4 +115,20 @@ strscpy(char *dst, const char *src, size_t dstsize)
 	return dstsize - n;
 }
 
+static inline void
+memset64(uint64_t *p, uint64_t v, size_t n)
+{
+
+	while (n --> 0)
+		*p++ = v;
+}
+
+static inline void
+memset_p(void **p, void *v, size_t n)
+{
+
+	while (n --> 0)
+		*p++ = v;
+}
+
 #endif  /* _LINUX_STRING_H_ */
