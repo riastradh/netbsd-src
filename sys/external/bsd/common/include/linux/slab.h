@@ -206,4 +206,11 @@ kmem_cache_free(struct kmem_cache *kc, void *ptr)
 	pool_cache_put(kc->kc_pool_cache, ptr);
 }
 
+static inline void
+kmem_cache_shrink(struct kmem_cache *kc)
+{
+
+	pool_cache_reclaim(kc->kc_pool_cache);
+}
+
 #endif  /* _LINUX_SLAB_H_ */
