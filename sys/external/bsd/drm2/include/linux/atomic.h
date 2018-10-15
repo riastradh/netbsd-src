@@ -71,7 +71,7 @@ struct atomic {
 typedef struct atomic atomic_t;
 
 static inline int
-atomic_read(atomic_t *atomic)
+atomic_read(const atomic_t *atomic)
 {
 	/* no membar */
 	return atomic->a_u.au_int;
