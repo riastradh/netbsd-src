@@ -130,10 +130,18 @@ list_add_tail(struct list_head *node, struct list_head *head)
 }
 
 static inline void
-list_del(struct list_head *entry)
+__list_del_entry(struct list_head *entry)
 {
 	entry->prev->next = entry->next;
 	entry->next->prev = entry->prev;
+}
+
+static inline void
+list_del(struct list_head *entry)
+{
+	__list_del_entry(entry);
+	entry->next = (void *)(uintptr_t)1;
+	entry->prev = (void *)(uintptr_t)2;
 }
 
 static inline void
