@@ -913,6 +913,13 @@ static const struct pci_device_id pciidlist[] = {
 };
 MODULE_DEVICE_TABLE(pci, pciidlist);
 
+#ifdef __NetBSD__
+
+/* XXX Kludge to expose this to NetBSD driver attachment goop.  */
+const struct pci_device_id *const i915_device_ids = pciidlist;
+const size_t i915_n_device_ids = __arraycount(pciidlist);
+
+#else
 static void i915_pci_remove(struct pci_dev *pdev)
 {
 	struct drm_i915_private *i915;
@@ -1083,6 +1090,8 @@ static void __exit i915_exit(void)
 
 module_init(i915_init);
 module_exit(i915_exit);
+
+#endif
 
 MODULE_AUTHOR("Tungsten Graphics, Inc.");
 MODULE_AUTHOR("Intel Corporation");
