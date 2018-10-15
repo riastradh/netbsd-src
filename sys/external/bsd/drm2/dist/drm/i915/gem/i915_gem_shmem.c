@@ -461,6 +461,9 @@ static int __create_shmem(struct drm_i915_private *i915,
 			  struct drm_gem_object *obj,
 			  resource_size_t size)
 {
+#ifdef __NetBSD__
+	return drm_gem_object_init(dev, obj, size);
+#else
 	unsigned long flags = VM_NORESERVE;
 	struct file *filp;
 
@@ -476,6 +479,7 @@ static int __create_shmem(struct drm_i915_private *i915,
 
 	obj->filp = filp;
 	return 0;
+#endif
 }
 
 static struct drm_i915_gem_object *
