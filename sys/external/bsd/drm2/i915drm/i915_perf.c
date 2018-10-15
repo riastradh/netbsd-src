@@ -40,6 +40,6 @@ i915_perf_init(struct drm_i915_private *i915)
 }
 
 void
-i915_gemfs_fini(struct drm_i915_private *i915)
+i915_perf_fini(struct drm_i915_private *i915)
 {
 }
