@@ -107,6 +107,12 @@ list_is_singular(const struct list_head *head)
 	return true;
 }
 
+static inline bool
+list_is_last(const struct list_head *entry, const struct list_head *head)
+{
+	return head == entry->next;
+}
+
 static inline void
 __list_add_between(struct list_head *prev, struct list_head *node,
     struct list_head *next)
