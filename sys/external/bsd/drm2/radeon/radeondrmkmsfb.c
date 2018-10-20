@@ -182,9 +182,7 @@ radeonfb_drmfb_mmapfb(struct drmfb_softc *drmfb, off_t offset, int prot)
 	    struct radeonfb_softc, sc_drmfb);
 	struct drm_fb_helper *const helper = sc->sc_rfa.rfa_fb_helper;
 	struct drm_framebuffer *const fb = helper->fb;
-	struct radeon_framebuffer *const rfb = container_of(fb,
-	    struct radeon_framebuffer, base);
-	struct drm_gem_object *const gobj = rfb->obj;
+	struct drm_gem_object *const gobj = fb->obj[0];
 	struct radeon_bo *const rbo = gem_to_radeon_bo(gobj);
 	int flags = 0;
 
