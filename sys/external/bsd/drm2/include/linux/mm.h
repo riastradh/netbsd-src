@@ -66,6 +66,14 @@ si_meminfo(struct sysinfo *si)
 	/* XXX Fill in more as needed.  */
 }
 
+static inline size_t
+si_mem_available(void)
+{
+
+	/* XXX ? */
+	return uvmexp.free;
+}
+
 static inline unsigned long
 vm_mmap(struct file *file __unused, unsigned long base __unused,
     unsigned long size __unused, unsigned long prot __unused,
