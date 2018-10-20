@@ -688,6 +688,14 @@ pci_dma_supported(struct pci_dev *pdev, uintmax_t mask)
 }
 
 bool
+pci_is_thunderbolt_attached(struct pci_dev *pdev)
+{
+
+	/* XXX Cop-out.  */
+	return false;
+}
+
+bool
 pci_is_root_bus(struct pci_bus *bus)
 {
 
