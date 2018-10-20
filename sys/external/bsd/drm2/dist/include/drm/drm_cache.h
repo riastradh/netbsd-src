@@ -40,8 +40,11 @@
 #endif
 #include <linux/scatterlist.h>
 
+struct page;
+
 void drm_clflush_pages(struct page *pages[], unsigned long num_pages);
 #ifdef __NetBSD__		/* XXX drm clflush */
+struct pglist;
 void drm_clflush_pglist(struct pglist *);
 void drm_clflush_page(struct page *);
 void drm_clflush_virt_range(const void *, size_t);
