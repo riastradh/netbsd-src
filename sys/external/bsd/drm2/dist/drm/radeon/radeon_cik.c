@@ -8398,7 +8398,7 @@ static int cik_startup(struct radeon_device *rdev)
 		}
 	}
 	rdev->rlc.cs_data = ci_cs_data;
-	rdev->rlc.cp_table_size = ALIGN(CP_ME_TABLE_SIZE * 5 * 4, 2048); /* CP JT */
+	rdev->rlc.cp_table_size = round_up(CP_ME_TABLE_SIZE * 5 * 4, 2048); /* CP JT */
 	rdev->rlc.cp_table_size += 64 * 1024; /* GDS */
 	r = sumo_rlc_init(rdev);
 	if (r) {
