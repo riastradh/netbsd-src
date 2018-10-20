@@ -159,20 +159,14 @@ srcu_read_lock(struct srcu *srcu)
 	 */
 	kpreempt_disable();
 	gen = srcu->srcu_gen;
-	/* Fetch the generation once before incrementing the count.  */
-	__insn_barrier();
 	srcu_adjust(srcu, gen, +1);
 	kpreempt_enable();
 
 	/*
-	 * Increment the count in our generation before doing anything
-	 * else on this CPU.
-	 *
 	 * No stronger, inter-CPU memory barrier is needed: if there is
 	 * a concurrent synchronize_srcu, it will issue an xcall that
 	 * functions as a stronger memory barrier.
 	 */
-	__insn_barrier();
 
 	return gen;
 }
@@ -192,14 +186,13 @@ srcu_read_unlock(struct srcu *srcu, int ticket)
 	unsigned gen = ticket;
 
 	/*
-	 * Make sure all side effects have completed on this CPU before
-	 * decrementing the count.
+	 * All side effects have completed on this CPU before we
+	 * disable kpreemption.
 	 *
 	 * No stronger, inter-CPU memory barrier is needed: if there is
 	 * a concurrent synchronize_srcu, it will issue an xcall that
 	 * functions as a stronger memory barrier.
 	 */
-	__insn_barrier();
 
 	/*
 	 * Prevent xcall while we determine whether we need to notify a
