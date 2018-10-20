@@ -34,7 +34,9 @@
 
 #include <sys/param.h>
 
-#define	cpu_relax()	DELAY(1)	/* XXX */
+#include <sys/lock.h>
+
+#define	cpu_relax()	SPINLOCK_BACKOFF_HOOK
 
 #if defined(__i386__) || defined(__x86_64__)
 static inline void
