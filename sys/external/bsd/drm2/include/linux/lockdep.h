@@ -38,11 +38,18 @@
 #define	__lockdep_used			__debugused
 #define	lock_acquire_shared_recursive(l, s, t, n, i)	__nothing
 #define	lock_release(l, n, i)		__nothing
+#ifdef notyet
 #define	lockdep_assert_held(m)		KDASSERT(lockdep_is_held(m))
 #define	lockdep_assert_held_once(m)	KDASSERT(lockdep_is_held(m))
 #define	lockdep_is_held(m)		mutex_owned(__lockdep_kmutex(m))
 #define	might_lock(m)							      \
 	KDASSERT(mutex_ownable(__lockdep_kmutex(m)))
+#else
+#define	lockdep_assert_held(m)		do {} while (0)
+#define	lockdep_assert_held_once(m)	do {} while (0)
+#define	lockdep_is_held(m)		1
+#define	might_lock(m)			do {} while (0)
+#endif
 
 #define	__lockdep_kmutex(m)						      \
 	(__builtin_types_compatible_p(typeof(*(m)), struct mutex) ?	      \
