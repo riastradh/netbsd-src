@@ -35,6 +35,8 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
+#include <linux/smp.h>
+
 /* Not actually local...  */
 static inline uint64_t
 local_clock(void)
