@@ -116,7 +116,7 @@ struct dma_fence *
 struct dma_fence *
 	dma_fence_get_rcu(struct dma_fence *);
 struct dma_fence *
-	dma_fence_get_rcu_safe(struct dma_fence **);
+	dma_fence_get_rcu_safe(struct dma_fence *volatile const *);
 void	dma_fence_put(struct dma_fence *);
 
 int	dma_fence_add_callback(struct dma_fence *, struct dma_fence_cb *,

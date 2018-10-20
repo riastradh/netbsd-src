@@ -211,7 +211,7 @@ dma_fence_get_rcu(struct dma_fence *fence)
  *	success, or NULL on failure.
  */
 struct dma_fence *
-dma_fence_get_rcu_safe(struct dma_fence **fencep)
+dma_fence_get_rcu_safe(struct dma_fence *volatile const *fencep)
 {
 	struct dma_fence *fence, *fence0;
 
