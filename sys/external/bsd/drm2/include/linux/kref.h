@@ -146,7 +146,6 @@ kref_read(const struct kref *kref)
 	unsigned v;
 
 	v = kref->kr_count;
-	__insn_barrier();
 
 	return v;
 }

@@ -208,7 +208,6 @@ tasklet_softintr(void *cookie)
 		 */
 		do {
 			state = tasklet->tl_state;
-			__insn_barrier();
 			/* It had better be scheduled.  */
 			KASSERT(state & TASKLET_SCHEDULED);
 			if (state & TASKLET_RUNNING)
@@ -539,7 +538,6 @@ tasklet_is_enabled(const struct tasklet_struct *tasklet)
 	unsigned int disablecount;
 
 	disablecount = tasklet->tl_disablecount;
-	__insn_barrier();
 
 	return (disablecount == 0);
 }

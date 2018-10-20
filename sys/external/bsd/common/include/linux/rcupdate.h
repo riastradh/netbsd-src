@@ -94,16 +94,14 @@ static inline void
 rcu_read_lock(void)
 {
 
-	kpreempt_disable();
-	__insn_barrier();
+	kpreempt_disable();	/* implies __insn_barrier */
 }
 
 static inline void
 rcu_read_unlock(void)
 {
 
-	__insn_barrier();
-	kpreempt_enable();
+	kpreempt_enable();	/* implies __insn_barrier */
 }
 
 #define	kfree_rcu(P, F)							      \
