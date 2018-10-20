@@ -109,7 +109,7 @@ i915drmkms_pci_lookup(const struct pci_attach_args *pa)
 	const struct intel_device_info *const info =
 	    (const void *)(uintptr_t)i915_device_ids[i].driver_data;
 
-	if (IS_PRELIMINARY_HW(info)) {
+	if (IS_ALPHA_SUPPORT(info)) {
 		printf("i915drmkms: preliminary hardware support disabled\n");
 		return NULL;
 	}
