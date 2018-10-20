@@ -37,4 +37,7 @@
 #define	local_irq_save(flags)		((flags) = splvm())
 #define	local_irq_restore(flags)	(splx((flags)))
 
+/* Only for positive assertions.  */
+#define	irqs_disabled()			true
+
 #endif	/* _LINUX_IRQFLAGS_H_ */
