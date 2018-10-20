@@ -190,6 +190,18 @@ reservation_object_held(struct reservation_object *robj)
 }
 
 /*
+ * reservation_object_assert_held(robj)
+ *
+ *	Panic if robj is not held, in DIAGNOSTIC builds.
+ */
+void
+reservation_object_assert_held(struct reservation_object *robj)
+{
+
+	KASSERT(reservation_object_held(robj));
+}
+
+/*
  * reservation_object_get_excl(robj)
  *
  *	Return a pointer to the exclusive fence of the reservation
