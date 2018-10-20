@@ -258,10 +258,10 @@ static int radeonfb_create(struct drm_fb_helper *helper,
 	rbo = gem_to_radeon_bo(gobj);
 
 #ifdef __NetBSD__
-	ret = radeon_framebuffer_init(rdev->ddev, &rfbdev->rfb, &mode_cmd, gobj);
+	ret = radeon_framebuffer_init(rdev->ddev, &rfbdev->fb, &mode_cmd, gobj);
 	if (ret) {
 		DRM_ERROR("failed to initialize framebuffer %d\n", ret);
-		goto out_unref;
+		goto out;
 	}
 
 	(void)memset(rbo->kptr, 0, radeon_bo_size(rbo));
@@ -279,10 +279,10 @@ static int radeonfb_create(struct drm_fb_helper *helper,
 	    CFARGS(.iattr = "radeonfbbus"));
 	if (helper->fbdev == NULL) {
 		DRM_ERROR("failed to attach genfb\n");
-		goto out_unref;
+		goto out;
 	}
     }
-	fb = &rfbdev->rfb.base;
+	fb = &rfbdev->fb;
 	rfbdev->helper.fb = fb;
 #else
 	/* okay we have an object now allocate the framebuffer */
