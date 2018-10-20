@@ -353,7 +353,7 @@ pci_bus_alloc_resource(struct pci_bus *bus, struct resource *resource,
 	if (error)
 		return error;
 
-	resource->size = size;
+	resource->end = start + (size - 1);
 	return 0;
 }
 
