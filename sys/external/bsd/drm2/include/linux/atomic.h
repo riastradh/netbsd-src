@@ -155,6 +155,23 @@ atomic_dec_and_test(atomic_t *atomic)
 	return atomic_dec_return(atomic) == 0;
 }
 
+static inline int
+atomic_dec_if_positive(atomic_t *atomic)
+{
+	int v;
+
+	smp_mb__before_atomic();
+	do {
+		v = atomic->a_u.au_uint;
+		__insn_barrier();
+		if (v <= 0)
+			break;
+	} while (atomic_cas_uint(&atomic->a_u.au_uint, v, v - 1) != v);
+	smp_mb__after_atomic();
+
+	return v - 1;
+}
+
 static inline void
 atomic_or(int value, atomic_t *atomic)
 {
