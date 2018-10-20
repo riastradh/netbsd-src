@@ -32,4 +32,18 @@
 #ifndef _ASM_AGP_H_
 #define _ASM_AGP_H_
 
+struct page;
+
+static inline void
+map_page_into_agp(struct page *p)
+{
+	/* XXX Linux does set_pages_uc here.  */
+}
+
+static inline void
+unmap_page_from_agp(struct page *p)
+{
+	/* XXX Linux does set_pages_wb here.  */
+}
+
 #endif  /* _ASM_AGP_H_ */
