@@ -89,6 +89,12 @@ spin_unlock_irqrestore(spinlock_t *spinlock, unsigned long __unused flags)
 }
 
 static inline void
+spin_lock_nested(spinlock_t *spinlock, int subclass)
+{
+	spin_lock(spinlock);
+}
+
+static inline void
 spin_lock_init(spinlock_t *spinlock)
 {
 	/* XXX What's the right IPL?  IPL_DRM...?  */
