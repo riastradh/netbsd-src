@@ -32,4 +32,6 @@
 #ifndef _LINUX_AGP_BACKEND_H_
 #define _LINUX_AGP_BACKEND_H_
 
+#include <drm/drm_agp_netbsd.h>
+
 #endif  /* _LINUX_AGP_BACKEND_H_ */
