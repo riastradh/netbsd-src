@@ -32,4 +32,14 @@
 #ifndef _LINUX_VGA_SWITCHEROO_H_
 #define _LINUX_VGA_SWITCHEROO_H_
 
+#include <sys/cdefs.h>
+
+#define	VGA_SWITCHEROO_CAN_SWITCH_DDC	__BIT(0)
+
+static inline int
+vga_switcheroo_handler_flags(void)
+{
+	return 0;
+}
+
 #endif  /* _LINUX_VGA_SWITCHEROO_H_ */
