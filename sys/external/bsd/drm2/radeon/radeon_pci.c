@@ -324,7 +324,7 @@ radeon_do_suspend(device_t self, const pmf_qual_t *qual)
 	if (dev == NULL)
 		return true;
 
-	ret = radeon_suspend_kms(dev, true, is_console);
+	ret = radeon_suspend_kms(dev, true, is_console, false);
 	if (ret)
 		return false;
 
