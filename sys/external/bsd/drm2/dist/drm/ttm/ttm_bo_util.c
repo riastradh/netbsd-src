@@ -568,9 +568,9 @@ static int ttm_buffer_object_transfer(struct ttm_buffer_object *bo,
 	fbo->base.moving = NULL;
 #ifdef __NetBSD__
 	drm_vma_node_init(&fbo->vma_node);
-	uvm_obj_init(&fbo->uvmobj, bo->bdev->driver->ttm_uvm_ops, true, 1);
+	uvm_obj_init(&fbo->base.uvmobj, bo->bdev->driver->ttm_uvm_ops, true, 1);
 	rw_obj_hold(bo->uvmobj.vmobjlock);
-	uvm_obj_setlock(&fbo->uvmobj, bo->uvmobj.vmobjlock);
+	uvm_obj_setlock(&fbo->base.uvmobj, bo->uvmobj.vmobjlock);
 #else
 	drm_vma_node_reset(&fbo->base.base.vma_node);
 #endif
