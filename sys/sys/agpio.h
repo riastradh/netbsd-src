@@ -31,6 +31,7 @@
 #ifndef _SYS_AGPIO_H_
 #define _SYS_AGPIO_H_
 
+#include <sys/types.h>
 #include <sys/ioccom.h>
 
 /*
