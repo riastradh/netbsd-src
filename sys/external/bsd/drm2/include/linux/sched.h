@@ -101,4 +101,14 @@ cond_resched(void)
 	preempt_point();
 }
 
+static inline bool
+signal_pending_state(int state, struct proc *p)
+{
+
+	KASSERT(p == current);
+	if (state & TASK_UNINTERRUPTIBLE)
+		return false;
+	return sigispending(curlwp, 0);
+}
+
 #endif  /* _LINUX_SCHED_H_ */

@@ -103,7 +103,7 @@ file	external/bsd/drm2/dist/drm/drm_irq.c	drmkms
 file	external/bsd/drm2/drm/drm_lease.c	drmkms
 file	external/bsd/drm2/drm/drm_lock.c	drmkms
 file	external/bsd/drm2/drm/drm_memory.c	drmkms
-file	external/bsd/drm2/dist/drm/drm_mm.c	drmkms
+#file	external/bsd/drm2/dist/drm/drm_mm.c	drmkms
 file	external/bsd/drm2/dist/drm/drm_mode_config.c	drmkms
 file	external/bsd/drm2/dist/drm/drm_mode_object.c	drmkms
 file	external/bsd/drm2/dist/drm/drm_modes.c	drmkms
