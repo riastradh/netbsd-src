@@ -217,6 +217,7 @@ static void drm_mm_interval_tree_add_node(struct drm_mm_node *hole_node,
 				   &drm_mm_interval_tree_augment);
 }
 
+#ifndef __NetBSD__
 #define RB_INSERT(root, member, expr) do { \
 	struct rb_node **link = &root.rb_node, *rb = NULL; \
 	u64 x = expr(node); \
@@ -230,6 +231,7 @@ static void drm_mm_interval_tree_add_node(struct drm_mm_node *hole_node,
 	rb_link_node(&node->member, rb, link); \
 	rb_insert_color(&node->member, &root); \
 } while (0)
+#endif
 
 #define HOLE_SIZE(NODE) ((NODE)->hole_size)
 #define HOLE_ADDR(NODE) (__drm_mm_hole_node_start(NODE))
@@ -269,7 +271,12 @@ static void add_hole(struct drm_mm_node *node)
 	DRM_MM_BUG_ON(!drm_mm_hole_follows(node));
 
 	insert_hole_size(&mm->holes_size, node);
+#ifdef __NetBSD__
+	struct rb_node *collision __diagused;
+	collision = rb_tree_insert_node(&mm->holes_addr
+#else
 	RB_INSERT(mm->holes_addr, rb_hole_addr, HOLE_ADDR);
+#endif
 
 	list_add(&node->hole_stack, &mm->hole_stack);
 }
