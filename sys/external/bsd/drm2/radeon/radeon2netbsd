@@ -20,7 +20,7 @@ env CONFIG_ACPI=y \
 env src=. \
 make -f Makefile -V '$(radeon-y)' \
 | tr ' ' '\n' \
-| grep -v '^$' \
+| grep -v -e '^[[:space:]]*$' \
 | sed -e 's,\.o$,.c,' \
 | sort -u \
 | awk '
