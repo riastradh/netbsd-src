@@ -55,7 +55,7 @@ typedef unsigned int drm_handle_t;
 #endif
 
 #ifdef __NetBSD__
-#include <stdint.h>
+#include <sys/stdint.h>
 #include <sys/ioccom.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
