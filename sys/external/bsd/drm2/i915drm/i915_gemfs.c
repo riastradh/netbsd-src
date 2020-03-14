@@ -32,7 +32,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
-#include "i915_gemfs.h"
+#include "gem/i915_gemfs.h"
 
 int
 i915_gemfs_init(struct drm_i915_private *i915)
