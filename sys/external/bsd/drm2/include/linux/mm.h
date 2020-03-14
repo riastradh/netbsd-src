@@ -40,6 +40,7 @@
 #include <asm/page.h>
 #include <linux/shrinker.h>
 #include <linux/slab.h>
+#include <linux/sizes.h>
 
 struct file;
 
