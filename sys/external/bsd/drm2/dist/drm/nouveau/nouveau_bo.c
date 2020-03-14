@@ -1739,7 +1739,6 @@ nouveau_ttm_tt_populate(struct ttm_tt *ttm, struct ttm_operation_ctx *ctx)
 		ttm_dma->dma_address[i] = addr;
 	}
 	return 0;
-#endif
 }
 
 static void
@@ -1749,7 +1748,6 @@ nouveau_ttm_tt_unpopulate(struct ttm_tt *ttm)
 	struct nouveau_drm *drm;
 	struct device *dev;
 	unsigned i;
-#endif
 	bool slave = !!(ttm->page_flags & TTM_PAGE_FLAG_SG);
 
 	if (slave)
@@ -1784,7 +1782,6 @@ nouveau_ttm_tt_unpopulate(struct ttm_tt *ttm)
 	}
 
 	ttm_pool_unpopulate(ttm);
-#endif
 }
 
 #ifdef __NetBSD__
