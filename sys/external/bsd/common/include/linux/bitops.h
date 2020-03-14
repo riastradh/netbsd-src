@@ -108,7 +108,6 @@ sign_extend64(uint64_t x, unsigned n)
  * turns up.
  */
 
-#define BITS_PER_BYTE 8
 #define	BITS_TO_LONGS(n)						\
 	roundup2((n), (sizeof(unsigned long) * CHAR_BIT))
 
