@@ -1967,7 +1967,6 @@ int i915_drm_resume_early(struct drm_device *dev)
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 	int ret;
 
-#ifndef __NetBSD__		/* pmf handles this for us.  */
 	/*
 	 * We have a resume ordering issue with the snd-hda driver also
 	 * requiring our device to be power up. Due to the lack of a

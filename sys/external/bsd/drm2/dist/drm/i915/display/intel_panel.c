@@ -699,7 +699,6 @@ intel_panel_actually_set_backlight(const struct drm_connector_state *conn_state,
 	level = intel_panel_compute_brightness(connector, level);
 	panel->backlight.set(conn_state, level);
 }
-#endif
 
 /* set backlight brightness to level in range [0..max], assuming hw min is
  * respected.

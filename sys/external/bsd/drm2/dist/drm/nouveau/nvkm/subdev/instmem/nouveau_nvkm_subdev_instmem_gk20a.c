@@ -184,7 +184,6 @@ gk20a_instobj_iommu_recycle_vaddr(struct gk20a_instobj_iommu *obj)
 		   imem->vaddr_max);
 }
 
-#endif	/* __NetBSD__ */
 
 /*
  * Must be called while holding gk20a_instmem::lock
