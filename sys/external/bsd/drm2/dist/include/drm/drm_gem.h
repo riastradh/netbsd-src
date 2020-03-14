@@ -168,7 +168,12 @@ struct drm_gem_object_funcs {
 	 * drm_gem_prime_mmap().  When @mmap is present @vm_ops is not
 	 * used, the @mmap callback must set vma->vm_ops instead.
 	 */
+#ifdef __NetBSD__
+	int (*mmap)(struct drm_device *, off_t, size_t, int, struct uvm_object **,
+	    voff_t *, struct file *);
+#else
 	int (*mmap)(struct drm_gem_object *obj, struct vm_area_struct *vma);
+#endif
 
 	/**
 	 * @vm_ops:
