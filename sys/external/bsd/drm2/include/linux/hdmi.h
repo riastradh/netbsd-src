@@ -554,4 +554,7 @@ hdmi_infoframe_pack(union hdmi_infoframe *frame, void *buf, size_t size)
 	}
 }
 
+struct hdr_sink_metadata {};
+struct hdmi_drm_infoframe {};
+
 #endif	/* _LINUX_HDMI_H_ */
