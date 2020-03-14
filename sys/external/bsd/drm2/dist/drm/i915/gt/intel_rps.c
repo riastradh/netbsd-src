@@ -15,7 +15,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_gt_pm_irq.h"
 #include "intel_rps.h"
 #include "intel_sideband.h"
-#include "../../../platform/x86/intel_ips.h"
+/* #include "../../../platform/x86/intel_ips.h" */
 
 /*
  * Lock protecting IPS related data structures
