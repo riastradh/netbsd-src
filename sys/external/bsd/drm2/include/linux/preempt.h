@@ -37,4 +37,6 @@
 #define	preempt_disable	kpreempt_disable
 #define	preempt_enable	kpreempt_enable
 
+#define	in_atomic()	kpreempt_disabled()
+
 #endif  /* _LINUX_PREEMPT_H_ */
