@@ -95,7 +95,7 @@ clear_user(void __user *user_ptr, size_t size)
 	 * out an int.
 	 */
 	while (n --> 0) {
-		if (subyte(p, 0) != 0)
+		if (ustore_char(p, 0) != 0)
 			return ++n;
 	}
 
