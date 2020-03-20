@@ -194,6 +194,9 @@ struct drm_device {
 	 * @irq: Used by the drm_irq_install() and drm_irq_unistall() helpers.
 	 */
 	int irq;
+#ifdef __NetBSD__
+	struct drm_bus_irq_cookie *irq_cookie;
+#endif
 
 	/**
 	 * @vblank_disable_immediate:
@@ -276,6 +279,20 @@ struct drm_device {
 	/** @hose: PCI hose, only used on ALPHA platforms. */
 	struct pci_controller *hose;
 #endif
+
+#ifdef __NetBSD__
+	bus_space_tag_t bst;
+	struct drm_bus_map *bus_maps;
+	unsigned bus_nmaps;
+	bus_dma_tag_t bus_dmat;	/* bus's full DMA tag, for internal use */
+	bus_dma_tag_t bus_dmat32;	/* bus's 32-bit DMA tag */
+	bus_dma_tag_t dmat;	/* DMA tag for driver, may be subregion */
+	bool dmat_subregion_p;
+	bus_addr_t dmat_subregion_min;
+	bus_addr_t dmat_subregion_max;
+	vmem_t *cma_pool;
+#endif
+
 	/** @num_crtcs: Number of CRTCs on this device */
 	unsigned int num_crtcs;
 
