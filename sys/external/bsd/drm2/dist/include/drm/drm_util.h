@@ -77,9 +77,13 @@
  */
 static inline bool drm_can_sleep(void)
 {
+#ifdef __NetBSD__
+	return false;		/* XXX */
+#else
 	if (in_atomic() || in_dbg_master() || irqs_disabled())
 		return false;
 	return true;
+#endif
 }
 
 #endif
