@@ -990,7 +990,7 @@ EXPORT_SYMBOL(drm_gem_prime_mmap);
  * Returns 0 on success or a negative error code on failure.
  */
 #ifdef __NetBSD__
-static int
+int
 drm_gem_dmabuf_mmap(struct dma_buf *dma_buf, off_t *offp, size_t size,
     int prot, int *flagsp, int *advicep, struct uvm_object **uobjp,
     int *maxprotp)
