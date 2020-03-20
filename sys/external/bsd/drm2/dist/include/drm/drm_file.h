@@ -230,8 +230,10 @@ struct drm_file {
 	 */
 	struct drm_master *master;
 
+#ifndef __NetBSD__
 	/** @pid: Process that opened this file. */
 	struct pid *pid;
+#endif
 
 	/** @magic: Authentication magic, see @authenticated. */
 	drm_magic_t magic;
@@ -299,7 +301,12 @@ struct drm_file {
 	struct list_head blobs;
 
 	/** @event_wait: Waitqueue for new events added to @event_list. */
+#ifdef __NetBSD__
+	drm_waitqueue_t event_wait;
+	struct selinfo event_selq;
+#else
 	wait_queue_head_t event_wait;
+#endif
 
 	/**
 	 * @pending_event_list:
