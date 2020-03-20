@@ -35,6 +35,7 @@
 #include <drm/drm_connector.h>
 
 struct videomode;
+struct device_node;
 
 /*
  * Note on terminology:  here, for brevity and convenience, we refer to connector
