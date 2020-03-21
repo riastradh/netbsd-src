@@ -62,4 +62,13 @@ drm_writeback_prepare_job(struct drm_writeback_job *job)
 	return 0;
 }
 
+static inline int
+drm_writeback_set_fb(struct drm_connector_state *conn_state,
+    struct drm_framebuffer *fb)
+{
+
+	panic("TODO");
+	return 0;
+}
+
 #endif	/* _DRM_DRM_WRITEBACK_H_ */
