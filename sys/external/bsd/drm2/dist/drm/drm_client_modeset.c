@@ -28,6 +28,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "drm_crtc_internal.h"
 #include "drm_internal.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define DRM_CLIENT_MAX_CLONED_CONNECTORS	8
 
 struct drm_client_offset {
