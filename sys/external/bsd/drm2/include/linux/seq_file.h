@@ -32,6 +32,8 @@
 #ifndef _LINUX_SEQ_FILE_H_
 #define _LINUX_SEQ_FILE_H_
 
+#include <linux/string.h>
+
 struct seq_file;
 
 #endif  /* _LINUX_SEQ_FILE_H_ */
