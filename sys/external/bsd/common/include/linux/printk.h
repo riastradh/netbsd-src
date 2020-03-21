@@ -34,6 +34,7 @@
 
 #include <sys/param.h>
 #include <sys/systm.h>
+#include <linux/export.h>
 
 #define	printk		printf
 #define	vprintk		vprintf
