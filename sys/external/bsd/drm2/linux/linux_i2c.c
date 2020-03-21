@@ -178,6 +178,9 @@ static i2c_op_t
 linux_i2c_flags_op(uint16_t flags, bool stop)
 {
 
+	if (ISSET(flags, I2C_M_STOP))
+		stop = true;
+
 	if (ISSET(flags, I2C_M_RD))
 		return (stop? I2C_OP_READ_WITH_STOP : I2C_OP_READ);
 	else
