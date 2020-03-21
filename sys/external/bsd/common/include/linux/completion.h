@@ -47,6 +47,7 @@
 #define _LINUX_COMPLETION_H_
 
 #include <sys/types.h>
+#include <sys/param.h>
 #include <sys/condvar.h>
 #include <sys/mutex.h>
 
