@@ -54,6 +54,12 @@ ktime_to_us(ktime_t kt)
 	return ktime_to_ns(kt)/1000;
 }
 
+static inline int64_t
+ktime_to_ms(ktime_t kt)
+{
+	return ktime_to_ns(kt)/1000000;
+}
+
 static inline ktime_t
 ns_to_ktime(int64_t nsec)
 {
@@ -165,6 +171,13 @@ ktime_us_delta(ktime_t a, ktime_t b)
 {
 	return ktime_to_us(ktime_sub(a, b));
 }
+
+static inline int64_t
+ktime_ms_delta(ktime_t a, ktime_t b)
+{
+	return ktime_to_ms(ktime_sub(a, b));
+}
+
 
 static inline bool
 time_in_range(unsigned long x, unsigned long a, unsigned long b)
