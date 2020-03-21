@@ -25,6 +25,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/bug.h>
 #include <linux/delay.h>
 #include <linux/errno.h>
 #include <linux/export.h>
