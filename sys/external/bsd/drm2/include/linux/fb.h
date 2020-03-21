@@ -41,4 +41,10 @@
 #define	FBINFO_STATE_RUNNING	0
 #define	FBINFO_STATE_SUSPENDED	1
 
+static inline int
+fb_get_options(const char *name, char **options)
+{
+	panic("TODO");
+	return 0;
+}
 #endif  /* _LINUX_FB_H_ */
