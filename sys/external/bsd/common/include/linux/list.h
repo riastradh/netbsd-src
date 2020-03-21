@@ -291,6 +291,11 @@ list_del_init(struct list_head *node)
 		&(VAR)->FIELD != (HEAD);				\
 		(VAR) = list_prev_entry((VAR), FIELD))
 
+#define	list_for_each_entry_from(VAR, HEAD, FIELD)			\
+	for (;								\
+		(&(VAR)->FIELD != (HEAD));				\
+		(VAR) = list_next_entry((VAR), FIELD))
+
 #define	list_for_each_entry_safe_from(VAR, NEXT, HEAD, FIELD)		\
 	for (;								\
 		(&(VAR)->FIELD != (HEAD)) &&				\
