@@ -47,4 +47,9 @@ struct drm_writeback_connector *
 struct dma_fence *
 	drm_writeback_get_out_fence(struct drm_writeback_connector *);
 
+static inline void
+drm_writeback_cleanup_job(struct drm_writeback_job *job) {
+	panic("TODO");
+}
+
 #endif	/* _DRM_DRM_WRITEBACK_H_ */
