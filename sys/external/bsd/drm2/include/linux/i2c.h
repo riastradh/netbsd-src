@@ -53,6 +53,7 @@ struct i2c_msg;
 #define	I2C_M_RD		0x01 /* xfer is read, not write */
 #define	I2C_M_NOSTART		0x02 /* don't initiate xfer */
 #define	I2C_M_TEN		0x04 /* 10-bit chip address */
+#define	I2C_M_STOP		0x08 /* send stop after msg */
 
 /*
  * I2C_CLASS_*: i2c_adapter classes
