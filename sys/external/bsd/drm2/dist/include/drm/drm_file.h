@@ -80,10 +80,12 @@ struct drm_minor {
 	struct device *kdev;		/* Linux device */
 	struct drm_device *dev;
 
+#ifndef __NetBSD__		/* XXX debugfs */
 	struct dentry *debugfs_root;
 
 	struct list_head debugfs_list;
 	struct mutex debugfs_lock; /* Protects debugfs_list. */
+#endif
 };
 
 /**
