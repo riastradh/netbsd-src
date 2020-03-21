@@ -682,7 +682,6 @@ static int drm_atomic_connector_set_property(struct drm_connector *connector,
 	struct drm_device *dev = connector->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 	bool replaced = false;
-	int ret;
 
 	if (property == config->prop_crtc_id) {
 		struct drm_crtc *crtc = drm_crtc_find(dev, file_priv, val);
@@ -734,6 +733,7 @@ static int drm_atomic_connector_set_property(struct drm_connector *connector,
 		if (state->link_status != DRM_LINK_STATUS_GOOD)
 			state->link_status = val;
 	} else if (property == config->hdr_output_metadata_property) {
+		int ret;
 		ret = drm_atomic_replace_property_blob_from_id(dev,
 				&state->hdr_output_metadata,
 				val,
