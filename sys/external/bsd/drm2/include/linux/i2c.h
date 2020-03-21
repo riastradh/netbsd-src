@@ -40,6 +40,7 @@
 #include <dev/i2c/i2cvar.h>
 
 #include <linux/pm.h>
+#include <linux/mutex.h>
 
 struct i2c_adapter;
 struct i2c_algorithm;
