@@ -412,7 +412,7 @@ struct drm_display_info {
 	 * @color_formats. Array of size @num_bus_formats encoded using
 	 * MEDIA_BUS_FMT\_ defines shared with v4l and media drivers.
 	 */
-	const u32 *bus_formats;
+	u32 *bus_formats;
 	/**
 	 * @num_bus_formats: Size of @bus_formats array.
 	 */
