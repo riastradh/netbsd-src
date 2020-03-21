@@ -58,6 +58,9 @@ __KERNEL_RCSID(0, "$NetBSD: drm_cdevsw.c,v 1.15 2020/12/19 22:09:15 thorpej Exp 
 #include <linux/pm.h>
 
 #include <drm/drmP.h>
+#include <drm/drm_drv.h>
+#include <drm/drm_file.h>
+#include <drm/drm_legacy.h>
 
 #include "../dist/drm/drm_internal.h"
 #include "../dist/drm/drm_legacy.h"
