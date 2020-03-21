@@ -252,7 +252,7 @@ bool drm_calc_vbltimestamp_from_scanoutpos(struct drm_device *dev,
 void drm_calc_timestamping_constants(struct drm_crtc *crtc,
 				     const struct drm_display_mode *mode);
 #ifdef __NetBSD__
-drm_waitqueue_t *drm_crtc_vblank_waitqueue(struct drm_crtc *crtc)
+drm_waitqueue_t *drm_crtc_vblank_waitqueue(struct drm_crtc *crtc);
 #else
 wait_queue_head_t *drm_crtc_vblank_waitqueue(struct drm_crtc *crtc);
 #endif
