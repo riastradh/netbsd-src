@@ -36,6 +36,8 @@
 #include <sys/errno.h>
 #include <sys/systm.h>
 
+#include <linux/compiler.h>
+
 /* XXX This is a cop-out.  */
 #define	VERIFY_READ	0
 #define	VERIFY_WRITE	1
