@@ -63,6 +63,15 @@ static DEFINE_SPINLOCK(drm_minor_lock);
 static struct idr drm_minors_idr;
 #endif
 
+/*
+ * If the drm core fails to init for whatever reason,
+ * we should prevent any drivers from registering with it.
+ * It's best to check this at drm_dev_init(), as some drivers
+ * prefer to embed struct drm_device into their own device
+ * structure and call drm_dev_init() themselves.
+ */
+static bool drm_core_init_complete = false;
+
 #ifndef __NetBSD__
 static struct dentry *drm_debugfs_root;
 #endif
