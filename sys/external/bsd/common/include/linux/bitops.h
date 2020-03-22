@@ -41,6 +41,7 @@
 #include <machine/limits.h>
 
 #include <lib/libkern/libkern.h>
+#include <linux/bits.h>
 
 /*
  * Linux __ffs/__ffs64 is zero-based; zero input is undefined.  Our
