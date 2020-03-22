@@ -3825,7 +3825,11 @@ static int drm_dp_mst_handle_down_rep(struct drm_dp_mst_topology_mgr *mgr)
 	mgr->is_waiting_for_dwn_reply = false;
 	mutex_unlock(&mgr->qlock);
 
+#ifdef __NetBSD__
+	DRM_WAKEUP_ALL(&mgr->tx_waitq, &mgr->qlock);
+#else
 	wake_up_all(&mgr->tx_waitq);
+#endif
 
 	return 0;
 
@@ -4716,7 +4720,13 @@ drm_dp_delayed_destroy_mstb(struct drm_dp_mst_branch *mstb)
 	mutex_unlock(&mstb->mgr->qlock);
 
 	if (wake_tx)
+	{
+#ifdef __NetBSD__
+		DRM_WAKEUP_ALL(&mstb->mgr->tx_waitq, &mstb->mgr->qlock);
+#else
 		wake_up_all(&mstb->mgr->tx_waitq);
+#endif
+	}
 
 	drm_dp_mst_put_mstb_malloc(mstb);
 }
