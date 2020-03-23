@@ -51,6 +51,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "drm_internal.h"
 #include "drm_legacy.h"
 
+#include <linux/nbsd-namespace.h>
+
 MODULE_AUTHOR("Gareth Hughes, Leif Delgass, José Fonseca, Jon Smirl");
 MODULE_DESCRIPTION("DRM shared core routines");
 MODULE_LICENSE("GPL and additional rights");
@@ -752,7 +754,9 @@ err_free:
 	sysmon_pswitch_unregister(&dev->sc_monitor_hotplug);
 err_pswitch:
 #endif
+#ifndef __NetBSD__		/* XXX drm sysfs */
 	put_device(dev->dev);
+#endif
 	mutex_destroy(&dev->master_mutex);
 	mutex_destroy(&dev->clientlist_mutex);
 	mutex_destroy(&dev->filelist_mutex);
@@ -831,7 +835,9 @@ void drm_dev_fini(struct drm_device *dev)
 	sysmon_pswitch_unregister(&dev->sc_monitor_hotplug);
 #endif
 
+#ifndef __NetBSD__		/* XXX drm sysfs */
 	put_device(dev->dev);
+#endif
 
 	mutex_destroy(&dev->master_mutex);
 	mutex_destroy(&dev->clientlist_mutex);
