@@ -87,4 +87,11 @@ dev_pm_set_driver_flags(struct device *dev, uint32_t flags)
 {
 }
 
+static inline int
+devm_add_action(struct device *parent, void (*func)(void *),
+    void *data)
+{
+	panic("TODO");
+}
+
 #endif  /* _LINUX_DEVICE_H_ */
