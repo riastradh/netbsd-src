@@ -38,6 +38,8 @@
 #include <sys/rwlock.h>
 #include <sys/vmem.h>
 
+#include <linux/mm.h>
+
 struct drm_file;
 
 struct drm_vma_offset_manager {
