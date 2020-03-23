@@ -47,6 +47,7 @@
 #include <drm/drm_vma_manager.h>
 
 struct drm_gem_object;
+struct xarray;
 
 /**
  * struct drm_gem_object_funcs - GEM object functions
