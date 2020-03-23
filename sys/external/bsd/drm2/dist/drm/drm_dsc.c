@@ -11,6 +11,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/bug.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
