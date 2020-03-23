@@ -78,6 +78,7 @@
 } while (0)
 
 #define	dev_name	device_xname
+#define	get_device(x)	(x)
 
 #define	DPM_FLAG_NEVER_SKIP	0
 
