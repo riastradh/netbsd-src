@@ -34,6 +34,7 @@
 
 #include <linux/kgdb.h>
 #include <linux/notifier.h>
+#include <linux/init.h>
 
 #define	PICOS2KHZ(PICOS)	(1000000000ul / (PICOS))
 #define	KHZ2PICOS(KHZ)		(1000000000ul / (KHZ))
