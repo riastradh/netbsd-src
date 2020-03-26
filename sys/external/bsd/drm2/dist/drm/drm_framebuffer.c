@@ -232,14 +232,14 @@ static int framebuffer_check(struct drm_device *dev,
 		}
 
 		if (r->modifier[i] && !(r->flags & DRM_MODE_FB_MODIFIERS)) {
-			DRM_DEBUG_KMS("bad fb modifier %llu for plane %d\n",
+			DRM_DEBUG_KMS("bad fb modifier %"PRIu64" for plane %d\n",
 				      r->modifier[i], i);
 			return -EINVAL;
 		}
 
 		if (r->flags & DRM_MODE_FB_MODIFIERS &&
 		    r->modifier[i] != r->modifier[0]) {
-			DRM_DEBUG_KMS("bad fb modifier %llu for plane %d\n",
+			DRM_DEBUG_KMS("bad fb modifier %"PRIu64" for plane %d\n",
 				      r->modifier[i], i);
 			return -EINVAL;
 		}
