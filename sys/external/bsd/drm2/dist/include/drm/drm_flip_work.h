@@ -26,6 +26,8 @@
 #ifndef DRM_FLIP_WORK_H
 #define DRM_FLIP_WORK_H
 
+#include <linux/bug.h>
+#include <linux/list.h>
 #include <linux/kfifo.h>
 #include <linux/spinlock.h>
 #include <linux/workqueue.h>
