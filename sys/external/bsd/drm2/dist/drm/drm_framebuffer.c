@@ -26,6 +26,7 @@
 __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <linux/export.h>
+#include <linux/capability.h>
 #include <linux/uaccess.h>
 
 #include <drm/drm_atomic.h>
