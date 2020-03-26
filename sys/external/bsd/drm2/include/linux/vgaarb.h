@@ -45,4 +45,10 @@ vga_client_register(struct pci_dev *pdev __unused, void *cookie __unused,
 	return -ENOSYS;
 }
 
+static inline int
+vga_remove_vgacon(struct pci_dev *pdev)
+{
+	return 0;
+}
+
 #endif  /* _LINUX_VGAARB_H_ */
