@@ -32,6 +32,7 @@
 #ifndef _LINUX_HASH_H_
 #define _LINUX_HASH_H_
 
+#include <sys/param.h>
 #include <machine/limits.h>
 
 static inline unsigned long
