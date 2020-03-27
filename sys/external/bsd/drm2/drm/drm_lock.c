@@ -60,6 +60,8 @@ __KERNEL_RCSID(0, "$NetBSD: drm_lock.c,v 1.8 2020/05/23 23:42:43 ad Exp $");
 
 static bool	drm_lock_acquire(struct drm_lock_data *, int);
 static void	drm_lock_release(struct drm_lock_data *, int);
+
+#if IS_ENABLED(CONFIG_DRM_LEGACY)
 static int	drm_lock_block_signals(struct drm_device *, struct drm_lock *,
 		    struct drm_file *);
 static void	drm_lock_unblock_signals(struct drm_device *,
@@ -215,6 +217,7 @@ out1:	spin_unlock(&master->lock.spinlock);
 out0:	mutex_lock(&drm_global_mutex);
 	return error;
 }
+#endif
 
 /*
  * Try to acquire the lock.  Whether or not we acquire it, guarantee
@@ -260,6 +263,7 @@ drm_legacy_idlelock_release(struct drm_lock_data *lock_data)
 	spin_unlock(&lock_data->spinlock);
 }
 
+#if IS_ENABLED(CONFIG_DRM_LEGACY)
 /*
  * Release the lock and free it on closing of a drm file.
  */
@@ -296,6 +300,7 @@ drm_legacy_lock_release(struct drm_device *dev, struct file *fp)
 
 out:	spin_unlock(&lock_data->spinlock);
 }
+#endif
 
 /*
  * Try to acquire the lock.  Return true if successful, false if not.
@@ -353,6 +358,7 @@ drm_lock_release(struct drm_lock_data *lock_data, int context)
 	DRM_SPIN_WAKEUP_ONE(&lock_data->lock_queue, &lock_data->spinlock);
 }
 
+#if IS_ENABLED(CONFIG_DRM_LEGACY)
 /*
  * Block signals for a process that holds a drm lock.
  *
@@ -375,3 +381,4 @@ drm_lock_unblock_signals(struct drm_device *dev __unused,
     struct drm_lock *lock_request __unused, struct drm_file *file __unused)
 {
 }
+#endif
