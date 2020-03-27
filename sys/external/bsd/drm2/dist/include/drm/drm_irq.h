@@ -28,7 +28,12 @@
 
 struct drm_device;
 
+#ifdef __NetBSD__
+int drm_irq_install(struct drm_device *dev);
+#else
 int drm_irq_install(struct drm_device *dev, int irq);
+#endif
+
 int drm_irq_uninstall(struct drm_device *dev);
 
 #endif
