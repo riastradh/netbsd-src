@@ -36,6 +36,8 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
+#include <linux/bug.h>
+
 #define	__rcu
 
 #define	RCU_INIT_POINTER(P, V)	((P) = (V))
