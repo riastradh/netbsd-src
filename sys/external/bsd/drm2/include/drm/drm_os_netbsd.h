@@ -55,6 +55,8 @@
  */
 #define	CONFIG_PCI	1
 
+#define	CONFIG_LOCKDEP	0
+
 #ifdef notyet
 #if defined(__i386__)
 #include "pnpbios.h"
