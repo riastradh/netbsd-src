@@ -45,6 +45,7 @@
 #include <linux/dma-resv.h>
 
 #include <drm/drm_vma_manager.h>
+#undef free
 
 struct drm_gem_object;
 struct xarray;
