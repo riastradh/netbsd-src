@@ -38,6 +38,7 @@ __KERNEL_RCSID(0, "$NetBSD: drm_gem_vm.c,v 1.9 2018/08/27 07:51:06 riastradh Exp
 #include <uvm/uvm_extern.h>
 
 #include <drm/drmP.h>
+#include <drm/drm_drv.h>
 #include <drm/drm_gem.h>
 #include <drm/drm_legacy.h>
 #include <drm/drm_vma_manager.h>
