@@ -855,7 +855,7 @@ drm_ioctl(struct file *fp, unsigned long cmd, void *data)
 	struct drm_device *const dev = file->minor->dev;
 	const struct drm_ioctl_desc *ioctl;
 
-	if (drm_device_is_unplugged(dev))
+	if (drm_dev_is_unplugged(dev))
 		return ENXIO;
 
 	const bool is_driver_ioctl =
