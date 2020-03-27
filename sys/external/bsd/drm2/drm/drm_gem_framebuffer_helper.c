@@ -35,6 +35,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/err.h>
 #include <linux/slab.h>
 
+#include <drm/drm_print.h>
+#include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem.h>
 #include <drm/drm_gem_framebuffer_helper.h>
