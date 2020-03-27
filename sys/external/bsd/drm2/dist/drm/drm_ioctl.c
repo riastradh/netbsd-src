@@ -37,6 +37,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/nospec.h>
 #include <linux/pci.h>
 #include <linux/uaccess.h>
+#include <linux/capability.h>
 
 #ifdef __NetBSD__
 #include <sys/types.h>
