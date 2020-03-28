@@ -153,7 +153,7 @@ fail1:	drm_pci_agp_destroy(dev);
 	if (dev->dmat_subregion_p) {
 		bus_dmatag_destroy(dev->dmat);
 	}
-	drm_dev_unref(dev);
+	drm_dev_put(dev);
 fail0:	return ret;
 }
 
@@ -176,7 +176,7 @@ drm_pci_detach(struct drm_device *dev, int flags __unused)
 		bus_dmatag_destroy(dev->dmat);
 	}
 
-	drm_dev_unref(dev);
+	drm_dev_put(dev);
 
 	return 0;
 }
