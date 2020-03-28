@@ -192,25 +192,6 @@ extern int drm_pci_attach(device_t, const struct pci_attach_args *,
     struct drm_device **);
 extern int drm_pci_detach(struct drm_device *, int);
 #endif
-#ifdef CONFIG_PCI
-extern int drm_get_pci_dev(struct pci_dev *pdev,
-			   const struct pci_device_id *ent,
-			   struct drm_driver *driver);
-extern int drm_pci_set_busid(struct drm_device *dev, struct drm_master *master);
-#else
-static inline int drm_get_pci_dev(struct pci_dev *pdev,
-				  const struct pci_device_id *ent,
-				  struct drm_driver *driver)
-{
-	return -ENOSYS;
-}
-
-static inline int drm_pci_set_busid(struct drm_device *dev,
-				    struct drm_master *master)
-{
-	return -ENOSYS;
-}
-#endif
 
 extern int drm_pcie_get_speed_cap_mask(struct drm_device *dev, u32 *speed_mask);
 
