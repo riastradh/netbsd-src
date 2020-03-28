@@ -45,6 +45,7 @@ __KERNEL_RCSID(0, "$NetBSD: drm_module.c,v 1.17 2020/01/03 21:01:16 jmcneill Exp
 #include <linux/mutex.h>
 
 #include <drm/drmP.h>
+#include <drm/drm_bridge.h>
 #include <drm/drm_encoder_slave.h>
 #include <drm/drm_sysctl.h>
 #include <drm/drm_panel.h>
