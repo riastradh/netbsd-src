@@ -33,7 +33,9 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #endif
 
 #ifdef __NetBSD__
+#include <sys/param.h>
 #include <sys/stdarg.h>
+#include <sys/device.h>
 #else
 #include <stdarg.h>
 
