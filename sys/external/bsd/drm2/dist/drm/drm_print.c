@@ -291,7 +291,7 @@ void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 #ifdef __NetBSD__
 	va_list va;
 
-	if (!(drm_debug & category))
+	if (!(__drm_debug & category))
 		return;
 
 	va_start(va, format);
@@ -327,7 +327,7 @@ void __drm_dbg(enum drm_debug_category category, const char *format, ...)
 #ifdef __NetBSD__
 	va_list va;
 
-	if (!(drm_debug & category))
+	if (!(__drm_debug & category))
 		return;
 
 	va_start(va, format);
