@@ -38,9 +38,9 @@ __KERNEL_RCSID(0, "$NetBSD: drm_cache.c,v 1.14 2020/09/05 07:45:44 maxv Exp $");
 
 #include <uvm/uvm_extern.h>
 
+#include <linux/highmem.h>
 #include <linux/mm_types.h>
 
-#include <drm/drmP.h>
 #include <drm/drm_cache.h>
 
 #if !defined(__arm__) && !defined(__aarch64__)

@@ -35,7 +35,8 @@ __KERNEL_RCSID(0, "$NetBSD: drm_fops.c,v 1.15 2020/02/14 04:36:56 riastradh Exp 
 #include <sys/param.h>
 #include <sys/select.h>
 
-#include <drm/drmP.h>
+#include <linux/capability.h>
+
 #include <drm/drm_drv.h>
 #include <drm/drm_legacy.h>
 #include <drm/drm_file.h>

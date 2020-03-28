@@ -35,6 +35,7 @@
 #define _DRM_PCI_H_
 
 #include <linux/pci.h>
+#include <drm/drm_os_netbsd.h>
 
 struct drm_dma_handle;
 struct drm_device;

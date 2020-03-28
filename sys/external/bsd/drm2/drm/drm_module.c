@@ -45,10 +45,13 @@ __KERNEL_RCSID(0, "$NetBSD: drm_module.c,v 1.17 2020/01/03 21:01:16 jmcneill Exp
 #include <linux/mutex.h>
 
 #include <drm/drmP.h>
+#include <drm/drm_agpsupport.h>
 #include <drm/drm_bridge.h>
 #include <drm/drm_encoder_slave.h>
+#include <drm/drm_global.h>
 #include <drm/drm_sysctl.h>
 #include <drm/drm_panel.h>
+#include <drm/drm_print.h>
 
 #include "../dist/drm/drm_crtc_internal.h"
 #include "../dist/drm/drm_internal.h"
@@ -119,7 +122,7 @@ drm_init(void)
 #endif
 
 	if (ISSET(boothowto, AB_DEBUG))
-		drm_debug = DRM_UT_CORE | DRM_UT_DRIVER | DRM_UT_KMS;
+		__drm_debug = DRM_UT_CORE | DRM_UT_DRIVER | DRM_UT_KMS;
 
 	spin_lock_init(&drm_minor_lock);
 	idr_init(&drm_minors_idr);
