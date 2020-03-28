@@ -25,6 +25,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/mm.h>
 #include <linux/export.h>
 #include <linux/uaccess.h>
 
