@@ -23,6 +23,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <linux/kernel.h>
 #include <drm/drm_ioctl.h>
 
 #define DRM_IF_MAJOR 1

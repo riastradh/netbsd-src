@@ -29,7 +29,10 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: drm_gem_cma_helper.c,v 1.10 2020/02/22 19:46:48 chs Exp $");
 
-#include <drm/drmP.h>
+#include <linux/err.h>
+
+#include <drm/drm_drv.h>
+#include <drm/drm_print.h>
 #include <drm/drm_gem_cma_helper.h>
 #include <drm/bus_dma_hacks.h>
 
