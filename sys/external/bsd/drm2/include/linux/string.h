@@ -131,4 +131,6 @@ memset_p(void **p, void *v, size_t n)
 		*p++ = v;
 }
 
+#define str_has_prefix(str, prefix) strncmp(str, prefix, strlen(prefix))
+
 #endif  /* _LINUX_STRING_H_ */
