@@ -148,14 +148,6 @@ struct drm_info_node {
 				/* Device support (drm_fops.h) */
 extern int drm_new_set_master(struct drm_device *dev, struct drm_file *fpriv);
 
-				/* IRQ support (drm_irq.h) */
-#ifdef __NetBSD__
-extern int drm_irq_install(struct drm_device *dev);
-#else
-extern int drm_irq_install(struct drm_device *dev, int irq);
-#endif
-extern int drm_irq_uninstall(struct drm_device *dev);
-
 				/* Stub support (drm_stub.h) */
 extern struct drm_master *drm_master_get(struct drm_master *master);
 extern void drm_master_put(struct drm_master **master);
