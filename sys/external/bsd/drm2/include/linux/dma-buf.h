@@ -36,6 +36,7 @@
 #include <sys/bus.h>
 #include <sys/mutex.h>
 
+#include <linux/err.h>
 #include <linux/reservation.h>
 
 struct device;
