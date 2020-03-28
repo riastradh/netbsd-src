@@ -431,7 +431,7 @@ struct drm_driver {
 	 * Interrupt handler called when using drm_irq_install(). Not used by
 	 * drivers which implement their own interrupt handling.
 	 */
-	irqreturn_t(*irq_handler) (int irq, void *arg);
+	irqreturn_t(*irq_handler) (DRM_IRQ_ARGS);
 
 	/**
 	 * @irq_preinstall:
