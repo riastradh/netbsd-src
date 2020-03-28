@@ -630,7 +630,7 @@ const char *drm_get_connector_force_name(enum drm_connector_force force)
 	}
 }
 
-#ifdef CONFIG_LOCKDEP
+#if IS_ENABLED(CONFIG_LOCKDEP)
 static struct lockdep_map connector_list_iter_dep_map = {
 	.name = "drm_connector_list_iter"
 };
