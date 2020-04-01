@@ -49,17 +49,6 @@
 #define	MODULE_DEVICE_TABLE(DESCRIPTION, IDLIST)
 #define	MODULE_FIRMWARE(FIRMWARE)
 #define	MODULE_LICENSE(LICENSE)
-struct linux_module_param_desc {
-	const char *name;
-	const char *description;
-};
-#define	MODULE_PARM_DESC(PARAMETER, DESCRIPTION) \
-static __attribute__((__used__)) \
-const struct linux_module_param_desc PARAMETER ## _desc = { \
-    .name = # PARAMETER, \
-    .description = DESCRIPTION, \
-}; \
-__link_set_add_rodata(linux_module_param_desc, PARAMETER ## _desc)
 
 #define	THIS_MODULE	0
 #define	KBUILD_MODNAME	__file__
