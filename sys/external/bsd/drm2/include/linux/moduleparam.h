@@ -67,4 +67,17 @@ __link_set_add_data(linux_module_param_info, info_ ## NAME)
 #define	module_param_unsafe		module_param
 #define	module_param_named_unsafe	module_param_named
 
+struct linux_module_param_desc {
+	const char *name;
+	const char *description;
+};
+#define	MODULE_PARM_DESC(PARAMETER, DESCRIPTION) \
+static __attribute__((__used__)) \
+const struct linux_module_param_desc PARAMETER ## _desc = { \
+    .name = # PARAMETER, \
+    .description = DESCRIPTION, \
+}; \
+__link_set_add_rodata(linux_module_param_desc, PARAMETER ## _desc)
+
+
 #endif  /* _LINUX_MODULEPARAM_H_ */
