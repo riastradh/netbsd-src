@@ -213,8 +213,4 @@ drm_io_mapping_init_wc(struct drm_device *dev, struct io_mapping *mapping,
 
 #endif	/* defined(__NetBSD__) */
 
-#ifdef __NetBSD__
-extern const struct cdevsw drm_cdevsw;
-#endif
-
 #endif
