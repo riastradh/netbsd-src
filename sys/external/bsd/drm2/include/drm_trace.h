@@ -48,7 +48,9 @@ trace_drm_vblank_event_queued(struct drm_file *file __unused,
 }
 
 static inline void
-trace_drm_vblank_event(int crtc __unused, uint32_t sequence __unused)
+trace_drm_vblank_event(int crtc __unused, uint32_t sequence __unused,
+    ktime_t time __unused,
+    bool condition __unused)
 {
 }
 
