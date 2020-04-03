@@ -335,7 +335,8 @@ struct drm_device {
 
 	/* Everything below here is for legacy driver, never use! */
 	/* private: */
-#if IS_ENABLED(CONFIG_DRM_LEGACY)
+#if IS_ENABLED(CONFIG_DRM_LEGACY) || \
+    defined(__NetBSD__) /* XXX drm_vm.c / drm_cdevsw.c use this */
 	/* Context handle management - linked list of context handles */
 	struct list_head ctxlist;
 
