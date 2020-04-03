@@ -144,7 +144,6 @@ static DEFINE_MUTEX(kernel_fb_helper_lock);
  * fbdev shadow buffer and call drm_fbdev_generic_setup() instead.
  */
 
-#ifndef __NetBSD__
 static void drm_fb_helper_restore_lut_atomic(struct drm_crtc *crtc)
 {
 	uint16_t *r_base, *g_base, *b_base;
@@ -164,9 +163,8 @@ static void drm_fb_helper_restore_lut_atomic(struct drm_crtc *crtc)
  * drm_fb_helper_debug_enter - implementation for &fb_ops.fb_debug_enter
  * @info: fbdev registered by the helper
  */
-int drm_fb_helper_debug_enter(struct fb_info *info)
+int drm_fb_helper_debug_enter_fb(struct drm_fb_helper *helper)
 {
-	struct drm_fb_helper *helper = info->par;
 	const struct drm_crtc_helper_funcs *funcs;
 	struct drm_mode_set *mode_set;
 
@@ -200,9 +198,8 @@ EXPORT_SYMBOL(drm_fb_helper_debug_enter);
  * drm_fb_helper_debug_leave - implementation for &fb_ops.fb_debug_leave
  * @info: fbdev registered by the helper
  */
-int drm_fb_helper_debug_leave(struct fb_info *info)
+int drm_fb_helper_debug_leave_fb(struct drm_fb_helper *helper)
 {
-	struct drm_fb_helper *helper = info->par;
 	struct drm_client_dev *client = &helper->client;
 	struct drm_device *dev = helper->dev;
 	struct drm_crtc *crtc;
@@ -239,7 +236,6 @@ int drm_fb_helper_debug_leave(struct fb_info *info)
 	return 0;
 }
 EXPORT_SYMBOL(drm_fb_helper_debug_leave);
-#endif
 
 /**
  * drm_fb_helper_restore_fbdev_mode_unlocked - restore fbdev configuration
