@@ -988,7 +988,7 @@ int radeon_ttm_init(struct radeon_device *rdev)
 			       rdev->ddev->anon_inode->i_mapping,
 #endif
 			       rdev->ddev->vma_offset_manager,
-			       dma_addressing_limited(&rdev->pdev->dev));
+			       dma_addressing_limited(&rdev->pdev->pd_dev));
 	if (r) {
 		DRM_ERROR("failed initializing buffer object driver(%d).\n", r);
 		return r;
