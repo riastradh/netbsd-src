@@ -303,10 +303,3 @@ drm_pci_set_unique(struct drm_device *dev, struct drm_master *master,
 	/* Success!  */
 	return 0;
 }
-
-int
-drm_pcie_get_speed_cap_mask(struct drm_device *dev, u32 *speed_mask)
-{
-
-	return -ENOSYS;
-}
