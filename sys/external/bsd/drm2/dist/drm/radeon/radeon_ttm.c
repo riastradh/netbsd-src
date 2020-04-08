@@ -812,7 +812,7 @@ static int radeon_ttm_tt_populate(struct ttm_tt *ttm,
 
 	if (slave && ttm->sg) {
 #ifdef __NetBSD__
-		r = drm_prime_bus_dmamap_load_sgt(ttm->bdev->dmat,
+		int r = drm_prime_bus_dmamap_load_sgt(ttm->bdev->dmat,
 		    gtt->ttm.dma_address, ttm->sg);
 		if (r)
 			return r;
