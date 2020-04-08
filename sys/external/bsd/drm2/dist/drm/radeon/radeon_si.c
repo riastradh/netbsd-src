@@ -1585,7 +1585,7 @@ int si_mc_load_microcode(struct radeon_device *rdev)
 	const __be32 *fw_data = NULL;
 	const __le32 *new_fw_data = NULL;
 	u32 running;
-	u32 *io_mc_regs = NULL;
+	const u32 *io_mc_regs = NULL;
 	const __le32 *new_io_mc_regs = NULL;
 	int i, regs_size, ucode_size;
 
