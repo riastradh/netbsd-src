@@ -82,6 +82,8 @@
 
 #define	DPM_FLAG_NEVER_SKIP	0
 
+#define	dev_warn_ratelimited	dev_warn
+
 static inline void
 dev_pm_set_driver_flags(struct device *dev, uint32_t flags)
 {
