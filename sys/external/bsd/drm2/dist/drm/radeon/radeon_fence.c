@@ -155,7 +155,7 @@ int radeon_fence_emit(struct radeon_device *rdev,
 	(*fence)->ring = ring;
 	(*fence)->is_vm_update = false;
 	dma_fence_init(&(*fence)->base, &radeon_fence_ops,
-		       &rdev->fence_queue.lock,
+		       &rdev->fence_lock,
 		       rdev->fence_context + ring,
 		       seq);
 	radeon_fence_ring_emit(rdev, ring, *fence);
