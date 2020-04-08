@@ -5687,7 +5687,9 @@ int ci_dpm_init(struct radeon_device *rdev)
 	u8 frev, crev;
 	struct ci_power_info *pi;
 	enum pci_bus_speed speed_cap = PCI_SPEED_UNKNOWN;
+#ifdef __linux__
 	struct pci_dev *root = rdev->pdev->bus->self;
+#endif
 	int ret;
 
 	pi = kzalloc(sizeof(struct ci_power_info), GFP_KERNEL);
@@ -5695,8 +5697,10 @@ int ci_dpm_init(struct radeon_device *rdev)
 		return -ENOMEM;
 	rdev->pm.dpm.priv = pi;
 
+#ifdef __linux__
 	if (!pci_is_root_bus(rdev->pdev->bus))
 		speed_cap = pcie_get_speed_cap(root);
+#endif
 	if (speed_cap == PCI_SPEED_UNKNOWN) {
 		pi->sys_pcie_mask = 0;
 	} else {
