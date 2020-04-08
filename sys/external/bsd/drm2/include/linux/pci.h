@@ -180,6 +180,14 @@ struct pci_dev {
 	bool			no_64bit_msi;
 };
 
+enum pci_bus_speed {
+	PCI_SPEED_UNKNOWN,
+	PCIE_SPEED_2_5GT,
+	PCIE_SPEED_5_0GT,
+	PCIE_SPEED_8_0GT,
+	PCIE_SPEED_16_0GT,
+};
+
 #define	PCIBIOS_MIN_MEM	0x100000	/* XXX bogus x86 kludge bollocks */
 
 #define	__pci_rom_iomem
