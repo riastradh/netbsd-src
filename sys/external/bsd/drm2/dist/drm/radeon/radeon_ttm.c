@@ -204,7 +204,7 @@ static int radeon_verify_access(struct ttm_buffer_object *bo, struct file *filp)
 		return -EPERM;
 #ifdef __NetBSD__
 	struct drm_file *drm_file = filp->f_data;
-	return drm_vma_node_verify_access(&rbo->gem_base.vma_node, drm_file);
+	return drm_vma_node_verify_access(&rbo->tbo.base.vma_node, drm_file);
 #else
 	return drm_vma_node_verify_access(&rbo->tbo.base.vma_node,
 					  filp->private_data);
