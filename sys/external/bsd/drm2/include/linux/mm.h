@@ -51,6 +51,8 @@ struct file;
 #define	PAGE_ALIGN(x)		(((x) + (PAGE_SIZE-1)) & ~(PAGE_SIZE-1))
 #define	offset_in_page(x)	((x) & (PAGE_SIZE-1))
 
+#define	untagged_addr(x)	(x)
+
 struct sysinfo {
 	unsigned long totalram;
 	unsigned long totalhigh;
