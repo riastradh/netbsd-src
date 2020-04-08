@@ -133,7 +133,12 @@ struct ttm_tt {
  */
 struct ttm_dma_tt {
 	struct ttm_tt ttm;
+#ifdef __NetBSD__
+	bus_dma_segment_t *dma_segs;
+	bus_dmamap_t dma_address;
+#else
 	dma_addr_t *dma_address;
+#endif
 	struct list_head pages_list;
 };
 
