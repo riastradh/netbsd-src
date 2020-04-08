@@ -74,4 +74,13 @@ static inline int drm_get_pci_dev(struct pci_dev *pdev,
 
 #endif
 
+#ifdef __NetBSD__
+int drm_pci_request_irq(struct drm_device *, int);
+void drm_pci_free_irq(struct drm_device *);
+extern int drm_pci_attach(device_t, const struct pci_attach_args *,
+    struct pci_dev *, struct drm_driver *, unsigned long,
+    struct drm_device **);
+extern int drm_pci_detach(struct drm_device *, int);
+#endif
+
 #endif /* _DRM_PCI_H_ */
