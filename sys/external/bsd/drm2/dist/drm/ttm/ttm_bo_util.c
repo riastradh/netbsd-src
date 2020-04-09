@@ -37,6 +37,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <drm/ttm/ttm_bo_driver.h>
 #include <drm/ttm/ttm_placement.h>
 #include <drm/drm_vma_manager.h>
+#include <drm/drm_os_netbsd.h>
 #include <linux/io.h>
 #include <linux/highmem.h>
 #include <linux/wait.h>
