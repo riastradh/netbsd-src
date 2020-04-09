@@ -41,6 +41,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/shmem_fs.h>
 #include <linux/file.h>
 #include <drm/drm_cache.h>
+#include <drm/drm_mem_util.h>
 #include <drm/ttm/ttm_bo_driver.h>
 #include <drm/ttm/ttm_page_alloc.h>
 #include <drm/bus_dma_hacks.h>
