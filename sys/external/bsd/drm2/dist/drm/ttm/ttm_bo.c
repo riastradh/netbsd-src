@@ -681,7 +681,7 @@ static void ttm_bo_release(struct kref *kref)
 #endif
 	drm_vma_offset_remove(bdev->vma_manager, &bo->base.vma_node);
 #ifdef __NetBSD__
-	drm_vma_node_destroy(&bo->vma_node);
+	drm_vma_node_destroy(&bo->base.vma_node);
 #endif
 	ttm_mem_io_lock(man, false);
 	ttm_mem_io_free_vm(bo);
@@ -1357,7 +1357,7 @@ int ttm_bo_init_reserved(struct ttm_bo_device *bdev,
 		 */
 		dma_resv_init(&bo->base._resv);
 #ifdef __NetBSD__
-		drm_vma_node_init(&bo->vma_node);
+		drm_vma_node_init(&bo->base.vma_node);
 		uvm_obj_init(&bo->uvmobj, bdev->driver->ttm_uvm_ops, true, 1);
 #else
 		drm_vma_node_reset(&bo->base.vma_node);
@@ -1645,7 +1645,7 @@ static void ttm_bo_global_release(void)
 	ttm_mem_unregister_shrink(glob->mem_glob, &glob->shrink);
 	BUG_ON(glob->dummy_read_page != NULL);
 	spin_lock_destroy(&glob->lru_lock);
-	mutex_destroy(&glob->device_list_mutex);
+	mutex_destroy(&ttm_global_mutex);
 	kfree(glob);
 #else
 	kobject_del(&glob->kobj);
@@ -1663,6 +1663,7 @@ static int ttm_bo_global_init(void)
 	int ret = 0;
 	unsigned i;
 
+	mutex_init(&ttm_global_mutex);
 	mutex_lock(&ttm_global_mutex);
 	if (++ttm_bo_glob_use_count > 1)
 		goto out;

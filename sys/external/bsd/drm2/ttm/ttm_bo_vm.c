@@ -55,7 +55,7 @@ ttm_bo_uvm_reference(struct uvm_object *uobj)
 	struct ttm_buffer_object *const bo = container_of(uobj,
 	    struct ttm_buffer_object, uvmobj);
 
-	(void)ttm_bo_reference(bo);
+	(void)ttm_bo_get(bo);
 }
 
 void
@@ -64,7 +64,7 @@ ttm_bo_uvm_detach(struct uvm_object *uobj)
 	struct ttm_buffer_object *bo = container_of(uobj,
 	    struct ttm_buffer_object, uvmobj);
 
-	ttm_bo_unref(&bo);
+	ttm_bo_put(bo);
 	KASSERT(bo == NULL);
 }
 
@@ -249,7 +249,7 @@ ttm_bo_mmap_object(struct ttm_bo_device *bdev, off_t offset, size_t size,
 	ret = ttm_bo_uvm_lookup(bdev, startpage, npages, &bo);
 	if (ret)
 		goto fail0;
-	KASSERT(drm_vma_node_start(&bo->vma_node) <= offset);
+	KASSERT(drm_vma_node_start(&bo->base.vma_node) <= offset);
 	/* XXX Just assert this?  */
 	if (__predict_false(bdev->driver->verify_access == NULL)) {
 		ret = -EPERM;
@@ -262,10 +262,10 @@ ttm_bo_mmap_object(struct ttm_bo_device *bdev, off_t offset, size_t size,
 	/* Success!  */
 	*uobjp = &bo->uvmobj;
 	*uoffsetp = (offset -
-	    (drm_vma_node_start(&bo->vma_node) << PAGE_SHIFT));
+	    (drm_vma_node_start(&bo->base.vma_node) << PAGE_SHIFT));
 	return 0;
 
-fail1:	ttm_bo_unref(&bo);
+fail1:	ttm_bo_put(bo);
 fail0:	KASSERT(ret);
 	return ret;
 }
@@ -277,15 +277,15 @@ ttm_bo_uvm_lookup(struct ttm_bo_device *bdev, unsigned long startpage,
 	struct ttm_buffer_object *bo = NULL;
 	struct drm_vma_offset_node *node;
 
-	drm_vma_offset_lock_lookup(&bdev->vma_manager);
-	node = drm_vma_offset_lookup_locked(&bdev->vma_manager, startpage,
+	drm_vma_offset_lock_lookup(bdev->vma_manager);
+	node = drm_vma_offset_lookup_locked(bdev->vma_manager, startpage,
 	    npages);
 	if (node != NULL) {
-		bo = container_of(node, struct ttm_buffer_object, vma_node);
+		bo = container_of(node, struct ttm_buffer_object, base.vma_node);
 		if (!kref_get_unless_zero(&bo->kref))
 			bo = NULL;
 	}
-	drm_vma_offset_unlock_lookup(&bdev->vma_manager);
+	drm_vma_offset_unlock_lookup(bdev->vma_manager);
 
 	if (bo == NULL)
 		return -ENOENT;
