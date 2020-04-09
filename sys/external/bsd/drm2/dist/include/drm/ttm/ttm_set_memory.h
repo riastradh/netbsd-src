@@ -35,7 +35,7 @@
 
 #include <linux/mm.h>
 
-#ifdef CONFIG_X86
+#if defined(CONFIG_X86) && defined(__linux__)
 
 #include <asm/set_memory.h>
 
