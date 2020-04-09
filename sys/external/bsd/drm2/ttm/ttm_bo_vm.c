@@ -110,7 +110,9 @@ ttm_bo_uvm_fault(struct uvm_faultinfo *ufi, vaddr_t vaddr,
 		 * it, and start over.
 		 */
 		uvmfault_unlockall(ufi, ufi->entry->aref.ar_amap, NULL);
-		(void)ttm_bo_wait_unreserved(bo);
+		if (!dma_resv_lock_interruptible(bo->base.resv, NULL))
+			dma_resv_unlock(bo->base.resv);
+
 		return ERESTART;
 	}
 
