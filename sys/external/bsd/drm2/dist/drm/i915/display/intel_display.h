@@ -77,6 +77,23 @@ enum i915_gpio {
 };
 
 /*
+ * NetBSD already has struct pipe, and according to C99 6.2.3 there's
+ * only one namespace for struct, union, and enum tags, but the i915
+ * driver wants a type called enum pipe.
+ *
+ * So rename it to avoid conflicts which confuse tools like ctfmerge --
+ * but make sure we include <sys/file.h> first to avoid having two
+ * different versions of struct file, one with a pointer to struct pipe
+ * and another with a pointer to struct i915_pipe.
+ *
+ * This will cause trouble if we ever have an API that involves `pipe'
+ * as a member which we need to reference from within drm code.  But
+ * for now that is not the case.
+ *
+ * XXX Yes, this is disgusting.  Sorry.
+ */
+#define	pipe	pipe_drmhack
+/*
  * Keep the pipe enum values fixed: the code assumes that PIPE_A=0, the
  * rest have consecutive values and match the enum values of transcoders
  * with a 1:1 transcoder -> pipe mapping.
