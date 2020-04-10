@@ -460,10 +460,17 @@ static inline void add_taint_for_CI(unsigned int taint)
 void cancel_timer(struct timer_list *t);
 void set_timer_ms(struct timer_list *t, unsigned long timeout);
 
+#ifdef __linux__
 static inline bool timer_expired(const struct timer_list *t)
 {
 	return READ_ONCE(t->expires) && !timer_pending(t);
 }
+#else
+static inline bool timer_expired(struct timer_list *t)
+{
+	return callout_expired(&t->tl_callout);
+}
+#endif
 
 /*
  * This is a lookalike for IS_ENABLED() that takes a kconfig value,
