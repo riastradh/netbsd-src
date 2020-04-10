@@ -43,4 +43,7 @@
 #define	mutex_destroy	linux_mutex_destroy
 #define	mutex_init	linux_mutex_init
 
+/* Disable our historic malloc(9) compatibility macro.  */
+#undef	free
+
 #endif  /* _LINUX_NBSD_NAMESPACE_H_ */
