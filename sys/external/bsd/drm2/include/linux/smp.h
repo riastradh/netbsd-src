@@ -33,6 +33,7 @@
 #define	_LINUX_SMP_H_
 
 #include <sys/systm.h>
+#include <sys/cpu.h>
 
 static inline int
 get_cpu(void)
