@@ -2617,12 +2617,6 @@ static inline bool i915_mmio_reg_valid(i915_reg_t reg)
 #define   GAMT_CHKN_DISABLE_DYNAMIC_CREDIT_SHARING	(1 << 28)
 #define   GAMT_CHKN_DISABLE_I2M_CYCLE_ON_WR_PORT	(1 << 24)
 
-#define GAMT_CHKN_BIT_REG	0x4ab8
-#define   GAMT_CHKN_DISABLE_DYNAMIC_CREDIT_SHARING     (1<<28)
-
-#define GEN9_GAMT_ECO_REG_RW_IA	0x4ab0
-#define   GAMT_ECO_ENABLE_IN_PLACE_DECOMPRESS	(1<<18)
-
 #if 0
 #define PRB0_TAIL	_MMIO(0x2030)
 #define PRB0_HEAD	_MMIO(0x2034)
@@ -7370,10 +7364,6 @@ enum {
 
 /* Display Internal Timeout Register */
 #define RM_TIMEOUT		_MMIO(0x42060)
-#define  MMIO_TIMEOUT_US(us)	((us) << 0)
-
-/* Display Internal Timeout Register */
-#define RM_TIMEOUT		0x42060
 #define  MMIO_TIMEOUT_US(us)	((us) << 0)
 
 /* interrupts */
