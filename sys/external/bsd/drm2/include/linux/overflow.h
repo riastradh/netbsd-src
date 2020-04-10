@@ -45,4 +45,7 @@ array_size(size_t nelem, size_t elemsize)
 	return nelem*elemsize;
 }
 
+#define	check_mul_overflow(a, b, res)	__builtin_mul_overflow(a, b, res)
+#define	check_add_overflow(a, b, res)	__builtin_add_overflow(a, b, res)
+
 #endif  /* _LINUX_OVERFLOW_H_ */
