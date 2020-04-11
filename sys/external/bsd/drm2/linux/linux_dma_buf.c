@@ -41,7 +41,7 @@ __KERNEL_RCSID(0, "$NetBSD: linux_dma_buf.c,v 1.6 2019/10/17 14:33:02 maya Exp $
 
 #include <linux/dma-buf.h>
 #include <linux/err.h>
-#include <linux/reservation.h>
+#include <linux/dma-resv.h>
 
 struct dma_buf_file {
 	struct dma_buf	*dbf_dmabuf;
@@ -86,11 +86,11 @@ dma_buf_export(struct dma_buf_export_info *info)
 
 	mutex_init(&dmabuf->db_lock, MUTEX_DEFAULT, IPL_NONE);
 	dmabuf->db_refcnt = 1;
-	reservation_poll_init(&dmabuf->db_resv_poll);
+	dma_resv_poll_init(&dmabuf->db_resv_poll);
 
 	if (dmabuf->resv == NULL) {
 		dmabuf->resv = &dmabuf->db_resv_int[0];
-		reservation_object_init(dmabuf->resv);
+		dma_resv_init(dmabuf->resv);
 	}
 
 	return dmabuf;
@@ -166,10 +166,10 @@ dma_buf_put(struct dma_buf *dmabuf)
 	if (atomic_dec_uint_nv(&dmabuf->db_refcnt) != 0)
 		return;
 
-	reservation_poll_fini(&dmabuf->db_resv_poll);
+	dma_resv_poll_fini(&dmabuf->db_resv_poll);
 	mutex_destroy(&dmabuf->db_lock);
 	if (dmabuf->resv == &dmabuf->db_resv_int[0]) {
-		reservation_object_fini(dmabuf->resv);
+		dma_resv_fini(dmabuf->resv);
 		kmem_free(dmabuf, offsetof(struct dma_buf, db_resv_int[1]));
 	} else {
 		kmem_free(dmabuf, sizeof(*dmabuf));
@@ -242,9 +242,9 @@ dmabuf_fop_poll(struct file *file, int events)
 {
 	struct dma_buf_file *dbf = file->f_data;
 	struct dma_buf *dmabuf = dbf->dbf_dmabuf;
-	struct reservation_poll *rpoll = &dmabuf->db_resv_poll;
+	struct dma_resv_poll *rpoll = &dmabuf->db_resv_poll;
 
-	return reservation_object_poll(dmabuf->resv, events, rpoll);
+	return dma_resv_do_poll(dmabuf->resv, events, rpoll);
 }
 
 static int
@@ -252,9 +252,9 @@ dmabuf_fop_kqfilter(struct file *file, struct knote *kn)
 {
 	struct dma_buf_file *dbf = file->f_data;
 	struct dma_buf *dmabuf = dbf->dbf_dmabuf;
-	struct reservation_poll *rpoll = &dmabuf->db_resv_poll;
+	struct dma_resv_poll *rpoll = &dmabuf->db_resv_poll;
 
-	return reservation_object_kqfilter(dmabuf->resv, kn, rpoll);
+	return dma_resv_kqfilter(dmabuf->resv, kn, rpoll);
 }
 
 static int
