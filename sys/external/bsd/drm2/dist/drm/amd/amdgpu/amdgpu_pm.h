@@ -26,6 +26,8 @@
 #ifndef __AMDGPU_PM_H__
 #define __AMDGPU_PM_H__
 
+struct amdgpu_device;
+
 #include <sys/stdbool.h>
 struct cg_flag_name
 {
@@ -45,7 +47,5 @@ void amdgpu_dpm_thermal_work_handler(struct work_struct *work);
 void amdgpu_dpm_enable_uvd(struct amdgpu_device *adev, bool enable);
 void amdgpu_dpm_enable_vce(struct amdgpu_device *adev, bool enable);
 void amdgpu_dpm_enable_jpeg(struct amdgpu_device *adev, bool enable);
-
-void amdgpu_pm_acpi_event_handler(struct amdgpu_device *adev);
 
 #endif
