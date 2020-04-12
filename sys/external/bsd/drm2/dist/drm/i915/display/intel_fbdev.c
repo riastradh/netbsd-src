@@ -333,18 +333,7 @@ static void intel_fbdev_destroy(struct intel_fbdev *ifbdev)
 	 * trying to rectify all the possible error paths leading here.
 	 */
 
-#ifdef __NetBSD__
-    {
-	int ret;
-	/* XXX errno NetBSD->Linux */
-	ret = -config_detach(ifbdev->helper.fbdev, DETACH_FORCE);
-	if (ret)
-		DRM_ERROR("failed to detach intelfb: %d\n", ret);
-	ifbdev->helper.fbdev = NULL;
-    }
-#else
 	drm_fb_helper_fini(&ifbdev->helper);
-#endif
 
 	if (ifbdev->vma)
 		intel_unpin_fb_vma(ifbdev->vma, ifbdev->vma_flags);
