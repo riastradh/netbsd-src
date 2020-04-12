@@ -35,10 +35,6 @@
  * - LIST_HEAD(x) means a declaration `struct list_head x =
  *   LIST_HEAD_INIT(x)' in Linux, but something else in NetBSD.
  *   Replace by the expansion.
- *
- * - The `_rcu' routines here are not actually pserialize(9)-safe.
- *   They need dependent read memory barriers added.  Please fix this
- *   if you need to use them with pserialize(9).
  */
 
 #ifndef _LINUX_LIST_H_
