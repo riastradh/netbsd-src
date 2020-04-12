@@ -36,6 +36,8 @@
 struct dma_fence_chain {
 	struct dma_fence	base;
 	uint64_t		prev_seqno;
+
+	spinlock_t		dfc_lock;
 };
 
 #define	dma_fence_chain_find_seqno	linux_dma_fence_chain_find_seqno
