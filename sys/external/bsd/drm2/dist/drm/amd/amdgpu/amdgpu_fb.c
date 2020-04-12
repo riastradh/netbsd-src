@@ -336,21 +336,8 @@ out:
 static int amdgpu_fbdev_destroy(struct drm_device *dev, struct amdgpu_fbdev *rfbdev)
 {
 	struct amdgpu_framebuffer *rfb = &rfbdev->rfb;
-#ifdef __NetBSD__
-	int ret;
-#endif
 
-#ifdef __NetBSD__
-	/* XXX errno NetBSD->Linux */
-	ret = -config_detach(rfbdev->helper.fbdev, DETACH_FORCE);
-	if (ret) {
-		DRM_ERROR("failed to detach amdgpufb: %d\n", ret);
-		return ret;
-	}
-	rfbdev->helper.fbdev = NULL;
-#else
 	drm_fb_helper_unregister_fbi(&rfbdev->helper);
-#endif
 
 	if (rfb->base.obj[0]) {
 		amdgpufb_destroy_pinned_object(rfb->base.obj[0]);
