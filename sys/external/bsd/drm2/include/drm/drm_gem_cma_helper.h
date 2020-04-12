@@ -8,6 +8,8 @@
 #include <drm/drm_ioctl.h>
 #include <drm/drm_gem.h>
 
+#include <sys/vmem.h>
+
 struct drm_mode_create_dumb;
 
 /**

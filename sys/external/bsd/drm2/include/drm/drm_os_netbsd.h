@@ -81,6 +81,4 @@
 #include <drm/drm_irq_netbsd.h>
 #include <drm/drm_wait_netbsd.h>
 
-#include <sys/vmem.h>
-
 #endif  /* _DRM_DRM_OS_NETBSD_H_ */
