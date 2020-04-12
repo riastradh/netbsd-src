@@ -32,6 +32,9 @@
 #ifndef _LINUX_FS_H_
 #define _LINUX_FS_H_
 
+#include <sys/param.h>
+#include <sys/file.h>
+
 #include <linux/capability.h>
 #include <linux/err.h>
 #include <linux/wait_bit.h>
