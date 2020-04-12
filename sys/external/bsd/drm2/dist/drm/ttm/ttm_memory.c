@@ -33,7 +33,6 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #define pr_fmt(fmt) "[TTM] " fmt
 
-#include <drm/drmP.h>
 #include <drm/ttm/ttm_memory.h>
 #include <drm/ttm/ttm_module.h>
 #include <drm/ttm/ttm_page_alloc.h>
