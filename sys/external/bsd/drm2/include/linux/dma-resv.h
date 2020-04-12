@@ -141,4 +141,10 @@ dma_resv_has_excl_fence(const struct dma_resv *robj)
 	return robj->fence_excl != NULL;
 }
 
+static inline struct ww_acquire_ctx *
+dma_resv_locking_ctx(struct dma_resv *robj)
+{
+	return robj->lock.wwm_u.ctx;
+}
+
 #endif	/* _LINUX_DMA_RESV_H_ */
