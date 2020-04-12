@@ -55,7 +55,8 @@
 #include <soc/tegra/pmc.h>
 
 #ifdef __NetBSD__
-#include <drm/drm_os_netbsd.h>	/* drm_waitqueue_t, IRQ_HANDLED */
+#include <drm/drm_irq_netbsd.h>
+#include <drm/drm_wait_netbsd.h>
 #endif
 
 #endif

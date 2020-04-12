@@ -35,9 +35,6 @@
 #ifndef _DRM_CACHE_H_
 #define _DRM_CACHE_H_
 
-#ifdef __NetBSD__
-#include <drm/drm_os_netbsd.h>
-#endif
 #include <linux/scatterlist.h>
 
 struct page;
