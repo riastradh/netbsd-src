@@ -1114,6 +1114,7 @@ static int setup_out_fence(struct drm_out_fence_state *fence_state,
 		ret = -ENOMEM;
 		goto out;
 	}
+	fd_affix(curproc, fp, fd);
 	fp = NULL;		/* sync_file consumes */
 
 out:	if (fp != NULL) {
