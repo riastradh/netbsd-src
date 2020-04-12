@@ -199,6 +199,20 @@ dma_resv_trylock(struct dma_resv *robj)
 }
 
 /*
+ * dma_resv_locking_ctx(robj)
+ *
+ *	Return a pointer to the ww_acquire_ctx used by the owner of
+ *	the reservation object's lock, or NULL if it is either not
+ *	owned or if it is locked without context.
+ */
+struct ww_acquire_ctx *
+dma_resv_locking_ctx(struct dma_resv *robj)
+{
+
+	return ww_mutex_locking_ctx(&robj->lock);
+}
+
+/*
  * dma_resv_unlock(robj)
  *
  *	Release a reservation object's lock.

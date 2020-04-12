@@ -832,3 +832,27 @@ ww_mutex_unlock(struct ww_mutex *mutex)
 	cv_broadcast(&mutex->wwm_cv);
 	mutex_exit(&mutex->wwm_lock);
 }
+
+struct ww_acquire_ctx *
+ww_mutex_locking_ctx(struct ww_mutex *mutex)
+{
+	struct ww_acquire_ctx *ctx;
+
+	mutex_enter(&mutex->wwm_lock);
+	switch (mutex->wwm_state) {
+	case WW_UNLOCKED:
+	case WW_OWNED:
+		ctx = NULL;
+		break;
+	case WW_CTX:
+	case WW_WANTOWN:
+		ctx = mutex->wwm_u.ctx;
+		break;
+	default:
+		panic("wait/wound mutex %p in bad state: %d",
+		    mutex, (int)mutex->wwm_state);
+	}
+	mutex_exit(&mutex->wwm_lock);
+
+	return ctx;
+}
