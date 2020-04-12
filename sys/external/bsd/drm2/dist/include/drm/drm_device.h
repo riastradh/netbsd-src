@@ -29,6 +29,7 @@ struct drm_fb_helper;
 struct pci_dev;
 struct pci_controller;
 
+typedef struct vmem vmem_t;
 
 /**
  * enum drm_switch_power - power state of drm device
