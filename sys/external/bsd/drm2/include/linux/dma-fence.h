@@ -37,8 +37,10 @@
 #include <sys/kernel.h>
 #include <sys/queue.h>
 
+#include <linux/err.h>
 #include <linux/kref.h>
 #include <linux/rcupdate.h>
+#include <linux/sched.h>
 #include <linux/spinlock.h>
 
 struct dma_fence_cb;
