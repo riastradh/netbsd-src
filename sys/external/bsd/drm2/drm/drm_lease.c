@@ -178,3 +178,13 @@ drm_mode_revoke_lease_ioctl(struct drm_device *dev, void *data,
 	/* XXX not yet implemented */
 	return -ENODEV;
 }
+
+/*
+ * drm_lease_destroy(master)
+ *
+ *	Notify lessees that master is being destroyed.
+ */
+void
+drm_lease_destroy(struct drm_master *master)
+{
+}
