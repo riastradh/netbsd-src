@@ -41,6 +41,7 @@
 #include <drm/drm_crtc_helper.h>
 #include <linux/i2c.h>
 #include <linux/i2c-algo-bit.h>
+#include <linux/ktime.h>
 
 struct radeon_bo;
 struct radeon_device;
