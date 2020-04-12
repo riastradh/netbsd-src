@@ -32,9 +32,6 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <drm/drm_file.h>
 #include <drm/drm_mode_config.h>
 #include <drm/drm_print.h>
-#ifdef __NetBSD__
-#include <drm/drm_os_netbsd.h>
-#endif
 #include <linux/dma-resv.h>
 
 #include "drm_crtc_internal.h"
