@@ -137,6 +137,7 @@ file	external/bsd/drm2/dist/drm/drm_modes.c	drmkms
 file	external/bsd/drm2/dist/drm/drm_modeset_helper.c	drmkms
 file	external/bsd/drm2/dist/drm/drm_modeset_lock.c	drmkms
 file	external/bsd/drm2/dist/drm/drm_panel.c	drmkms
+file	external/bsd/drm2/dist/drm/drm_panel_orientation_quirks.c	drmkms
 #file	external/bsd/drm2/dist/drm/drm_pci.c	drmkms	# drmkms_pci
 file	external/bsd/drm2/dist/drm/drm_plane.c	drmkms
 file	external/bsd/drm2/dist/drm/drm_plane_helper.c	drmkms
