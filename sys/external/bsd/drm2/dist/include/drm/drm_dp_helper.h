@@ -27,6 +27,7 @@
 
 #include <linux/delay.h>
 #include <linux/i2c.h>
+#include <linux/seq_file.h>
 #include <linux/types.h>
 #include <linux/workqueue.h>
 
