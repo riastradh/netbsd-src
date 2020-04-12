@@ -32,4 +32,12 @@
 #ifndef _LINUX_BACKLIGHT_H_
 #define _LINUX_BACKLIGHT_H_
 
+struct backlight_device;
+
+#define	backlight_disable	linux_backlight_disable
+#define	backlight_enable	linux_backlight_enable
+
+int	backlight_disable(struct backlight_device *);
+int	backlight_enable(struct backlight_device *);
+
 #endif  /* _LINUX_BACKLIGHT_H_ */
