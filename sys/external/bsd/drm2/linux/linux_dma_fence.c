@@ -171,6 +171,28 @@ dma_fence_is_later(struct dma_fence *a, struct dma_fence *b)
 }
 
 /*
+ * dma_fence_get_stub()
+ *
+ *	Return a dma fence that is always already signalled.
+ */
+struct dma_fence *
+dma_fence_get_stub(void)
+{
+	/*
+	 * XXX This probably isn't good enough -- caller may try
+	 * operations on this that require the lock, which will
+	 * require us to create and destroy the lock on module
+	 * load/unload.
+	 */
+	static struct dma_fence fence = {
+		.refcount = {1}, /* always referenced */
+		.flags = 1u << DMA_FENCE_FLAG_SIGNALED_BIT,
+	};
+
+	return dma_fence_get(&fence);
+}
+
+/*
  * dma_fence_get(fence)
  *
  *	Acquire a reference to fence.  The fence must not be being
