@@ -308,7 +308,11 @@ static int i915_driver_modeset_probe(struct drm_i915_private *i915)
 		goto out;
 #endif
 
+#ifdef __NetBSD__
+	intel_register_dsm_handler(i915);
+#else
 	intel_register_dsm_handler();
+#endif
 
 	ret = i915_switcheroo_register(i915);
 	if (ret)
