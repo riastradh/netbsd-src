@@ -88,7 +88,7 @@ void *drm_gem_dmabuf_vmap(struct dma_buf *dma_buf);
 void drm_gem_dmabuf_vunmap(struct dma_buf *dma_buf, void *vaddr);
 
 #ifdef __NetBSD__
-int gem_prime_mmap(struct drm_gem_object *, off_t *, size_t, int, int *,
+int drm_gem_prime_mmap(struct drm_gem_object *, off_t *, size_t, int, int *,
     int *, struct uvm_object **, int *);
 int drm_gem_dmabuf_mmap(struct dma_buf *, off_t *, size_t, int, int *,
     int *, struct uvm_object **, int *);

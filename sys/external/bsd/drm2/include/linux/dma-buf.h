@@ -58,6 +58,7 @@ enum dma_data_direction {
 };
 
 struct dma_buf_ops {
+	bool	cache_sgt_mapping;
 	int	(*attach)(struct dma_buf *, struct dma_buf_attachment *);
 	void	(*detach)(struct dma_buf *, struct dma_buf_attachment *);
 	struct sg_table *
