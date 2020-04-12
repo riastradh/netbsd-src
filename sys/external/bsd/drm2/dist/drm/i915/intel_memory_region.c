@@ -203,6 +203,8 @@ intel_memory_region_create(struct drm_i915_private *i915,
 	return mem;
 
 err_free:
+	mutex_destroy(&mem->mm_lock);
+	mutex_destroy(&mem->objects.lock);
 	kfree(mem);
 	return ERR_PTR(err);
 }
