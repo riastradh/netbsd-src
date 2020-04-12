@@ -354,19 +354,8 @@ out:
 
 static int radeon_fbdev_destroy(struct drm_device *dev, struct radeon_fbdev *rfbdev)
 {
-#ifdef __NetBSD__
-	int ret;
-#else
 	struct drm_framebuffer *fb = &rfbdev->fb;
-#endif
 
-#ifdef __NetBSD__
-	/* XXX errno NetBSD->Linux */
-	ret = -config_detach(rfbdev->helper.fbdev, DETACH_FORCE);
-	if (ret)
-		DRM_ERROR("failed to detach radeonfb: %d\n", ret);
-	rfbdev->helper.fbdev = NULL;
-#else
 	drm_fb_helper_unregister_fbi(&rfbdev->helper);
 
 	if (fb->obj[0]) {
@@ -376,7 +365,6 @@ static int radeon_fbdev_destroy(struct drm_device *dev, struct radeon_fbdev *rfb
 		drm_framebuffer_cleanup(fb);
 	}
 	drm_fb_helper_fini(&rfbdev->helper);
-#endif
 
 	return 0;
 }

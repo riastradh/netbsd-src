@@ -483,20 +483,8 @@ nouveau_fbcon_destroy(struct drm_device *dev, struct nouveau_fbdev *fbcon)
 {
 	struct nouveau_framebuffer *nouveau_fb = nouveau_framebuffer(fbcon->helper.fb);
 
-#ifdef __NetBSD__
-	if (fbcon->helper.fbdev) {
-		int ret;
-
-		/* XXX errno NetBSD->Linux */
-		ret = -config_detach(fbcon->helper.fbdev, DETACH_FORCE);
-		if (ret)
-			DRM_ERROR("failed to detach nouveaufb: %d\n", ret);
-		fbcon->helper.fbdev = NULL;
-	}
-#else
 	drm_fb_helper_unregister_fbi(&fbcon->helper);
 	drm_fb_helper_fini(&fbcon->helper);
-#endif
 
 	if (nouveau_fb && nouveau_fb->nvbo) {
 		nouveau_vma_del(&nouveau_fb->vma);
