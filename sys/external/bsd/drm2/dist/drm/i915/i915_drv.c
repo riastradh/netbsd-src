@@ -173,17 +173,19 @@ static int
 intel_alloc_mchbar_resource(struct drm_i915_private *dev_priv)
 {
 	int reg = INTEL_GEN(dev_priv) >= 4 ? MCHBAR_I965 : MCHBAR_I915;
+#ifdef CONFIG_PNP
 	u32 temp_lo, temp_hi = 0;
 	u64 mchbar_addr;
+#endif
 	int ret;
 
+#ifdef CONFIG_PNP
 	if (INTEL_GEN(dev_priv) >= 4)
 		pci_read_config_dword(dev_priv->bridge_dev, reg + 4, &temp_hi);
 	pci_read_config_dword(dev_priv->bridge_dev, reg, &temp_lo);
 	mchbar_addr = ((u64)temp_hi << 32) | temp_lo;
 
 	/* If ACPI doesn't have it, assume we need to allocate it ourselves */
-#ifdef CONFIG_PNP
 	if (mchbar_addr &&
 	    pnp_range_reserved(mchbar_addr, mchbar_addr + MCHBAR_SIZE))
 		return 0;
