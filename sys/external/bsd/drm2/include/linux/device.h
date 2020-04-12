@@ -33,7 +33,10 @@
 #define _LINUX_DEVICE_H_
 
 #include <sys/types.h>
+#include <sys/device.h>
 #include <sys/systm.h>
+
+#include <linux/ratelimit.h>
 
 #define	dev_crit(DEV, FMT, ...)	do {					      \
 	if (DEV)							      \
