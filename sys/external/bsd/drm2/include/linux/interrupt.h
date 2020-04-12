@@ -34,6 +34,7 @@
 
 #include <sys/cpu.h>
 
+#include <linux/irqreturn.h>
 #include <linux/hardirq.h>
 #include <linux/kernel.h>
 #include <linux/tasklet.h>
