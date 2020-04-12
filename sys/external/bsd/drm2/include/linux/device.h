@@ -36,6 +36,7 @@
 #include <sys/device.h>
 #include <sys/systm.h>
 
+#include <linux/hrtimer.h>
 #include <linux/ratelimit.h>
 
 #define	dev_crit(DEV, FMT, ...)	do {					      \

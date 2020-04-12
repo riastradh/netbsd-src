@@ -40,7 +40,10 @@
 #include <asm/param.h>
 #include <asm/barrier.h>
 #include <asm/processor.h>
+#include <linux/device.h>
 #include <linux/errno.h>
+
+struct seq_file;
 
 #define	TASK_COMM_LEN	MAXCOMLEN
 

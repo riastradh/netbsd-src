@@ -42,6 +42,7 @@
 #include <sys/callout.h>
 
 #include <linux/jiffies.h>
+#include <linux/ktime.h>
 
 struct timer_list {
 	struct callout tl_callout;
