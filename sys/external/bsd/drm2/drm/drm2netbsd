@@ -17,6 +17,8 @@ drmkms_flag=drmkms
 env CONFIG_PCI=y \
 env CONFIG_AGP=y \
 env CONFIG_DRM_FBDEV_EMULATION=y \
+env CONFIG_DRM_GEM_CMA_HELPER=y \
+env CONFIG_DRM_PANEL=y \
 env CONFIG_DRM_VM=y \
 make -f Makefile -V '$(drm-y)' -V '$(drm_kms_helper-y)' \
 | tr ' ' '\n' \
