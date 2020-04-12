@@ -39,6 +39,10 @@
 #include <linux/preempt.h>
 #include <linux/smp.h>
 
+#ifdef __NetBSD__
+#include <drm/drm_wait_netbsd.h>
+#endif
+
 /*
  * Use EXPORT_SYMBOL_FOR_TESTS_ONLY() for functions that shall
  * only be visible for drmselftests.

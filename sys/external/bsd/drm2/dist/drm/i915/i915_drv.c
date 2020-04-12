@@ -87,6 +87,17 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_memory_region.h"
 #include "intel_pm.h"
 
+#ifdef __NetBSD__
+#ifdef notyet
+#if defined(__i386__)
+#include "pnpbios.h"
+#endif
+#if NPNPBIOS > 0
+#define CONFIG_PNP
+#endif
+#endif
+#endif
+
 static struct drm_driver driver;
 
 #ifdef __NetBSD__

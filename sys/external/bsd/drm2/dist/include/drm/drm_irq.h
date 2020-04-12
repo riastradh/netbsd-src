@@ -26,6 +26,10 @@
 #ifndef _DRM_IRQ_H_
 #define _DRM_IRQ_H_
 
+#ifdef __NetBSD__
+#include <drm/drm_irq_netbsd.h>
+#endif
+
 struct drm_device;
 
 #ifdef __NetBSD__

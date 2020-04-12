@@ -67,7 +67,6 @@
 #include <uapi/drm/drm_mode.h>
 
 #ifdef __NetBSD__
-#include <drm/drm_os_netbsd.h>
 #include <asm/barrier.h>
 #include <asm/bug.h>
 #include <linux/atomic.h>
