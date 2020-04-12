@@ -39,6 +39,7 @@
 
 #include <linux/export.h>
 #include <linux/moduleparam.h>
+#include <linux/rbtree.h>
 #include <linux/stringify.h>
 
 #define	module_init(INIT)
