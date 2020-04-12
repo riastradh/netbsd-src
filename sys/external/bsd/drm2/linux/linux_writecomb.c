@@ -157,3 +157,16 @@ arch_phys_wc_index(int handle)
 	/* XXX Actually implement this...requires changes to our MTRR API.  */
 	return handle;
 }
+
+/* XXX Reserve PAT space on x86.  */
+
+int
+arch_io_reserve_memtype_wc(resource_size_t start, resource_size_t size)
+{
+	return 0;
+}
+
+void
+arch_io_free_memtype_wc(resource_size_t start, resource_size_t size)
+{
+}
