@@ -75,6 +75,7 @@ __KERNEL_RCSID(0, "$NetBSD: drm_memory.c,v 1.13 2018/08/27 15:32:06 riastradh Ex
 #include <drm/drm_drv.h>
 #include <drm/drm_legacy.h>
 #include <drm/drm_pci.h>
+#include <drm/drm_print.h>
 
 /*
  * XXX drm_bus_borrow is a horrible kludge!
