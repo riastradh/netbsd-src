@@ -32,6 +32,8 @@
 #ifndef _LINUX_HRTIMER_H_
 #define _LINUX_HRTIMER_H_
 
+#include <linux/timer.h>
+
 struct hrtimer {
 };
 
