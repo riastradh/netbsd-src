@@ -388,6 +388,8 @@ struct drm_device {
 
 #ifdef __NetBSD__
 extern const struct cdevsw drm_cdevsw;
+int drm_limit_dma_space(struct drm_device *, resource_size_t, resource_size_t);
+int drm_guarantee_initialized(void);
 #endif
 
 #endif
