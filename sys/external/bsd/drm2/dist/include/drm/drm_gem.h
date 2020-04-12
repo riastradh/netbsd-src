@@ -173,8 +173,8 @@ struct drm_gem_object_funcs {
 	 * used, the @mmap callback must set vma->vm_ops instead.
 	 */
 #ifdef __NetBSD__
-	int (*mmap)(struct drm_device *, off_t, size_t, int, struct uvm_object **,
-	    voff_t *, struct file *);
+	int (*mmap)(struct drm_gem_object *, off_t *, size_t, int,
+	    int *, int *, struct uvm_object **, int *);
 #else
 	int (*mmap)(struct drm_gem_object *obj, struct vm_area_struct *vma);
 #endif
