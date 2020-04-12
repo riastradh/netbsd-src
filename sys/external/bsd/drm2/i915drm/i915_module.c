@@ -39,7 +39,7 @@ __KERNEL_RCSID(0, "$NetBSD: i915_module.c,v 1.8 2018/08/28 03:35:08 riastradh Ex
 #endif
 #include <sys/systm.h>
 
-#include <drm/drmP.h>
+#include <drm/drm_device.h>
 #include <drm/drm_sysctl.h>
 
 #include "i915_drv.h"

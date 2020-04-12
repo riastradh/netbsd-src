@@ -37,11 +37,11 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_pci.c,v 1.5 2018/08/27 14:41:26 riastradh Exp
 #include <sys/systm.h>
 #include <sys/workqueue.h>
 
-#include <drm/drmP.h>
-
 #include <amdgpu.h>
 #include "amdgpu_drv.h"
 #include "amdgpu_task.h"
+
+struct drm_device;
 
 SIMPLEQ_HEAD(amdgpu_task_head, amdgpu_task);
 

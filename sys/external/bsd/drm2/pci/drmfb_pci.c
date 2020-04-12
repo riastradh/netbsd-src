@@ -62,7 +62,7 @@ __KERNEL_RCSID(0, "$NetBSD: drmfb_pci.c,v 1.3 2015/03/05 20:19:30 christos Exp $
 #include <dev/ic/vgavar.h>
 #endif
 
-#include <drm/drmP.h>
+#include <drm/drm_device.h>
 #include <drm/drm_fb_helper.h>
 
 #include <drm/drmfb.h>

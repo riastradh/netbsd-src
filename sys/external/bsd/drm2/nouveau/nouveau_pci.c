@@ -44,8 +44,6 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_pci.c,v 1.26 2020/02/03 16:52:13 jmcneill Ex
 #include <sys/workqueue.h>
 #include <sys/module.h>
 
-#include <drm/drmP.h>
-
 #include <core/device.h>
 #include <core/pci.h>
 
@@ -55,6 +53,8 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_pci.c,v 1.26 2020/02/03 16:52:13 jmcneill Ex
 
 #include "nouveau_drv.h"
 #include "nouveau_pci.h"
+
+struct drm_device;
 
 MODULE(MODULE_CLASS_DRIVER, nouveau_pci, "nouveau,drmkms_pci");
 

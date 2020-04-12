@@ -65,7 +65,7 @@ __KERNEL_RCSID(0, "$NetBSD: drmfb.c,v 1.8 2020/06/27 13:41:44 jmcneill Exp $");
 
 #include <dev/wsfb/genfbvar.h>
 
-#include <drm/drmP.h>
+#include <drm/drm_device.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drmfb.h>
 

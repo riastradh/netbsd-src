@@ -36,7 +36,6 @@ __KERNEL_RCSID(0, "$NetBSD: radeondrmkmsfb.c,v 1.13 2019/11/06 07:31:20 mrg Exp 
 #include <sys/types.h>
 #include <sys/device.h>
 
-#include <drm/drmP.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drmfb.h>
 #include <drm/drmfb_pci.h>
