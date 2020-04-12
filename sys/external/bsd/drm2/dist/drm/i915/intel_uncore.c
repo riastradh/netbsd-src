@@ -1688,10 +1688,20 @@ static int uncore_mmio_setup(struct intel_uncore *uncore)
 	else
 		mmio_size = 2 * 1024 * 1024;
 	uncore->regs = pci_iomap(pdev, mmio_bar, mmio_size);
+#ifdef __NetBSD__
+	if (!dev_priv->regs)
+		dev_priv->regs = drm_agp_borrow(&i915->drm, mmio_bar,
+		    mmio_size);
+#endif
 	if (uncore->regs == NULL) {
 		drm_err(&i915->drm, "failed to map registers\n");
 		return -EIO;
 	}
+
+#ifdef __NetBSD__
+	i915->regs_bst = i915->drm.pdev->pd_resources[mmio_bar].bst;
+	i915->regs_bsh = i915->drm.pdev->pd_resources[mmio_bar].bsh;
+#endif
 
 	return 0;
 }
