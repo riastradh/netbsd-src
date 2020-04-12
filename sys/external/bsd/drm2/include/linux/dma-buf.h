@@ -68,8 +68,6 @@ struct dma_buf_ops {
 	void	(*release)(struct dma_buf *);
 	int	(*begin_cpu_access)(struct dma_buf *, enum dma_data_direction);
 	int	(*end_cpu_access)(struct dma_buf *, enum dma_data_direction);
-	void *	(*map)(struct dma_buf *, unsigned long);
-	void	(*unmap)(struct dma_buf *, unsigned long, void *);
 	int	(*mmap)(struct dma_buf *, off_t *, size_t, int, int *,
 		    int *, struct uvm_object **, int *);
 	void *	(*vmap)(struct dma_buf *);
