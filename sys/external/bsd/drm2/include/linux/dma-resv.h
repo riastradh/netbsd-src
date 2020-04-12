@@ -108,7 +108,7 @@ struct dma_fence *
 	dma_resv_get_excl(struct dma_resv *);
 struct dma_resv_list *
 	dma_resv_get_list(struct dma_resv *);
-int	dma_resv_reserve_shared(struct dma_resv *);
+int	dma_resv_reserve_shared(struct dma_resv *, unsigned int);
 void	dma_resv_add_excl_fence(struct dma_resv *,
 	    struct dma_fence *);
 void	dma_resv_add_shared_fence(struct dma_resv *,
