@@ -278,12 +278,13 @@ dma_resv_get_list(struct dma_resv *robj)
  *	we don't have enough.  This is not guaranteed.
  */
 int
-dma_resv_reserve_shared(struct dma_resv *robj)
+dma_resv_reserve_shared(struct dma_resv *robj, unsigned int num_fences)
 {
 	struct dma_resv_list *list, *prealloc;
 	uint32_t n, nalloc;
 
 	KASSERT(dma_resv_held(robj));
+	KASSERT(num_fences == 1);
 
 	list = robj->fence;
 	prealloc = robj->robj_prealloc;
