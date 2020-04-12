@@ -38,6 +38,7 @@ __KERNEL_RCSID(0, "$NetBSD: drm_pci.c,v 1.33 2020/02/14 04:29:19 riastradh Exp $
 
 #include <dev/pci/pcivar.h>
 
+#include <drm/drm_agpsupport.h>
 #include <drm/drm_device.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_legacy.h>
@@ -269,37 +270,5 @@ drm_pci_set_busid(struct drm_device *dev, struct drm_master *master)
 		return -ENOMEM;
 	master->unique_len = strlen(master->unique);
 
-	return 0;
-}
-
-int
-drm_pci_set_unique(struct drm_device *dev, struct drm_master *master,
-    struct drm_unique *unique)
-{
-	char kbuf[64], ubuf[64];
-	int ret;
-
-	/* Reject excessively long unique strings.  */
-	if (unique->unique_len > sizeof(ubuf) - 1)
-		return -EINVAL;
-
-	/* Copy in the alleged unique string, NUL-terminated.  */
-	ret = -copyin(unique->unique, ubuf, unique->unique_len);
-	if (ret)
-		return ret;
-	ubuf[unique->unique_len] = '\0';
-
-	/* Make sure it matches what we expect.  */
-	snprintf(kbuf, sizeof kbuf, "PCI:%d:%ld:%ld", dev->pdev->bus->number,
-	    (long)PCI_SLOT(dev->pdev->devfn),
-	    (long)PCI_FUNC(dev->pdev->devfn));
-	if (strncmp(kbuf, ubuf, sizeof(kbuf)) != 0)
-		return -EINVAL;
-
-	/* Remember it.  */
-	master->unique = kstrdup(ubuf, GFP_KERNEL);
-	master->unique_len = strlen(master->unique);
-
-	/* Success!  */
 	return 0;
 }
