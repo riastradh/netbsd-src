@@ -75,6 +75,12 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 	if (!obj)
 		return -ENOENT;
 
+#ifdef __NetBSD__
+	struct drm_i915_private *i915 = to_i915(obj->base.dev);
+	if (dev->quirks & QUIRK_NETBSD_VERSION_CALLED)
+		args->flags = 0;
+#endif
+
 	/* prime objects have no backing filp to GEM mmap
 	 * pages from.
 	 */

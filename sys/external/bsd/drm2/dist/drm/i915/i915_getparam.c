@@ -116,6 +116,9 @@ int i915_getparam_ioctl(struct drm_device *dev, void *data,
 		break;
 
 	case I915_PARAM_MMAP_VERSION:
+#ifdef __NetBSD__
+		dev_priv->quirks |= QUIRK_NETBSD_VERSION_CALLED;
+#endif
 		/* Remember to bump this if the version changes! */
 	case I915_PARAM_HAS_GEM:
 	case I915_PARAM_HAS_PAGEFLIPPING:
