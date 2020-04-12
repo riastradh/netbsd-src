@@ -283,7 +283,7 @@ void drm_self_refresh_helper_cleanup(struct drm_crtc *crtc)
 	crtc->self_refresh_data = NULL;
 
 	cancel_delayed_work_sync(&sr_data->entry_work);
-	mutex_destroy(&sr_data->svg_mutex);
+	mutex_destroy(&sr_data->avg_mutex);
 	kfree(sr_data);
 }
 EXPORT_SYMBOL(drm_self_refresh_helper_cleanup);
