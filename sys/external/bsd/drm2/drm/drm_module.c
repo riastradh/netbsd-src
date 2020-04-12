@@ -129,7 +129,6 @@ drm_init(void)
 	linux_mutex_init(&drm_global_mutex);
 	linux_mutex_init(&drm_kernel_fb_helper_lock);
 	drm_connector_ida_init();
-	drm_global_init();
 	drm_panel_init_lock();
 	drm_bridge_init_lock();
 	drm_sysctl_init(&drm_def);
@@ -158,7 +157,6 @@ drm_fini(void)
 	drm_sysctl_fini(&drm_def);
 	drm_bridge_fini_lock();
 	drm_panel_fini_lock();
-	drm_global_release();
 	drm_connector_ida_destroy();
 	linux_mutex_destroy(&drm_kernel_fb_helper_lock);
 	linux_mutex_destroy(&drm_global_mutex);
