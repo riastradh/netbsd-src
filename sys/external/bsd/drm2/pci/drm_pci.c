@@ -38,10 +38,10 @@ __KERNEL_RCSID(0, "$NetBSD: drm_pci.c,v 1.33 2020/02/14 04:29:19 riastradh Exp $
 
 #include <dev/pci/pcivar.h>
 
-#include <drm/drmP.h>
-#include <drm/drm_pci.h>
+#include <drm/drm_device.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_legacy.h>
+#include <drm/drm_pci.h>
 
 #include "../dist/drm/drm_internal.h"
 

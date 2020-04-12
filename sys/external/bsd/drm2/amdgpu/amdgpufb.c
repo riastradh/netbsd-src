@@ -37,7 +37,6 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpufb.c,v 1.1 2018/08/27 14:02:32 riastradh Exp $
 #include <sys/device.h>
 #include <sys/errno.h>
 
-#include <drm/drmP.h>
 #include <drm/drmfb.h>
 #include <drm/drmfb_pci.h>
 

@@ -36,7 +36,7 @@ __KERNEL_RCSID(0, "$NetBSD: via_module.c,v 1.4 2018/08/28 03:35:08 riastradh Exp
 #include <sys/module.h>
 #include <sys/once.h>
 
-#include <drm/drmP.h>
+#include <drm/drm_device.h>
 #include <drm/via_drm.h>
 
 #include "via_drv.h"

@@ -36,7 +36,6 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_module.c,v 1.9 2018/08/28 03:34:07 riastradh
 #include <sys/module.h>
 #include <sys/systm.h>
 
-#include <drm/drmP.h>
 #include <drm/drm_sysctl.h>
 
 #include <core/device.h>

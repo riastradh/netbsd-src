@@ -67,8 +67,9 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_pci.c,v 1.14 2020/01/24 11:44:27 jmcneill Exp
 #include <dev/fdt/fdtvar.h>
 #endif
 
-#include <drm/drm_pci.h>
+#include <drm/drm_device.h>
 #include <drm/drm_fb_helper.h>
+#include <drm/drm_pci.h>
 
 #include <radeon.h>
 #include "radeon_drv.h"

@@ -37,7 +37,6 @@ __KERNEL_RCSID(0, "$NetBSD: nouveaufb.c,v 1.4 2016/12/12 19:45:56 maya Exp $");
 #include <sys/device.h>
 #include <sys/errno.h>
 
-#include <drm/drmP.h>
 #include <drm/drmfb.h>
 #include <drm/drmfb_pci.h>
 

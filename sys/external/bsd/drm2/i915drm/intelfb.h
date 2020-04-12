@@ -34,8 +34,9 @@
 
 #include <sys/bus.h>
 
-#include <drm/drmP.h>
 #include <drm/drm_fb_helper.h>
+
+struct drm_device;
 
 struct intelfb_attach_args {
 	struct drm_device			*ifa_drm_dev;

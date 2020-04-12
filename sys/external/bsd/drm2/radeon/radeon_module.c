@@ -39,7 +39,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_module.c,v 1.5 2018/08/28 03:35:08 riastradh 
 #endif
 #include <sys/systm.h>
 
-#include <drm/drmP.h>
+#include <drm/drm_device.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_sysctl.h>
 

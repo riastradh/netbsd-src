@@ -32,8 +32,9 @@
 #ifndef	_RADEON_RADEONDRMKMSFB_H_
 #define	_RADEON_RADEONDRMKMSFB_H_
 
-#include <drm/drmP.h>
 #include <drm/drm_fb_helper.h>
+
+struct drm_device;
 
 struct radeonfb_attach_args {
 	struct drm_fb_helper			*rfa_fb_helper;

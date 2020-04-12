@@ -38,10 +38,10 @@ __KERNEL_RCSID(0, "$NetBSD: i915_pci.c,v 1.21 2018/08/27 14:49:22 riastradh Exp 
 #include <sys/queue.h>
 #include <sys/workqueue.h>
 
-#include <drm/drmP.h>
-
 #include "i915_drv.h"
 #include "i915_pci.h"
+
+struct drm_device;
 
 SIMPLEQ_HEAD(i915drmkms_task_head, i915drmkms_task);
 

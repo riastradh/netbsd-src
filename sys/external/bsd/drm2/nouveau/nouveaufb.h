@@ -34,8 +34,9 @@
 
 #include <sys/bus.h>
 
-#include <drm/drmP.h>
 #include <drm/drm_fb_helper.h>
+
+struct drm_device;
 
 struct nouveaufb_attach_args {
 	struct drm_device			*nfa_drm_dev;

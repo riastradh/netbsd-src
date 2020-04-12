@@ -44,14 +44,13 @@ __KERNEL_RCSID(0, "$NetBSD: drm_module.c,v 1.17 2020/01/03 21:01:16 jmcneill Exp
 
 #include <linux/mutex.h>
 
-#include <drm/drmP.h>
 #include <drm/drm_agpsupport.h>
 #include <drm/drm_bridge.h>
+#include <drm/drm_device.h>
 #include <drm/drm_encoder_slave.h>
-#include <drm/drm_global.h>
-#include <drm/drm_sysctl.h>
 #include <drm/drm_panel.h>
 #include <drm/drm_print.h>
+#include <drm/drm_sysctl.h>
 
 #include "../dist/drm/drm_crtc_internal.h"
 #include "../dist/drm/drm_internal.h"
