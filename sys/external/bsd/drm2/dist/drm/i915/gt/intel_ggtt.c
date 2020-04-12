@@ -13,6 +13,10 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <asm/set_memory.h>
 #include <asm/smp.h>
 
+#ifdef __NetBSD__
+#include <drm/io-mapping.h>
+#endif
+
 #include "intel_gt.h"
 #include "i915_drv.h"
 #include "i915_scatterlist.h"
