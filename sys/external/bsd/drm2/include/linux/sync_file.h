@@ -32,12 +32,26 @@
 #ifndef	_LINUX_SYNC_FILE_H_
 #define	_LINUX_SYNC_FILE_H_
 
+#include <sys/mutex.h>
+#include <sys/select.h>
+
+#include <linux/dma-fence.h>
+
 struct dma_fence;
 struct file;
 struct sync_file;
 
 struct sync_file {
-	struct file	*file;
+	/* Linux API */
+	struct file		*file;
+
+	/* Private */
+	struct dma_fence	*sf_fence;
+	kmutex_t		sf_lock;
+	struct selinfo		sf_selq;
+	struct dma_fence_cb	sf_fcb;
+	bool			sf_polling;
+	bool			sf_signalled;
 };
 
 struct sync_file *
