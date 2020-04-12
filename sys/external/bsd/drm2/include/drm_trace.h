@@ -33,6 +33,7 @@
 #define _DRM_TRACE_H_
 
 #include <sys/types.h>
+#include <linux/ktime.h>
 
 static inline void
 trace_drm_vblank_event_delivered(struct drm_file *fp __unused,
