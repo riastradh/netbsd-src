@@ -214,6 +214,21 @@ list_move_tail(struct list_head *node, struct list_head *head)
 }
 
 static inline void
+list_bulk_move_tail(struct list_head *head, struct list_head *first,
+    struct list_head *last)
+{
+
+	first->prev->next = last->next;
+	last->next->prev = first->prev;
+
+	head->prev->next = first;
+	first->prev = head->prev;
+
+	last->next = head;
+	head->prev = last;
+}
+
+static inline void
 list_replace(struct list_head *old, struct list_head *new)
 {
 	new->prev = old->prev;
