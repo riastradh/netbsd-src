@@ -503,6 +503,32 @@ dma_fence_set_error(struct dma_fence *fence, int error)
 }
 
 /*
+ * dma_fence_get_status(fence)
+ *
+ *	Return 0 if fence has yet to be signalled, 1 if it has been
+ *	signalled without error, or negative error code if
+ *	dma_fence_set_error was used.
+ */
+int
+dma_fence_get_status(struct dma_fence *fence)
+{
+	int ret;
+
+	spin_lock(fence->lock);
+	if (!dma_fence_is_signaled_locked(fence)) {
+		ret = 0;
+	} else if (fence->error) {
+		ret = fence->error;
+		KASSERTMSG(ret < 0, "%d", ret);
+	} else {
+		ret = 1;
+	}
+	spin_unlock(fence->lock);
+
+	return ret;
+}
+
+/*
  * dma_fence_signal(fence)
  *
  *	Signal the fence.  If it has already been signalled, return
