@@ -30,6 +30,8 @@
 #include <linux/types.h>
 #include <linux/workqueue.h>
 
+struct seq_file;
+
 /*
  * Unless otherwise noted, all values are from the DP 1.1a spec.  Note that
  * DP and DPCD versions are independent.  Differences from 1.0 are not noted,
