@@ -36,6 +36,8 @@
 
 #include <asm/div64.h>
 
+#include <linux/types.h>
+
 static inline int64_t
 div64_u64(int64_t dividend, uint64_t divisor)
 {
