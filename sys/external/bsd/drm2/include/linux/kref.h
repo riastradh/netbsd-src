@@ -37,6 +37,7 @@
 #include <sys/systm.h>
 
 #include <linux/atomic.h>
+#include <linux/refcount.h>
 #include <linux/mutex.h>
 
 struct kref {
