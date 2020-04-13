@@ -49,6 +49,8 @@ struct nouveau_backlight;
 
 #define nouveau_conn_atom(p)                                                   \
 	container_of((p), struct nouveau_conn_atom, state)
+#define nouveau_conn_atom_const(p)                                             \
+	const_container_of((p), struct nouveau_conn_atom, state)
 
 struct nouveau_conn_atom {
 	struct drm_connector_state state;
