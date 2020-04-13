@@ -33,6 +33,12 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <nvif/class.h>
 
+#ifdef __NetBSD__
+#define	__iomem		__lut_iomem
+#define	readw(p)	atomic_load_relaxed((const __iomem uint16_t *)(p))
+#define	writew(v,p)	atomic_store_relaxed((__iomem uint16_t *)(p), (v))
+#endif
+
 u32
 nv50_lut_load(struct nv50_lut *lut, int buffer, struct drm_property_blob *blob,
 	      void (*load)(struct drm_color_lut *, int, void __iomem *))

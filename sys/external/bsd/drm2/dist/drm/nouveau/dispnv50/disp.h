@@ -50,7 +50,16 @@ struct nv50_disp_interlock {
 
 void corec37d_ntfy_init(struct nouveau_bo *, u32);
 
+#ifdef __NetBSD__
+#  define	__lut_iomem	volatile
+#  define	__iomem		__lut_iomem
+#endif
+
 void head907d_olut_load(struct drm_color_lut *, int size, void __iomem *);
+
+#ifdef __NetBSD__
+#  undef	__iomem
+#endif
 
 struct nv50_chan {
 	struct nvif_object user;

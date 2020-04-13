@@ -138,6 +138,12 @@ fixedU0_16_FP16(u16 fixed)
         return (sign << 15) | (exp << 10) | man;
 }
 
+#ifdef __NetBSD__
+#define	__iomem		__lut_iomem
+#define	readw(p)	atomic_load_relaxed((const __iomem uint16_t *)(p))
+#define	writew(v,p)	atomic_store_relaxed((__iomem uint16_t *)(p), (v))
+#endif
+
 static void
 wndwc57e_ilut_load(struct drm_color_lut *in, int size, void __iomem *mem)
 {
