@@ -57,4 +57,19 @@ platform_device_dev(const struct platform_device *platformdev)
 	return platformdev->pd_dev;
 }
 
+static inline const char *
+platform_device_name(const struct platform_device *platformdev)
+{
+
+	return device_xname(platformdev->pd_dev);
+}
+
+static inline struct platform_device *
+to_platform_device(device_t self)
+{
+
+	/* XXX */
+	return device_private(self);
+}
+
 #endif  /* _LINUX_PLATFORM_DEVICE_H_ */

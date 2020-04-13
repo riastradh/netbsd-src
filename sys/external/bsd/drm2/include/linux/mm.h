@@ -93,6 +93,13 @@ get_num_physpages(void)
 }
 
 static inline void *
+kvmalloc(size_t size, gfp_t gfp)
+{
+
+	return kmalloc(size, gfp);
+}
+
+static inline void *
 kvzalloc(size_t size, gfp_t gfp)
 {
 
