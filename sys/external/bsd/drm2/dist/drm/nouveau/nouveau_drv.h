@@ -242,6 +242,8 @@ nouveau_drm_use_coherent_gpu_mapping(struct nouveau_drm *drm)
 }
 
 #ifdef __NetBSD__
+int nouveau_drm_device_init(struct drm_device *);
+void nouveau_drm_device_fini(struct drm_device *);
 int nouveau_pmops_suspend(struct drm_device *);
 int nouveau_pmops_resume(struct drm_device *);
 #else

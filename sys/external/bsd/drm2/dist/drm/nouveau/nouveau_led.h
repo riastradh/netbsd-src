@@ -34,7 +34,9 @@ struct led_classdev;
 struct nouveau_led {
 	struct drm_device *dev;
 
+#if IS_REACHABLE(CONFIG_LEDS_CLASS)
 	struct led_classdev led;
+#endif
 };
 
 static inline struct nouveau_led *
