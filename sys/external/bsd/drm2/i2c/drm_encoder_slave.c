@@ -205,7 +205,7 @@ drm_i2c_encoder_get_client(struct drm_encoder *encoder)
 	return bus_priv->i2c_client;
 }
 
-static inline struct drm_encoder_slave_funcs *
+static inline const struct drm_encoder_slave_funcs *
 slave_funcs(struct drm_encoder *encoder)
 {
 
