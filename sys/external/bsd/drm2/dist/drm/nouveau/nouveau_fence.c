@@ -29,9 +29,11 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/atomic.h>
 #include <linux/ktime.h>
 #include <linux/hrtimer.h>
 #include <linux/sched/signal.h>
+#include <linux/workqueue.h>
 #include <trace/events/dma_fence.h>
 
 #include <nvif/cl826e.h>
