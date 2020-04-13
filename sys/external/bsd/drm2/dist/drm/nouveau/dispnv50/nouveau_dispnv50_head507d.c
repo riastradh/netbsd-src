@@ -27,6 +27,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "head.h"
 #include "core.h"
 
+#include <linux/nbsd-namespace.h>
+
 void
 head507d_procamp(struct nv50_head *head, struct nv50_head_atom *asyh)
 {

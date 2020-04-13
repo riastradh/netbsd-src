@@ -74,7 +74,7 @@ headc57d_procamp(struct nv50_head *head, struct nv50_head_atom *asyh)
 	}
 }
 
-void
+static void
 headc57d_olut_clr(struct nv50_head *head)
 {
 	struct nv50_dmac *core = &nv50_disp(head->base.base.dev)->core->chan;
@@ -86,7 +86,7 @@ headc57d_olut_clr(struct nv50_head *head)
 	}
 }
 
-void
+static void
 headc57d_olut_set(struct nv50_head *head, struct nv50_head_atom *asyh)
 {
 	struct nv50_dmac *core = &nv50_disp(head->base.base.dev)->core->chan;
@@ -156,7 +156,7 @@ headc57d_olut_load(struct drm_color_lut *in, int size, void __iomem *mem)
 	writew(readw(mem - 4), mem + 4);
 }
 
-bool
+static bool
 headc57d_olut(struct nv50_head *head, struct nv50_head_atom *asyh, int size)
 {
 	if (size != 0 && size != 256 && size != 1024)
