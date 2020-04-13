@@ -218,6 +218,12 @@ head907d_olut_set(struct nv50_head *head, struct nv50_head_atom *asyh)
 	}
 }
 
+#ifdef __NetBSD__
+#define	__iomem		__lut_iomem
+#define	readw(p)	atomic_load_relaxed((const __iomem uint16_t *)(p))
+#define	writew(v,p)	atomic_store_relaxed((__iomem uint16_t *)(p), (v))
+#endif
+
 void
 head907d_olut_load(struct drm_color_lut *in, int size, void __iomem *mem)
 {

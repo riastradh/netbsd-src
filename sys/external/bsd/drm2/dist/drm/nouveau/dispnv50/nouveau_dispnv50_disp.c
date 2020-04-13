@@ -175,7 +175,7 @@ nv50_dmac_create(struct nvif_device *device, struct nvif_object *disp,
 	if (ret)
 		return ret;
 
-	dmac->ptr = dmac->push.object.map.ptr;
+	dmac->ptr = __UNVOLATILE(dmac->push.object.map.ptr);
 
 	args->pushbuf = nvif_handle(&dmac->push.object);
 
