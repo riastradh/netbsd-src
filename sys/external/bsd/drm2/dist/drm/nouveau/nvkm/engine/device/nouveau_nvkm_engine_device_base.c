@@ -3016,7 +3016,7 @@ nvkm_device_ctor(const struct nvkm_device_func *func,
 #ifndef __BIG_ENDIAN
 		if (bus_space_read_stream_4(mmiot, mmioh, 4) != 0)
 #else
-		if (bus_space_read_stream_4(mmiot, mmioh, 4) != 1)
+		if (bus_space_read_stream_4(mmiot, mmioh, 4) == 0)
 #endif
 		{
 			bus_space_write_stream_4(mmiot, mmioh, 4, 0x01000001);
