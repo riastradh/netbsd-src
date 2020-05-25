@@ -34,6 +34,7 @@
 
 #include <uvm/uvm_page.h>	/* XXX don't expose this */
 
+#include <linux/completion.h>
 #include <linux/rwsem.h>
 
 struct page {
