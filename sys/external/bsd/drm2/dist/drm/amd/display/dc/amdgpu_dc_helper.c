@@ -35,7 +35,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/delay.h>
 
 #include "dm_services.h"
-#include <stdarg.h>
+#include <sys/stdarg.h>
 
 #include "dc.h"
 #include "dc_dmub_srv.h"
