@@ -27,6 +27,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include "qmgr.h"
 
+#include <linux/nbsd-namespace.h>
+
 static bool
 nvkm_falcon_cmdq_has_room(struct nvkm_falcon_cmdq *cmdq, u32 size, bool *rewind)
 {

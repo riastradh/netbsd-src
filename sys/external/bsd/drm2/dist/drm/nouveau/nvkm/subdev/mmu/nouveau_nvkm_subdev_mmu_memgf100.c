@@ -36,8 +36,14 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <nvif/unpack.h>
 
 int
+#ifdef __NetBSD__
+gf100_mem_map(struct nvkm_mmu *mmu, struct nvkm_memory *memory, void *argv,
+	      u32 argc, bus_space_tag_t *ptag, u64 *paddr, u64 *psize,
+	      struct nvkm_vma **pvma)
+#else
 gf100_mem_map(struct nvkm_mmu *mmu, struct nvkm_memory *memory, void *argv,
 	      u32 argc, u64 *paddr, u64 *psize, struct nvkm_vma **pvma)
+#endif
 {
 	struct gf100_vmm_map_v0 uvmm = {};
 	union {
@@ -65,6 +71,9 @@ gf100_mem_map(struct nvkm_mmu *mmu, struct nvkm_memory *memory, void *argv,
 	if (ret)
 		return ret;
 
+#ifdef __NetBSD__
+	*ptag = device->func->resource_tag(device, 1);
+#endif
 	*paddr = device->func->resource_addr(device, 1) + (*pvma)->addr;
 	*psize = (*pvma)->size;
 	return 0;

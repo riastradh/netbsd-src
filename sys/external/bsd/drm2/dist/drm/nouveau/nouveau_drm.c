@@ -933,7 +933,16 @@ nouveau_pmops_resume(struct device *dev)
 	return ret;
 }
 
-#ifndef __NetBSD__		/* XXX nouveau pm */
+#ifdef __NetBSD__		/* XXX nouveau pm */
+
+bool
+nouveau_pmops_runtime(void)
+{
+	return true;		/* XXX */
+}
+
+#else
+
 static int
 nouveau_pmops_freeze(struct device *dev)
 {

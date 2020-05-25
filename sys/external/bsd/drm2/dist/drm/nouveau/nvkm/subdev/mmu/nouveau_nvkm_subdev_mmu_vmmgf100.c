@@ -33,6 +33,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <nvif/if900d.h>
 #include <nvif/unpack.h>
 
+#include <linux/nbsd-namespace.h>
+
 static inline void
 gf100_vmm_pgt_pte(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
 		  u32 ptei, u32 ptes, struct nvkm_vmm_map *map, u64 addr)
@@ -59,12 +61,14 @@ gf100_vmm_pgt_pte(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
 	}
 }
 
+#ifndef __NetBSD__
 void
 gf100_vmm_pgt_sgl(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
 		  u32 ptei, u32 ptes, struct nvkm_vmm_map *map)
 {
 	VMM_MAP_ITER_SGL(vmm, pt, ptei, ptes, map, gf100_vmm_pgt_pte);
 }
+#endif
 
 void
 gf100_vmm_pgt_dma(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
@@ -104,7 +108,9 @@ gf100_vmm_pgt = {
 	.unmap = gf100_vmm_pgt_unmap,
 	.mem = gf100_vmm_pgt_mem,
 	.dma = gf100_vmm_pgt_dma,
+#ifndef __NetBSD__
 	.sgl = gf100_vmm_pgt_sgl,
+#endif
 };
 
 void

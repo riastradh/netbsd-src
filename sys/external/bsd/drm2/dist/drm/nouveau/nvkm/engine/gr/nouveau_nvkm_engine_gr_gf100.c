@@ -46,6 +46,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <nvif/if900d.h>
 #include <nvif/unpack.h>
 
+#include <linux/nbsd-namespace.h>
+
 /*******************************************************************************
  * Zero Bandwidth Clear
  ******************************************************************************/
@@ -746,7 +748,7 @@ gf100_gr_fecs_ctrl_ctxsw(struct gf100_gr *gr, u32 mthd)
 	return -ETIMEDOUT;
 }
 
-int
+static int
 gf100_gr_fecs_start_ctxsw(struct nvkm_gr *base)
 {
 	struct gf100_gr *gr = gf100_gr(base);
@@ -761,7 +763,7 @@ gf100_gr_fecs_start_ctxsw(struct nvkm_gr *base)
 	return ret;
 }
 
-int
+static int
 gf100_gr_fecs_stop_ctxsw(struct nvkm_gr *base)
 {
 	struct gf100_gr *gr = gf100_gr(base);
@@ -2011,7 +2013,7 @@ gf100_gr_fini(struct nvkm_gr *base, bool suspend)
 	return 0;
 }
 
-void *
+static void *
 gf100_gr_dtor(struct nvkm_gr *base)
 {
 	struct gf100_gr *gr = gf100_gr(base);

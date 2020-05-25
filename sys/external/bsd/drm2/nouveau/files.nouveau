@@ -102,7 +102,7 @@ file	external/bsd/drm2/dist/drm/nouveau/nouveau_display.c	nouveau
 file	external/bsd/drm2/dist/drm/nouveau/nouveau_dma.c	nouveau
 file	external/bsd/drm2/dist/drm/nouveau/nouveau_dp.c	nouveau
 file	external/bsd/drm2/dist/drm/nouveau/nouveau_drm.c	nouveau
-#file	external/bsd/drm2/dist/drm/nouveau/nouveau_fbcon.c	nouveau
+file	external/bsd/drm2/dist/drm/nouveau/nouveau_fbcon.c	nouveau
 file	external/bsd/drm2/dist/drm/nouveau/nouveau_fence.c	nouveau
 file	external/bsd/drm2/dist/drm/nouveau/nouveau_gem.c	nouveau
 file	external/bsd/drm2/dist/drm/nouveau/nouveau_hwmon.c	nouveau

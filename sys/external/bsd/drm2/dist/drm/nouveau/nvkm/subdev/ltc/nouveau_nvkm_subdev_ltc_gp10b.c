@@ -39,6 +39,9 @@ gp10b_ltc_init(struct nvkm_ltc *ltc)
 	nvkm_wr32(device, 0x17e000, ltc->ltc_nr);
 	nvkm_wr32(device, 0x100800, ltc->ltc_nr);
 
+#ifdef __NetBSD__		/* XXX arm64 iort smmu iommu */
+	__USE(spec);
+#else
 	spec = dev_iommu_fwspec_get(device->dev);
 	if (spec) {
 		u32 sid = spec->ids[0] & 0xffff;
@@ -46,6 +49,7 @@ gp10b_ltc_init(struct nvkm_ltc *ltc)
 		/* stream ID */
 		nvkm_wr32(device, 0x160000, sid << 2);
 	}
+#endif
 }
 
 static const struct nvkm_ltc_func

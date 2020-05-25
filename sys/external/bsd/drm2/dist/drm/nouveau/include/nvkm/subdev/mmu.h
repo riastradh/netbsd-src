@@ -39,8 +39,13 @@ struct nvkm_vmm {
 	struct list_head join;
 
 	struct list_head list;
+#ifdef __NetBSD__
+	struct rb_tree free;
+	struct rb_tree root;
+#else
 	struct rb_root free;
 	struct rb_root root;
+#endif
 
 	bool bootstrapped;
 	atomic_t engref[NVKM_SUBDEV_NR];
@@ -70,7 +75,9 @@ struct nvkm_vmm_map {
 	u64 offset;
 
 	struct nvkm_mm_node *mem;
+#ifndef __NetBSD__
 	struct scatterlist *sgl;
+#endif
 	dma_addr_t *dma;
 	u64 *pfn;
 	u64 off;

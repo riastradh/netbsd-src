@@ -27,10 +27,19 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "user.h"
 
 static int
+#ifdef __NetBSD__
+gv100_fifo_user_map(struct nvkm_object *object, void *argv, u32 argc,
+		    enum nvkm_object_map *type,
+		    bus_space_tag_t *tag, u64 *addr, u64 *size)
+#else
 gv100_fifo_user_map(struct nvkm_object *object, void *argv, u32 argc,
 		    enum nvkm_object_map *type, u64 *addr, u64 *size)
+#endif
 {
 	struct nvkm_device *device = object->engine->subdev.device;
+#ifdef __NetBSD__
+	*tag = device->func->resource_tag(device, 0);
+#endif
 	*addr = 0x810000 + device->func->resource_addr(device, 0);
 	*size = 0x010000;
 	*type = NVKM_OBJECT_MAP_IO;

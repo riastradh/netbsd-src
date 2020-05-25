@@ -37,8 +37,11 @@ __KERNEL_RCSID(0, "$NetBSD: nouveaufb.c,v 1.4 2016/12/12 19:45:56 maya Exp $");
 #include <sys/device.h>
 #include <sys/errno.h>
 
+#include <drm/drm_drv.h>
 #include <drm/drmfb.h>
 #include <drm/drmfb_pci.h>
+
+#include <ttm/ttm_placement.h>
 
 #include "nouveau_bo.h"
 #include "nouveau_drv.h"
@@ -179,9 +182,10 @@ nouveaufb_drmfb_mmapfb(struct drmfb_softc *drmfb, off_t offset, int prot)
 	struct nouveaufb_softc *const sc = container_of(drmfb,
 	    struct nouveaufb_softc, sc_drmfb);
 	struct drm_fb_helper *const helper = sc->sc_nfa.nfa_fb_helper;
-	struct nouveau_fbdev *const fbdev = container_of(helper,
-	    struct nouveau_fbdev, helper);
-	struct nouveau_bo *const nvbo = fbdev->nouveau_fb.nvbo;
+	struct drm_framebuffer *const fb = helper->fb;
+	struct nouveau_framebuffer *const nvfb = container_of(fb,
+	    struct nouveau_framebuffer, base);
+	struct nouveau_bo *const nvbo = nvfb->nvbo;
 	const unsigned num_pages __diagused = nvbo->bo.num_pages;
 	int flags = 0;
 

@@ -329,7 +329,6 @@ nouveau_ttm_fini(struct nouveau_drm *drm)
 	drm->ttm.mtrr = 0;
 
 #ifdef __NetBSD__
-	struct nvkm_device *device = nvxx_device(&drm->device);
 	pmap_pv_untrack(device->func->resource_addr(device, 1),
 	    device->func->resource_size(device, 1));
 #endif
