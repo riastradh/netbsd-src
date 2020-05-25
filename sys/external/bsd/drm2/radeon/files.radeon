@@ -14,7 +14,6 @@ attach	radeondrmkmsfb at radeonfbbus
 # overflow is OK.
 makeoptions 	radeon	"COPTS.radeon"+="-fwrapv"
 
-makeoptions	radeon	"CPPFLAGS.radeon"+="${CPPFLAGS.drmkms}"
 makeoptions	radeondrmkmsfb	"CPPFLAGS.radeondrmkmsfb"+="${CPPFLAGS.radeon}"
 
 # Our overrides first.
