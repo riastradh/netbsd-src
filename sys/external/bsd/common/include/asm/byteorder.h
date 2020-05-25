@@ -34,6 +34,14 @@
 
 #include <sys/endian.h>
 
+#if _BYTE_ORDER == _LITTLE_ENDIAN
+#define	__LITTLE_ENDIAN
+#elif _BYTE_ORDER == _BIG_ENDIAN
+#define	__BIG_ENDIAN
+#else
+#error Unknown byte order!
+#endif
+
 #define	cpu_to_le16	htole16
 #define	cpu_to_le32	htole32
 #define	cpu_to_le64	htole64
