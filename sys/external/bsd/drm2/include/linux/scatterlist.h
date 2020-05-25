@@ -32,6 +32,7 @@
 #ifndef	_LINUX_SCATTERLIST_H_
 #define	_LINUX_SCATTERLIST_H_
 
+#include <linux/mm.h>
 #include <linux/types.h>
 
 #endif	/* _LINUX_SCATTERLIST_H_ */
