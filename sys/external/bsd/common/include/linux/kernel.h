@@ -117,6 +117,8 @@
 
 #define	IS_ALIGNED(X, N)	(((X) & ((N) - 1)) == 0)
 
+#define	ALIGN_DOWN(X, N)	round_down(X, N)
+
 /*
  * These select 32-bit halves of what may be 32- or 64-bit quantities,
  * for which straight 32-bit shifts may be undefined behaviour (and do
