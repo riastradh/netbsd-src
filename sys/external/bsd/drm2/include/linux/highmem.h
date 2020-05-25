@@ -38,6 +38,7 @@
 #include <uvm/uvm_extern.h>
 
 #include <linux/kernel.h>
+#include <linux/mm.h>
 #include <linux/mm_types.h>
 
 /* XXX Make the nm output a little more greppable...  */
