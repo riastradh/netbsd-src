@@ -2,7 +2,7 @@
 
 define	linux
 
-makeoptions 	linux	CPPFLAGS+="-I$S/external/bsd/common/include"
+makeoptions 	linux	"CPPFLAGS.linux"+="-I$S/external/bsd/common/include"
 
 file	external/bsd/common/linux/linux_rcu.c		linux
 file	external/bsd/common/linux/linux_srcu.c		linux

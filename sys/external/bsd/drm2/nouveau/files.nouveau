@@ -7,9 +7,11 @@ device	nouveau: drmkms, drmkms_ttm, nouveaufbbus, firmload
 
 attach	nouveau at pci with nouveau_pci: drmkms_pci
 file	external/bsd/drm2/nouveau/nouveau_pci.c			nouveau_pci
+makeoptions	nouveau_pci	"CPPFLAGS.nouveau_pci"+="${CPPFLAGS.nouveau}"
 
 device	nouveaufb: nouveaufbbus, drmfb, drmfb_pci, wsemuldisplaydev
 attach	nouveaufb at nouveaufbbus
+makeoptions	nouveaufb	"CPPFLAGS.nouveaufb"+="${CPPFLAGS.nouveau}"
 
 # Local additions.  External sources are listd below.
 file	external/bsd/drm2/nouveau/nouveau_vga.c			nouveau
@@ -19,14 +21,15 @@ file	external/bsd/drm2/nouveau/nouveaufb.c			nouveaufb
 # overflow is OK.
 makeoptions 	nouveau	"COPTS.nouveau"+="-fwrapv"
 
-makeoptions	nouveau	CPPFLAGS+="-I$S/external/bsd/drm2/dist/drm/nouveau"
-makeoptions	nouveau	CPPFLAGS+="-I$S/external/bsd/drm2/dist/drm/nouveau/include"
-makeoptions	nouveau	CPPFLAGS+="-I$S/external/bsd/drm2/dist/drm/nouveau/include/nvkm"
-makeoptions	nouveau	CPPFLAGS+="-I$S/external/bsd/drm2/dist/drm/nouveau/nvkm"
-makeoptions	nouveau	CPPFLAGS+="-I$S/external/bsd/drm2/nouveau"
+makeoptions	nouveau	"CPPFLAGS.nouveau"+="${CPPFLAGS.drmkms}"
+makeoptions	nouveau	"CPPFLAGS.nouveau"+="-I$S/external/bsd/drm2/dist/drm/nouveau"
+makeoptions	nouveau	"CPPFLAGS.nouveau"+="-I$S/external/bsd/drm2/dist/drm/nouveau/include"
+makeoptions	nouveau	"CPPFLAGS.nouveau"+="-I$S/external/bsd/drm2/dist/drm/nouveau/include/nvkm"
+makeoptions	nouveau	"CPPFLAGS.nouveau"+="-I$S/external/bsd/drm2/dist/drm/nouveau/nvkm"
+makeoptions	nouveau	"CPPFLAGS.nouveau"+="-I$S/external/bsd/drm2/nouveau"
 
-makeoptions	nouveau	CPPFLAGS+="-DCONFIG_NOUVEAU_DEBUG=5"
-makeoptions	nouveau	CPPFLAGS+="-DCONFIG_NOUVEAU_DEBUG_DEFAULT=3"
+makeoptions	nouveau	"CPPFLAGS.nouveau"+="-DCONFIG_NOUVEAU_DEBUG=5"
+makeoptions	nouveau	"CPPFLAGS.nouveau"+="-DCONFIG_NOUVEAU_DEBUG_DEFAULT=3"
 
 makeoptions	nouveau	"CWARNFLAGS.nouveau"+="-Wno-missing-field-initializers"
 makeoptions	nouveau	"CWARNFLAGS.nouveau"+="-Wno-pointer-arith"

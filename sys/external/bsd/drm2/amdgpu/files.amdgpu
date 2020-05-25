@@ -12,10 +12,10 @@ device	amdgpufb: amdgpufbbus, drmfb, drmfb_pci, wsemuldisplaydev
 attach	amdgpufb at amdgpufbbus
 
 # Match order in dist/drm/amd/amdgpu/Makefile.
-makeoptions	amdgpu	CPPFLAGS+="-I$S/external/bsd/drm2/dist/drm/amd/include/asic_reg"
-makeoptions	amdgpu	CPPFLAGS+="-I$S/external/bsd/drm2/dist/drm/amd/include"
-makeoptions	amdgpu	CPPFLAGS+="-I$S/external/bsd/drm2/dist/drm/amd/amdgpu"
-makeoptions	amdgpu	CPPFLAGS+="-I$S/external/bsd/drm2/dist/drm/amd/scheduler"
+makeoptions	amdgpu	"CPPFLAGS.amdgpu"+="-I$S/external/bsd/drm2/dist/drm/amd/include/asic_reg"
+makeoptions	amdgpu	"CPPFLAGS.amdgpu"+="-I$S/external/bsd/drm2/dist/drm/amd/include"
+makeoptions	amdgpu	"CPPFLAGS.amdgpu"+="-I$S/external/bsd/drm2/dist/drm/amd/amdgpu"
+makeoptions	amdgpu	"CPPFLAGS.amdgpu"+="-I$S/external/bsd/drm2/dist/drm/amd/scheduler"
 
 makeoptions	amdgpu	"CWARNFLAGS.amdgpu"+="-Wno-missing-field-initializers"
 makeoptions	amdgpu	"CWARNFLAGS.amdgpu"+="-Wno-shadow"
