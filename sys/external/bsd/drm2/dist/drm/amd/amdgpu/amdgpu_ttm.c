@@ -966,10 +966,8 @@ static int amdgpu_ttm_tt_pin_userptr(struct ttm_tt *ttm)
 	int r;
 
 	int write = !(gtt->userflags & AMDGPU_GEM_USERPTR_READONLY);
-#ifndef __NetBSD__
 	enum dma_data_direction direction = write ?
 		DMA_BIDIRECTIONAL : DMA_TO_DEVICE;
-#endif
 
 	/* Allocate an SG array and squash pages into it */
 	r = sg_alloc_table_from_pages(ttm->sg, ttm->pages, ttm->num_pages, 0,
@@ -993,7 +991,6 @@ static int amdgpu_ttm_tt_pin_userptr(struct ttm_tt *ttm)
 release_sg:
 	kfree(ttm->sg);
 	return r;
-#endif
 }
 
 /**
