@@ -33,7 +33,12 @@ struct gk104_fifo {
 	struct {
 		struct nvkm_memory *mem[2];
 		int next;
+#ifdef __NetBSD__
+		spinlock_t lock;
+		drm_waitqueue_t wait;
+#else
 		wait_queue_head_t wait;
+#endif
 		struct list_head cgrp;
 		struct list_head chan;
 		u32 engm;

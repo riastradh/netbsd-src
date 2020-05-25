@@ -38,6 +38,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <nvif/event.h>
 
+#include <linux/nbsd-namespace.h>
+
 struct lt_state {
 	struct nvkm_dp *dp;
 	u8  stat[6];

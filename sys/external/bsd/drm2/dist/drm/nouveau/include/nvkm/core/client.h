@@ -13,7 +13,11 @@ struct nvkm_client {
 	u32 debug;
 
 	struct nvkm_client_notify *notify[32];
+#ifdef __NetBSD__
+	rb_tree_t objtree;
+#else
 	struct rb_root objroot;
+#endif
 
 	bool super;
 	void *data;
@@ -45,7 +49,7 @@ int nvkm_client_notify_put(struct nvkm_client *, int index);
 #define nvif_printk(o,l,p,f,a...) do {                                         \
 	const struct nvkm_object *_object = (o);                               \
 	const struct nvkm_client *_client = _object->client;                   \
-	if (_client->debug >= NV_DBG_##l)                                      \
+	if (_client->debug == NV_DBG_##l || _client->debug > NV_DBG_##l)       \
 		printk(KERN_##p "nouveau: %s:%08x:%08x: "f, _client->name,     \
 		       _object->handle, _object->oclass, ##a);                 \
 } while(0)

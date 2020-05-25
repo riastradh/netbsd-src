@@ -34,6 +34,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <nvfw/acr.h>
 #include <nvfw/flcn.h>
 
+#include <linux/nbsd-namespace.h>
+
 void
 gp102_acr_wpr_patch(struct nvkm_acr *acr, s64 adjust)
 {

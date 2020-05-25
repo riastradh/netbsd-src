@@ -79,7 +79,10 @@ gt215_pmu_send(struct nvkm_pmu *pmu, u32 reply[2],
 
 	/* wait for reply, if requested */
 	if (reply) {
-		wait_event(pmu->recv.wait, (pmu->recv.process == 0));
+		int ret;
+		DRM_WAIT_NOINTR_UNTIL(ret, &pmu->recv.wait, &subdev->mutex,
+		    (pmu->recv.process == 0));
+		KASSERT(ret == 0);
 		reply[0] = pmu->recv.data[0];
 		reply[1] = pmu->recv.data[1];
 	}
@@ -121,10 +124,12 @@ gt215_pmu_recv(struct nvkm_pmu *pmu)
 	if (pmu->recv.process) {
 		if (process == pmu->recv.process &&
 		    message == pmu->recv.message) {
+			mutex_lock(&subdev->mutex);
 			pmu->recv.data[0] = data0;
 			pmu->recv.data[1] = data1;
 			pmu->recv.process = 0;
-			wake_up(&pmu->recv.wait);
+			DRM_WAKEUP_ONE(&pmu->recv.wait, &subdev->mutex);
+			mutex_unlock(&subdev->mutex);
 			return;
 		}
 	}

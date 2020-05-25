@@ -37,6 +37,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <nvif/if900b.h>
 #include <nvif/if900d.h>
 
+#include <linux/nbsd-namespace.h>
+
 int
 nouveau_mem_map(struct nouveau_mem *mem,
 		struct nvif_vmm *vmm, struct nvif_vma *vma)
@@ -121,8 +123,12 @@ nouveau_mem_host(struct ttm_mem_reg *reg, struct ttm_dma_tt *tt)
 		mem->comp = 0;
 	}
 
+#ifdef __NetBSD__		/* XXX prime */
+	args.dma = tt->dma_address;
+#else
 	if (tt->ttm.sg) args.sgl = tt->ttm.sg->sgl;
 	else            args.dma = tt->dma_address;
+#endif
 
 	mutex_lock(&drm->master.lock);
 	cli->base.super = true;

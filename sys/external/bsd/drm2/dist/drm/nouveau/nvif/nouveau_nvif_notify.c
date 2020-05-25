@@ -161,7 +161,7 @@ nvif_notify_fini(struct nvif_notify *notify)
 	if (ret >= 0 && object) {
 		ret = nvif_object_ioctl(object, &args, sizeof(args), NULL);
 		notify->object = NULL;
-		kfree((void *)notify->data);
+		kfree(__UNCONST(notify->data));
 	}
 	return ret;
 }
