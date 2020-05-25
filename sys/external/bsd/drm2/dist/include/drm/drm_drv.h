@@ -800,6 +800,7 @@ struct drm_driver {
 	int (*dma_ioctl) (struct drm_device *dev, void *data, struct drm_file *file_priv);
 	int (*dma_quiescent) (struct drm_device *);
 	int (*context_dtor) (struct drm_device *dev, int context);
+	int (*set_busid)(struct drm_device *dev, struct drm_master *master);
 	int dev_priv_size;
 };
 
