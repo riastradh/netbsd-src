@@ -105,6 +105,14 @@ fail0:	KASSERT(ret);
 	return ret;
 }
 
+static inline int
+firmware_request_nowarn(const struct firmware **fwp, const char *image_name,
+    struct device *dev)
+{
+
+	return request_firmware(fwp, image_name, dev);
+}
+
 static inline void
 request_firmware_work(struct work_struct *wk)
 {
