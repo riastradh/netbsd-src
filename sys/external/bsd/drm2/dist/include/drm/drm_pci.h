@@ -80,6 +80,7 @@ extern int drm_pci_attach(device_t, const struct pci_attach_args *,
     struct pci_dev *, struct drm_driver *, unsigned long,
     struct drm_device **);
 extern int drm_pci_detach(struct drm_device *, int);
+int drm_pci_set_busid(struct drm_device *, struct drm_master *);
 #endif
 
 #endif /* _DRM_PCI_H_ */
