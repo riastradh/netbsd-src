@@ -59,12 +59,14 @@ nv50_vmm_pgt_pte(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
 	}
 }
 
+#ifndef __NetBSD__
 static void
 nv50_vmm_pgt_sgl(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
 		 u32 ptei, u32 ptes, struct nvkm_vmm_map *map)
 {
 	VMM_MAP_ITER_SGL(vmm, pt, ptei, ptes, map, nv50_vmm_pgt_pte);
 }
+#endif
 
 static void
 nv50_vmm_pgt_dma(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
@@ -104,7 +106,9 @@ nv50_vmm_pgt = {
 	.unmap = nv50_vmm_pgt_unmap,
 	.mem = nv50_vmm_pgt_mem,
 	.dma = nv50_vmm_pgt_dma,
+#ifndef __NetBSD__
 	.sgl = nv50_vmm_pgt_sgl,
+#endif
 };
 
 static bool

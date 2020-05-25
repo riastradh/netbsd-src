@@ -21,6 +21,10 @@ struct nvkm_umem {
 		struct nvkm_vma *bar;
 		void *map;
 	};
+#ifdef __NetBSD__
+	bus_dma_tag_t dmat;
+	bus_size_t size;
+#endif
 };
 
 int nvkm_umem_new(const struct nvkm_oclass *, void *argv, u32 argc,

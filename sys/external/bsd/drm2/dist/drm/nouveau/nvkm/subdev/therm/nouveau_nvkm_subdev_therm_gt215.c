@@ -41,7 +41,7 @@ gt215_therm_fan_sense(struct nvkm_therm *therm)
 	return -ENODEV;
 }
 
-void
+static void
 gt215_therm_init(struct nvkm_therm *therm)
 {
 	struct nvkm_device *device = therm->subdev.device;

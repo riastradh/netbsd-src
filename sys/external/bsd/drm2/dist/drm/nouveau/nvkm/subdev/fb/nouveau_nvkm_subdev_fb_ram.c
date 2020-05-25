@@ -32,6 +32,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <core/memory.h>
 #include <subdev/mmu.h>
 
+#include <linux/nbsd-namespace.h>
+
 struct nvkm_vram {
 	struct nvkm_memory memory;
 	struct nvkm_ram *ram;

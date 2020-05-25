@@ -35,6 +35,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <nvfw/hs.h>
 #include <engine/nvdec.h>
 
+#include <linux/nbsd-namespace.h>
+
 int
 gp102_fb_vpr_scrub(struct nvkm_fb *fb)
 {

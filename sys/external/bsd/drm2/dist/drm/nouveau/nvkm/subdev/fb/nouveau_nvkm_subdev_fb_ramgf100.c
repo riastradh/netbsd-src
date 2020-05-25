@@ -524,9 +524,9 @@ gf100_ram_ctor(const struct nvkm_ram_func *func, struct nvkm_fb *fb,
 	ubase = lcomm + func->upper;
 	usize = total - lower;
 
-	nvkm_debug(subdev, "Lower: %4lld MiB @ %010llx\n", lower >> 20, 0ULL);
-	nvkm_debug(subdev, "Upper: %4lld MiB @ %010llx\n", usize >> 20, ubase);
-	nvkm_debug(subdev, "Total: %4lld MiB\n", total >> 20);
+	nvkm_debug(subdev, "Lower: %4"PRId64" MiB @ %010llx\n", lower >> 20, 0ULL);
+	nvkm_debug(subdev, "Upper: %4"PRId64" MiB @ %010"PRIx64"\n", usize >> 20, ubase);
+	nvkm_debug(subdev, "Total: %4"PRId64" MiB\n", total >> 20);
 
 	ret = nvkm_ram_ctor(func, fb, type, total, ram);
 	if (ret)

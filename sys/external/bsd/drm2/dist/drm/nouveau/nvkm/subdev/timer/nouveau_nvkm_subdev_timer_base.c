@@ -42,7 +42,7 @@ nvkm_timer_wait_test(struct nvkm_timer_wait *wait)
 
 	if (wait->time1 == time) {
 		if (wait->reads++ == 16) {
-			nvkm_fatal(subdev, "stalled at %016llx\n", time);
+			nvkm_fatal(subdev, "stalled at %016"PRIx64"\n", time);
 			return -ETIMEDOUT;
 		}
 	} else {

@@ -18,7 +18,11 @@ struct nvif_mem_ram_vn {
 struct nvif_mem_ram_v0 {
 	__u8  version;
 	__u8  pad01[7];
+#ifdef __NetBSD__
+	bus_dmamap_t dma;
+#else
 	dma_addr_t *dma;
 	struct scatterlist *sgl;
+#endif
 };
 #endif

@@ -53,13 +53,13 @@ loader_config_v1_dump(struct nvkm_subdev *subdev,
 	nvkm_debug(subdev, "loaderConfig\n");
 	nvkm_debug(subdev, "\treserved      : 0x%08x\n", hdr->reserved);
 	nvkm_debug(subdev, "\tdmaIdx        : %d\n", hdr->dma_idx);
-	nvkm_debug(subdev, "\tcodeDmaBase   : 0x%llxx\n", hdr->code_dma_base);
+	nvkm_debug(subdev, "\tcodeDmaBase   : 0x%"PRIx64"x\n", hdr->code_dma_base);
 	nvkm_debug(subdev, "\tcodeSizeTotal : 0x%x\n", hdr->code_size_total);
 	nvkm_debug(subdev, "\tcodeSizeToLoad: 0x%x\n", hdr->code_size_to_load);
 	nvkm_debug(subdev, "\tcodeEntryPoint: 0x%x\n", hdr->code_entry_point);
-	nvkm_debug(subdev, "\tdataDmaBase   : 0x%llx\n", hdr->data_dma_base);
+	nvkm_debug(subdev, "\tdataDmaBase   : 0x%"PRIx64"\n", hdr->data_dma_base);
 	nvkm_debug(subdev, "\tdataSize      : 0x%x\n", hdr->data_size);
-	nvkm_debug(subdev, "\toverlayDmaBase: 0x%llx\n", hdr->overlay_dma_base);
+	nvkm_debug(subdev, "\toverlayDmaBase: 0x%"PRIx64"\n", hdr->overlay_dma_base);
 	nvkm_debug(subdev, "\targc          : 0x%08x\n", hdr->argc);
 	nvkm_debug(subdev, "\targv          : 0x%08x\n", hdr->argv);
 }
@@ -100,13 +100,13 @@ flcn_bl_dmem_desc_v1_dump(struct nvkm_subdev *subdev,
 		   hdr->signature[0], hdr->signature[1], hdr->signature[2],
 		   hdr->signature[3]);
 	nvkm_debug(subdev, "\tctxDma        : %d\n", hdr->ctx_dma);
-	nvkm_debug(subdev, "\tcodeDmaBase   : 0x%llx\n", hdr->code_dma_base);
+	nvkm_debug(subdev, "\tcodeDmaBase   : 0x%"PRIx64"\n", hdr->code_dma_base);
 	nvkm_debug(subdev, "\tnonSecCodeOff : 0x%x\n", hdr->non_sec_code_off);
 	nvkm_debug(subdev, "\tnonSecCodeSize: 0x%x\n", hdr->non_sec_code_size);
 	nvkm_debug(subdev, "\tsecCodeOff    : 0x%x\n", hdr->sec_code_off);
 	nvkm_debug(subdev, "\tsecCodeSize   : 0x%x\n", hdr->sec_code_size);
 	nvkm_debug(subdev, "\tcodeEntryPoint: 0x%x\n", hdr->code_entry_point);
-	nvkm_debug(subdev, "\tdataDmaBase   : 0x%llx\n", hdr->data_dma_base);
+	nvkm_debug(subdev, "\tdataDmaBase   : 0x%"PRIx64"\n", hdr->data_dma_base);
 	nvkm_debug(subdev, "\tdataSize      : 0x%x\n", hdr->data_size);
 }
 
@@ -114,7 +114,7 @@ void
 flcn_bl_dmem_desc_v2_dump(struct nvkm_subdev *subdev,
 			  const struct flcn_bl_dmem_desc_v2 *hdr)
 {
-	flcn_bl_dmem_desc_v1_dump(subdev, (void *)hdr);
+	flcn_bl_dmem_desc_v1_dump(subdev, (const void *)hdr);
 	nvkm_debug(subdev, "\targc          : 0x%08x\n", hdr->argc);
 	nvkm_debug(subdev, "\targv          : 0x%08x\n", hdr->argv);
 }

@@ -62,14 +62,24 @@ static void
 nv40_instobj_wr32(struct nvkm_memory *memory, u64 offset, u32 data)
 {
 	struct nv40_instobj *iobj = nv40_instobj(memory);
+#ifdef __NetBSD__
+	bus_space_write_stream_4(iobj->imem->iomemt, iobj->imem->iomemh,
+	    iobj->node->offset + offset, data);
+#else
 	iowrite32_native(data, iobj->imem->iomem + iobj->node->offset + offset);
+#endif
 }
 
 static u32
 nv40_instobj_rd32(struct nvkm_memory *memory, u64 offset)
 {
 	struct nv40_instobj *iobj = nv40_instobj(memory);
+#ifdef __NetBSD__
+	return bus_space_read_stream_4(iobj->imem->iomemt, iobj->imem->iomemh,
+	    iobj->node->offset + offset);
+#else
 	return ioread32_native(iobj->imem->iomem + iobj->node->offset + offset);
+#endif
 }
 
 static const struct nvkm_memory_ptrs

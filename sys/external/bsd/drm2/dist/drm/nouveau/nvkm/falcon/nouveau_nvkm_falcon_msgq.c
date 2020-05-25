@@ -27,6 +27,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include "qmgr.h"
 
+#include <linux/nbsd-namespace.h>
+
 static void
 nvkm_falcon_msgq_open(struct nvkm_falcon_msgq *msgq)
 {

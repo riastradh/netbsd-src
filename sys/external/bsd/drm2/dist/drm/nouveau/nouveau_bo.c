@@ -1591,6 +1591,9 @@ nouveau_ttm_io_mem_reserve(struct ttm_bo_device *bdev, struct ttm_mem_reg *reg)
 
 			ret = nvif_object_map_handle(&mem->mem.object,
 						     &args, argc,
+#ifdef __NetBSD__
+						     NULL,
+#endif
 						     &handle, &length);
 			if (ret != 1)
 				return ret ? ret : -EINVAL;

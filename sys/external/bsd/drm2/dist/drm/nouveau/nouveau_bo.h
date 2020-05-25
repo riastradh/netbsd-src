@@ -9,6 +9,7 @@
 #include <ttm/ttm_bo_api.h>
 
 struct nouveau_channel;
+struct nouveau_cli;
 struct nouveau_drm;
 struct nouveau_fence;
 struct nvkm_vm;

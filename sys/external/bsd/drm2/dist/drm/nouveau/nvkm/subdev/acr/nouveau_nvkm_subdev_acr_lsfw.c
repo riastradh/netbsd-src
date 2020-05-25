@@ -30,6 +30,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <nvfw/fw.h>
 #include <nvfw/ls.h>
 
+#include <linux/nbsd-namespace.h>
+
 void
 nvkm_acr_lsfw_del(struct nvkm_acr_lsfw *lsfw)
 {

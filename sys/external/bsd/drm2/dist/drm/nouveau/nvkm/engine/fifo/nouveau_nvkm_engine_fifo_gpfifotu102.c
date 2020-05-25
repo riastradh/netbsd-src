@@ -65,9 +65,9 @@ tu102_fifo_gpfifo_new(struct gk104_fifo *fifo, const struct nvkm_oclass *oclass,
 
 	nvif_ioctl(parent, "create channel gpfifo size %d\n", size);
 	if (!(ret = nvif_unpack(ret, &data, &size, args->v0, 0, 0, false))) {
-		nvif_ioctl(parent, "create channel gpfifo vers %d vmm %llx "
-				   "ioffset %016llx ilength %08x "
-				   "runlist %016llx priv %d\n",
+		nvif_ioctl(parent, "create channel gpfifo vers %d vmm %"PRIx64" "
+				   "ioffset %016"PRIx64" ilength %08x "
+				   "runlist %016"PRIx64" priv %d\n",
 			   args->v0.version, args->v0.vmm, args->v0.ioffset,
 			   args->v0.ilength, args->v0.runlist, args->v0.priv);
 		if (args->v0.priv && !oclass->client->super)

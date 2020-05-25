@@ -37,6 +37,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <nvfw/acr.h>
 #include <nvfw/flcn.h>
 
+#include <linux/nbsd-namespace.h>
+
 int
 gm200_acr_init(struct nvkm_acr *acr)
 {

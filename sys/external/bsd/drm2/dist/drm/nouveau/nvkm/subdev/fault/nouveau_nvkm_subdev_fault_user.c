@@ -33,12 +33,21 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <nvif/unpack.h>
 
 static int
+#ifdef __NetBSD__
+nvkm_ufault_map(struct nvkm_object *object, void *argv, u32 argc,
+		enum nvkm_object_map *type,
+		bus_space_tag_t *tag, u64 *addr, u64 *size)
+#else
 nvkm_ufault_map(struct nvkm_object *object, void *argv, u32 argc,
 		enum nvkm_object_map *type, u64 *addr, u64 *size)
+#endif
 {
 	struct nvkm_fault_buffer *buffer = nvkm_fault_buffer(object);
 	struct nvkm_device *device = buffer->fault->subdev.device;
 	*type = NVKM_OBJECT_MAP_IO;
+#ifdef __NetBSD__
+	*tag = device->func->resource_tag(device, 3);
+#endif
 	*addr = device->func->resource_addr(device, 3) + buffer->addr;
 	*size = nvkm_memory_size(buffer->mem);
 	return 0;

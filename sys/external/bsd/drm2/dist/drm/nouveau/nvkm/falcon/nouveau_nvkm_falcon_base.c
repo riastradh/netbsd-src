@@ -29,6 +29,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <subdev/mc.h>
 #include <subdev/top.h>
 
+#include <linux/nbsd-namespace.h>
+
 void
 nvkm_falcon_load_imem(struct nvkm_falcon *falcon, void *data, u32 start,
 		      u32 size, u16 tag, u8 port, bool secure)

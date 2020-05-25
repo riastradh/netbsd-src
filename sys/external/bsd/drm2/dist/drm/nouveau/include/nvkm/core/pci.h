@@ -8,6 +8,10 @@
 struct nvkm_device_pci {
 	struct nvkm_device device;
 	struct pci_dev *pdev;
+#ifdef __NetBSD__
+	bus_dma_tag_t bus_dmat;
+	bus_dma_tag_t dmat;
+#endif
 	bool suspend;
 };
 

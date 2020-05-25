@@ -29,6 +29,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <nvif/class.h>
 
+#include <linux/nbsd-namespace.h>
+
 static void
 tu102_gr_init_fecs_exceptions(struct gf100_gr *gr)
 {

@@ -24,8 +24,13 @@ struct nvkm_mmu_func {
 		struct nvkm_sclass user;
 		int (*vram)(struct nvkm_mmu *, int type, u8 page, u64 size,
 			    void *argv, u32 argc, struct nvkm_memory **);
+#ifdef __NetBSD__
+		int (*umap)(struct nvkm_mmu *, struct nvkm_memory *, void *argv,
+			    u32 argc, bus_space_tag_t *, u64 *addr, u64 *size, struct nvkm_vma **);
+#else
 		int (*umap)(struct nvkm_mmu *, struct nvkm_memory *, void *argv,
 			    u32 argc, u64 *addr, u64 *size, struct nvkm_vma **);
+#endif
 	} mem;
 
 	struct {

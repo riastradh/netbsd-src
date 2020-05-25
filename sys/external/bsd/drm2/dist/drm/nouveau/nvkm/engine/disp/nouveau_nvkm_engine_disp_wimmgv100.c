@@ -65,7 +65,7 @@ gv100_disp_wimm_new_(const struct nv50_disp_chan_func *func,
 	nvif_ioctl(parent, "create window imm channel dma size %d\n", argc);
 	if (!(ret = nvif_unpack(ret, &argv, &argc, args->v0, 0, 0, false))) {
 		nvif_ioctl(parent, "create window imm channel dma vers %d "
-				   "pushbuf %016llx index %d\n",
+				   "pushbuf %016"PRIx64" index %d\n",
 			   args->v0.version, args->v0.pushbuf, args->v0.index);
 		if (!(disp->wndw.mask & BIT(args->v0.index)))
 			return -EINVAL;

@@ -44,12 +44,14 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_pci.c,v 1.26 2020/02/03 16:52:13 jmcneill Ex
 #include <sys/workqueue.h>
 #include <sys/module.h>
 
-#include <core/device.h>
-#include <core/pci.h>
-
 #ifdef FDT
 #include <dev/fdt/fdtvar.h>
 #endif
+
+#include <drm/drm_pci.h>
+
+#include <core/device.h>
+#include <core/pci.h>
 
 #include "nouveau_drv.h"
 #include "nouveau_pci.h"

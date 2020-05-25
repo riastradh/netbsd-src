@@ -93,7 +93,7 @@ nvkm_therm_sensor_event(struct nvkm_therm *therm, enum nvkm_therm_thrs thrs,
 	};
 	int temperature = therm->func->temp_get(therm);
 
-	if ((unsigned)thrs >= __arraycount(thresolds))
+	if ((unsigned)thrs >= __arraycount(thresholds))
 		return;
 
 	if (dir == NVKM_THERM_THRS_FALLING)

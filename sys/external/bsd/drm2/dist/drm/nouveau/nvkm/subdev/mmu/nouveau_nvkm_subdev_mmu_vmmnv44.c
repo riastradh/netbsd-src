@@ -74,7 +74,7 @@ nv44_vmm_pgt_fill(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
 	VMM_WO032(pt, vmm, pteo + 0xc, tmp[3] | 0x40000000);
 }
 
-static void
+static void __unused
 nv44_vmm_pgt_pte(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
 		 u32 ptei, u32 ptes, struct nvkm_vmm_map *map, u64 addr)
 {
@@ -106,12 +106,14 @@ nv44_vmm_pgt_pte(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
 	}
 }
 
+#ifndef __NetBSD__
 static void
 nv44_vmm_pgt_sgl(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
 		 u32 ptei, u32 ptes, struct nvkm_vmm_map *map)
 {
 	VMM_MAP_ITER_SGL(vmm, pt, ptei, ptes, map, nv44_vmm_pgt_pte);
 }
+#endif
 
 static void
 nv44_vmm_pgt_dma(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
@@ -177,7 +179,9 @@ static const struct nvkm_vmm_desc_func
 nv44_vmm_desc_pgt = {
 	.unmap = nv44_vmm_pgt_unmap,
 	.dma = nv44_vmm_pgt_dma,
+#ifndef __NetBSD__
 	.sgl = nv44_vmm_pgt_sgl,
+#endif
 };
 
 static const struct nvkm_vmm_desc

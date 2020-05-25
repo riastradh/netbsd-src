@@ -28,7 +28,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include "priv.h"
 
-void
+static void
 gp10b_mc_init(struct nvkm_mc *mc)
 {
 	struct nvkm_device *device = mc->subdev.device;

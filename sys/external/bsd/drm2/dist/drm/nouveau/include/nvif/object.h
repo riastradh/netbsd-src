@@ -47,6 +47,9 @@ u32  nvif_object_rd(struct nvif_object *, int, u64);
 void nvif_object_wr(struct nvif_object *, int, u64, u32);
 int  nvif_object_mthd(struct nvif_object *, u32, void *, u32);
 int  nvif_object_map_handle(struct nvif_object *, void *, u32,
+#ifdef __NetBSD__
+			    bus_space_tag_t *,
+#endif
 			    u64 *handle, u64 *length);
 void nvif_object_unmap_handle(struct nvif_object *);
 int  nvif_object_map(struct nvif_object *, void *, u32);

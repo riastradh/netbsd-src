@@ -43,7 +43,9 @@ gm200_vmm_spt = {
 	.sparse = gm200_vmm_pgt_sparse,
 	.mem = gf100_vmm_pgt_mem,
 	.dma = gf100_vmm_pgt_dma,
+#ifndef __NetBSD__
 	.sgl = gf100_vmm_pgt_sgl,
+#endif
 };
 
 static const struct nvkm_vmm_desc_func
