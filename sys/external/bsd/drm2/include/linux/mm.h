@@ -107,6 +107,16 @@ kvzalloc(size_t size, gfp_t gfp)
 }
 
 static inline void *
+kvcalloc(size_t nelem, size_t elemsize, gfp_t gfp)
+{
+
+	KASSERT(elemsize > 0);
+	if (SIZE_MAX/elemsize < nelem)
+		return NULL;
+	return kvzalloc(nelem * elemsize, gfp);
+}
+
+static inline void *
 kvmalloc_array(size_t nelem, size_t elemsize, gfp_t gfp)
 {
 
