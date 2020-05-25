@@ -59,6 +59,7 @@
 	else								      \
 		aprint_error("warn: " FMT, ##__VA_ARGS__);		      \
 } while (0)
+#define	dev_WARN	dev_warn
 
 #define	dev_notice(DEV, FMT, ...)	do {				      \
 	if (DEV)							      \
