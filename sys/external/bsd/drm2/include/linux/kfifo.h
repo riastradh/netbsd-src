@@ -52,7 +52,14 @@ struct kfifo_meta {
 		TYPE			*kf_buf;			      \
 	}
 
+#define	_KFIFO_TYPE(TAG, TYPE, N)					      \
+	struct TAG {							      \
+		struct kfifo_meta	kf_meta;			      \
+		TYPE			kf_buf[N];			      \
+	}
+
 #define	DECLARE_KFIFO_PTR(FIFO, TYPE)	_KFIFO_PTR_TYPE(, TYPE) FIFO
+#define	DECLARE_KFIFO(FIFO, TYPE, N)	_KFIFO_TYPE(, TYPE, N) FIFO
 
 _KFIFO_PTR_TYPE(kfifo, void);
 
