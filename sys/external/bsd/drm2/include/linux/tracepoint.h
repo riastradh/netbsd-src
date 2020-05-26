@@ -36,4 +36,10 @@
 
 #define	TP_PROTO(ARGS...)	(ARGS)
 
+#define	DECLARE_EVENT_CLASS(NAME, PROTOTYPE, ARGS, FIELDS, TRACE, PRINT)      \
+	/* nothing */
+
+#define	DEFINE_EVENT(CLASS, NAME, PROTOTYPE, ARGS)			      \
+	static inline void trace_##NAME PROTOTYPE {}
+
 #endif	/* _LINUX_TRACEPOINT_H_ */
