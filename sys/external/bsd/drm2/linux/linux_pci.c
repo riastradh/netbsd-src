@@ -30,6 +30,7 @@
  */
 
 #ifdef _KERNEL_OPT
+#include "acpica.h"
 #include "opt_pci.h"
 #endif
 
