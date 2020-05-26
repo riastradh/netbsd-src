@@ -165,6 +165,21 @@ bitmap_clear(unsigned long *bitmap, size_t startbit, size_t nbits)
 }
 
 /*
+ * bitmap_complement(dst, src, nbits)
+ *
+ *	Set dst to the the bitwise NOT of src.  dst and src may alias.
+ */
+static inline void
+bitmap_complement(unsigned long *dst, const unsigned long *src, size_t nbits)
+{
+	const size_t bpl = NBBY * sizeof(unsigned long);
+	size_t n = howmany(nbits, bpl);
+
+	while (n --> 0)
+		*dst++ = ~*src++;
+}
+
+/*
  * bitmap_and(dst, src1, src2, nbits)
  *
  *	Set dst to be the bitwise AND of src1 and src2, all bitmaps
