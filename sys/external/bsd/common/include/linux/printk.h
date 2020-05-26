@@ -43,6 +43,7 @@
 #define	pr_cont		printf	/* XXX */
 #define	pr_info		printf	/* XXX */
 #define	pr_info_once	printf	/* XXX */
+#define	pr_info_ratelimited	printf	/* XXX */
 #define	pr_warn		printf	/* XXX */
 #define	pr_warn_once	printf	/* XXX */
 #define	pr_notice	printf	/* XXX */
