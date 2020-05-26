@@ -54,13 +54,6 @@
 #include <dev/pci/pcivar.h>
 #include <dev/pci/agpvar.h>
 
-#if NACPICA > 0
-#include <dev/acpi/acpivar.h>
-#include <dev/acpi/acpi_pci.h>
-#else
-struct acpi_devnode;
-#endif
-
 #include <linux/device.h>
 #include <linux/dma-mapping.h>
 #include <linux/errno.h>
@@ -69,6 +62,7 @@ struct acpi_devnode;
 #include <linux/ioport.h>
 #include <linux/kernel.h>
 
+struct acpi_devnode;
 struct pci_driver;
 
 struct pci_bus {
