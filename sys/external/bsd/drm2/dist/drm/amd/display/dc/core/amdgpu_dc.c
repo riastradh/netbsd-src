@@ -2113,8 +2113,10 @@ static void commit_planes_do_stream_update(struct dc *dc,
 				if (*stream_update->dpms_off) {
 					core_link_disable_stream(pipe_ctx);
 					/* for dpms, keep acquired resources*/
+#ifndef __NetBSD__			/* XXX amdgpu audio */
 					if (pipe_ctx->stream_res.audio && !dc->debug.az_endpoint_mute_only)
 						pipe_ctx->stream_res.audio->funcs->az_disable(pipe_ctx->stream_res.audio);
+#endif
 
 					dc->hwss.optimize_bandwidth(dc, dc->current_state);
 				} else {

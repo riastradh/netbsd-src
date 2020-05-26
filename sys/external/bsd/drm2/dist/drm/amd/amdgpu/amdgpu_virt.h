@@ -278,7 +278,11 @@ struct amdgpu_virt {
 static inline bool is_virtual_machine(void)
 {
 #ifdef CONFIG_X86
+#ifdef __NetBSD__
+	return false;		/* XXX */
+#else
 	return boot_cpu_has(X86_FEATURE_HYPERVISOR);
+#endif
 #else
 	return false;
 #endif

@@ -188,6 +188,7 @@ static int ci_program_jump_on_start(struct pp_hwmgr *hwmgr)
 	return 0;
 }
 
+static
 bool ci_is_smc_ram_running(struct pp_hwmgr *hwmgr)
 {
 	return ((0 == PHM_READ_VFPF_INDIRECT_FIELD(hwmgr->device,
@@ -2133,7 +2134,7 @@ static int ci_thermal_setup_fan_table(struct pp_hwmgr *hwmgr)
 	uint32_t t_diff1, t_diff2, pwm_diff1, pwm_diff2;
 	uint16_t fdo_min, slope1, slope2;
 	uint32_t reference_clock;
-	int res;
+	int res __unused;
 	uint64_t tmp64;
 
 	if (!phm_cap_enabled(hwmgr->platform_descriptor.platformCaps, PHM_PlatformCaps_MicrocodeFanControl))

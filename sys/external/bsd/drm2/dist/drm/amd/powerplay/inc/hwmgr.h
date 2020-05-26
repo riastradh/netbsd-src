@@ -200,7 +200,7 @@ enum SMU_ASIC_RESET_MODE
 };
 
 struct pp_smumgr_func {
-	char *name;
+	const char *name;
 	int (*smu_init)(struct pp_hwmgr  *hwmgr);
 	int (*smu_fini)(struct pp_hwmgr  *hwmgr);
 	int (*start_smu)(struct pp_hwmgr  *hwmgr);

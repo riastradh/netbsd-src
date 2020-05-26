@@ -33,7 +33,9 @@ struct amdgpu_hive_info {
 	int number_devices;
 	struct mutex hive_lock, reset_lock;
 	struct kobject *kobj;
+#ifdef CONFIG_SYSFS
 	struct device_attribute dev_attr;
+#endif
 	struct amdgpu_device *adev;
 	int pstate; /*0 -- low , 1 -- high , -1 unknown*/
 	struct task_barrier tb;

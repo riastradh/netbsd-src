@@ -76,8 +76,8 @@ void pre_surface_trace(
 				"plane_state->visible = %d;\n"
 				"plane_state->flip_immediate = %d;\n"
 				"plane_state->address.type = %d;\n"
-				"plane_state->address.grph.addr.quad_part = 0x%llX;\n"
-				"plane_state->address.grph.meta_addr.quad_part = 0x%llX;\n"
+				"plane_state->address.grph.addr.quad_part = 0x%"PRIX64";\n"
+				"plane_state->address.grph.meta_addr.quad_part = 0x%"PRIX64";\n"
 				"plane_state->scaling_quality.h_taps = %d;\n"
 				"plane_state->scaling_quality.v_taps = %d;\n"
 				"plane_state->scaling_quality.h_taps_c = %d;\n"
@@ -193,8 +193,8 @@ void update_surface_trace(
 		SURFACE_TRACE("Update %d\n", i);
 		if (update->flip_addr) {
 			SURFACE_TRACE("flip_addr->address.type = %d;\n"
-					"flip_addr->address.grph.addr.quad_part = 0x%llX;\n"
-					"flip_addr->address.grph.meta_addr.quad_part = 0x%llX;\n"
+					"flip_addr->address.grph.addr.quad_part = 0x%"PRIX64";\n"
+					"flip_addr->address.grph.meta_addr.quad_part = 0x%"PRIX64";\n"
 					"flip_addr->flip_immediate = %d;\n",
 					update->flip_addr->address.type,
 					update->flip_addr->address.grph.addr.quad_part,
