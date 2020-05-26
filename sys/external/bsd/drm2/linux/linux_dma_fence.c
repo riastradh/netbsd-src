@@ -589,6 +589,8 @@ struct wait_any {
 		kmutex_t	lock;
 		kcondvar_t	cv;
 		bool		done;
+		uint32_t	*ip;
+		struct wait_any	*cb;
 	}		*common;
 };
 
@@ -601,19 +603,22 @@ wait_any_cb(struct dma_fence *fence, struct dma_fence_cb *fcb)
 
 	mutex_enter(&cb->common->lock);
 	cb->common->done = true;
+	if (cb->common->ip)
+		*cb->common->ip = cb - cb->common->cb;
 	cv_broadcast(&cb->common->cv);
 	mutex_exit(&cb->common->lock);
 }
 
 /*
- * dma_fence_wait_any_timeout(fence, nfences, intr, timeout)
+ * dma_fence_wait_any_timeout(fence, nfences, intr, timeout, ip)
  *
  *	Wait for any of fences[0], fences[1], fences[2], ...,
- *	fences[nfences-1] to be signaled.
+ *	fences[nfences-1] to be signaled.  If ip is nonnull, set *ip to
+ *	the index of the first one.
  */
 long
 dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t nfences,
-    bool intr, long timeout)
+    bool intr, long timeout, uint32_t *ip)
 {
 	struct wait_any1 common;
 	struct wait_any *cb;
@@ -632,6 +637,8 @@ dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t nfences,
 	mutex_init(&common.lock, MUTEX_DEFAULT, IPL_VM);
 	cv_init(&common.cv, "fence");
 	common.done = false;
+	common.ip = ip;
+	common.cb = cb;
 
 	/* Add a callback to each of the fences, or stop here if we can't.  */
 	for (i = 0; i < nfences; i++) {
@@ -649,8 +656,12 @@ dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t nfences,
 	 * notified by one of the callbacks when they have.
 	 */
 	for (j = 0; j < nfences; j++) {
-		if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fences[j]->flags))
+		if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fences[j]->flags)) {
+			if (ip)
+				*ip = j;
+			ret = 0;
 			goto out1;
+		}
 	}
 
 	/*

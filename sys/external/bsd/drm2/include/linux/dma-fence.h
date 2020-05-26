@@ -139,7 +139,8 @@ int	dma_fence_signal(struct dma_fence *);
 int	dma_fence_signal_locked(struct dma_fence *);
 long	dma_fence_default_wait(struct dma_fence *, bool, long);
 long	dma_fence_wait(struct dma_fence *, bool);
-long	dma_fence_wait_any_timeout(struct dma_fence **, uint32_t, bool, long);
+long	dma_fence_wait_any_timeout(struct dma_fence **, uint32_t, bool, long,
+	    uint32_t *);
 long	dma_fence_wait_timeout(struct dma_fence *, bool, long);
 
 static inline void __printflike(2, 3)
