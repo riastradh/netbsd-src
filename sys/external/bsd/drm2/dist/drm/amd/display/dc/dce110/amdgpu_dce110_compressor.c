@@ -417,6 +417,7 @@ void dce110_compressor_destroy(struct compressor **compressor)
 	*compressor = NULL;
 }
 
+static __unused
 bool dce110_get_required_compressed_surfacesize(struct fbc_input_info fbc_input_info,
 						struct fbc_requested_compressed_size size)
 {
@@ -461,6 +462,7 @@ void get_max_support_fbc_buffersize(unsigned int *max_x, unsigned int *max_y)
 }
 
 
+static __unused
 unsigned int controller_id_to_index(enum controller_id controller_id)
 {
 	unsigned int index = 0;

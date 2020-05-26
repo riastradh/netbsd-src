@@ -75,6 +75,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "amdgpu_amdkfd.h"
 #include "dce_virtual.h"
 
+#include <linux/nbsd-namespace.h>
+
 /*
  * Indirect registers accessor
  */

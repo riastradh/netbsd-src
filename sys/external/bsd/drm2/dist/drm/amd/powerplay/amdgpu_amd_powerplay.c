@@ -37,6 +37,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "amdgpu.h"
 #include "hwmgr.h"
 
+#include <linux/nbsd-namespace.h>
 
 static const struct amd_pm_funcs pp_dpm_funcs;
 
@@ -655,7 +656,7 @@ static int pp_dpm_get_pp_table(void *handle, char **table)
 		return -EINVAL;
 
 	mutex_lock(&hwmgr->smu_lock);
-	*table = (char *)hwmgr->soft_pp_table;
+	*table = __UNCONST(hwmgr->soft_pp_table);
 	size = hwmgr->soft_pp_table_size;
 	mutex_unlock(&hwmgr->smu_lock);
 	return size;
