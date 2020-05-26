@@ -37,6 +37,7 @@
 
 #define	IORESOURCE_IO	0
 #define	IORESOURCE_MEM	1
+#define	IORESOURCE_IRQ	2
 
 struct resource {
 	bus_addr_t start;

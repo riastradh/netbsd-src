@@ -61,6 +61,7 @@ struct i2c_msg;
  * I2C_CLASS_*: i2c_adapter classes
  */
 #define	I2C_CLASS_DDC	0x01
+#define	I2C_CLASS_SPD	0x02
 
 /*
  * I2C_FUNC_*: i2c_adapter functionality bits
