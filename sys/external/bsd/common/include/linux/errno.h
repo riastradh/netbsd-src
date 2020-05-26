@@ -50,5 +50,6 @@
 #define	ENOTSUPP	ENOTSUP	/* XXX ???  */
 #define	EREMOTEIO	EIO	/* XXX Urk...  */
 #define	ECHRNG		ERANGE	/* XXX ??? */
+#define	EHWPOISON	EIO
 
 #endif  /* _LINUX_ERRNO_H_ */
