@@ -34,6 +34,8 @@
 
 #include <sys/atomic.h>
 
+#include <linux/compiler.h>
+
 #ifdef _KERNEL_OPT
 #include "opt_multiprocessor.h"
 #else
