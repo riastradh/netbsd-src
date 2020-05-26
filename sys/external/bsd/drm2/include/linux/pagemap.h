@@ -34,6 +34,8 @@
 
 #include <sys/types.h>
 
+#include <linux/uaccess.h>
+
 static inline int
 fault_in_multipages_readable(const char *uaddr __unused, size_t len __unused)
 {
