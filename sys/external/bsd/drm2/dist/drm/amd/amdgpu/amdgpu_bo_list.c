@@ -113,12 +113,18 @@ int amdgpu_bo_list_create(struct amdgpu_device *adev, struct drm_file *filp,
 
 		usermm = amdgpu_ttm_tt_get_usermm(bo->tbo.ttm);
 		if (usermm) {
+#ifdef __NetBSD__		/* XXX amdgpu userptr */
+			amdgpu_bo_unref(&bo);
+			r = -EPERM;
+			goto error_free;
+#else
 			if (usermm != current->mm) {
 				amdgpu_bo_unref(&bo);
 				r = -EPERM;
 				goto error_free;
 			}
 			entry = &array[--first_userptr];
+#endif
 		} else {
 			entry = &array[last_entry++];
 		}

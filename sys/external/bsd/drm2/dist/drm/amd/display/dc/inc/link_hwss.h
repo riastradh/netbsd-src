@@ -73,7 +73,7 @@ void dp_set_hw_lane_settings(
 void dp_set_hw_test_pattern(
 	struct dc_link *link,
 	enum dp_test_pattern test_pattern,
-	uint8_t *custom_pattern,
+	const uint8_t *custom_pattern,
 	uint32_t custom_pattern_size);
 
 void dp_retrain_link_dp_test(struct dc_link *link,

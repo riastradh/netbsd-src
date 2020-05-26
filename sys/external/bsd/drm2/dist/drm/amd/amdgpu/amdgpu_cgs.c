@@ -36,6 +36,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "atom.h"
 #include "amdgpu_ucode.h"
 
+#include <linux/nbsd-namespace.h>
+
 struct amdgpu_cgs_device {
 	struct cgs_device base;
 	struct amdgpu_device *adev;

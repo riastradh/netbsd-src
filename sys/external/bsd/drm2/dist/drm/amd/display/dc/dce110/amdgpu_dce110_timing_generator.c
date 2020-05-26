@@ -1356,7 +1356,7 @@ void dce110_timing_generator_tear_down_global_swap_lock(
 
 	/* Restore DCP_GSL_PURPOSE_SURFACE_FLIP */
 	{
-		uint32_t value_crtc_vtotal;
+		uint32_t value_crtc_vtotal __unused;
 
 		value_crtc_vtotal = dm_read_reg(tg->ctx,
 				CRTC_REG(mmCRTC_V_TOTAL));

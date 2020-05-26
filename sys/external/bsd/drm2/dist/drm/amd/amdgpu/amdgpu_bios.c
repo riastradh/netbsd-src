@@ -37,6 +37,9 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/pci.h>
 #include <linux/slab.h>
 #include <linux/acpi.h>
+
+#include <linux/nbsd-namespace.h>
+
 /*
  * BIOS.
  */

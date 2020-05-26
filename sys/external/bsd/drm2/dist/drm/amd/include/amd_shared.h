@@ -158,7 +158,7 @@ enum amd_dpm_forced_level;
  */
 struct amd_ip_funcs {
 	/** @name: Name of IP block */
-	char *name;
+	const char *name;
 	/**
 	 * @early_init:
 	 *

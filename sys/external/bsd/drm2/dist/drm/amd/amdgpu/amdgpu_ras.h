@@ -320,8 +320,10 @@ struct amdgpu_ras {
 	/* debugfs */
 	struct dentry *dir;
 	/* sysfs */
+#ifdef CONFIG_SYSFS
 	struct device_attribute features_attr;
 	struct bin_attribute badpages_attr;
+#endif
 	/* block array */
 	struct ras_manager *objs;
 
@@ -393,8 +395,10 @@ struct ras_manager {
 	/* debugfs */
 	struct dentry *ent;
 	/* sysfs */
+#ifdef CONFIG_SYSFS
 	struct device_attribute sysfs_attr;
 	int attr_inuse;
+#endif
 
 	/* fs node name */
 	struct ras_fs_data fs_data;
