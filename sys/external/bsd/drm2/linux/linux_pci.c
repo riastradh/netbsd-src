@@ -36,6 +36,11 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: linux_pci.c,v 1.10 2020/02/12 18:35:01 jdolecek Exp $");
 
+#if NACPICA > 0
+#include <dev/acpi/acpivar.h>
+#include <dev/acpi/acpi_pci.h>
+#endif
+
 #include <linux/pci.h>
 
 #include <drm/drm_agp_netbsd.h>
