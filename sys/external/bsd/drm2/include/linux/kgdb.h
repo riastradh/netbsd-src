@@ -32,6 +32,8 @@
 #ifndef _LINUX_KGDB_H_
 #define _LINUX_KGDB_H_
 
+#include <sys/types.h>
+
 #ifdef _KERNEL_OPT		/* XXX */
 #include "opt_ddb.h"
 #else
