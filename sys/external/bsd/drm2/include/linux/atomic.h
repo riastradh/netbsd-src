@@ -421,6 +421,18 @@ atomic_long_inc_not_zero(struct atomic_long *a)
 }
 
 static inline long
+atomic_long_xchg(struct atomic_long *a, long new)
+{
+	long old;
+
+	smp_mb__before_atomic();
+	old = (long)atomic_swap_ulong(&a->al_v, (unsigned long)new);
+	smp_mb__after_atomic();
+
+	return old;
+}
+
+static inline long
 atomic_long_cmpxchg(struct atomic_long *a, long expect, long new)
 {
 	long old;
