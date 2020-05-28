@@ -29,6 +29,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * XXX WARNING: This does not actually implement interval trees -- it
+ * only implements trees of intervals.  In particular, it does not
+ * support finding all intervals that contain a given point, or that
+ * intersect with a given interval.  Another way to look at it is that
+ * this is an interval tree restricted to nonoverlapping intervals.
+ */
+
 #ifndef	_LINUX_INTERVAL_TREE_H_
 #define	_LINUX_INTERVAL_TREE_H_
 
