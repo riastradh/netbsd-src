@@ -30,6 +30,13 @@
 #ifndef _UVM_UVM_DEVICE_H_
 #define _UVM_UVM_DEVICE_H_
 
+#include <sys/types.h>
+#include <sys/queue.h>
+
+#include <uvm/uvm_object.h>
+#include <uvm/uvm_param.h>
+#include <uvm/uvm_prot.h>
+
 /*
  * uvm_device.h
  *
