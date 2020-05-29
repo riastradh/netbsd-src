@@ -31,11 +31,11 @@ __KERNEL_RCSID(0, "$NetBSD: anx_dp.c,v 1.2 2020/01/04 12:08:32 jmcneill Exp $");
 
 #include <sys/param.h>
 #include <sys/bus.h>
+#include <sys/conf.h>
 #include <sys/device.h>
 #include <sys/intr.h>
-#include <sys/systm.h>
 #include <sys/kernel.h>
-#include <sys/conf.h>
+#include <sys/systm.h>
 
 #include <dev/ic/anx_dp.h>
 
@@ -43,10 +43,10 @@ __KERNEL_RCSID(0, "$NetBSD: anx_dp.c,v 1.2 2020/01/04 12:08:32 jmcneill Exp $");
 #include <dev/audio/audio_dai.h>
 #endif
 
-#include <drm/drm_drv.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_dp_helper.h>
+#include <drm/drm_drv.h>
 #include <drm/drm_edid.h>
 
 #define	ANXDP_DP_TX_VERSION	0x010

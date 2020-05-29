@@ -31,27 +31,27 @@ __KERNEL_RCSID(0, "$NetBSD: rk_drm.c,v 1.7 2021/08/07 16:18:45 thorpej Exp $");
 
 #include <sys/param.h>
 #include <sys/bus.h>
+#include <sys/conf.h>
 #include <sys/device.h>
 #include <sys/intr.h>
-#include <sys/systm.h>
 #include <sys/kernel.h>
-#include <sys/conf.h>
+#include <sys/systm.h>
 
+#include <uvm/uvm_device.h>
 #include <uvm/uvm_extern.h>
 #include <uvm/uvm_object.h>
-#include <uvm/uvm_device.h>
+
+#include <dev/fdt/fdt_port.h>
+#include <dev/fdt/fdtvar.h>
+
+#include <arm/rockchip/rk_drm.h>
 
 #include <drm/drm_auth.h>
-#include <drm/drm_drv.h>
 #include <drm/drm_crtc_helper.h>
+#include <drm/drm_drv.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_vblank.h>
-
-#include <dev/fdt/fdtvar.h>
-#include <dev/fdt/fdt_port.h>
-
-#include <arm/rockchip/rk_drm.h>
 
 #define	RK_DRM_MAX_WIDTH	3840
 #define	RK_DRM_MAX_HEIGHT	2160

@@ -37,10 +37,10 @@ __KERNEL_RCSID(0, "$NetBSD: sunxi_fb.c,v 1.3 2019/01/30 10:55:44 jmcneill Exp $"
 
 #include <dev/fdt/fdtvar.h>
 
+#include <arm/sunxi/sunxi_drm.h>
+
 #include <drm/drm_drv.h>
 #include <drm/drmfb.h>
-
-#include <arm/sunxi/sunxi_drm.h>
 
 static int	sunxi_fb_match(device_t, cfdata_t, void *);
 static void	sunxi_fb_attach(device_t, device_t, void *);

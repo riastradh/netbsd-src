@@ -31,20 +31,20 @@ __KERNEL_RCSID(0, "$NetBSD: sunxi_lcdc.c,v 1.12 2021/01/27 03:10:20 thorpej Exp 
 
 #include <sys/param.h>
 #include <sys/bus.h>
+#include <sys/conf.h>
 #include <sys/device.h>
 #include <sys/intr.h>
-#include <sys/systm.h>
 #include <sys/kernel.h>
-#include <sys/conf.h>
+#include <sys/systm.h>
 
-#include <drm/drm_drv.h>
-#include <drm/drm_crtc_helper.h>
-#include <drm/drm_vblank.h>
-
-#include <dev/fdt/fdtvar.h>
 #include <dev/fdt/fdt_port.h>
+#include <dev/fdt/fdtvar.h>
 
 #include <arm/sunxi/sunxi_drm.h>
+
+#include <drm/drm_crtc_helper.h>
+#include <drm/drm_drv.h>
+#include <drm/drm_vblank.h>
 
 #define	TCON_GCTL_REG		0x000
 #define	 TCON_GCTL_TCON_EN			__BIT(31)

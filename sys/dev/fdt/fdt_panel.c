@@ -32,17 +32,17 @@ __KERNEL_RCSID(0, "$NetBSD: fdt_panel.c,v 1.3 2021/01/27 03:10:21 thorpej Exp $"
 #include <sys/param.h>
 #include <sys/bus.h>
 #include <sys/device.h>
-#include <sys/systm.h>
 #include <sys/gpio.h>
+#include <sys/systm.h>
 
-#include <dev/fdt/fdtvar.h>
 #include <dev/fdt/fdt_port.h>
+#include <dev/fdt/fdtvar.h>
 
 #include <dev/i2c/ddcvar.h>
 
 #include <drm/drm_drv.h>
-#include <drm/drm_panel.h>
 #include <drm/drm_edid.h>
+#include <drm/drm_panel.h>
 
 static const struct device_compatible_entry compat_data[] = {
 	{ .compat = "simple-panel" },
