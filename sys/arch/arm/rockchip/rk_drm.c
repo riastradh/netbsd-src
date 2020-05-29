@@ -146,7 +146,7 @@ rk_drm_attach(device_t parent, device_t self, void *aux)
 	aprint_normal("\n");
 
 	sc->sc_ddev = drm_dev_alloc(driver, sc->sc_dev);
-	if (sc->sc_ddev == NULL) {
+	if (IS_ERR(sc->sc_ddev)) {
 		aprint_error_dev(self, "couldn't allocate DRM device\n");
 		return;
 	}
