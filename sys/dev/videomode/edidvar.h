@@ -34,6 +34,8 @@
 #ifndef _DEV_VIDEOMODE_EDIDVAR_H
 #define _DEV_VIDEOMODE_EDIDVAR_H
 
+#include <dev/videomode/videomode.h>
+
 struct edid_chroma {
 	uint16_t	ec_redx;
 	uint16_t	ec_redy;
