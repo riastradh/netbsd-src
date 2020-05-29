@@ -37,7 +37,7 @@ __KERNEL_RCSID(0, "$NetBSD: sunxi_fb.c,v 1.3 2019/01/30 10:55:44 jmcneill Exp $"
 
 #include <dev/fdt/fdtvar.h>
 
-#include <drm/drmP.h>
+#include <drm/drm_drv.h>
 #include <drm/drmfb.h>
 
 #include <arm/sunxi/sunxi_drm.h>
