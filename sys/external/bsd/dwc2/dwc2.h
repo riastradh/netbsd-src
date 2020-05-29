@@ -41,6 +41,7 @@
 
 #include <linux/list.h>
 #include <linux/workqueue.h>
+#include <linux/bug.h>
 
 #include "opt_usb.h"
 // #define VERBOSE_DEBUG
@@ -70,7 +71,6 @@ typedef int irqreturn_t;
 
 #ifdef DWC2_DEBUG
 extern int dwc2debug;
-#define WARN_ON(x)	KASSERT(!(x))
 
 #define	dev_info(d,fmt,...) do {			\
 	printf("%s: " fmt, device_xname(d), 		\
@@ -97,7 +97,6 @@ extern int dwc2debug;
 	}						\
 } while (0)
 #else
-#define WARN_ON(x)
 #define	dev_info(...) do { } while (0)
 #define	dev_warn(...) do { } while (0)
 #define	dev_err(...) do { } while (0)

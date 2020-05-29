@@ -29,7 +29,7 @@
 #ifndef _ARM_SUNXI_HDMIPHY_H
 #define _ARM_SUNXI_HDMIPHY_H
 
-#include <drm/drmP.h>
+#include <drm/drm_drv.h>
 #include <drm/drm_modes.h>
 
 void	sunxi_hdmiphy_init(struct fdtbus_phy *);

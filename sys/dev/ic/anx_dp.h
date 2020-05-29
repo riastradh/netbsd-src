@@ -33,9 +33,12 @@
 #include <dev/audio/audio_dai.h>
 #endif
 
-#include <drm/drmP.h>
+#include <drm/drm_drv.h>
+#include <drm/drm_bridge.h>
+#include <drm/drm_connector.h>
 #include <drm/drm_dp_helper.h>
 #include <drm/drm_panel.h>
+#include <drm/drm_probe_helper.h>
 
 struct anxdp_softc;
 

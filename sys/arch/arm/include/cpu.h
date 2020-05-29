@@ -67,6 +67,8 @@ void cpu_set_hatched(int);
 
 #endif
 
+struct proc;
+
 void	cpu_proc_fork(struct proc *, struct proc *);
 
 #endif	/* !_LOCORE */
