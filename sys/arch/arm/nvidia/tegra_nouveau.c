@@ -221,7 +221,7 @@ tegra_nouveau_init(device_t self)
 	}
 
 	dev = drm_dev_alloc(driver, sc->sc_dev);
-	if (dev == NULL) {
+	if (IS_ERR(dev)) {
 		aprint_error_dev(self, "couldn't allocate DRM device\n");
 		return;
 	}

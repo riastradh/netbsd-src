@@ -38,6 +38,7 @@ __KERNEL_RCSID(0, "$NetBSD: drm_pci.c,v 1.33 2020/02/14 04:29:19 riastradh Exp $
 
 #include <dev/pci/pcivar.h>
 
+#include <linux/err.h>
 #include <drm/drm_agpsupport.h>
 #include <drm/drm_device.h>
 #include <drm/drm_drv.h>
@@ -74,7 +75,7 @@ drm_pci_attach(device_t self, const struct pci_attach_args *pa,
 
 	/* Create a DRM device.  */
 	dev = drm_dev_alloc(driver, self);
-	if (dev == NULL) {
+	if (IS_ERR(dev)) {
 		ret = -ENOMEM;
 		goto fail0;
 	}
