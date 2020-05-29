@@ -420,7 +420,7 @@ tilcdc_attach(device_t parent, device_t self, void *aux)
 	fdt_ports_register(&sc->sc_ports, self, phandle, EP_DRM_ENCODER);
 
 	sc->sc_ddev = drm_dev_alloc(driver, sc->sc_dev);
-	if (sc->sc_ddev == NULL) {
+	if (IS_ERR(sc->sc_ddev)) {
 		aprint_error_dev(self, "couldn't allocate DRM device\n");
 		return;
 	}
