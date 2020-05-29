@@ -31,7 +31,7 @@ __KERNEL_RCSID(0, "$NetBSD: dw_hdmi_phy.c,v 1.2 2019/11/10 10:36:01 jmcneill Exp
 
 #include <sys/param.h>
 
-#include <drm/drmP.h>
+#include <drm/drm_drv.h>
 
 #include <dev/ic/dw_hdmi.h>
 
@@ -267,7 +267,7 @@ dwhdmi_phy_test_clear(struct dwhdmi_softc *sc, unsigned char bit)
 }
 
 static int
-dwhdmi_phy_configure(struct dwhdmi_softc *sc, struct drm_display_mode *mode)
+dwhdmi_phy_configure(struct dwhdmi_softc *sc, const struct drm_display_mode *mode)
 {
 	const struct dwhdmi_mpll_config *mpll_conf;
 	const struct dwhdmi_phy_config *phy_conf;
@@ -355,7 +355,7 @@ dwhdmi_phy_configure(struct dwhdmi_softc *sc, struct drm_display_mode *mode)
 }
 
 static void
-dwhdmi_phy_init(struct dwhdmi_softc *sc, struct drm_display_mode *mode)
+dwhdmi_phy_init(struct dwhdmi_softc *sc, const struct drm_display_mode *mode)
 {
 	int i;
 
@@ -395,7 +395,8 @@ dwhdmi_phy_disable(struct dwhdmi_softc *sc)
 
 void
 dwhdmi_phy_mode_set(struct dwhdmi_softc *sc,
-    struct drm_display_mode *mode, struct drm_display_mode *adjusted_mode)
+    const struct drm_display_mode *mode,
+    const struct drm_display_mode *adjusted_mode)
 {
 	dwhdmi_phy_init(sc, adjusted_mode);
 }

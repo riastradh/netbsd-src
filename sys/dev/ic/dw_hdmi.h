@@ -34,7 +34,10 @@
 
 #include <dev/audio/audio_dai.h>
 
-#include <drm/drmP.h>
+#include <drm/drm_drv.h>
+#include <drm/drm_bridge.h>
+#include <drm/drm_connector.h>
+#include <drm/drm_modes.h>
 
 struct dwhdmi_softc;
 
@@ -91,8 +94,8 @@ struct dwhdmi_softc {
 	void			(*sc_enable)(struct dwhdmi_softc *);
 	void			(*sc_disable)(struct dwhdmi_softc *);
 	void			(*sc_mode_set)(struct dwhdmi_softc *,
-					       struct drm_display_mode *,
-					       struct drm_display_mode *);
+					       const struct drm_display_mode *,
+					       const struct drm_display_mode *);
 };
 
 #define	to_dwhdmi_connector(x)	container_of(x, struct dwhdmi_connector, base)
@@ -107,7 +110,7 @@ enum drm_connector_status dwhdmi_phy_detect(struct dwhdmi_softc *, bool);
 void		dwhdmi_phy_enable(struct dwhdmi_softc *);
 void		dwhdmi_phy_disable(struct dwhdmi_softc *);
 void		dwhdmi_phy_mode_set(struct dwhdmi_softc *,
-				    struct drm_display_mode *,
-				    struct drm_display_mode *);
+				    const struct drm_display_mode *,
+				    const struct drm_display_mode *);
 
 #endif /* !_DEV_IC_DWHDMI_H */
