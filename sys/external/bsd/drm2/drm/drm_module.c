@@ -110,6 +110,9 @@ drm_init(void)
 	if (error)
 		return error;
 
+	extern bool drm_core_init_complete;
+	drm_core_init_complete = true;
+
 	drm_agp_hooks_init();
 #if NAGP > 0
 	extern int drmkms_agp_guarantee_initialized(void);
