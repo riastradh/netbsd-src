@@ -37,10 +37,10 @@ __KERNEL_RCSID(0, "$NetBSD: rk_fb.c,v 1.2 2021/05/21 09:33:27 jmcneill Exp $");
 
 #include <dev/fdt/fdtvar.h>
 
+#include <arm/rockchip/rk_drm.h>
+
 #include <drm/drm_drv.h>
 #include <drm/drmfb.h>
-
-#include <arm/rockchip/rk_drm.h>
 
 static int	rk_fb_match(device_t, cfdata_t, void *);
 static void	rk_fb_attach(device_t, device_t, void *);

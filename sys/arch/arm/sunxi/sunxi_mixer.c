@@ -31,24 +31,24 @@ __KERNEL_RCSID(0, "$NetBSD: sunxi_mixer.c,v 1.16 2021/01/27 03:10:20 thorpej Exp
 
 #include <sys/param.h>
 #include <sys/bus.h>
+#include <sys/conf.h>
 #include <sys/device.h>
 #include <sys/intr.h>
-#include <sys/systm.h>
 #include <sys/kernel.h>
-#include <sys/conf.h>
 #include <sys/sysctl.h>
+#include <sys/systm.h>
 
-#include <drm/drm_drv.h>
+#include <dev/fdt/fdt_port.h>
+#include <dev/fdt/fdtvar.h>
+
+#include <arm/sunxi/sunxi_drm.h>
+
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
+#include <drm/drm_drv.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_plane_helper.h>
 #include <drm/drm_vblank.h>
-
-#include <dev/fdt/fdtvar.h>
-#include <dev/fdt/fdt_port.h>
-
-#include <arm/sunxi/sunxi_drm.h>
 
 #define	MIXER_CURSOR_MAXWIDTH	256
 #define	MIXER_CURSOR_MAXHEIGHT	256
