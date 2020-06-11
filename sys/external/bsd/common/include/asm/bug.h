@@ -49,7 +49,7 @@
 #define	BUILD_BUG()		do {} while (0)
 #define	BUILD_BUG_ON(CONDITION)	DRMCTASSERT(!(CONDITION))
 #define	BUILD_BUG_ON_MSG(CONDITION,MSG)	DRMCTASSERT(!(CONDITION))
-#define	BUILD_BUG_ON_INVALID(EXPR)	((void)sizeof(EXPR))
+#define	BUILD_BUG_ON_INVALID(EXPR)	((void)sizeof((long)(EXPR)))
 
 /* XXX Rate limit?  */
 #define WARN(CONDITION, FMT, ...)					\
