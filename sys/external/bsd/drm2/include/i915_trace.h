@@ -36,7 +36,7 @@
 #include <sys/sdt.h>
 
 #include "i915_request.h"
-#include "intel_drv.h"
+#include "i915_drv.h"
 
 /* Must come last.  */
 #include <drm/drm_trace_netbsd.h>
