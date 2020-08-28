@@ -299,11 +299,14 @@ wait_remaining_ms_from_jiffies(unsigned long timestamp_jiffies, int to_wait_ms)
  * check the condition before the timeout.
  */
 #ifdef __NetBSD__
-#define _wait_for(COND, MS, Wmin, Wmax) ({ \
+#define __wait_for(OP, COND, MS, Wmin, Wmax) ({ \
 	int ret__ = 0;							\
 	if (cold) {							\
 		int ms = (MS);						\
 		while (!(COND)) {					\
+			OP;						\
+			/* Guarantee COND check prior to timeout */	\
+			barrier();					\
 			if (--ms < 0) {					\
 				DELAY(1000);				\
 				if (!(COND))				\
@@ -315,6 +318,9 @@ wait_remaining_ms_from_jiffies(unsigned long timestamp_jiffies, int to_wait_ms)
 	} else {							\
 		unsigned long timeout__ = jiffies + msecs_to_jiffies(MS); \
 		while (!(COND)) {					\
+			OP;						\
+			/* Guarantee COND check prior to timeout */	\
+			barrier();					\
 			if (time_after(jiffies, timeout__)) {		\
 				if (!(COND))				\
 					ret__ = -ETIMEDOUT;		\
