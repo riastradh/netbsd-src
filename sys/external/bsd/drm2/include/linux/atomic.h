@@ -85,6 +85,12 @@ atomic_set(atomic_t *atomic, int value)
 }
 
 static inline void
+atomic_set_release(atomic_t *atomic, int value)
+{
+	atomic_store_release(&atomic->a_u.au_int, value);
+}
+
+static inline void
 atomic_add(int addend, atomic_t *atomic)
 {
 	/* no membar */
