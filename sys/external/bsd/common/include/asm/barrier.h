@@ -72,7 +72,7 @@
 
 #if defined(MULTIPROCESSOR) && !defined(__HAVE_ATOMIC_AS_MEMBAR)
 #  define	smp_mb__before_atomic()		membar_exit()
-#  define	smp_mb__after_atomic()		membar_enter()
+#  define	smp_mb__after_atomic()		membar_sync() /* XXX acquire */
 #else
 #  define	smp_mb__before_atomic()		__insn_barrier()
 #  define	smp_mb__after_atomic()		__insn_barrier()
