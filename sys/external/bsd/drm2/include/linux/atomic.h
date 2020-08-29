@@ -475,6 +475,16 @@ clear_bit(unsigned int bit, volatile unsigned long *ptr)
 }
 
 static inline void
+clear_bit_unlock(unsigned int bit, volatile unsigned long *ptr)
+{
+	const unsigned int units = (sizeof(*ptr) * CHAR_BIT);
+
+	/* store-release */
+	smp_mb__before_atomic();
+	atomic_and_ulong(&ptr[bit / units], ~(1UL << (bit % units)));
+}
+
+static inline void
 change_bit(unsigned int bit, volatile unsigned long *ptr)
 {
 	const unsigned int units = (sizeof(*ptr) * CHAR_BIT);
