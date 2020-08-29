@@ -391,6 +391,8 @@ __END_DECLS
 
 #include <sys/cdefs.h>
 
+#include <lib/libkern/libkern.h>
+
 #ifdef _LP64
 #define	__HAVE_ATOMIC64_LOADSTORE	1
 #define	__ATOMIC_SIZE_MAX		8
