@@ -70,4 +70,12 @@
 #  define	smp_read_barrier_depends()	do {} while (0)
 #endif
 
+#if defined(MULTIPROCESSOR) && !defined(__HAVE_ATOMIC_AS_MEMBAR)
+#  define	smp_mb__before_atomic()		membar_exit()
+#  define	smp_mb__after_atomic()		membar_enter()
+#else
+#  define	smp_mb__before_atomic()		__insn_barrier()
+#  define	smp_mb__after_atomic()		__insn_barrier()
+#endif
+
 #endif  /* _ASM_BARRIER_H_ */

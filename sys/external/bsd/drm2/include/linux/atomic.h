@@ -38,14 +38,6 @@
 
 #include <asm/barrier.h>
 
-#if defined(MULTIPROCESSOR) && !defined(__HAVE_ATOMIC_AS_MEMBAR)
-#  define	smp_mb__before_atomic()		membar_exit()
-#  define	smp_mb__after_atomic()		membar_enter()
-#else
-#  define	smp_mb__before_atomic()		__insn_barrier()
-#  define	smp_mb__after_atomic()		__insn_barrier()
-#endif
-
 #define	xchg(P, V)							      \
 	(sizeof(*(P)) == 4 ? atomic_swap_32((volatile uint32_t *)P, V)	      \
 	    : sizeof(*(P)) == 8 ? atomic_swap_64((volatile uint64_t *)P, V)   \
