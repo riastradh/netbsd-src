@@ -613,8 +613,8 @@ wait_any_cb(struct dma_fence *fence, struct dma_fence_cb *fcb)
  * dma_fence_wait_any_timeout(fence, nfences, intr, timeout, ip)
  *
  *	Wait for any of fences[0], fences[1], fences[2], ...,
- *	fences[nfences-1] to be signaled.  If ip is nonnull, set *ip to
- *	the index of the first one.
+ *	fences[nfences-1] to be signalled.  If ip is nonnull, set *ip
+ *	to the index of the first one.
  */
 long
 dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t nfences,
