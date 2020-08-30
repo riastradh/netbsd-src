@@ -109,7 +109,15 @@ struct intel_forcewake_range {
 };
 
 struct intel_uncore {
+#ifdef __NetBSD__
+#  define	__iomem
+#endif
+
 	void __iomem *regs;
+
+#ifdef __NetBSD__
+#  undef	__iomem
+#endif
 
 	struct drm_i915_private *i915;
 	struct intel_runtime_pm *rpm;
