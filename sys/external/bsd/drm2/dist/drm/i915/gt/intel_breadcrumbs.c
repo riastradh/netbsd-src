@@ -108,6 +108,8 @@ check_signal_order(struct intel_context *ce, struct i915_request *rq)
 	return true;
 }
 
+#ifndef __NetBSD__
+
 static bool
 __dma_fence_signal(struct dma_fence *fence)
 {
@@ -135,6 +137,8 @@ __dma_fence_signal__notify(struct dma_fence *fence,
 		cur->func(fence, cur);
 	}
 }
+
+#endif
 
 static void add_retire(struct intel_breadcrumbs *b, struct intel_timeline *tl)
 {
@@ -208,6 +212,9 @@ static void signal_irq_work(struct irq_work *work)
 	list_for_each_safe(pos, next, &signal) {
 		struct i915_request *rq =
 			list_entry(pos, typeof(*rq), signal_link);
+#ifdef __NetBSD__
+		__dma_fence_signal_wake(&rq->fence, timestamp);
+#else
 		struct list_head cb_list;
 
 		spin_lock(&rq->lock);
@@ -215,6 +222,7 @@ static void signal_irq_work(struct irq_work *work)
 		__dma_fence_signal__timestamp(&rq->fence, timestamp);
 		__dma_fence_signal__notify(&rq->fence, &cb_list);
 		spin_unlock(&rq->lock);
+#endif
 
 		i915_request_put(rq);
 	}
