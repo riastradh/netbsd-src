@@ -36,6 +36,7 @@
 #include <sys/stdbool.h>
 
 #include <linux/kernel.h>	/* container_of */
+#include <linux/stringify.h>
 
 #define	INIT_DELAYED_WORK		linux_INIT_DELAYED_WORK
 #define	INIT_WORK			linux_INIT_WORK
