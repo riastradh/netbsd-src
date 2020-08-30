@@ -1477,7 +1477,9 @@ IS_PLATFORM(const struct drm_i915_private *i915, enum intel_platform p)
 	const unsigned int pi = __platform_mask_index(info, p);
 	const unsigned int pb = __platform_mask_bit(info, p);
 
+#if 0
 	BUILD_BUG_ON(!__builtin_constant_p(p));
+#endif
 
 	return info->platform_mask[pi] & BIT(pb);
 }
@@ -1492,9 +1494,11 @@ IS_SUBPLATFORM(const struct drm_i915_private *i915,
 	const unsigned int msb = BITS_PER_TYPE(info->platform_mask[0]) - 1;
 	const u32 mask = info->platform_mask[pi];
 
+#if 0
 	BUILD_BUG_ON(!__builtin_constant_p(p));
 	BUILD_BUG_ON(!__builtin_constant_p(s));
 	BUILD_BUG_ON((s) >= INTEL_SUBPLATFORM_BITS);
+#endif
 
 	/* Shift and test on the MSB position so sign flag can be used. */
 	return ((mask << (msb - pb)) & (mask << (msb - s))) & BIT(msb);
