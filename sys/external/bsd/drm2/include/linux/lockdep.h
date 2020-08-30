@@ -32,6 +32,9 @@
 #ifndef _LINUX_LOCKDEP_H_
 #define _LINUX_LOCKDEP_H_
 
+struct mutex;
+struct spinlock;
+
 #define	__acquires(lock)	/* XXX lockdep annotation */
 #define	__releases(lock)	/* XXX lockdep annotation */
 
@@ -59,5 +62,21 @@
 	    : NULL)
 
 #define	SINGLE_DEPTH_NESTING	0
+
+struct pin_cookie {
+	int	dummy;
+};
+
+static inline struct pin_cookie
+lockdep_pin_lock(struct mutex *m)
+{
+	return (struct pin_cookie) { (int)(intptr_t)m };
+}
+
+static inline void
+lockdep_unpin_lock(struct mutex *m, struct pin_cookie cookie)
+{
+	KASSERT(cookie.dummy == (int)(intptr_t)m);
+}
 
 #endif	/* _LINUX_LOCKDEP_H_ */
