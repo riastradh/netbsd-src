@@ -1701,12 +1701,6 @@ IS_SUBPLATFORM(const struct drm_i915_private *i915,
 #define OVERLAY_NEEDS_PHYSICAL(dev_priv) \
 		(INTEL_INFO(dev_priv)->display.overlay_needs_physical)
 
-/*
- * The Gen7 cmdparser copies the scanned buffer to the ggtt for execution
- * All later gens can run the final buffer from the ppgtt
- */
-#define CMDPARSER_USES_GGTT(dev_priv) IS_GEN7(dev_priv)
-
 /* Early gen2 have a totally busted CS tlb and require pinned batches. */
 #define HAS_BROKEN_CS_TLB(dev_priv)	(IS_I830(dev_priv) || IS_I845G(dev_priv))
 
