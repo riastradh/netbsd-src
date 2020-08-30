@@ -78,4 +78,10 @@ typedef int gfp_t;
 
 struct page;
 
+static inline bool
+gfpflags_allow_blocking(gfp_t gfp)
+{
+	return (gfp & (__GFP_WAIT|__GFP_NORETRY)) == __GFP_WAIT;
+}
+
 #endif	/* _LINUX_GFP_H_ */
