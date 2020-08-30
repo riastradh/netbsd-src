@@ -43,6 +43,11 @@
 	    : sizeof(*(P)) == 8 ? atomic_swap_64((volatile uint64_t *)P, V)   \
 	    : (__builtin_abort(), 0))
 
+#define	cmpxchg(P, O, N)						      \
+	(sizeof(*(P)) == 4 ? atomic_cas_32((volatile uint32_t *)P, O, N)      \
+	    : sizeof(*(P)) == 8 ? atomic_cas_64((volatile uint64_t *)P, O, N) \
+	    : (__builtin_abort(), 0))
+
 /*
  * atomic (u)int operations
  *
