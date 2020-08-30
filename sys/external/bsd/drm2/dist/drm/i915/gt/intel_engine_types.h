@@ -163,6 +163,10 @@ struct intel_engine_execlists {
 	 */
 	bool no_priolist;
 
+#ifdef __NetBSD__
+#  define	__iomem
+#endif
+
 	/**
 	 * @submit_reg: gen-specific execlist submission register
 	 * set to the ExecList Submission Port (elsp) register pre-Gen11 and to
@@ -175,6 +179,10 @@ struct intel_engine_execlists {
 	 * submit queue on the HW and to request preemptions to idle
 	 */
 	u32 __iomem *ctrl_reg;
+
+#ifdef __NetBSD__
+#  undef	__iomem
+#endif
 
 #define EXECLIST_MAX_PORTS 2
 	/**
