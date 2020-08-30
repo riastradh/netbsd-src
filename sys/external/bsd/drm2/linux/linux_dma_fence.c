@@ -877,3 +877,47 @@ out:
 	 */
 	return (timeout < MAX_SCHEDULE_TIMEOUT ? MIN(deadline - now, 1) : 1);
 }
+
+/*
+ * __dma_fence_signal(fence)
+ *
+ *	Set fence's signalled bit, without waking waiters yet.  Return
+ *	true if it was newly set, false if it was already set.
+ */
+bool
+__dma_fence_signal(struct dma_fence *fence)
+{
+
+	if (test_and_set_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
+		return false;
+
+	return true;
+}
+
+/*
+ * __dma_fence_signal_wake(fence)
+ *
+ *	Wake fence's waiters.  Caller must have previously called
+ *	__dma_fence_signal and it must have previously returned true.
+ */
+void
+__dma_fence_signal_wake(struct dma_fence *fence, ktime_t timestamp)
+{
+	struct dma_fence_cb *fcb, *next;
+
+	spin_lock(fence->lock);
+
+	KASSERT(fence->flags & DMA_FENCE_FLAG_SIGNALED_BIT);
+
+	/* Wake waiters.  */
+	cv_broadcast(&fence->f_cv);
+
+	/* Remove and call the callbacks.  */
+	TAILQ_FOREACH_SAFE(fcb, &fence->f_callbacks, fcb_entry, next) {
+		TAILQ_REMOVE(&fence->f_callbacks, fcb, fcb_entry);
+		fcb->fcb_onqueue = false;
+		(*fcb->func)(fence, fcb);
+	}
+
+	spin_unlock(fence->lock);
+}
