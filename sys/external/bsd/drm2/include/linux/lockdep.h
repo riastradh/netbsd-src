@@ -32,6 +32,11 @@
 #ifndef _LINUX_LOCKDEP_H_
 #define _LINUX_LOCKDEP_H_
 
+#include <sys/cdefs.h>
+#include <sys/types.h>
+
+#include <lib/libkern/libkern.h>
+
 struct mutex;
 struct spinlock;
 
