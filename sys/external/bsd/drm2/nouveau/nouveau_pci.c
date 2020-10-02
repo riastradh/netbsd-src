@@ -223,6 +223,13 @@ nouveau_pci_attach_real(device_t self)
 	sc->sc_pci_attached = true;
 
 	/* XXX errno Linux->NetBSD */
+	error = -nouveau_drm_device_init(sc->sc_drm_dev);
+	if (error) {
+		aprint_error_dev(self, "unable to init nouveau: %d\n", error);
+		return;
+	}
+
+	/* XXX errno Linux->NetBSD */
 	error = -drm_dev_register(sc->sc_drm_dev, 0);
 	if (error) {
 		aprint_error_dev(self, "unable to register drm: %d\n", error);
