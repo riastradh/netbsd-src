@@ -31,6 +31,8 @@
 
 #include <sys/stdbool.h>
 
+#include <asm/cpufeature.h>
+
 /* namespace */
 #define	init_irq_work	linux_init_irq_work
 #define	irq_work_queue	linux_irq_work_queue
