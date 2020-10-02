@@ -45,7 +45,7 @@ array_size(size_t x, size_t y)
 {
 	size_t xy;
 
-	if (check_add_overflow(x, y, &xy))
+	if (check_mul_overflow(x, y, &xy))
 		return SIZE_MAX;
 	return xy;
 }
