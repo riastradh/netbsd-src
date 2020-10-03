@@ -49,6 +49,7 @@ int __drm_mode_object_add(struct drm_device *dev, struct drm_mode_object *obj,
 
 	WARN_ON(!dev->driver->load && dev->registered && !obj_free_cb);
 
+	idr_preload(GFP_KERNEL);
 	mutex_lock(&dev->mode_config.idr_mutex);
 	ret = idr_alloc(&dev->mode_config.object_idr, register_obj ? obj : NULL,
 			1, 0, GFP_KERNEL);
@@ -65,6 +66,7 @@ int __drm_mode_object_add(struct drm_device *dev, struct drm_mode_object *obj,
 		}
 	}
 	mutex_unlock(&dev->mode_config.idr_mutex);
+	idr_preload_end();
 
 	return ret < 0 ? ret : 0;
 }
