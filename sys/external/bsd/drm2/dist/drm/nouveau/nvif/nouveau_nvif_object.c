@@ -259,13 +259,21 @@ nvif_object_map(struct nvif_object *object, void *argv, u32 argc)
 	if (ret >= 0) {
 		if (ret) {
 #ifdef __NetBSD__
-			ret = client->driver->map(client, tag, handle,
-			    object->map.size,
+			/*
+			 * Note: handle is the bus address;
+			 * object->map.handle is the
+			 * bus_space_handle_t, which is typically a
+			 * virtual address mapped in kva.
+			 */
+			object->map.tag = tag;
+			object->map.addr = handle;
+			ret = client->driver->map(client, tag, handle, length,
 			    &object->map.handle, &object->map.ptr);
 			if (ret) {
 				nvif_object_unmap(object);
 				return -ENOMEM;
 			}
+			object->map.size = length;
 #else
 			object->map.ptr = client->driver->map(client,
 							      handle,
