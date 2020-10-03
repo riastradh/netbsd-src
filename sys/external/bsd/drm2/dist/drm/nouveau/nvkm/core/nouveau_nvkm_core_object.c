@@ -53,8 +53,8 @@ nvkm_object_search(struct nvkm_client *client, u64 handle,
 			else
 				goto done;
 		}
-		return ERR_PTR(-ENOENT);
 #endif
+		return ERR_PTR(-ENOENT);
 	} else {
 		object = &client->object;
 	}
