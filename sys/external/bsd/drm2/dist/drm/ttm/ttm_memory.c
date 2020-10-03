@@ -503,9 +503,7 @@ void ttm_mem_global_release(struct ttm_mem_global *glob)
 		kobject_put(&zone->kobj);
 #endif
 	}
-#ifdef __NetBSD__
-	kfree(glob);
-#else
+#ifndef __NetBSD__
 	kobject_del(&glob->kobj);
 	kobject_put(&glob->kobj);
 #endif
