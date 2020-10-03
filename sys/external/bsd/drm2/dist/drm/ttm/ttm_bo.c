@@ -1656,7 +1656,6 @@ static void ttm_bo_global_release(void)
 	spin_lock_destroy(&glob->lru_lock);
 	mutex_unlock(&ttm_global_mutex);
 	mutex_destroy(&ttm_global_mutex);
-	kfree(glob);
 	return;
 #endif
 out:
