@@ -69,7 +69,7 @@ void
 nvkm_object_remove(struct nvkm_object *object)
 {
 #ifdef __NetBSD__
-	if (!object->on_tree)
+	if (object->on_tree)
 		rb_tree_remove_node(&object->client->objtree, object);
 #else
 	if (!RB_EMPTY_NODE(&object->node))
