@@ -1645,17 +1645,20 @@ static void ttm_bo_global_release(void)
 	if (--ttm_bo_glob_use_count > 0)
 		goto out;
 
-#ifdef __NetBSD__
-	BUG_ON(glob->dummy_read_page != NULL);
-	spin_lock_destroy(&glob->lru_lock);
-	mutex_destroy(&ttm_global_mutex);
-	kfree(glob);
-#else
+#ifndef __NetBSD__
 	kobject_del(&glob->kobj);
 	kobject_put(&glob->kobj);
 #endif
 	ttm_mem_global_release(&ttm_mem_glob);
 	memset(glob, 0, sizeof(*glob));
+#ifdef __NetBSD__
+	BUG_ON(glob->dummy_read_page != NULL);
+	spin_lock_destroy(&glob->lru_lock);
+	mutex_unlock(&ttm_global_mutex);
+	mutex_destroy(&ttm_global_mutex);
+	kfree(glob);
+	return;
+#endif
 out:
 	mutex_unlock(&ttm_global_mutex);
 }
