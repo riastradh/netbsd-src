@@ -280,6 +280,7 @@ fail2: __unused
 		KASSERT(mem->dmamap->dm_segs[i].ds_len <= PAGE_SIZE);
 		mem->dma[i] = mem->dmamap->dm_segs[i].ds_addr;
 	}
+	mem->pages = size;
 #else
 	if (!(mem->mem = kvmalloc_array(size, sizeof(*mem->mem), GFP_KERNEL)))
 		return -ENOMEM;
