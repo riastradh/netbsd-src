@@ -173,9 +173,11 @@ int vgem_fence_attach_ioctl(struct drm_device *dev,
 
 	/* Record the fence in our idr for later signaling */
 	if (ret == 0) {
+		idr_preload(GFP_KERNEL);
 		mutex_lock(&vfile->fence_mutex);
 		ret = idr_alloc(&vfile->fence_idr, fence, 1, 0, GFP_KERNEL);
 		mutex_unlock(&vfile->fence_mutex);
+		idr_preload_end();
 		if (ret > 0) {
 			arg->out_fence = ret;
 			ret = 0;

@@ -375,8 +375,10 @@ static struct intel_vgpu *__intel_gvt_create_vgpu(struct intel_gvt *gvt,
 	if (!vgpu)
 		return ERR_PTR(-ENOMEM);
 
+	idr_preload(GFP_KERNEL);
 	ret = idr_alloc(&gvt->vgpu_idr, vgpu, IDLE_VGPU_IDR + 1, GVT_MAX_VGPU,
 		GFP_KERNEL);
+	idr_preload_end();
 	if (ret < 0)
 		goto out_free_vgpu;
 

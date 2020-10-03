@@ -486,7 +486,9 @@ int intel_vgpu_query_plane(struct intel_vgpu *vgpu, void *args)
 
 	dmabuf_obj->vgpu = vgpu;
 
+	idr_preload(GFP_NOWAIT); /* XXX ??? */
 	ret = idr_alloc(&vgpu->object_idr, dmabuf_obj, 1, 0, GFP_NOWAIT);
+	idr_preload_end();
 	if (ret < 0)
 		goto out_free_info;
 	gfx_plane_info->dmabuf_id = ret;
