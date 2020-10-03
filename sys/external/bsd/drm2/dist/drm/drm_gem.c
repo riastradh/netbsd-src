@@ -196,13 +196,13 @@ void drm_gem_private_object_init(struct drm_device *dev,
 	kref_init(&obj->refcount);
 	obj->handle_count = 0;
 	obj->size = size;
-#ifdef __NetBSD__
-	drm_vma_node_init(&obj->vma_node);
-#else
 	dma_resv_init(&obj->_resv);
 	if (!obj->resv)
 		obj->resv = &obj->_resv;
 
+#ifdef __NetBSD__
+	drm_vma_node_init(&obj->vma_node);
+#else
 	drm_vma_node_reset(&obj->vma_node);
 #endif
 }
