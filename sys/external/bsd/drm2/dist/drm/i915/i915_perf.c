@@ -4080,6 +4080,7 @@ int i915_perf_add_config_ioctl(struct drm_device *dev, void *data,
 		oa_config->flex_regs = regs;
 	}
 
+	idr_preload(GFP_KERNEL);
 	err = mutex_lock_interruptible(&perf->metrics_lock);
 	if (err)
 		goto reg_err;
@@ -4112,6 +4113,7 @@ int i915_perf_add_config_ioctl(struct drm_device *dev, void *data,
 	}
 
 	mutex_unlock(&perf->metrics_lock);
+	idr_preload_end();
 
 	DRM_DEBUG("Added config %s id=%i\n", oa_config->uuid, oa_config->id);
 
@@ -4119,6 +4121,7 @@ int i915_perf_add_config_ioctl(struct drm_device *dev, void *data,
 
 sysfs_err:
 	mutex_unlock(&perf->metrics_lock);
+	idr_preload_end();
 reg_err:
 	i915_oa_config_put(oa_config);
 	DRM_DEBUG("Failed to add new OA config\n");

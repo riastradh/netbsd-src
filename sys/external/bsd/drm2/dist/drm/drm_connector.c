@@ -2400,6 +2400,7 @@ struct drm_tile_group *drm_mode_create_tile_group(struct drm_device *dev,
 	memcpy(tg->group_data, topology, 8);
 	tg->dev = dev;
 
+	idr_preload(GFP_KERNEL);
 	mutex_lock(&dev->mode_config.idr_mutex);
 	ret = idr_alloc(&dev->mode_config.tile_idr, tg, 1, 0, GFP_KERNEL);
 	if (ret >= 0) {
@@ -2410,6 +2411,7 @@ struct drm_tile_group *drm_mode_create_tile_group(struct drm_device *dev,
 	}
 
 	mutex_unlock(&dev->mode_config.idr_mutex);
+	idr_preload_end();
 	return tg;
 }
 EXPORT_SYMBOL(drm_mode_create_tile_group);
