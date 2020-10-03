@@ -175,7 +175,7 @@ nvkm_mem_map_host(struct nvkm_memory *memory, void **pmap)
 			*pmap = NULL;
 			return ret;
 		}
-		*tagp = tag;
+		*tagp = dmat;
 		return 0;
 #else
 		*pmap = vmap(mem->mem, mem->pages, VM_MAP, PAGE_KERNEL);
