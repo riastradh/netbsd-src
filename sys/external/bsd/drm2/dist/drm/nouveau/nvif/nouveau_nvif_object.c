@@ -269,11 +269,10 @@ nvif_object_map(struct nvif_object *object, void *argv, u32 argc)
 			object->map.addr = handle;
 			ret = client->driver->map(client, tag, handle, length,
 			    &object->map.handle, &object->map.ptr);
-			if (ret) {
-				nvif_object_unmap(object);
-				return -ENOMEM;
+			if (ret == 0) {
+				object->map.size = length;
+				return 0;
 			}
-			object->map.size = length;
 #else
 			object->map.ptr = client->driver->map(client,
 							      handle,
