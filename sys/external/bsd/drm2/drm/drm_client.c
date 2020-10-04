@@ -37,15 +37,24 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/err.h>
 
 #include <drm/drm_client.h>
+#include <drm/drm_drv.h>
 
 int
 drm_client_init(struct drm_device *dev, struct drm_client_dev *client,
     const char *name, const struct drm_client_funcs *funcs)
 {
+	int ret;
 
 	client->dev = dev;
 
+	ret = drm_client_modeset_create(client);
+	if (ret)
+		goto out0;
+
+	drm_dev_get(dev);
 	return 0;
+
+out0:	return ret;
 }
 
 void
@@ -56,6 +65,9 @@ drm_client_register(struct drm_client_dev *client)
 void
 drm_client_release(struct drm_client_dev *client)
 {
+
+	drm_client_modeset_free(client);
+	drm_dev_put(client->dev);
 }
 
 void
