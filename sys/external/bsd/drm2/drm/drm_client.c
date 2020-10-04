@@ -42,6 +42,9 @@ int
 drm_client_init(struct drm_device *dev, struct drm_client_dev *client,
     const char *name, const struct drm_client_funcs *funcs)
 {
+
+	client->dev = dev;
+
 	return 0;
 }
 
