@@ -521,7 +521,7 @@ bool radeon_fence_signaled(struct radeon_fence *fence)
 	if (radeon_fence_seq_signaled(fence->rdev, fence->seq, fence->ring)) {
 		int ret;
 
-		ret = dma_fence_signal(&fence->base);
+		ret = dma_fence_signal_locked(&fence->base);
 		if (!ret)
 			DMA_FENCE_TRACE(&fence->base, "signaled from radeon_fence_signaled\n");
 		return true;
