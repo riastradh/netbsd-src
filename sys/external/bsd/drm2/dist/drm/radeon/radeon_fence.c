@@ -326,6 +326,9 @@ static void radeon_fence_check_lockup(struct work_struct *work)
 	if (!down_read_trylock(&rdev->exclusive_lock)) {
 		/* just reschedule the check if a reset is going on */
 		radeon_fence_schedule_check(rdev, ring);
+#ifdef __NetBSD__
+		spin_unlock(&rdev->fence_lock);
+#endif
 		return;
 	}
 
@@ -524,6 +527,7 @@ bool radeon_fence_signaled(struct radeon_fence *fence)
 		ret = dma_fence_signal_locked(&fence->base);
 		if (!ret)
 			DMA_FENCE_TRACE(&fence->base, "signaled from radeon_fence_signaled\n");
+		spin_unlock(&fence->rdev->fence_lock);
 		return true;
 	}
 	spin_unlock(&fence->rdev->fence_lock);
