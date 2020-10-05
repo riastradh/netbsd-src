@@ -1199,9 +1199,6 @@ static int dce4_crtc_do_set_base(struct drm_crtc *crtc,
 		radeon_bo_unreserve(rbo);
 	}
 
-	radeon_bo_get_tiling_flags(rbo, &tiling_flags, NULL);
-	radeon_bo_unreserve(rbo);
-
 	switch (target_fb->format->format) {
 	case DRM_FORMAT_C8:
 		fb_format = (EVERGREEN_GRPH_DEPTH(EVERGREEN_GRPH_DEPTH_8BPP) |
