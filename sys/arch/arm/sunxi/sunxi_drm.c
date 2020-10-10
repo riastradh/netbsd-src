@@ -383,6 +383,7 @@ sunxi_drm_fb_probe(struct drm_fb_helper *helper, struct drm_fb_helper_surface_si
 	fb->width = width;
 	fb->height = height;
 	fb->format = drm_format_info(DRM_FORMAT_XRGB8888);
+	fb->dev = ddev;
 
 	error = drm_framebuffer_init(ddev, fb, &sunxi_drm_framebuffer_funcs);
 	if (error != 0) {
