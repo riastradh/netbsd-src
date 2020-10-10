@@ -45,6 +45,8 @@ __KERNEL_RCSID(0, "$NetBSD: sunxi_fb.c,v 1.3 2019/01/30 10:55:44 jmcneill Exp $"
 static int	sunxi_fb_match(device_t, cfdata_t, void *);
 static void	sunxi_fb_attach(device_t, device_t, void *);
 
+static void	sunxi_fb_init(device_t);
+
 static bool	sunxi_fb_shutdown(device_t, int);
 
 struct sunxi_fb_softc {
@@ -80,7 +82,6 @@ sunxi_fb_attach(device_t parent, device_t self, void *aux)
 	struct sunxi_fb_softc * const sc = device_private(self);
 	struct sunxi_drm_softc * const drmsc = device_private(parent);
 	struct sunxi_drmfb_attach_args * const sfa = aux;
-	int error;
 
 	sc->sc_dev = self;
 	sc->sc_drm = drmsc;
@@ -95,9 +96,18 @@ sunxi_fb_attach(device_t parent, device_t self, void *aux)
 	const bool is_console = true;
 	prop_dictionary_set_bool(dict, "is_console", is_console);
 #endif
+	config_defer(self, sunxi_fb_init);
+}
+
+static void
+sunxi_fb_init(device_t dev)
+{
+	struct sunxi_fb_softc * const sc = device_private(dev);
+	struct sunxi_drmfb_attach_args * const sfa = &sc->sc_sfa;
+	int error;
 
 	const struct drmfb_attach_args da = {
-		.da_dev = self,
+		.da_dev = dev,
 		.da_fb_helper = sfa->sfa_fb_helper,
 		.da_fb_sizes = &sfa->sfa_fb_sizes,
 		.da_fb_vaddr = sc->sc_fb->obj->vaddr,
@@ -105,13 +115,14 @@ sunxi_fb_attach(device_t parent, device_t self, void *aux)
 		.da_params = &sunxifb_drmfb_params,
 	};
 
+
 	error = drmfb_attach(&sc->sc_drmfb, &da);
 	if (error) {
-		aprint_error_dev(self, "failed to attach drmfb: %d\n", error);
+		aprint_error_dev(dev, "failed to attach drmfb: %d\n", error);
 		return;
 	}
 
-	pmf_device_register1(self, NULL, NULL, sunxi_fb_shutdown);
+	pmf_device_register1(dev, NULL, NULL, sunxi_fb_shutdown);
 }
 
 static bool
