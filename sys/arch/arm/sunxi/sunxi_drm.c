@@ -266,15 +266,7 @@ sunxi_drm_fb_create(struct drm_device *ddev, struct drm_file *file,
 
 	fb = kmem_zalloc(sizeof(*fb), KM_SLEEP);
 	fb->obj = to_drm_gem_cma_obj(gem_obj);
-	fb->base.pitches[0] = cmd->pitches[0];
-	fb->base.pitches[1] = cmd->pitches[1];
-	fb->base.pitches[2] = cmd->pitches[2];
-	fb->base.offsets[0] = cmd->offsets[0];
-	fb->base.offsets[1] = cmd->offsets[2];
-	fb->base.offsets[2] = cmd->offsets[1];
-	fb->base.width = cmd->width;
-	fb->base.height = cmd->height;
-	fb->base.format = drm_format_info(cmd->pixel_format);
+	drm_helper_mode_fill_fb_struct(ddev, &fb->base, cmd);
 
 	error = drm_framebuffer_init(ddev, &fb->base, &sunxi_drm_framebuffer_funcs);
 	if (error != 0)
