@@ -112,6 +112,7 @@ execlists_active(const struct intel_engine_execlists *execlists)
 	return *READ_ONCE(execlists->active);
 }
 
+#ifdef __linux__
 static inline void
 execlists_active_lock_bh(struct intel_engine_execlists *execlists)
 {
@@ -125,6 +126,22 @@ execlists_active_unlock_bh(struct intel_engine_execlists *execlists)
 	tasklet_unlock(&execlists->tasklet);
 	local_bh_enable(); /* restore softirq, and kick ksoftirqd! */
 }
+#else
+static inline int
+execlists_active_lock_bh(struct intel_engine_execlists *execlists)
+{
+	int s = splsoftserial(); /* prevent local softirq and lock recursion */
+	tasklet_lock(&execlists->tasklet);
+	return s;
+}
+
+static inline void
+execlists_active_unlock_bh(struct intel_engine_execlists *execlists, int s)
+{
+	tasklet_unlock(&execlists->tasklet);
+	splraise(s); /* restore softirq, and kick ksoftirqd! */
+}
+#endif
 
 struct i915_request *
 execlists_unwind_incomplete_requests(struct intel_engine_execlists *execlists);
