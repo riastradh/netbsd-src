@@ -90,7 +90,7 @@ drm_lease_held(struct drm_file *file, int id)
 bool
 _drm_lease_held(struct drm_file *file, int id)
 {
-	panic("%s: not yet implemented", __func__);
+	return true;
 }
 
 /*
@@ -101,7 +101,6 @@ _drm_lease_held(struct drm_file *file, int id)
 void
 drm_lease_revoke(struct drm_master *master)
 {
-	panic("%s: not yet implemented", __func__);
 }
 
 /*
@@ -112,7 +111,7 @@ drm_lease_revoke(struct drm_master *master)
 uint32_t
 drm_lease_filter_crtcs(struct drm_file *file, uint32_t crtcs)
 {
-	panic("%s: not yet implemented", __func__);
+	return crtcs;
 }
 
 /*
