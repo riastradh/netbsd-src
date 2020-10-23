@@ -177,6 +177,7 @@ drm_open(dev_t d, int flags, int fmt, struct lwp *l)
 		if (error)
 			goto fail4;
 	}
+	priv->filp = fp;
 
 	mutex_lock(&dev->filelist_mutex);
 	list_add(&priv->lhead, &dev->filelist);
