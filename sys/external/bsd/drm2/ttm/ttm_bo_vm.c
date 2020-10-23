@@ -65,7 +65,6 @@ ttm_bo_uvm_detach(struct uvm_object *uobj)
 	    struct ttm_buffer_object, uvmobj);
 
 	ttm_bo_put(bo);
-	KASSERT(bo == NULL);
 }
 
 int
