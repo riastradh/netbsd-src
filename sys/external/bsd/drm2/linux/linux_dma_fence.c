@@ -330,6 +330,7 @@ dma_fence_ensure_signal_enabled(struct dma_fence *fence)
 		return 0;
 
 	/* Otherwise, note that we've called it and call it.  */
+	KASSERT(fence->ops->enable_signaling);
 	if (!(*fence->ops->enable_signaling)(fence)) {
 		/* If it failed, signal and return -ENOENT.  */
 		dma_fence_signal_locked(fence);
@@ -766,7 +767,11 @@ dma_fence_wait(struct dma_fence *fence, bool intr)
 
 	KASSERT(dma_fence_referenced_p(fence));
 
-	ret = (*fence->ops->wait)(fence, intr, MAX_SCHEDULE_TIMEOUT);
+	if (fence->ops->wait)
+		ret = (*fence->ops->wait)(fence, intr, MAX_SCHEDULE_TIMEOUT);
+	else
+		ret = dma_fence_default_wait(fence, intr,
+		    MAX_SCHEDULE_TIMEOUT);
 	KASSERT(ret != 0);
 
 	return (ret < 0 ? ret : 0);
