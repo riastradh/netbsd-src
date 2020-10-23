@@ -745,7 +745,10 @@ dma_fence_wait_timeout(struct dma_fence *fence, bool intr, long timeout)
 	KASSERT(timeout >= 0);
 	KASSERT(timeout < MAX_SCHEDULE_TIMEOUT);
 
-	return (*fence->ops->wait)(fence, intr, timeout);
+	if (fence->ops->wait)
+		return (*fence->ops->wait)(fence, intr, timeout);
+	else
+		return dma_fence_default_wait(fence, intr, timeout);
 }
 
 /*
