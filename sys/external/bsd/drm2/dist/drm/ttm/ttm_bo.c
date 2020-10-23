@@ -1362,11 +1362,13 @@ int ttm_bo_init_reserved(struct ttm_bo_device *bdev,
 		dma_resv_init(&bo->base._resv);
 #ifdef __NetBSD__
 		drm_vma_node_init(&bo->base.vma_node);
-		uvm_obj_init(&bo->uvmobj, bdev->driver->ttm_uvm_ops, true, 1);
 #else
 		drm_vma_node_reset(&bo->base.vma_node);
 #endif
 	}
+#ifdef __NetBSD__
+	uvm_obj_init(&bo->uvmobj, bdev->driver->ttm_uvm_ops, true, 1);
+#endif
 	atomic_inc(&ttm_bo_glob.bo_count);
 
 	/*
