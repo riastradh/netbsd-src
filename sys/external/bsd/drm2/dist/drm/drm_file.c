@@ -156,6 +156,7 @@ struct drm_file *drm_file_alloc(struct drm_minor *minor)
 	INIT_LIST_HEAD(&file->event_list);
 #ifdef __NetBSD__
 	DRM_INIT_WAITQUEUE(&file->event_wait, "drmevent");
+	DRM_INIT_WAITQUEUE(&file->event_read_wq, "drmevtrd");
 	selinit(&file->event_selq);
 #else
 	init_waitqueue_head(&file->event_wait);
@@ -198,6 +199,7 @@ out_prime_destroy:
 	mutex_destroy(&file->fbs_lock);
 #ifdef __NetBSD__
 	DRM_DESTROY_WAITQUEUE(&file->event_wait);
+	DRM_DESTROY_WAITQUEUE(&file->event_read_wq);
 	seldestroy(&file->event_selq);
 #else
 	put_pid(file->pid);
