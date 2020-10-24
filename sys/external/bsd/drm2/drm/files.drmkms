@@ -60,6 +60,9 @@ file	external/bsd/drm2/drm/drm_module.c		drmkms
 file	external/bsd/drm2/drm/drm_stub.c		!drmkms & !drmbase
 file	external/bsd/drm2/drm/drm_sysctl.c		drmkms
 
+# pci bus ids -- doesn't depend on all of pci, just the header files
+file	external/bsd/drm2/pci/drm_pci_busid.c		drmkms
+
 # Generic, unaccelerated kms framebuffer.
 define	drmfb: genfb
 file	external/bsd/drm2/drm/drmfb.c			drmfb
