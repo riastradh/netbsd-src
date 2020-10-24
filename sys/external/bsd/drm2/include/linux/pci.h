@@ -308,6 +308,13 @@ void		pci_iounmap(struct pci_dev *, void __pci_iomem *);
 
 void		pci_save_state(struct pci_dev *);
 void		pci_restore_state(struct pci_dev *);
-bool		dev_is_pci(struct pci_dev *);
+
+static inline bool
+dev_is_pci(struct device *dev)
+{
+	struct device *parent = device_parent(dev);
+
+	return parent && device_is_a(parent, "pci");
+}
 
 #endif  /* _LINUX_PCI_H_ */

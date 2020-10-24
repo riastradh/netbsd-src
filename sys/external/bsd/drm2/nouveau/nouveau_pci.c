@@ -358,7 +358,6 @@ nouveau_pci_modcmd(modcmd_t cmd, void *arg __unused)
 	switch (cmd) {
 	case MODULE_CMD_INIT:
 		*nouveau_drm_driver_pci = *nouveau_drm_driver_stub;
-		nouveau_drm_driver_pci->set_busid = drm_pci_set_busid;
 		nouveau_drm_driver_pci->request_irq = drm_pci_request_irq;
 		nouveau_drm_driver_pci->free_irq = drm_pci_free_irq;
 #if 0		/* XXX nouveau acpi */

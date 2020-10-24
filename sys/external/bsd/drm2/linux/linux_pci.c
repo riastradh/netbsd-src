@@ -789,9 +789,3 @@ linux_pci_dev_destroy(struct pci_dev *pdev)
 	KASSERT(pdev->pd_saved_state == NULL);
 	KASSERT(pdev->pd_intr_handles == NULL);
 }
-
-bool
-dev_is_pci(struct pci_dev *pdev)
-{
-	return pdev != NULL;
-}

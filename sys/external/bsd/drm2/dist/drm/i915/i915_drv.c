@@ -50,7 +50,6 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <drm/drm_irq.h>
 #include <drm/drm_probe_helper.h>
 #include <drm/i915_drm.h>
-#include "../drm_internal.h"	/* drm_pci_set_busid */
 
 #include "display/intel_acpi.h"
 #include "display/intel_audio.h"

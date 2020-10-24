@@ -226,18 +226,3 @@ drm_pci_free_irq(struct drm_device *dev)
 	kmem_free(cookie, sizeof(*cookie));
 	dev->irq_cookie = NULL;
 }
-
-int
-drm_pci_set_busid(struct drm_device *dev, struct drm_master *master)
-{
-	const struct pci_attach_args *const pa = &dev->pdev->pd_pa;
-
-	master->unique = kasprintf(GFP_KERNEL, "pci:%04x:%02x:%02x.%d",
-	    device_unit(device_parent(dev->dev)),
-	    pa->pa_bus, pa->pa_device, pa->pa_function);
-	if (master->unique == NULL)
-		return -ENOMEM;
-	master->unique_len = strlen(master->unique);
-
-	return 0;
-}

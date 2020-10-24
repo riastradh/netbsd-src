@@ -79,7 +79,6 @@ void drm_pci_free_irq(struct drm_device *);
 int drm_pci_attach(struct drm_device *, const struct pci_attach_args *,
     struct pci_dev *);
 void drm_pci_detach(struct drm_device *);
-int drm_pci_set_busid(struct drm_device *, struct drm_master *);
 #endif
 
 #endif /* _DRM_PCI_H_ */
