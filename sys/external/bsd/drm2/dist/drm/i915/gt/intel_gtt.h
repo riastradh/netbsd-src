@@ -415,11 +415,7 @@ i915_vm_is_4lvl(const struct i915_address_space *vm)
 static inline bool
 i915_vm_has_scratch_64K(struct i915_address_space *vm)
 {
-#ifdef __NetBSD__
-	return vm->scratch_page.seg.ds_len == I915_GTT_PAGE_SIZE_64K;
-#else
 	return vm->scratch_order == get_order(I915_GTT_PAGE_SIZE_64K);
-#endif
 }
 
 static inline bool
