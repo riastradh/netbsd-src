@@ -87,6 +87,9 @@ struct delayed_work {
 	}				dw_state;
 };
 
+struct rcu_work {
+};
+
 #define	WQ_FREEZABLE		__BIT(0)
 #define	WQ_HIGHPRI		__BIT(1)
 #define	WQ_MEM_RECLAIM		__BIT(2)
