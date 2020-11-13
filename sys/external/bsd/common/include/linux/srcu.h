@@ -46,7 +46,7 @@
 struct lwp;
 struct percpu;
 
-struct srcu {
+struct srcu_struct {
 	struct percpu		*srcu_percpu;	/* struct srcu_cpu */
 	kmutex_t		srcu_lock;
 	kcondvar_t		srcu_cv;
@@ -55,12 +55,12 @@ struct srcu {
 	volatile unsigned	srcu_gen;
 };
 
-void	srcu_init(struct srcu *, const char *);
-void	srcu_fini(struct srcu *);
+void	srcu_init(struct srcu_struct *, const char *);
+void	srcu_fini(struct srcu_struct *);
 
-int	srcu_read_lock(struct srcu *);
-void	srcu_read_unlock(struct srcu *, int);
+int	srcu_read_lock(struct srcu_struct *);
+void	srcu_read_unlock(struct srcu_struct *, int);
 
-void	synchronize_srcu(struct srcu *);
+void	synchronize_srcu(struct srcu_struct *);
 
 #endif	/* _LINUX_SRCU_H_ */
