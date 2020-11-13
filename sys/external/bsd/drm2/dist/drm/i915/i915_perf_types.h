@@ -225,7 +225,11 @@ struct i915_perf_stream {
 	 * @poll_wq: The wait queue that hrtimer callback wakes when it
 	 * sees data ready to read in the circular OA buffer.
 	 */
+#ifdef __linux__
 	wait_queue_head_t poll_wq;
+#else
+	drm_waitqueue_t poll_wq;
+#endif
 
 	/**
 	 * @pollin: Whether there is data available to read.
