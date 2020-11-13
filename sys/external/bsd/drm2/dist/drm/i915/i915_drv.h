@@ -1484,7 +1484,7 @@ IS_PLATFORM(const struct drm_i915_private *i915, enum intel_platform p)
 	return info->platform_mask[pi] & BIT(pb);
 }
 
-static __always_inline bool
+static __always_inline inline bool
 IS_SUBPLATFORM(const struct drm_i915_private *i915,
 	       enum intel_platform p, unsigned int s)
 {
