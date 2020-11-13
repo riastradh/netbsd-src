@@ -57,6 +57,7 @@ struct spinlock;
 #define	lockdep_assert_held_once(m)	do {} while (0)
 #define	lockdep_is_held(m)		1
 #define	might_lock(m)			do {} while (0)
+#define	might_lock_nested(m,n)		do {} while (0)
 #endif
 
 #define	__lockdep_kmutex(m)						      \
