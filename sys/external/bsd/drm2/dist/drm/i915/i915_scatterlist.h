@@ -15,6 +15,7 @@
 
 #include "i915_gem.h"
 
+#ifdef __linux__
 /*
  * Optimised SGL iterator for GEM objects
  */
@@ -41,7 +42,6 @@ static __always_inline struct sgt_iter {
 	return s;
 }
 
-#ifndef __NetBSD__
 static inline int __sg_page_count(const struct scatterlist *sg)
 {
 	return sg->length >> PAGE_SHIFT;
