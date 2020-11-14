@@ -92,6 +92,7 @@ enum i915_gpio {
  *
  * XXX Yes, this is disgusting.  Sorry.
  */
+#include <sys/file.h>
 #define	pipe	pipe_drmhack
 /*
  * Keep the pipe enum values fixed: the code assumes that PIPE_A=0, the
