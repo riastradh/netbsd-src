@@ -35,6 +35,7 @@
 #include <sys/time.h>
 
 #include <linux/math64.h>
+#include <linux/seqlock.h>
 
 #define	timespec64	timespec	/* take that, 2038 */
 
