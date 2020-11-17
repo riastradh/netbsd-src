@@ -8,6 +8,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/err.h>
 #include <linux/kmemleak.h>
 #include <linux/slab.h>
 
