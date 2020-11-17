@@ -13,6 +13,7 @@ attach	intelfb at intelfbbus
 # overflow is OK.
 makeoptions 	i915drmkms	"COPTS.i915drmkms"+="-fwrapv"
 
+makeoptions	intelfb		"CPPFLAGS.intelfb"+="-I$S/external/bsd/drm2/i915drm"
 makeoptions	i915drmkms	"CPPFLAGS.i915drmkms"+="-I$S/external/bsd/drm2/i915drm"
 
 makeoptions	intelfb		"CPPFLAGS.intelfb"+="-I$S/external/bsd/drm2/dist/drm/i915"
