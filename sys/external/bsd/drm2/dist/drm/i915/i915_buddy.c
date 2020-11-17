@@ -38,6 +38,10 @@ static struct i915_global_block global = { {
 	.exit = i915_global_buddy_exit,
 } };
 
+#ifdef __NetBSD__
+#define	__init	/* called from i915_module.c */
+#endif
+
 int __init i915_global_buddy_init(void)
 {
 	global.slab_blocks = KMEM_CACHE(i915_buddy_block, SLAB_HWCACHE_ALIGN);

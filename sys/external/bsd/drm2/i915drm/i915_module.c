@@ -52,12 +52,18 @@ MODULE(MODULE_CLASS_DRIVER, i915drmkms, "drmkms,drmkms_pci"); /* XXX drmkms_i2c 
 
 struct drm_sysctl_def i915_def = DRM_SYSCTL_INIT();
 
+int i915_global_buddy_init(void); /* XXX */
+
 static int
 i915drmkms_init(void)
 {
 	int error;
 
 	error = drm_guarantee_initialized();
+	if (error)
+		return error;
+
+	error = -i915_global_buddy_init();
 	if (error)
 		return error;
 
