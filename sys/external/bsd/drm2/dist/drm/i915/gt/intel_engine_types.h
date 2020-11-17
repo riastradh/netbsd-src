@@ -15,6 +15,7 @@
 #include <linux/kref.h>
 #include <linux/list.h>
 #include <linux/llist.h>
+#include <linux/notifier.h>
 #include <linux/rbtree.h>
 #include <linux/timer.h>
 #include <linux/types.h>
