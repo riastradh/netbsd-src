@@ -10,6 +10,7 @@
 #define __INTEL_ENGINE_TYPES__
 
 #include <linux/average.h>
+#include <linux/completion.h>
 #include <linux/hashtable.h>
 #include <linux/irq_work.h>
 #include <linux/kref.h>
