@@ -352,8 +352,8 @@ int i915_buddy_alloc_range(struct i915_buddy_mm *mm,
 {
 	struct i915_buddy_block *block;
 	struct i915_buddy_block *buddy;
-	LIST_HEAD(allocated);
-	LIST_HEAD(dfs);
+	struct list_head allocated = LIST_HEAD_INIT(allocated);
+	struct list_head dfs = LIST_HEAD_INIT(dfs);
 	u64 end;
 	int err;
 	int i;
