@@ -35,6 +35,8 @@
 #include <sys/atomic.h>
 #include <sys/cdefs.h>
 
+#include <linux/stddef.h>
+
 #include <asm/barrier.h>
 
 #define	__printf	__printflike
