@@ -19,7 +19,7 @@ void intel_register_dsm_handler(void);
 void intel_unregister_dsm_handler(void);
 #else
 #ifdef __NetBSD__
-static inline void intel_register_dsm_handler(struct drm_i915_private *) { return; }
+static inline void intel_register_dsm_handler(struct drm_i915_private *i915) { return; }
 #else
 static inline void intel_register_dsm_handler(void) { return; }
 #endif
