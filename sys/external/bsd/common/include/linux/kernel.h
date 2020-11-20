@@ -123,6 +123,8 @@
 
 #define	ARRAY_SIZE(ARRAY)	__arraycount(ARRAY)
 
+#define	__is_constexpr(x)	__builtin_constant_p(x)
+
 #define	swap(X, Y)	do						\
 {									\
 	/* XXX Kludge for type-safety.  */				\
