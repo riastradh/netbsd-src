@@ -41,6 +41,6 @@
 #define	BUILD_BUG()			do {} while (0)
 #define	BUILD_BUG_ON_MSG(EXPR,MSG)	BUILD_BUG_ON(EXPR)
 #define	BUILD_BUG_ON_INVALID(EXPR)	((void)sizeof((long)(EXPR)))
-#define	BUILD_BUG_ON_ZERO(EXPR)		0
+#define	BUILD_BUG_ON_ZERO(EXPR)		((int)(0*sizeof(int[(EXPR) ? -1 : 1])))
 
 #endif	/* _LINUX_BUILD_BUG_H_ */
