@@ -34,6 +34,7 @@
 
 #include <sys/types.h>
 
+#include <linux/highmem.h>
 #include <linux/uaccess.h>
 
 static inline int
