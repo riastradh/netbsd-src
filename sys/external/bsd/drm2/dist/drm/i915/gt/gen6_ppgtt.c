@@ -202,7 +202,11 @@ static void gen6_flush_pd(struct gen6_ppgtt *ppgtt, u64 start, u64 end)
 		gen6_write_pde(ppgtt, pde, pt);
 
 	mb();
+#ifdef __NetBSD__
+	(void)bus_space_read_4(ppgtt->pd_bst, ppgtt->pd_bsh, 4*(pde - 1));
+#else
 	ioread32(ppgtt->pd_addr + pde - 1);
+#endif
 	gen6_ggtt_invalidate(ppgtt->base.vm.gt->ggtt);
 	mb();
 
