@@ -60,7 +60,6 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/pci.h>
 #include <linux/dma-buf.h>
 #include <linux/mman.h>
-#include <linux/nbsd-namespace.h>
 
 #include "display/intel_display.h"
 #include "display/intel_frontbuffer.h"
@@ -80,6 +79,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "i915_vgpu.h"
 
 #include "intel_pm.h"
+
+#include <linux/nbsd-namespace.h>
 
 static int
 insert_mappable_node(struct i915_ggtt *ggtt, struct drm_mm_node *node, u32 size)
