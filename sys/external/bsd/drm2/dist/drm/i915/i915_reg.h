@@ -272,6 +272,7 @@ static inline bool i915_mmio_reg_valid(i915_reg_t reg)
 	if (__builtin_constant_p(mask) && __builtin_constant_p(value)) {   \
 		BUILD_BUG_ON_MSG((value) & ~(mask),			   \
 				 "Incorrect value for mask");		   \
+	}								   \
 	__MASKED_FIELD(mask, value); })
 #define _MASKED_BIT_ENABLE(a)	({ typeof(a) _a = (a); _MASKED_FIELD(_a, _a); })
 #define _MASKED_BIT_DISABLE(a)	(_MASKED_FIELD((a), 0))
