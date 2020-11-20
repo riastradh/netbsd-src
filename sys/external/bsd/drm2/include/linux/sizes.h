@@ -33,6 +33,7 @@
 #define	_LINUX_SIZES_H_
 
 #define	SZ_8K		0x00008000
+#define	SZ_64K		0x00010000
 #define	SZ_1M		0x00100000
 #define	SZ_2M		0x00200000
 
