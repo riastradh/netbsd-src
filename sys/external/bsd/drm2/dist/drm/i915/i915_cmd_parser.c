@@ -1173,9 +1173,15 @@ static u32 *copy_batch(struct drm_i915_gem_object *dst_obj,
 		 * We don't care about copying too much here as we only
 		 * validate up to the end of the batch.
 		 */
-		if (!(dst_obj->cache_coherent & I915_BO_CACHE_COHERENT_FOR_READ))
+		if (!(dst_obj->cache_coherent & I915_BO_CACHE_COHERENT_FOR_READ)) {
+#ifdef __NetBSD__
+			length = round_up(length,
+					  cpu_info_primary.ci_cflush_lsize);
+#else
 			length = round_up(length,
 					  boot_cpu_data.x86_clflush_size);
+#endif
+		}
 
 		ptr = dst;
 		x = offset_in_page(offset);
