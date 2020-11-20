@@ -15,6 +15,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "i915_trace.h"
 #include "i915_vgpu.h"
 #include "intel_gt.h"
+#include <linux/nbsd-namespace.h>
 
 /* Write pde (index) from the page directory @pd to the page table @pt */
 static inline void gen6_write_pde(const struct gen6_ppgtt *ppgtt,
