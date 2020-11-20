@@ -113,6 +113,18 @@ atomic_add_return(int addend, atomic_t *atomic)
 	return v;
 }
 
+static inline int
+atomic_sub_return(int subtrahend, atomic_t *atomic)
+{
+	int v;
+
+	smp_mb__before_atomic();
+	v = (int)atomic_add_int_nv(&atomic->a_u.au_uint, -subtrahend);
+	smp_mb__after_atomic();
+
+	return v;
+}
+
 static inline void
 atomic_inc(atomic_t *atomic)
 {

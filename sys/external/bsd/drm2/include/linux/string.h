@@ -116,6 +116,14 @@ strscpy(char *dst, const char *src, size_t dstsize)
 }
 
 static inline void
+memset32(uint32_t *p, uint32_t v, size_t n)
+{
+
+	while (n --> 0)
+		*p++ = v;
+}
+
+static inline void
 memset64(uint64_t *p, uint64_t v, size_t n)
 {
 
