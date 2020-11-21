@@ -450,34 +450,6 @@ static void i915_workqueues_cleanup(struct drm_i915_private *dev_priv)
 	destroy_workqueue(dev_priv->wq);
 }
 
-static const struct intel_device_info intel_kabylake_info = {
-	.is_kabylake = 1,
-	.gen = 9,
-	.num_pipes = 3,
-	.need_gfx_hws = 1, .has_hotplug = 1,
-	.ring_mask = RENDER_RING | BSD_RING | BLT_RING | VEBOX_RING,
-	.has_llc = 1,
-	.has_ddi = 1,
-	.has_fpga_dbg = 1,
-	.has_fbc = 1,
-	GEN_DEFAULT_PIPEOFFSETS,
-	IVB_CURSOR_OFFSETS,
-};
-
-static const struct intel_device_info intel_kabylake_gt3_info = {
-	.is_kabylake = 1,
-	.gen = 9,
-	.num_pipes = 3,
-	.need_gfx_hws = 1, .has_hotplug = 1,
-	.ring_mask = RENDER_RING | BSD_RING | BLT_RING | VEBOX_RING | BSD2_RING,
-	.has_llc = 1,
-	.has_ddi = 1,
-	.has_fpga_dbg = 1,
-	.has_fbc = 1,
-	GEN_DEFAULT_PIPEOFFSETS,
-	IVB_CURSOR_OFFSETS,
-};
-
 /*
  * We don't keep the workarounds for pre-production hardware, so we expect our
  * driver to fail on these machines in one way or another. A little warning on
