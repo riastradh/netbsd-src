@@ -1483,7 +1483,7 @@ i915_driver_create(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (!i915)
 		return ERR_PTR(-ENOMEM);
 
-	err = drm_dev_init(&i915->drm, &driver, device_parent(pdev->pd_dev));
+	err = drm_dev_init(&i915->drm, &driver, pci_dev_dev(pdev));
 	if (err) {
 		kfree(i915);
 		return ERR_PTR(err);
