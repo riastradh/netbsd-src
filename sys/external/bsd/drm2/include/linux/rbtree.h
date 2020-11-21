@@ -69,6 +69,11 @@ rb_first(struct rb_root *root)
 }
 
 static inline struct rb_node *
+rb_next2(struct rb_root *root, struct rb_node *rb) {
+	return RB_TREE_NEXT(&root->rbr_tree, rb);
+}
+
+static inline struct rb_node *
 rb_last(struct rb_root *root)
 {
 	char *vnode = RB_TREE_MAX(&root->rbr_tree);
