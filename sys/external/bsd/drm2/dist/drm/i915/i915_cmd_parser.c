@@ -30,6 +30,8 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/bitmap.h>
+
 #include "gt/intel_engine.h"
 
 #include "i915_drv.h"
