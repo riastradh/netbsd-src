@@ -2043,8 +2043,6 @@ int i915_drm_resume_early(struct drm_device *dev)
 
 	enable_rpm_wakeref_asserts(&dev_priv->runtime_pm);
 
-	i915_rc6_ctx_wa_resume(dev_priv);
-
 	return ret;
 }
 
