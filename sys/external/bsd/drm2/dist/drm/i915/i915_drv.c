@@ -1690,7 +1690,9 @@ static int i915_driver_open(struct drm_device *dev, struct drm_file *file)
 static void i915_driver_lastclose(struct drm_device *dev)
 {
 	intel_fbdev_restore_mode(dev);
+#ifndef __NetBSD__		/* XXX vga */
 	vga_switcheroo_process_delayed_switch();
+#endif
 }
 
 static void i915_driver_postclose(struct drm_device *dev, struct drm_file *file)
