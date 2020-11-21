@@ -97,6 +97,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #endif
 #endif
 
+#include <linux/nbsd-namespace.h>
+
 static struct drm_driver driver;
 
 #ifdef __NetBSD__
