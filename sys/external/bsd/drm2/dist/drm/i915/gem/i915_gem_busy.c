@@ -57,7 +57,7 @@ __busy_set_if_active(const struct dma_fence *fence, u32 (*flag)(u16 id))
 		return 0;
 
 	/* opencode to_request() in order to avoid const warnings */
-	rq = container_of(fence, const struct i915_request, fence);
+	rq = const_container_of(fence, struct i915_request, fence);
 	if (i915_request_completed(rq))
 		return 0;
 
