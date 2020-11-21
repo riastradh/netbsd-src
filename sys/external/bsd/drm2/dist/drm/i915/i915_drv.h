@@ -1817,6 +1817,11 @@ extern const struct dev_pm_ops i915_pm_ops;
 int i915_driver_probe(struct pci_dev *pdev, const struct pci_device_id *ent);
 void i915_driver_remove(struct drm_i915_private *i915);
 
+int i915_drm_resume(struct drm_device *);
+int i915_drm_resume_early(struct drm_device *);
+int i915_drm_suspend(struct drm_device *);
+int i915_drm_suspend_late(struct drm_device *, bool);
+
 int i915_resume_switcheroo(struct drm_i915_private *i915);
 int i915_suspend_switcheroo(struct drm_i915_private *i915, pm_message_t state);
 

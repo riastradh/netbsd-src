@@ -20,7 +20,10 @@ struct i915_mmap_offset;
 struct mutex;
 
 int i915_gem_mmap_gtt_version(void);
-#ifdef __linux__
+#ifdef __NetBSD__
+int i915_gem_fault(struct uvm_faultinfo *, vaddr_t, struct vm_page **,
+    int, int, vm_prot_t, int);
+#else
 int i915_gem_mmap(struct file *filp, struct vm_area_struct *vma);
 #endif
 
