@@ -892,12 +892,6 @@ skl_dram_get_channels_info(struct drm_i915_private *dev_priv)
 	return 0;
 }
 
-#ifdef __NetBSD__
-/* XXX Kludge to expose this to NetBSD driver attachment goop.  */
-const struct pci_device_id *const i915_device_ids = pciidlist;
-const size_t i915_n_device_ids = __arraycount(pciidlist);
-#endif
-
 static enum intel_dram_type
 skl_get_dram_type(struct drm_i915_private *dev_priv)
 {
