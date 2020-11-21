@@ -1814,7 +1814,7 @@ get_suspend_mode(struct drm_i915_private *dev_priv, bool hibernate)
 	return I915_DRM_SUSPEND_MEM;
 }
 
-static int i915_drm_suspend_late(struct drm_device *dev, bool hibernation)
+int i915_drm_suspend_late(struct drm_device *dev, bool hibernation)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	struct pci_dev *pdev = dev_priv->drm.pdev;
