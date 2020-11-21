@@ -201,7 +201,9 @@ struct i915_request {
 	 */
 	struct i915_sw_fence submit;
 	union {
+#ifndef __NetBSD__		/* XXX */
 		wait_queue_entry_t submitq;
+#endif
 		struct i915_sw_dma_fence_cb dmaq;
 		struct i915_request_duration_cb {
 			struct dma_fence_cb cb;
