@@ -45,7 +45,7 @@ void
 init_rwsem(struct rw_semaphore *rwsem)
 {
 
-	mutex_init(&rwsem->rws_lock, MUTEX_DEFAULT, IPL_NONE);
+	mutex_init(&rwsem->rws_lock, MUTEX_DEFAULT, IPL_VM);
 	cv_init(&rwsem->rws_cv, "lnxrwsem");
 	rwsem->rws_writer = NULL;
 	rwsem->rws_readers = 0;
