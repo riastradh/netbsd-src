@@ -301,6 +301,7 @@ void drm_file_free(struct drm_file *file)
 
 #ifdef __NetBSD__
 	DRM_DESTROY_WAITQUEUE(&file->event_wait);
+	DRM_DESTROY_WAITQUEUE(&file->event_read_wq);
 	seldestroy(&file->event_selq);
 #else
 	put_pid(file->pid);
