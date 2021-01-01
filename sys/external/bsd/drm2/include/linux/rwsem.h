@@ -60,6 +60,7 @@ struct rw_semaphore {
 	struct lwp	*rws_writer;
 	unsigned	rws_readers;
 	bool		rws_writewanted;
+	bool		rws_debug;
 };
 
 void init_rwsem(struct rw_semaphore *);
