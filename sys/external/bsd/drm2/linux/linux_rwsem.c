@@ -143,8 +143,9 @@ down_read_trylock(struct rw_semaphore *rwsem)
 	}
 	mutex_exit(&rwsem->rws_lock);
 
-	if (ret)
+	if (ret) {
 		RWSEM_LOCKED_SH(rwsem);
+	}
 
 	return ret;
 }
