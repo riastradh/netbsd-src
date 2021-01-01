@@ -55,12 +55,16 @@
 #define	up_write		linux_up_write
 
 struct rw_semaphore {
-	kmutex_t	rws_lock;
-	kcondvar_t	rws_cv;
+	/*
+	 * Note: rws_lock and rws_cv must not be first; doing so
+	 * confuses lockdebug.
+	 */
 	struct lwp	*rws_writer;
 	unsigned	rws_readers;
 	bool		rws_writewanted;
 	bool		rws_debug;
+	kmutex_t	rws_lock;
+	kcondvar_t	rws_cv;
 };
 
 void init_rwsem(struct rw_semaphore *);
