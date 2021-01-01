@@ -685,7 +685,8 @@ static void ttm_bo_release(struct kref *kref)
 #endif
 	drm_vma_offset_remove(bdev->vma_manager, &bo->base.vma_node);
 #ifdef __NetBSD__
-	drm_vma_node_destroy(&bo->base.vma_node);
+	if (!ttm_bo_uses_embedded_gem_object(bo))
+		drm_vma_node_destroy(&bo->base.vma_node);
 #endif
 	ttm_mem_io_lock(man, false);
 	ttm_mem_io_free_vm(bo);
