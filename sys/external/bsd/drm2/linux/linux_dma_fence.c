@@ -807,8 +807,10 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, long timeout)
 	spin_lock(fence->lock);
 
 	/* Ensure signalling is enabled, or stop if already completed.  */
-	if (dma_fence_ensure_signal_enabled(fence) != 0)
+	if (dma_fence_ensure_signal_enabled(fence) != 0) {
+		spin_unlock(fence->lock);
 		return (timeout ? timeout : 1);
+	}
 
 	/* If merely polling, stop here.  */
 	if (timeout == 0) {
