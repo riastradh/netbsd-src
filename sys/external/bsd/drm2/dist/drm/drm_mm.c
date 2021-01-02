@@ -302,7 +302,7 @@ compare_hole_sizes(void *cookie, const void *va, const void *vb)
 		return -1;
 	if (a->hole_size > b->hole_size)
 		return +1;
-	return 0;
+	return (a < b ? -1 : a > b ? +1 : 0);
 }
 
 static int
