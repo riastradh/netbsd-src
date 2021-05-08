@@ -129,10 +129,17 @@ void drm_connector_ida_destroy(void)
 static void drm_connector_get_cmdline_mode(struct drm_connector *connector)
 {
 	struct drm_cmdline_mode *mode = &connector->cmdline_mode;
+#ifdef __NetBSD__
+	const char *option;
+	prop_dictionary_t prop = device_properties(connector->dev->dev);
+	if (!prop_dictionary_get_string(prop, connector->name, &option))
+		return;
+#else
 	char *option = NULL;
 
 	if (fb_get_options(connector->name, &option))
 		return;
+#endif
 
 	if (!drm_mode_parse_command_line_for_connector(option,
 						       connector,
