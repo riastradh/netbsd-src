@@ -37,6 +37,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "atom-bits.h"
 #include <drm/drm_dp_helper.h>
 
+#include <linux/nbsd-namespace.h>
+
 /* move these to drm_dp_helper.c/h */
 #define DP_LINK_CONFIGURATION_SIZE 9
 #define DP_DPCD_SIZE DP_RECEIVER_CAP_SIZE
