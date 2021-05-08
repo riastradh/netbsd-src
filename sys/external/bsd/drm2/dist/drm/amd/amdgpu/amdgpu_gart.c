@@ -282,7 +282,7 @@ amdgpu_gart_post_update(struct amdgpu_device *adev, unsigned gpu_pgstart,
 		    gpu_pgstart*entsize, gpu_npages*entsize,
 		    BUS_DMASYNC_PREWRITE);
 	}
-	membar_sync();		/* XXX overkill */
+	mb();
 	amdgpu_gart_flush_gpu_tlb(adev, 0);
 }
 #endif
