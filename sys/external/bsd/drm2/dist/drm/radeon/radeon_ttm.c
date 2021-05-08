@@ -851,6 +851,11 @@ static void radeon_ttm_tt_unpopulate(struct ttm_tt *ttm)
 	struct radeon_ttm_tt *gtt = radeon_ttm_tt_to_gtt(ttm);
 	bool slave = !!(ttm->page_flags & TTM_PAGE_FLAG_SG);
 
+#ifdef __NetBSD__
+	if (slave && ttm->sg) {
+		bus_dmamap_unload(ttm->bdev->dmat, gtt->ttm.dma_address);
+	}
+#endif
 	if (gtt && gtt->userptr) {
 		kfree(ttm->sg);
 		ttm->page_flags &= ~TTM_PAGE_FLAG_SG;
