@@ -55,7 +55,7 @@ nv50_gpio_reset(struct nvkm_gpio *gpio, u8 match)
 
 		nvkm_gpio_set(gpio, 0, func, line, defs);
 
-		nvkm_mask(device, reg, 0x00010001 << lsh, val << lsh);
+		nvkm_mask(device, reg, 0x00010001U << lsh, val << lsh);
 	}
 }
 

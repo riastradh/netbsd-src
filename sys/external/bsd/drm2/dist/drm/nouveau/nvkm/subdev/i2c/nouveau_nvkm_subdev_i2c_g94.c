@@ -39,7 +39,7 @@ g94_aux_stat(struct nvkm_i2c *i2c, u32 *hi, u32 *lo, u32 *rq, u32 *tx)
 		if ((stat & (1 << (i * 4)))) *hi |= 1 << i;
 		if ((stat & (2 << (i * 4)))) *lo |= 1 << i;
 		if ((stat & (4 << (i * 4)))) *rq |= 1 << i;
-		if ((stat & (8 << (i * 4)))) *tx |= 1 << i;
+		if ((stat & (8U << (i * 4)))) *tx |= 1 << i;
 	}
 	nvkm_wr32(device, 0x00e06c, intr);
 }
