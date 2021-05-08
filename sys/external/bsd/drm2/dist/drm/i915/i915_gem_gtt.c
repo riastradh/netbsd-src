@@ -35,11 +35,11 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <drm/bus_dma_hacks.h>
 #include <x86/machdep.h>
 #include <x86/pte.h>
-#define	_PAGE_PRESENT	PG_V	/* 0x01 PTE is present / valid */
-#define	_PAGE_RW	PG_RW	/* 0x02 read/write */
-#define	_PAGE_PWT	PG_WT	/* 0x08 write-through */
-#define	_PAGE_PCD	PG_N	/* 0x10 page cache disabled / non-cacheable */
-#define	_PAGE_PAT	PG_PAT	/* 0x80 page attribute table on PTE */
+#define	_PAGE_PRESENT	PTE_P	/* 0x01 PTE is present */
+#define	_PAGE_RW	PTE_W	/* 0x02 read/write */
+#define	_PAGE_PWT	PTE_PWT	/* 0x08 page write-through */
+#define	_PAGE_PCD	PTE_PCD	/* 0x10 page cache disabled */
+#define	_PAGE_PAT	PTE_PAT	/* 0x80 page attribute table on PTE */
 #endif
 
 int i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
