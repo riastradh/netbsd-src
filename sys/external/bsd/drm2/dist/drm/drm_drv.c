@@ -681,6 +681,12 @@ int drm_dev_init(struct drm_device *dev,
 	mutex_init(&dev->clientlist_mutex);
 	mutex_init(&dev->master_mutex);
 
+	dev->sc_monitor_hotplug.smpsw_name = PSWITCH_HK_DISPLAY_CYCLE;
+	dev->sc_monitor_hotplug.smpsw_type = PSWITCH_TYPE_HOTKEY;
+	ret = sysmon_pswitch_register(&dev->sc_monitor_hotplug);
+	if (ret)
+		goto err_pswitch;
+
 	dev->anon_inode = drm_fs_inode_new();
 	if (IS_ERR(dev->anon_inode)) {
 		ret = PTR_ERR(dev->anon_inode);
@@ -729,6 +735,10 @@ err_minors:
 	drm_minor_free(dev, DRM_MINOR_RENDER);
 	drm_fs_inode_free(dev->anon_inode);
 err_free:
+#ifdef __NetBSD__
+	sysmon_pswitch_unregister(&dev->sc_monitor_hotplug);
+err_pswitch:
+#endif
 	put_device(dev->dev);
 	mutex_destroy(&dev->master_mutex);
 	mutex_destroy(&dev->clientlist_mutex);
@@ -803,6 +813,10 @@ void drm_dev_fini(struct drm_device *dev)
 
 	drm_minor_free(dev, DRM_MINOR_PRIMARY);
 	drm_minor_free(dev, DRM_MINOR_RENDER);
+
+#ifdef __NetBSD__
+	sysmon_pswitch_unregister(&dev->sc_monitor_hotplug);
+#endif
 
 	put_device(dev->dev);
 

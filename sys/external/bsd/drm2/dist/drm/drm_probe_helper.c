@@ -571,6 +571,9 @@ EXPORT_SYMBOL(drm_helper_probe_single_connector_modes);
  */
 void drm_kms_helper_hotplug_event(struct drm_device *dev)
 {
+#ifdef __NetBSD__
+	sysmon_pswitch_event(&dev->sc_monitor_hotplug, PSWITCH_EVENT_PRESSED);
+#endif
 	/* send a uevent + call fbdev */
 	drm_sysfs_hotplug_event(dev);
 	if (dev->mode_config.funcs->output_poll_changed)
