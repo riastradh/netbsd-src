@@ -11,6 +11,10 @@
 #include <drm/drm_hashtab.h>
 #include <drm/drm_mode_config.h>
 
+#ifdef __NetBSD__
+#include <dev/sysmon/sysmonvar.h>
+#endif
+
 struct drm_driver;
 struct drm_minor;
 struct drm_master;
