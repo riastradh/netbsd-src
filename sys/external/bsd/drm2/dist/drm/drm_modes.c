@@ -1193,8 +1193,18 @@ drm_mode_validate_size(const struct drm_display_mode *mode,
 	if (maxX > 0 && mode->hdisplay > maxX)
 		return MODE_VIRTUAL_X;
 
+#if defined(DRM_MAX_RESOLUTION_HORIZONTAL)
+	if (mode->hdisplay > DRM_MAX_RESOLUTION_HORIZONTAL)
+		return MODE_VIRTUAL_X;
+#endif
+
 	if (maxY > 0 && mode->vdisplay > maxY)
 		return MODE_VIRTUAL_Y;
+
+#if defined(DRM_MAX_RESOLUTION_VERTICAL)
+	if (mode->vdisplay > DRM_MAX_RESOLUTION_VERTICAL)
+		return MODE_VIRTUAL_Y;
+#endif
 
 	return MODE_OK;
 }
