@@ -312,7 +312,7 @@ radeon_gart_post_update(struct radeon_device *rdev, unsigned gpu_pgstart,
 		    BUS_DMASYNC_PREWRITE);
 	}
 	if (rdev->gart.ptr != NULL) {
-		membar_sync();		/* XXX overkill */
+		mb();
 		radeon_gart_tlb_flush(rdev);
 	}
 }
