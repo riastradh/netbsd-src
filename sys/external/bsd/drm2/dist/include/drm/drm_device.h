@@ -308,6 +308,10 @@ struct drm_device {
 	 */
 	struct drm_fb_helper *fb_helper;
 
+#ifdef __NetBSD__
+	struct sysmon_pswitch sc_monitor_hotplug;
+#endif
+
 	/* Everything below here is for legacy driver, never use! */
 	/* private: */
 #if IS_ENABLED(CONFIG_DRM_LEGACY)
