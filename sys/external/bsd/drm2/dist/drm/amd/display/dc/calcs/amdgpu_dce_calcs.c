@@ -3018,7 +3018,7 @@ static bool all_displays_in_sync(const struct pipe_ctx pipe[],
 
 bool bw_calcs(struct dc_context *ctx,
 	const struct bw_calcs_dceip *dceip,
-	const struct bw_calcs_vbios *vbios,
+	struct bw_calcs_vbios *vbios,
 	const struct pipe_ctx pipe[],
 	int pipe_count,
 	struct dce_bw_output *calcs_output)
