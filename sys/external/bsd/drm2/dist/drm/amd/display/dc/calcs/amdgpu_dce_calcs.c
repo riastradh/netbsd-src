@@ -111,7 +111,7 @@ static void calculate_bandwidth(
 	bool lpt_enabled;
 	enum bw_defines sclk_message;
 	enum bw_defines yclk_message;
-	enum bw_defines v_filter_init_mode[maximum_number_of_surfaces];
+	enum bw_defines v_filter_init_mode[maximum_number_of_surfaces] __unused;
 	enum bw_defines tiling_mode[maximum_number_of_surfaces];
 	enum bw_defines surface_type[maximum_number_of_surfaces];
 	enum bw_defines voltage;
@@ -3036,7 +3036,7 @@ bool bw_calcs(struct dc_context *ctx,
 		calcs_output->all_displays_in_sync = false;
 
 	if (data->number_of_displays != 0) {
-		uint8_t yclk_lvl, sclk_lvl;
+		uint8_t yclk_lvl, sclk_lvl __unused;
 		struct bw_fixed high_sclk = vbios->high_sclk;
 		struct bw_fixed mid1_sclk = vbios->mid1_sclk;
 		struct bw_fixed mid2_sclk = vbios->mid2_sclk;

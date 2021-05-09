@@ -1019,7 +1019,7 @@ struct pixel_rate_range_table_entry {
 	unsigned short div_factor;
 };
 
-static const struct pixel_rate_range_table_entry video_optimized_pixel_rates[] = {
+static const struct pixel_rate_range_table_entry video_optimized_pixel_rates[] __unused = {
 	// /1.001 rates
 	{25170, 25180, 25200, 1000, 1001},	//25.2MHz   ->   25.17
 	{59340, 59350, 59400, 1000, 1001},	//59.4Mhz   ->   59.340
