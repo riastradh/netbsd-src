@@ -161,7 +161,7 @@ imx6_dwhdmi_ep_activate(device_t dev, struct fdt_endpoint *ep, bool activate)
 
 	sc->sc_encoder.possible_crtcs = 3; // 1U << drm_crtc_index(crtc); /* XXX */
 	drm_encoder_init(crtc->dev, &sc->sc_encoder, &imx6_dwhdmi_encoder_funcs,
-	    DRM_MODE_ENCODER_TMDS);
+	    DRM_MODE_ENCODER_TMDS, NULL);
 	drm_encoder_helper_add(&sc->sc_encoder, &imx6_dwhdmi_encoder_helper_funcs);
 
 	sc->sc_base.sc_connector.base.connector_type = DRM_MODE_CONNECTOR_HDMIA;
