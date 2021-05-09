@@ -55,7 +55,7 @@ struct dce120_hw_seq_reg_offsets {
 	uint32_t crtc;
 };
 
-static const struct dce120_hw_seq_reg_offsets reg_offsets[] = {
+static const struct dce120_hw_seq_reg_offsets reg_offsets[] __unused = {
 {
 	.crtc = (mmCRTC0_CRTC_GSL_CONTROL - mmCRTC0_CRTC_GSL_CONTROL),
 },
