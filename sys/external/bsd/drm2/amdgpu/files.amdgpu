@@ -112,7 +112,7 @@ file	external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/core/amdgpu_dc_stream.c
 file	external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/core/amdgpu_dc_surface.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/core/amdgpu_dc_vm_helper.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/dce/amdgpu_dce_abm.c	amdgpu
-file	external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/dce/amdgpu_dce_audio.c	amdgpu
+#file	external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/dce/amdgpu_dce_audio.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/dce/amdgpu_dce_aux.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/dce/amdgpu_dce_clock_source.c	amdgpu
 file	external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/dce/amdgpu_dce_dmcu.c	amdgpu

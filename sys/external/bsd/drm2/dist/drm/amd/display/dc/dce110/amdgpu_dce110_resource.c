@@ -325,6 +325,8 @@ static const struct dce110_aux_registers aux_engine_regs[] = {
 		aux_engine_regs(5)
 };
 
+#ifndef __NetBSD__		/* XXX amdgpu audio */
+
 #define audio_regs(id)\
 [id] = {\
 	AUD_COMMON_REG_LIST(id)\
@@ -347,6 +349,8 @@ static const struct dce_audio_shift audio_shift = {
 static const struct dce_audio_mask audio_mask = {
 		AUD_COMMON_MASK_SH_LIST(_MASK)
 };
+
+#endif	/* __NetBSD__ */
 
 /* AG TBD Needs to be reduced back to 3 pipes once dce10 hw sequencer implemented. */
 
@@ -495,12 +499,14 @@ static void read_dce_straps(
 	REG_GET(DC_PINSTRAPS, DC_PINSTRAPS_AUDIO, &straps->dc_pinstraps_audio);
 }
 
+#ifndef __NetBSD__		/* XXX amdgpu audio */
 static struct audio *create_audio(
 		struct dc_context *ctx, unsigned int inst)
 {
 	return dce_audio_create(ctx, inst,
 			&audio_regs[inst], &audio_shift, &audio_mask);
 }
+#endif
 
 static struct timing_generator *dce110_timing_generator_create(
 		struct dc_context *ctx,
@@ -570,7 +576,9 @@ static struct dce_hwseq *dce110_hwseq_create(
 
 static const struct resource_create_funcs res_create_funcs = {
 	.read_dce_straps = read_dce_straps,
+#ifndef __NetBSD__		/* XXX amdgpu audio */
 	.create_audio = create_audio,
+#endif
 	.create_stream_encoder = dce110_stream_encoder_create,
 	.create_hwseq = dce110_hwseq_create,
 };
@@ -841,7 +849,9 @@ static void dce110_resource_destruct(struct dce110_resource_pool *pool)
 
 	for (i = 0; i < pool->base.audio_count; i++)	{
 		if (pool->base.audios[i] != NULL) {
+#ifndef __NetBSD__		/* XXX amdgpu audio */
 			dce_aud_destroy(&pool->base.audios[i]);
+#endif
 		}
 	}
 
