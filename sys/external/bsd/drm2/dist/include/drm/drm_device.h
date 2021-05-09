@@ -22,8 +22,6 @@ struct drm_vma_offset_manager;
 struct drm_vram_mm;
 struct drm_fb_helper;
 
-struct inode;
-
 struct pci_dev;
 struct pci_controller;
 
@@ -121,7 +119,7 @@ struct drm_device {
 	bool unplugged;
 
 	/** @anon_inode: inode for private address-space */
-	struct inode *anon_inode;
+	void *anon_inode;
 
 	/** @unique: Unique name of the device */
 	char *unique;
