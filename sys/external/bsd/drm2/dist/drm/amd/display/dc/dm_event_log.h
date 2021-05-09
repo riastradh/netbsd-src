@@ -33,9 +33,18 @@
 
 #define __DM_EVENT_LOG_H__
 
-#define EVENT_LOG_AUX_REQ(ddc, type, action, address, len, data)
-#define EVENT_LOG_AUX_REP(ddc, type, replyStatus, len, data)
-#define EVENT_LOG_CUST_MSG(tag, a, ...)
+enum event_log_type {
+	EVENT_LOG_AUX_ORIGIN_NATIVE,
+};
+
+#define EVENT_LOG_AUX_REQ(ddc, type, action, address, len, data)	      \
+	(void)((void)(ddc), (void)(type), (void)(action), (void)(address),    \
+	    (void)(len), (void)(data))
+#define EVENT_LOG_AUX_REP(ddc, type, replyStatus, len, data)		      \
+	(void)((void)(ddc), (void)(type), (void)(replyStatus), (void)(len),   \
+	    (void)(data))
+#define EVENT_LOG_CUST_MSG(tag, a, ...)					      \
+	(void)((void)(tag), (void)(a))
 
 #endif
 
