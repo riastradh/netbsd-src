@@ -416,8 +416,9 @@ nouveau_fbcon_create(struct drm_fb_helper *helper,
 	nfa.nfa_fb_ptr = nvbo_kmap_obj_iovirtual(nvbo);
 	nfa.nfa_fb_linebytes = mode_cmd.pitches[0];
 
-	helper->fbdev = config_found_ia(dev->dev, "nouveaufbbus", &nfa,
-	    nouveau_fbcon_print);
+	helper->fbdev = config_found(dev->dev, &nfa, nouveau_fbcon_print,
+	    CFARG_IATTR, "nouveaufbbus",
+	    CFARG_EOL);
 	if (helper->fbdev == NULL) {
 		goto out_unlock;
 	}
