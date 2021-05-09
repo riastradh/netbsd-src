@@ -188,7 +188,8 @@ void drm_gem_private_object_init(struct drm_device *dev,
 	obj->filp = NULL;
 	KASSERT(drm_core_check_feature(dev, DRIVER_GEM));
 	KASSERT(dev->driver->gem_uvm_ops != NULL);
-	uvm_obj_init(&obj->gemo_uvmobj, dev->driver->gem_uvm_ops, true, 1);
+	uvm_obj_init(&obj->gemo_uvmobj, dev->driver->gem_uvm_ops,
+	    /*allocate lock*/true, /*nrefs*/1);
 #else
 	obj->filp = NULL;
 #endif
@@ -1065,7 +1066,7 @@ drm_gem_object_release(struct drm_gem_object *obj)
 	drm_vma_node_destroy(&obj->vma_node);
 	if (obj->filp)
 		uao_detach(obj->filp);
-	uvm_obj_destroy(&obj->gemo_uvmobj, true);
+	uvm_obj_destroy(&obj->gemo_uvmobj, /*free lock*/true);
 #else
 	if (obj->filp)
 		fput(obj->filp);
