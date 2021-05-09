@@ -59,7 +59,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 struct gpio_service *dal_gpio_service_create(
 	enum dce_version dce_version_major,
-	enum dce_version dce_version_minor,
+	enum dce_environment dce_version_minor,
 	struct dc_context *ctx)
 {
 	struct gpio_service *service;
