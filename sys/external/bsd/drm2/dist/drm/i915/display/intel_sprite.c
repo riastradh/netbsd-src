@@ -137,7 +137,7 @@ void intel_pipe_update_start(const struct intel_crtc_state *new_crtc_state)
 	trace_intel_pipe_update_start(crtc);
 
 #ifdef __NetBSD__
-	DRM_SPIN_TIMED_WAIT_UNTIL(ret, wq, &dev->vbl_lock, timeout,
+	DRM_SPIN_TIMED_WAIT_NOINTR_UNTIL(ret, wq, &dev->vbl_lock, timeout,
 	    (scanline = intel_get_crtc_scanline(crtc),
 		scanline < min || scanline > max));
 	if (ret <= 0)
