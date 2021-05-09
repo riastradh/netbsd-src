@@ -50,7 +50,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "dcn10_cm_common.h"
 #include "clk_mgr.h"
 
-unsigned int snprintf_count(char *pBuf, unsigned int bufSize, char *fmt, ...)
+unsigned int __printflike(3,4) snprintf_count(char *pBuf, unsigned int bufSize, const char *fmt, ...)
 {
 	unsigned int ret_vsnprintf;
 	unsigned int chars_printed;
