@@ -32,6 +32,8 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <sys/mutex.h> /* XXX work around cycle x86/mutex.h<->x86/intr.h */
+
 #include <sys/atomic.h>
 #include <sys/intr.h>
 #include <sys/lock.h>
