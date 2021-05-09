@@ -36,7 +36,6 @@ __KERNEL_RCSID(0, "$NetBSD: imx6_dwhdmi.c,v 1.2 2021/01/27 03:10:20 thorpej Exp 
 #include <sys/kernel.h>
 #include <sys/conf.h>
 
-#include <drm/drmP.h>
 #include <drm/drm_crtc_helper.h>
 
 #include <dev/fdt/fdtvar.h>
