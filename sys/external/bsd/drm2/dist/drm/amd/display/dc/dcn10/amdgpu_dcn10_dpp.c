@@ -139,7 +139,7 @@ bool dpp1_get_optimal_number_of_taps(
 		struct scaler_data *scl_data,
 		const struct scaling_taps *in_taps)
 {
-	uint32_t pixel_width;
+	uint32_t pixel_width __unused;
 
 	if (scl_data->viewport.width > scl_data->recout.width)
 		pixel_width = scl_data->recout.width;
