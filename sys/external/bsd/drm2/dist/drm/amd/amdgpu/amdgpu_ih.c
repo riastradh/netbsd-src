@@ -84,7 +84,7 @@ fail1:			bus_dmamem_free(adev->ddev->dmat, &ih->ring_seg, 1);
 			goto fail0;
 		}
 		r = -bus_dmamem_map(adev->ddev->dmat, &ih->ring_seg, 1, size,
-		    &kva, BUS_DMA_WAITOK);
+		    &kva, BUS_DMA_WAITOK|BUS_DMA_COHERENT);
 		if (r) {
 fail2:			bus_dmamap_destroy(adev->ddev->dmat, ih->ring_map);
 			ih->ring_map = NULL;

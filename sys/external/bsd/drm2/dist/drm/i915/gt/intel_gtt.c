@@ -419,10 +419,12 @@ int setup_scratch_page(struct i915_address_space *vm, gfp_t gfp)
 
 		/* Zero the page.  */
 		ret = -bus_dmamem_map(vm->dmat, &vm->scratch_page.seg, 1,
-		    size, &kva, BUS_DMA_NOWAIT);
+		    size, &kva, BUS_DMA_NOWAIT|BUS_DMA_NOCACHE);
 		if (ret)
 			goto unload_dmamap;
 		memset(kva, 0, size);
+		bus_dmamap_sync(vm->dmat, vm->scratch_page.map, 0, size,
+		    BUS_DMASYNC_PREREAD|BUS_DMASYNC_PREWRITE);
 		bus_dmamem_unmap(vm->dmat, kva, size);
 
 		/* XXX Is this page guaranteed to work as a huge page?  */

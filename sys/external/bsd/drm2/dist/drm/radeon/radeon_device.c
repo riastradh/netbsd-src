@@ -839,6 +839,8 @@ int radeon_dummy_page_init(struct radeon_device *rdev)
 		goto fail3;
 
 	memset(rdev->dummy_page.rdp_addr, 0, PAGE_SIZE);
+	bus_dmamap_sync(rdev->ddev->dmat, rdev->dummy_page.rdp_map, 0,
+	    PAGE_SIZE, BUS_DMASYNC_PREREAD|BUS_DMASYNC_PREWRITE);
 
 	/* Success!  */
 	rdev->dummy_page.addr = rdev->dummy_page.rdp_map->dm_segs[0].ds_addr;

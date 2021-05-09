@@ -254,7 +254,7 @@ fail1:		bus_dmamem_free(dmat, &vmm->nullseg, 1);
 
 	/* XXX errno NetBSD->Linux */
 	ret = -bus_dmamem_map(dmat, &vmm->nullseg, 1, nullsz,
-	    &vmm->nullp, BUS_DMA_WAITOK);
+	    &vmm->nullp, BUS_DMA_WAITOK|BUS_DMA_COHERENT);
 	if (ret) {
 fail2:		bus_dmamap_destroy(dmat, vmm->nullmap);
 		goto fail1;
