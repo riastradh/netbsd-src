@@ -517,16 +517,14 @@ EXPORT_SYMBOL(drm_dev_unplug);
 
 #ifdef __NetBSD__
 
-struct inode;
-
-static struct inode *
+static void *
 drm_fs_inode_new(void)
 {
 	return NULL;
 }
 
 static void
-drm_fs_inode_free(struct inode *inode)
+drm_fs_inode_free(void *inode)
 {
 	KASSERT(inode == NULL);
 }
