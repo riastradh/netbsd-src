@@ -99,7 +99,9 @@ int radeon_gart_table_ram_alloc(struct radeon_device *rdev)
 	if (error)
 		goto fail3;
 
-	memset((void *)rdev->gart.ptr, 0, rdev->gart.table_size);
+	memset(rdev->gart.ptr, 0, rdev->gart.table_size);
+	bus_dmamap_sync(rdev->ddev->dmat, rdev->gart.rg_table_map, 0,
+	    rdev->gart.table_size, BUS_DMASYNC_PREWRITE);
 
 	/* Success!  */
 	rdev->gart.table_addr = rdev->gart.rg_table_map->dm_segs[0].ds_addr;
