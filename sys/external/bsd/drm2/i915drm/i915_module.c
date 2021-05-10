@@ -53,6 +53,8 @@ MODULE(MODULE_CLASS_DRIVER, i915drmkms, "drmkms,drmkms_pci"); /* XXX drmkms_i2c 
 struct drm_sysctl_def i915_def = DRM_SYSCTL_INIT();
 
 int i915_global_buddy_init(void); /* XXX */
+void i915_gem_client_blt_init(void); /* XXX */
+void i915_gem_client_blt_fini(void); /* XXX */
 
 static int
 i915drmkms_init(void)
@@ -69,6 +71,7 @@ i915drmkms_init(void)
 
 	drm_sysctl_init(&i915_def);
 	spin_lock_init(&mchdev_lock);
+	i915_gem_client_blt_init();
 
 	return 0;
 }
@@ -90,6 +93,7 @@ static void
 i915drmkms_fini(void)
 {
 
+	i915_gem_client_blt_fini();
 	spin_lock_destroy(&mchdev_lock);
 	drm_sysctl_fini(&i915_def);
 }
