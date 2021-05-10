@@ -1239,7 +1239,9 @@ void i915_gem_driver_remove(struct drm_i915_private *dev_priv)
 
 	i915_gem_suspend_late(dev_priv);
 	intel_gt_driver_remove(&dev_priv->gt);
+#ifndef __NetBSD__		/* XXX uabi_engines */
 	dev_priv->uabi_engines = RB_ROOT;
+#endif
 
 	/* Flush any outstanding unpin_work. */
 	i915_gem_drain_workqueue(dev_priv);

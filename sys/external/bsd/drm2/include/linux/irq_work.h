@@ -38,6 +38,7 @@
 #define	irq_work_queue	linux_irq_work_queue
 
 struct irq_work {
+	char dummy;
 };
 
 void	init_irq_work(struct irq_work *, void (*)(struct irq_work *));
