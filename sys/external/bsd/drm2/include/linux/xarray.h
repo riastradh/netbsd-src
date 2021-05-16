@@ -52,6 +52,8 @@ struct xa_limit {
 		(ENTRY) != NULL;					      \
 		(ENTRY) = xa_find_after((XA), &(INDEX), ULONG_MAX, 0))
 
+#define	XA_FLAGS_ALLOC	0
+
 #define	xa_alloc	linux_xa_alloc
 #define	xa_erase	linux_xa_erase
 #define	xa_find		linux_xa_find
