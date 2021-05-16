@@ -26,6 +26,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/bitmap.h>
 #include <drm/i915_drm.h>
 
 #include "i915_drv.h"
