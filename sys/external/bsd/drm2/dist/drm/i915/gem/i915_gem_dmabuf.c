@@ -44,7 +44,7 @@ static struct sg_table *i915_gem_map_dma_buf(struct dma_buf_attachment *attachme
 	st = drm_prime_pglist_to_sg(&obj->mm.pageq,
 	    obj->base.size >> PAGE_SHIFT);
 	if (IS_ERR(st))
-		goto err_unpin;
+		goto err_unpin_pages;
 #else
 	/* Copy sg so that we make an independent mapping */
 	st = kmalloc(sizeof(struct sg_table), GFP_KERNEL);
@@ -135,7 +135,7 @@ static int i915_gem_dmabuf_mmap(struct dma_buf *dma_buf, struct vm_area_struct *
 	if (!obj->base.filp)
 		return -ENODEV;
 	/* XXX review mmap refcount */
-	drm_gem_object_reference(&obj->base);
+	drm_gem_object_get(&obj->base);
 	*advicep = UVM_ADV_RANDOM;
 	*uobjp = &obj->base.gemo_uvmobj;
 	*maxprotp = prot;

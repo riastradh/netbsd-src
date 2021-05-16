@@ -39,6 +39,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "i915_drv.h"
 #include "i915_trace.h"
 
+#include <linux/nbsd-namespace.h>
+
 I915_SELFTEST_DECLARE(static struct igt_evict_ctl {
 	bool fail_if_busy:1;
 } igt_evict_ctl;)
