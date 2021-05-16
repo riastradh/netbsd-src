@@ -14,6 +14,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 struct stub_fence {
 	struct dma_fence dma;
+	spinlock_t lock;
 	struct i915_sw_fence chain;
 };
 
@@ -53,6 +54,7 @@ static void stub_release(struct dma_fence *fence)
 
 	BUILD_BUG_ON(offsetof(typeof(*stub), dma));
 	dma_fence_free(&stub->dma);
+	spin_lock_destroy(&stub->lock);
 }
 
 static const struct dma_fence_ops stub_fence_ops = {
@@ -73,7 +75,8 @@ i915_gem_object_lock_fence(struct drm_i915_gem_object *obj)
 		return NULL;
 
 	i915_sw_fence_init(&stub->chain, stub_notify);
-	dma_fence_init(&stub->dma, &stub_fence_ops, &stub->chain.wait.lock,
+	spin_lock_init(&stub->lock);
+	dma_fence_init(&stub->dma, &stub_fence_ops, &stub->lock,
 		       0, 0);
 
 	if (i915_sw_fence_await_reservation(&stub->chain,
