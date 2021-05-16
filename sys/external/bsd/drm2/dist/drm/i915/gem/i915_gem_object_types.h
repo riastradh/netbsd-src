@@ -70,6 +70,7 @@ enum i915_mmap_type {
 	I915_MMAP_TYPE_WC,
 	I915_MMAP_TYPE_WB,
 	I915_MMAP_TYPE_UC,
+	I915_MMAP_NTYPES
 };
 
 struct i915_mmap_offset {
@@ -137,7 +138,11 @@ struct drm_i915_gem_object {
 
 	struct {
 		spinlock_t lock; /* Protects access to mmo offsets */
+#ifdef __NetBSD__
+		struct i915_mmap_offset *offsets[I915_MMAP_NTYPES];
+#else
 		struct rb_root offsets;
+#endif
 	} mmo;
 
 	I915_SELFTEST_DECLARE(struct list_head st_link);
