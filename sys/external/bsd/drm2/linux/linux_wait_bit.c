@@ -114,6 +114,17 @@ wake_up_bit(const volatile unsigned long *bitmap, unsigned bit)
 	wait_bit_exit(wbe);
 }
 
+void
+clear_and_wake_up_bit(int bit, volatile unsigned long *bitmap)
+{
+	struct waitbitentry *wbe;
+
+	wbe = wait_bit_enter(bitmap, bit);
+	clear_bit(bit, bitmap);
+	cv_broadcast(&wbe->cv);
+	wait_bit_exit(wbe);
+}
+
 int
 wait_on_bit(const volatile unsigned long *bitmap, unsigned bit, int flags)
 {
