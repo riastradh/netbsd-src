@@ -54,6 +54,10 @@
 #define	barrier()	__insn_barrier()
 #define	likely(X)	__predict_true(X)
 #define	unlikely(X)	__predict_false(X)
+#define	__same_type(X,Y)						      \
+	__builtin_types_compatible_p(__typeof__(X), __typeof__(Y))
+#define	__must_be_array(X)						      \
+	BUILD_BUG_ON_ZERO(__same_type((X), &(X)[0]))
 
 #define	READ_ONCE(X)	({						      \
 	typeof(X) __read_once_tmp = (X);				      \
