@@ -19,10 +19,17 @@
 struct drm_i915_gem_object;
 struct i915_address_space;
 
+#ifdef __NetBSD__
+int __must_check i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
+					    bus_dmamap_t pages);
+void i915_gem_gtt_finish_pages(struct drm_i915_gem_object *obj,
+			       bus_dmamap_t pages);
+#else
 int __must_check i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
 					    struct sg_table *pages);
 void i915_gem_gtt_finish_pages(struct drm_i915_gem_object *obj,
 			       struct sg_table *pages);
+#endif
 
 int i915_gem_gtt_reserve(struct i915_address_space *vm,
 			 struct drm_mm_node *node,
