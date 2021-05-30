@@ -53,6 +53,14 @@
 	(P);								      \
 })
 
+#define	rcu_replace_pointer(PTRP, NEWPTR, C) ({				      \
+	__typeof__(PTRP) __rrp_ptrp = (PTRP);				      \
+	__typeof__(PTRP) __rrp_oldptr =					      \
+		rcu_dereference_protected(__rrp_ptrp, C);		      \
+	rcu_assign_pointer(__rrp_ptrp, NEWPTR);				      \
+	__rrp_oldptr;							      \
+})
+
 
 /* kill_dependency */
 #define	rcu_pointer_handoff(P)	(P)
