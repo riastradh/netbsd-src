@@ -100,17 +100,17 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 	int error;
 
         /* Acquire a reference for uvm_map to consume.  */
-        uao_reference(obj->filp);
+        uao_reference(obj->base.filp);
         addr = (*curproc->p_emul->e_vm_default_addr)(curproc,
             (vaddr_t)curproc->p_vmspace->vm_daddr, args->size,
             curproc->p_vmspace->vm_map.flags & VM_MAP_TOPDOWN);
         error = uvm_map(&curproc->p_vmspace->vm_map, &addr, args->size,
-            obj->filp, args->offset, 0,
+            obj->base.filp, args->offset, 0,
             UVM_MAPFLAG(VM_PROT_READ|VM_PROT_WRITE,
                 VM_PROT_READ|VM_PROT_WRITE, UVM_INH_COPY, UVM_ADV_NORMAL,
                 0));
         if (error) {
-                uao_detach(obj->filp);
+                uao_detach(obj->base.filp);
 		/* XXX errno NetBSD->Linux */
 		addr = -error;
 		goto err;
