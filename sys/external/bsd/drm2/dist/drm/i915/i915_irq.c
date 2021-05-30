@@ -1183,7 +1183,6 @@ static void intel_get_hpd_pins(struct drm_i915_private *dev_priv,
 
 static void gmbus_irq_handler(struct drm_i915_private *dev_priv)
 {
-	struct drm_i915_private *dev_priv = dev->dev_private;
 
 #ifdef __NetBSD__
 	spin_lock(&dev_priv->gmbus_wait_lock);
@@ -1197,7 +1196,6 @@ static void gmbus_irq_handler(struct drm_i915_private *dev_priv)
 
 static void dp_aux_irq_handler(struct drm_i915_private *dev_priv)
 {
-	struct drm_i915_private *dev_priv = dev->dev_private;
 
 #ifdef __NetBSD__
 	spin_lock(&dev_priv->gmbus_wait_lock);
@@ -2143,7 +2141,7 @@ static void bxt_hpd_irq_handler(struct drm_i915_private *dev_priv,
 	intel_hpd_irq_handler(dev_priv, pin_mask, long_mask);
 }
 
-static irqreturn_t gen11_hpd_irq_handler(DRM_IRQ_ARGS)
+static void gen11_hpd_irq_handler(struct drm_i915_private *dev_priv, u32 iir)
 {
 	u32 pin_mask = 0, long_mask = 0;
 	u32 trigger_tc = iir & GEN11_DE_TC_HOTPLUG_MASK;
