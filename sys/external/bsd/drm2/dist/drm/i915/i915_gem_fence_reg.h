@@ -63,9 +63,9 @@ void i915_gem_restore_fences(struct i915_ggtt *ggtt);
 
 #ifdef __NetBSD__
 void i915_gem_object_do_bit_17_swizzle(struct drm_i915_gem_object *obj,
-				       struct pglist *pages);
+				       struct page **pages);
 void i915_gem_object_save_bit_17_swizzle(struct drm_i915_gem_object *obj,
-					 struct pglist *pages);
+					 struct page **pages);
 #else
 void i915_gem_object_do_bit_17_swizzle(struct drm_i915_gem_object *obj,
 				       struct sg_table *pages);
