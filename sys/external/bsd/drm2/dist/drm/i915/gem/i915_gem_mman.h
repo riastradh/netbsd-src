@@ -21,6 +21,7 @@ struct mutex;
 
 int i915_gem_mmap_gtt_version(void);
 #ifdef __NetBSD__
+const struct uvm_pagerops *const i915_gem_uvm_ops;
 int i915_gem_mmap_object(struct drm_device *, off_t, size_t, int,
     struct uvm_object **, voff_t *, struct file *);
 #else

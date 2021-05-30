@@ -49,6 +49,7 @@ struct radix_tree_root {
 };
 
 struct radix_tree_iter {
+	unsigned long index;
 };
 
 void	INIT_RADIX_TREE(struct radix_tree_root *, gfp_t);

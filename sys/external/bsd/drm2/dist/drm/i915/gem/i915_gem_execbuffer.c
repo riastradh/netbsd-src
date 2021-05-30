@@ -17,6 +17,10 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <drm/drm_syncobj.h>
 #include <drm/i915_drm.h>
 
+#ifdef __NetBSD__
+#include <sys/filedesc.h>
+#endif
+
 #include "display/intel_frontbuffer.h"
 
 #include "gem/i915_gem_ioctls.h"
@@ -2667,7 +2671,7 @@ i915_gem_do_execbuffer(struct drm_device *dev,
 #ifdef __NetBSD__
 		err = -fd_allocfile(&fp, &out_fence_fd);
 		if (err)
-			goto err_in_fence;
+			goto err_exec_fence;
 #else
 		out_fence_fd = get_unused_fd_flags(O_CLOEXEC);
 		if (out_fence_fd < 0) {
@@ -2817,7 +2821,11 @@ err_request:
 
 	if (out_fence) {
 		if (err == 0) {
+#ifdef __NetBSD__
+			fd_affix(curproc, fp, out_fence_fd);
+#else
 			fd_install(out_fence_fd, out_fence->file);
+#endif
 			args->rsvd2 &= GENMASK_ULL(31, 0); /* keep in-fence */
 			args->rsvd2 |= (u64)out_fence_fd << 32;
 			out_fence_fd = -1;

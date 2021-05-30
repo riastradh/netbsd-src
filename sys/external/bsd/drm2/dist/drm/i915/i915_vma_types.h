@@ -183,13 +183,7 @@ struct i915_vma {
 	struct drm_i915_gem_object *obj;
 	struct dma_resv *resv; /** Alias of obj->resv */
 
-#ifdef __NetBSD__
-	bus_dma_segment_t *segs;
-	int nsegs;
-	bus_dmamap_t pages;
-#else
 	struct sg_table *pages;
-#endif
 	void __iomem *iomap;
 	void *private; /* owned by creator */
 

@@ -16,6 +16,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include "i915_drv.h"
 
+#include <linux/nbsd-namespace.h>
+
 void i915_gem_suspend(struct drm_i915_private *i915)
 {
 	GEM_TRACE("%s\n", dev_name(i915->drm.dev));

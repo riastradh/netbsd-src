@@ -643,7 +643,7 @@ struct sgt_dma {
 static inline struct sgt_dma
 sgt_dma(struct i915_vma *vma)
 {
-	return (struct sgt_dma) { vma->pages, 0, 0 };
+	return (struct sgt_dma) { vma->pages->sgl->sg_dmamap, 0, 0 };
 }
 #else
 static inline struct sgt_dma {
