@@ -177,14 +177,14 @@ dma_buf_put(struct dma_buf *dmabuf)
 }
 
 struct dma_buf_attachment *
-dma_buf_attach(struct dma_buf *dmabuf, struct device *dev)
+dma_buf_attach(struct dma_buf *dmabuf, bus_dma_tag_t dmat)
 {
 	struct dma_buf_attachment *attach;
 	int ret = 0;
 
 	attach = kmem_zalloc(sizeof(*attach), KM_SLEEP);
 	attach->dmabuf = dmabuf;
-	attach->dev = dev;
+	attach->dev = dmat;
 
 	mutex_enter(&dmabuf->db_lock);
 	if (dmabuf->ops->attach)

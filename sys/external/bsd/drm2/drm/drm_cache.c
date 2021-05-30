@@ -72,21 +72,13 @@ drm_clflush_pages(struct page **pages, unsigned long npages)
 }
 
 void
-drm_clflush_page(struct page *page)
+drm_clflush_sg(struct sg_table *sgt)
 {
-#if defined(DRM_CLFLUSH)
-	if (drm_md_clflush_finegrained_p()) {
-		drm_md_clflush_begin();
-		drm_md_clflush_page(page);
-		drm_md_clflush_commit();
-	} else {
-		drm_md_clflush_all();
-	}
-#endif
+	drm_clflush_pages(sgt->sgl->sg_pgs, sgt->sgl->sg_npgs);
 }
 
 void
-drm_clflush_virt_range(const void *vaddr, size_t nbytes)
+drm_clflush_virt_range(void *vaddr, unsigned long nbytes)
 {
 #if defined(DRM_CLFLUSH)
 	if (drm_md_clflush_finegrained_p()) {
