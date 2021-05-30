@@ -40,13 +40,8 @@
 struct page;
 
 void drm_clflush_pages(struct page *pages[], unsigned long num_pages);
-#ifdef __NetBSD__		/* XXX drm clflush */
-void drm_clflush_page(struct page *);
-void drm_clflush_virt_range(const void *, size_t);
-#else
 void drm_clflush_sg(struct sg_table *st);
 void drm_clflush_virt_range(void *addr, unsigned long length);
-#endif
 bool drm_need_swiotlb(int dma_bits);
 
 

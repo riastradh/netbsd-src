@@ -226,4 +226,11 @@ bitmap_zalloc(size_t nbits, gfp_t gfp)
 	return kcalloc(n, sizeof(unsigned long), gfp);
 }
 
+static inline void
+bitmap_free(unsigned long *bitmap)
+{
+
+	kfree(bitmap);
+}
+
 #endif  /* _LINUX_BITMAP_H_ */

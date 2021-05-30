@@ -115,6 +115,13 @@ mutex_lock_nested(struct mutex *mutex, unsigned subclass __unused)
 	mutex_lock(mutex);
 }
 
+static inline int
+mutex_lock_interruptible_nested(struct mutex *mutex,
+    unsigned subclass __unused)
+{
+	return mutex_lock_interruptible(mutex);
+}
+
 /*
  * `recursive locking is bad, do not use this ever.'
  * -- linux/scripts/checkpath.pl

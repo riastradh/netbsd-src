@@ -102,9 +102,15 @@ struct dma_buf *drm_gem_prime_export(struct drm_gem_object *obj,
 				     int flags);
 
 /* helper functions for importing */
+#ifdef __NetBSD__
+struct drm_gem_object *drm_gem_prime_import_dev(struct drm_device *dev,
+						struct dma_buf *dma_buf,
+						bus_dma_tag_t attach_dev);
+#else
 struct drm_gem_object *drm_gem_prime_import_dev(struct drm_device *dev,
 						struct dma_buf *dma_buf,
 						struct device *attach_dev);
+#endif
 struct drm_gem_object *drm_gem_prime_import(struct drm_device *dev,
 					    struct dma_buf *dma_buf);
 

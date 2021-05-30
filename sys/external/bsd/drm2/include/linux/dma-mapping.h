@@ -39,6 +39,23 @@
 
 #include <linux/types.h>
 
+enum dma_data_direction {
+	DMA_NONE		= 0,
+	DMA_TO_DEVICE		= 1,
+	DMA_FROM_DEVICE		= 2,
+	DMA_BIDIRECTIONAL	= 3,
+
+	PCI_DMA_NONE		= DMA_NONE,
+	PCI_TO_DEVICE		= DMA_TO_DEVICE,
+	PCI_FROM_DEVICE		= DMA_FROM_DEVICE,
+	PCI_DMA_BIDIRECTIONAL	= DMA_BIDIRECTIONAL,
+};
+
+enum {
+	DMA_ATTR_NO_WARN	= __BIT(0),
+	DMA_ATTR_SKIP_CPU_SYNC	= __BIT(1),
+};
+
 static inline uintmax_t
 DMA_BIT_MASK(unsigned nbits)
 {
