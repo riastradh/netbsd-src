@@ -279,18 +279,25 @@ list_del_init(struct list_head *node)
 		(VAR) = list_entry(list_next(&(VAR)->FIELD), typeof(*(VAR)), \
 		    FIELD))
 
-#define	list_for_each_entry_reverse(VAR, HEAD, FIELD)			\
-	for ((VAR) = list_entry(list_last((HEAD)), typeof(*(VAR)), FIELD); \
-		&(VAR)->FIELD != (HEAD);				\
-		(VAR) = list_entry(list_prev(&(VAR)->FIELD), typeof(*(VAR)), \
-		    FIELD))
-
 #define	list_for_each_entry_safe(VAR, NEXT, HEAD, FIELD)		\
 	for ((VAR) = list_entry(list_first((HEAD)), typeof(*(VAR)), FIELD); \
 		(&(VAR)->FIELD != (HEAD)) &&				\
 		    ((NEXT) = list_entry(list_next(&(VAR)->FIELD),	\
 			typeof(*(VAR)), FIELD), 1);			\
 		(VAR) = (NEXT))
+
+#define	list_for_each_entry_safe_reverse(VAR, NEXT, HEAD, FIELD)	\
+	for ((VAR) = list_entry(list_last((HEAD)), typeof(*(VAR)), FIELD); \
+		(&(VAR)->FIELD != (HEAD)) &&				\
+		    ((NEXT) = list_entry(list_prev(&(VAR)->FIELD),	\
+		        typeof(*(VAR)), FIELD), 1);			\
+		(VAR) = (NEXT))
+
+#define	list_for_each_entry_reverse(VAR, HEAD, FIELD)			\
+	for ((VAR) = list_entry(list_last((HEAD)), typeof(*(VAR)), FIELD); \
+		&(VAR)->FIELD != (HEAD);				\
+		(VAR) = list_entry(list_prev(&(VAR)->FIELD), typeof(*(VAR)), \
+		    FIELD))
 
 #define	list_for_each_entry_continue(VAR, HEAD, FIELD)			\
 	for ((VAR) = list_next_entry((VAR), FIELD);			\
