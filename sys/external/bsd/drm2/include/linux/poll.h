@@ -32,7 +32,7 @@
 #ifndef _LINUX_POLL_H_
 #define _LINUX_POLL_H_
 
-#include <linux/uaccess.h>
 #include <linux/fs.h>
+#include <linux/uaccess.h>
 
 #endif  /* _LINUX_POLL_H_ */

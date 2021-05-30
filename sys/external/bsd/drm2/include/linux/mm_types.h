@@ -33,6 +33,7 @@
 #define _LINUX_MM_TYPES_H_
 
 #include <sys/types.h>		/* for uvm_page.h */
+
 #include <uvm/uvm_page.h>	/* XXX don't expose this */
 
 #include <linux/completion.h>
