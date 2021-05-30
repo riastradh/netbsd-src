@@ -38,19 +38,9 @@
 
 #include <asm/barrier.h>
 
-#define	xchg(P, V)							      \
-	(sizeof(*(P)) == 4 ? atomic_swap_32((volatile uint32_t *)(P),	      \
-		(uint32_t)(V))						      \
-	    : sizeof(*(P)) == 8 ? atomic_swap_64((volatile uint64_t *)(P),    \
-		(uint64_t)(V))						      \
-	    : (__builtin_abort(), 0))
-
-#define	cmpxchg(P, O, N)						      \
-	(sizeof(*(P)) == 4 ? atomic_cas_32((volatile uint32_t *)(P),	      \
-		(uint32_t)(O), (uint32_t)(N))				      \
-	    : sizeof(*(P)) == 8 ? atomic_cas_64((volatile uint64_t *)(P),     \
-		(uint64_t)(O), (uint64_t)(N))				      \
-	    : (__builtin_abort(), 0))
+/* XXX Hope the GCC __sync builtins work everywhere we care about!  */
+#define	xchg(P, V)		__sync_lock_test_and_set(P, V)
+#define	cmpxchg(P, O, N)	__sync_val_compare_and_swap(P, O, N)
 
 /*
  * atomic (u)int operations
