@@ -113,7 +113,6 @@ struct ttm_tt {
 	struct sg_table *sg; /* for SG objects via dma-buf */
 #ifdef __NetBSD__
 	struct uvm_object *swap_storage;
-	struct pglist pglist;
 #else
 	struct file *swap_storage;
 #endif

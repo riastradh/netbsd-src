@@ -25,7 +25,7 @@ static void __do_clflush(struct drm_i915_gem_object *obj)
 {
 	GEM_BUG_ON(!i915_gem_object_has_pages(obj));
 #ifdef __NetBSD__
-	drm_clflush_pglist(&obj->mm.pageq);
+	drm_clflush_pages(obj->mm.pagearray, obj->base.size >> PAGE_SHIFT);
 #else
 	drm_clflush_sg(obj->mm.pages);
 #endif

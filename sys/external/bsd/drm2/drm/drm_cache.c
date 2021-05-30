@@ -72,24 +72,6 @@ drm_clflush_pages(struct page **pages, unsigned long npages)
 }
 
 void
-drm_clflush_pglist(struct pglist *list)
-{
-#if defined(DRM_CLFLUSH)
-	if (drm_md_clflush_finegrained_p()) {
-		struct vm_page *page;
-
-		drm_md_clflush_begin();
-		TAILQ_FOREACH(page, list, pageq.queue)
-			drm_md_clflush_page(container_of(page, struct page,
-				p_vmp));
-		drm_md_clflush_commit();
-	} else {
-		drm_md_clflush_all();
-	}
-#endif
-}
-
-void
 drm_clflush_page(struct page *page)
 {
 #if defined(DRM_CLFLUSH)

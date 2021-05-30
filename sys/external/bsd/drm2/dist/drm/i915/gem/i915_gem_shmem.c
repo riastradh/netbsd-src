@@ -298,8 +298,13 @@ __i915_gem_object_release_shmem(struct drm_i915_gem_object *obj,
 	    (obj->read_domains & I915_GEM_DOMAIN_CPU) == 0 &&
 	    !(obj->cache_coherent & I915_BO_CACHE_COHERENT_FOR_READ))
 #ifdef __NetBSD__
-		/* XXX Shouldn't realy use obj->... here.  */
-		drm_clflush_pglist(&obj->mm.pageq);
+		/*
+		 * XXX Should maybe use bus_dmamap_sync instead --
+		 * shouldn't really touch obj->mm here since the caller
+		 * already pulled off the pages.
+		 */
+		drm_clflush_pages(obj->mm.pagearray,
+		    obj->base.size >> PAGE_SHIFT);
 #else
 		drm_clflush_sg(pages);
 #endif

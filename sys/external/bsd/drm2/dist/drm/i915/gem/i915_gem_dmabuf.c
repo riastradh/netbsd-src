@@ -41,7 +41,7 @@ static struct sg_table *i915_gem_map_dma_buf(struct dma_buf_attachment *attachme
 		goto err;
 
 #ifdef __NetBSD__
-	st = drm_prime_pglist_to_sg(&obj->mm.pageq,
+	st = drm_prime_pages_to_sg(obj->mm.pagearray,
 	    obj->base.size >> PAGE_SHIFT);
 	if (IS_ERR(st))
 		goto err_unpin_pages;

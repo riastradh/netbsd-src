@@ -75,8 +75,8 @@ ttm_bus_dma_populate(struct ttm_dma_tt *ttm_dma)
 
 	/* Load the DMA map.  */
 	/* XXX errno NetBSD->Linux */
-	ret = -bus_dmamap_load_pglist(ttm_dma->ttm.bdev->dmat,
-	    ttm_dma->dma_address, &ttm_dma->ttm.pglist,
+	ret = -bus_dmamap_load_pages(ttm_dma->ttm.bdev->dmat,
+	    ttm_dma->dma_address, ttm_dma->ttm.pages,
 	    (ttm_dma->ttm.num_pages << PAGE_SHIFT), BUS_DMA_NOWAIT);
 	if (ret)
 		goto fail1;
