@@ -36,9 +36,14 @@ __KERNEL_RCSID(0, "$NetBSD: i915_gem_userptr.c,v 1.1 2018/08/27 07:56:13 riastra
 #include "../dist/drm/i915/gem/i915_gem_ioctls.h"
 
 int
-i915_gem_init_userptr(struct drm_i915_private *dev_priv)
+i915_gem_init_userptr(struct drm_i915_private *i915)
 {
 	return 0;
+}
+
+void
+i915_gem_cleanup_userptr(struct drm_i915_private *i915)
+{
 }
 
 int

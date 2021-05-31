@@ -427,6 +427,7 @@ void i915_gem_driver_unregister__shrinker(struct drm_i915_private *i915)
 void i915_gem_shrinker_taints_mutex(struct drm_i915_private *i915,
 				    struct mutex *mutex)
 {
+#if IS_ENABLED(CONFIG_LOCKDEP)
 	bool unlock = false;
 
 	if (!IS_ENABLED(CONFIG_LOCKDEP))
@@ -447,6 +448,7 @@ void i915_gem_shrinker_taints_mutex(struct drm_i915_private *i915,
 
 	if (unlock)
 		mutex_release(&i915->drm.struct_mutex.dep_map, _RET_IP_);
+#endif
 }
 
 #define obj_to_i915(obj__) to_i915((obj__)->base.dev)
