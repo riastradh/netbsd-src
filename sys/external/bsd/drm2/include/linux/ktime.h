@@ -144,6 +144,12 @@ ktime_get_raw_ns(void)
 	return ktime_to_ns(ktime_get_raw());
 }
 
+static inline uint64_t
+ktime_get_mono_fast_ns(void)
+{
+	return ktime_get_raw_ns();
+}
+
 static inline ktime_t
 ktime_get_monotonic_offset(void)
 {

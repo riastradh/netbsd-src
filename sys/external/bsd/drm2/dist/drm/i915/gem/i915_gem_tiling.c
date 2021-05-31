@@ -9,6 +9,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/bitmap.h>
 #include <linux/string.h>
 #include <linux/bitops.h>
 #include <drm/i915_drm.h>

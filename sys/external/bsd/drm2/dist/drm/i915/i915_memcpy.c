@@ -32,6 +32,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include "i915_memcpy.h"
 
+#include <linux/nbsd-namespace.h>
+
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG)
 #define CI_BUG_ON(expr) BUG_ON(expr)
 #else

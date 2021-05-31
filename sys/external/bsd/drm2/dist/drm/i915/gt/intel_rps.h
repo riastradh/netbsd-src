@@ -38,4 +38,6 @@ void gen5_rps_irq_handler(struct intel_rps *rps);
 void gen6_rps_irq_handler(struct intel_rps *rps, u32 pm_iir);
 void gen11_rps_irq_handler(struct intel_rps *rps, u32 pm_iir);
 
+extern spinlock_t mchdev_lock;
+
 #endif /* INTEL_RPS_H */
