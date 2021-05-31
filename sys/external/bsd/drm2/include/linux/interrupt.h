@@ -44,6 +44,8 @@
 #define	disable_irq		linux_disable_irq
 #define	enable_irq		linux_enable_irq
 
+typedef irqreturn_t (*irq_handler_t)(void *);
+
 void	disable_irq(int);
 void	enable_irq(int);
 

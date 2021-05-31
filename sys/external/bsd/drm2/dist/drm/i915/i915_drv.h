@@ -1323,6 +1323,11 @@ struct drm_i915_private {
 
 	I915_SELFTEST_DECLARE(struct i915_selftest_stash selftest;)
 
+#ifdef __NetBSD__
+	pci_intr_handle_t *pci_ihp;
+	void *pci_intrcookie;
+#endif
+
 	/*
 	 * NOTE: This is the dri1/ums dungeon, don't add stuff here. Your patch
 	 * will be rejected. Instead look for a better place.

@@ -225,6 +225,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "oa/i915_oa_icl.h"
 #include "oa/i915_oa_tgl.h"
 
+#include <linux/nbsd-namespace.h>
+
 /* HW requires this to be a power of two, between 128k and 16M, though driver
  * is currently generally designed assuming the largest 16M size is used such
  * that the overflow cases are unlikely in normal operation.
@@ -401,9 +403,9 @@ void i915_oa_config_release(struct kref *ref)
 	struct i915_oa_config *oa_config =
 		container_of(ref, typeof(*oa_config), ref);
 
-	kfree(oa_config->flex_regs);
-	kfree(oa_config->b_counter_regs);
-	kfree(oa_config->mux_regs);
+	kfree(__UNCONST(oa_config->flex_regs));
+	kfree(__UNCONST(oa_config->b_counter_regs));
+	kfree(__UNCONST(oa_config->mux_regs));
 
 	kfree_rcu(oa_config, rcu);
 }

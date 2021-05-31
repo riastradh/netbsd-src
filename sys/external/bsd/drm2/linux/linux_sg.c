@@ -54,8 +54,9 @@ sg_alloc_table(struct sg_table *sgt, unsigned npgs, gfp_t gfp)
 }
 
 int
-sg_alloc_table_from_pages(struct sg_table *sgt, struct page **pgs,
-    unsigned npgs, bus_size_t offset, bus_size_t size, gfp_t gfp)
+__sg_alloc_table_from_pages(struct sg_table *sgt, struct page **pgs,
+    unsigned npgs, bus_size_t offset, bus_size_t size, unsigned maxseg,
+    gfp_t gfp)
 {
 	unsigned i;
 	int ret;
@@ -71,6 +72,15 @@ sg_alloc_table_from_pages(struct sg_table *sgt, struct page **pgs,
 		sgt->sgl->sg_pgs[i] = pgs[i];
 
 	return 0;
+}
+
+int
+sg_alloc_table_from_pages(struct sg_table *sgt, struct page **pgs,
+    unsigned npgs, bus_size_t offset, bus_size_t size, gfp_t gfp)
+{
+
+	return __sg_alloc_table_from_pages(sgt, pgs, npgs, offset, size,
+	    -1, gfp);
 }
 
 int

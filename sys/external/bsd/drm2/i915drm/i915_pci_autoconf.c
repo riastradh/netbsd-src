@@ -38,6 +38,8 @@ __KERNEL_RCSID(0, "$NetBSD: i915_pci.c,v 1.21 2018/08/27 14:49:22 riastradh Exp 
 #include <sys/queue.h>
 #include <sys/workqueue.h>
 
+#include <drm/drm_pci.h>
+
 #include "i915_drv.h"
 #include "i915_pci.h"
 
@@ -111,7 +113,7 @@ i915drmkms_pci_lookup(const struct pci_attach_args *pa)
 	const struct intel_device_info *const info =
 	    (const void *)(uintptr_t)i915_device_ids[i].driver_data;
 
-	if (IS_ALPHA_SUPPORT(info)) {
+	if (info->require_force_probe) {
 		printf("i915drmkms: preliminary hardware support disabled\n");
 		return NULL;
 	}

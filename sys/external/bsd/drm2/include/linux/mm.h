@@ -87,8 +87,16 @@ vm_mmap(struct file *file __unused, unsigned long base __unused,
 }
 
 static inline unsigned long
+totalram_pages(void)
+{
+
+	return uvmexp.npages;
+}
+
+static inline unsigned long
 get_num_physpages(void)
 {
+
 	return uvmexp.npages;
 }
 

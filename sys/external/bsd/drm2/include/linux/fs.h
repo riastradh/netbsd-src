@@ -39,4 +39,10 @@
 #include <linux/err.h>
 #include <linux/wait_bit.h>
 
+static inline struct uvm_object *
+file_inode(struct uvm_object *uobj)
+{
+	return uobj;
+}
+
 #endif  /* _LINUX_FS_H_ */

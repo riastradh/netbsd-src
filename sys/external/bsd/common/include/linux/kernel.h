@@ -261,4 +261,13 @@ add_taint(unsigned taint, int lockdep)
 {
 }
 
+#define	DFEINE_STATIC_KEY_FALSE(FLAG)					      \
+	bool FLAG = false
+
+static inline bool
+static_branch_likely(const bool *flagp)
+{
+	return __predict_true(*flagp);
+}
+
 #endif  /* _LINUX_KERNEL_H_ */
