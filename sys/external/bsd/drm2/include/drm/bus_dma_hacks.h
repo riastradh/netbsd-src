@@ -171,7 +171,6 @@ bus_dmamap_load_pages(bus_dma_tag_t tag, bus_dmamap_t map,
 
 		segs[seg].ds_addr = baddr;
 		segs[seg].ds_len = PAGE_SIZE;
-		seg++;
 	}
 
 	error = bus_dmamap_load_raw(tag, map, segs, nsegs, size, flags);
