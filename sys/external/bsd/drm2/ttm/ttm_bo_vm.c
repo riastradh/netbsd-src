@@ -254,7 +254,29 @@ ttm_bo_mmap_object(struct ttm_bo_device *bdev, off_t offset, size_t size,
 	ret = ttm_bo_uvm_lookup(bdev, startpage, npages, &bo);
 	if (ret)
 		goto fail0;
-	KASSERT(drm_vma_node_start(&bo->base.vma_node) <= offset);
+	KASSERTMSG((drm_vma_node_start(&bo->base.vma_node) <= startpage),
+	    "mapping npages=0x%jx @ pfn=0x%jx"
+	    " from vma npages=0x%jx @ pfn=0x%jx",
+	    (uintmax_t)npages,
+	    (uintmax_t)startpage,
+	    (uintmax_t)drm_vma_node_size(&bo->base.vma_node),
+	    (uintmax_t)drm_vma_node_start(&bo->base.vma_node));
+	KASSERTMSG((npages <= drm_vma_node_size(&bo->base.vma_node)),
+	    "mapping npages=0x%jx @ pfn=0x%jx"
+	    " from vma npages=0x%jx @ pfn=0x%jx",
+	    (uintmax_t)npages,
+	    (uintmax_t)startpage,
+	    (uintmax_t)drm_vma_node_size(&bo->base.vma_node),
+	    (uintmax_t)drm_vma_node_start(&bo->base.vma_node));
+	KASSERTMSG(((startpage - drm_vma_node_start(&bo->base.vma_node))
+		<= (drm_vma_node_size(&bo->base.vma_node) - npages)),
+	    "mapping npages=0x%jx @ pfn=0x%jx"
+	    " from vma npages=0x%jx @ pfn=0x%jx",
+	    (uintmax_t)npages,
+	    (uintmax_t)startpage,
+	    (uintmax_t)drm_vma_node_size(&bo->base.vma_node),
+	    (uintmax_t)drm_vma_node_start(&bo->base.vma_node));
+
 	/* XXX Just assert this?  */
 	if (__predict_false(bdev->driver->verify_access == NULL)) {
 		ret = -EPERM;
