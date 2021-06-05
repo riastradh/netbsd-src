@@ -197,7 +197,7 @@ static int drm_prime_add_buf_handle(struct drm_prime_file_private *prime_fpriv,
 #ifdef __NetBSD__
 	collision = rb_tree_insert_node(&prime_fpriv->dmabufs.rbr_tree,
 	    member);
-	KASSERT(collision == NULL);
+	KASSERT(collision == member);
 #else
 	rb = NULL;
 	p = &prime_fpriv->dmabufs.rb_node;
@@ -218,7 +218,7 @@ static int drm_prime_add_buf_handle(struct drm_prime_file_private *prime_fpriv,
 #ifdef __NetBSD__
 	collision = rb_tree_insert_node(&prime_fpriv->handles.rbr_tree,
 	    member);
-	KASSERT(collision == NULL);
+	KASSERT(collision == member);
 #else
 	rb = NULL;
 	p = &prime_fpriv->handles.rb_node;
