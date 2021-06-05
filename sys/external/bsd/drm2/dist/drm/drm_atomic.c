@@ -52,6 +52,11 @@ void __drm_crtc_commit_free(struct kref *kref)
 	struct drm_crtc_commit *commit =
 		container_of(kref, struct drm_crtc_commit, ref);
 
+#ifdef __NetBSD__
+	destroy_completion(&commit->flip_done);
+	destroy_completion(&commit->hw_done);
+	destroy_completion(&commit->cleanup_done);
+#endif
 	kfree(commit);
 }
 EXPORT_SYMBOL(__drm_crtc_commit_free);
