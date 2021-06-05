@@ -521,6 +521,18 @@ static void ttm_transfered_destroy(struct ttm_buffer_object *bo)
 
 	fbo = container_of(bo, struct ttm_transfer_obj, base);
 	ttm_bo_put(fbo->bo);
+	dma_resv_fini(&fbo->base.base._resv);
+	if (ttm_bo_uses_embedded_gem_object(bo)) {
+		/*
+		 * Initialization is unconditional, but we don't go
+		 * through drm_gem_object_release, and destruction in
+		 * ttm_bo_release is conditional, so do this
+		 * conditionally with the reverse sense.
+		 *
+		 * Yes, this is a kludge.
+		 */
+		drm_vma_node_destroy(&fbo->base.base.vma_node);
+	}
 	kfree(fbo);
 }
 
@@ -567,8 +579,7 @@ static int ttm_buffer_object_transfer(struct ttm_buffer_object *bo,
 	INIT_LIST_HEAD(&fbo->base.io_reserve_lru);
 	fbo->base.moving = NULL;
 #ifdef __NetBSD__
-	if (!ttm_bo_uses_embedded_gem_object(bo))
-		drm_vma_node_init(&fbo->base.base.vma_node);
+	drm_vma_node_init(&fbo->base.base.vma_node);
 	uvm_obj_init(&fbo->base.uvmobj, bo->bdev->driver->ttm_uvm_ops, true, 1);
 	rw_obj_hold(bo->uvmobj.vmobjlock);
 	uvm_obj_setlock(&fbo->base.uvmobj, bo->uvmobj.vmobjlock);
