@@ -228,6 +228,14 @@ nvkm_therm_fan_fini(struct nvkm_therm *therm, bool suspend)
 	return 0;
 }
 
+void
+nvkm_therm_fan_dtor(struct nvkm_therm *therm)
+{
+	if (therm->fan->dtor)
+		therm->fan->dtor(therm->fan);
+	spin_lock_destroy(&therm->fan->lock);
+}
+
 int
 nvkm_therm_fan_ctor(struct nvkm_therm *therm)
 {

@@ -159,6 +159,7 @@ static void *
 nvkm_engine_dtor(struct nvkm_subdev *subdev)
 {
 	struct nvkm_engine *engine = nvkm_engine(subdev);
+	spin_lock_destroy(&engine->lock);
 	if (engine->func->dtor)
 		return engine->func->dtor(engine);
 	return engine;

@@ -617,6 +617,7 @@ nvkm_dp_dtor(struct nvkm_outp *outp)
 {
 	struct nvkm_dp *dp = nvkm_dp(outp);
 	nvkm_notify_fini(&dp->hpd);
+	mutex_destroy(&dp->mutex);
 	return dp;
 }
 

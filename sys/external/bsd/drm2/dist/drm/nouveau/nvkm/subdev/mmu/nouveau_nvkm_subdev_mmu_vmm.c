@@ -1138,6 +1138,8 @@ nvkm_vmm_dtor(struct nvkm_vmm *vmm)
 		nvkm_mmu_ptc_put(vmm->mmu, true, &vmm->pd->pt[0]);
 		nvkm_vmm_pt_del(&vmm->pd);
 	}
+
+	mutex_destroy(&vmm->mutex);
 }
 
 static int

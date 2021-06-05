@@ -305,6 +305,7 @@ nouveau_svmm_fini(struct nouveau_svmm **psvmm)
 		svmm->vmm = NULL;
 		mutex_unlock(&svmm->mutex);
 		mmu_notifier_put(&svmm->notifier);
+		mutex_destroy(&svmm->mutex);
 		*psvmm = NULL;
 	}
 }
@@ -364,6 +365,7 @@ out_mm_unlock:
 	up_write(&current->mm->mmap_sem);
 out_free:
 	mutex_unlock(&cli->mutex);
+	mutex_destroy(&svmm->mutex);
 	kfree(svmm);
 	return ret;
 }

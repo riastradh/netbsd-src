@@ -199,6 +199,7 @@ nvkm_falcon_msgq_del(struct nvkm_falcon_msgq **pmsgq)
 {
 	struct nvkm_falcon_msgq *msgq = *pmsgq;
 	if (msgq) {
+		mutex_destroy(&msgq->mutex);
 		kfree(*pmsgq);
 		*pmsgq = NULL;
 	}

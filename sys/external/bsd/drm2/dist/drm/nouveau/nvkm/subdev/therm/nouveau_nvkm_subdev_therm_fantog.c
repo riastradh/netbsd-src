@@ -92,6 +92,13 @@ nvkm_fantog_set(struct nvkm_therm *therm, int percent)
 	return 0;
 }
 
+static void
+nvkm_fantog_dtor(struct nvkm_fan *base)
+{
+	struct nvkm_fantog *fan = container_of(base, struct nvkm_fantog, base);
+	spin_lock_destroy(&fan->lock);
+}
+
 int
 nvkm_fantog_create(struct nvkm_therm *therm, struct dcb_gpio_func *func)
 {
@@ -112,6 +119,7 @@ nvkm_fantog_create(struct nvkm_therm *therm, struct dcb_gpio_func *func)
 	fan->base.type = "toggle";
 	fan->base.get = nvkm_fantog_get;
 	fan->base.set = nvkm_fantog_set;
+	fan->base.dtor = nvkm_fantog_dtor;
 	nvkm_alarm_init(&fan->alarm, nvkm_fantog_alarm);
 	fan->period_us = 100000; /* 10Hz */
 	fan->percent = 100;

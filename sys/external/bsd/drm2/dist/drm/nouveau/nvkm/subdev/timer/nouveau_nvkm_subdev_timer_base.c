@@ -176,6 +176,7 @@ nvkm_timer_init(struct nvkm_subdev *subdev)
 static void *
 nvkm_timer_dtor(struct nvkm_subdev *subdev)
 {
+	spin_lock_destroy(&nvkm_timer(subdev)->lock);
 	return nvkm_timer(subdev);
 }
 

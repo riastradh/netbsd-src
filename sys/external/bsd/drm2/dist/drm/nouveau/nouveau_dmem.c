@@ -409,6 +409,7 @@ nouveau_dmem_fini(struct nouveau_drm *drm)
 			nouveau_bo_ref(NULL, &chunk->bo);
 		}
 		list_del(&chunk->list);
+		spin_lock_destroy(&chunk->lock);
 		kfree(chunk);
 	}
 
@@ -558,6 +559,7 @@ nouveau_dmem_init(struct nouveau_drm *drm)
 	NV_INFO(drm, "DMEM: registered %ldMB of device memory\n", size >> 20);
 	return;
 out_free:
+	mutex_destroy(&drm->dmem->mutex);
 	kfree(drm->dmem);
 	drm->dmem = NULL;
 }

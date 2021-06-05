@@ -276,6 +276,7 @@ nvkm_client_dtor(struct nvkm_object *object)
 	int i;
 	for (i = 0; i < ARRAY_SIZE(client->notify); i++)
 		nvkm_client_notify_del(client, i);
+	spin_lock_destroy(&client->lock);
 	return client;
 }
 

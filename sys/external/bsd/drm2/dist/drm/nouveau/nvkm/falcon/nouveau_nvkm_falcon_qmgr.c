@@ -68,6 +68,7 @@ nvkm_falcon_qmgr_del(struct nvkm_falcon_qmgr **pqmgr)
 {
 	struct nvkm_falcon_qmgr *qmgr = *pqmgr;
 	if (qmgr) {
+		mutex_destroy(&qmgr->seq.mutex);
 		kfree(*pqmgr);
 		*pqmgr = NULL;
 	}

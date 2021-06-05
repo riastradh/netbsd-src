@@ -1366,9 +1366,17 @@ nv04_gr_init(struct nvkm_gr *base)
 	return 0;
 }
 
+static void *
+nv04_gr_dtor(struct nvkm_gr *gr)
+{
+	spin_lock_destroy(&nv04_gr(gr)->lock);
+	return gr;
+}
+
 static const struct nvkm_gr_func
 nv04_gr = {
 	.init = nv04_gr_init,
+	.dtor = nv04_gr_dtor,
 	.intr = nv04_gr_intr,
 	.chan_new = nv04_gr_chan_new,
 	.sclass = {
