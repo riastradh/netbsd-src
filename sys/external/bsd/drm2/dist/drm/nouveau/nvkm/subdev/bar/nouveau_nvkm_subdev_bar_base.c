@@ -126,6 +126,7 @@ nvkm_bar_dtor(struct nvkm_subdev *subdev)
 {
 	struct nvkm_bar *bar = nvkm_bar(subdev);
 	nvkm_bar_bar2_fini(subdev->device);
+	spin_lock_destroy(&bar->lock);
 	return bar->func->dtor(bar);
 }
 

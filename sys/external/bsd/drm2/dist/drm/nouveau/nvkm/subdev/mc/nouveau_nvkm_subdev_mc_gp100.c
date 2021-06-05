@@ -98,9 +98,17 @@ gp100_mc_intr[] = {
 	{},
 };
 
+static void *
+nv50_mc_dtor(struct nvkm_mc *mc)
+{
+	spin_lock_destroy(&gp100_mc(mc)->lock);
+	return mc;
+}
+
 static const struct nvkm_mc_func
 gp100_mc = {
 	.init = nv50_mc_init,
+	.dtor = nv50_mc_dtor,
 	.intr = gp100_mc_intr,
 	.intr_unarm = gp100_mc_intr_unarm,
 	.intr_rearm = gp100_mc_intr_rearm,

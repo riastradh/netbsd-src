@@ -679,6 +679,7 @@ nouveau_fbcon_fini(struct drm_device *dev)
 
 	nouveau_fbcon_accel_fini(dev);
 	nouveau_fbcon_destroy(dev, drm->fbcon);
+	mutex_destroy(&drm->fbcon->hotplug_lock);
 	kfree(drm->fbcon);
 	drm->fbcon = NULL;
 }

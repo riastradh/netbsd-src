@@ -2455,6 +2455,7 @@ nv50_display_destroy(struct drm_device *dev)
 	nouveau_bo_ref(NULL, &disp->sync);
 
 	nouveau_display(dev)->priv = NULL;
+	mutex_destroy(&disp->mutex);
 	kfree(disp);
 }
 

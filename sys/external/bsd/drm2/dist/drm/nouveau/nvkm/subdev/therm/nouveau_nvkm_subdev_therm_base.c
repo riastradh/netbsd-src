@@ -414,7 +414,10 @@ static void *
 nvkm_therm_dtor(struct nvkm_subdev *subdev)
 {
 	struct nvkm_therm *therm = nvkm_therm(subdev);
+	nvkm_therm_fan_dtor(therm);
 	kfree(therm->fan);
+	spin_lock_destroy(&therm->sensor.alarm_program_lock);
+	spin_lock_destroy(&therm->lock);
 	return therm;
 }
 

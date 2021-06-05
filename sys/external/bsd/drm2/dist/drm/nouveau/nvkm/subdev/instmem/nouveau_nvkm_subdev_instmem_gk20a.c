@@ -662,6 +662,8 @@ gk20a_instmem_dtor(struct nvkm_instmem *base)
 		nvkm_warn(&base->subdev, "instobj vmap area not empty! "
 			  "0x%x bytes still mapped\n", imem->vaddr_use);
 
+	mutex_destroy(&imem->lock);
+
 	return imem;
 }
 

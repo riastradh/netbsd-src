@@ -37,6 +37,7 @@ nvkm_fuse_read(struct nvkm_fuse *fuse, u32 addr)
 static void *
 nvkm_fuse_dtor(struct nvkm_subdev *subdev)
 {
+	spin_lock_destroy(&nvkm_fuse(subdev)->lock);
 	return nvkm_fuse(subdev);
 }
 

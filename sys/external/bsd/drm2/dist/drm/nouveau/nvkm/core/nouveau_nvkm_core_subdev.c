@@ -31,6 +31,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <core/option.h>
 #include <subdev/mc.h>
 
+#include <linux/nbsd-namespace.h>
+
 static struct lock_class_key nvkm_subdev_lock_class[NVKM_SUBDEV_NR];
 
 const char *
@@ -208,6 +210,7 @@ nvkm_subdev_del(struct nvkm_subdev **psubdev)
 			*psubdev = subdev->func->dtor(subdev);
 		time = ktime_to_us(ktime_get()) - time;
 		nvkm_trace(subdev, "destroy completed in %"PRId64"us\n", time);
+		mutex_destroy(&subdev->mutex);
 		kfree(*psubdev);
 		*psubdev = NULL;
 	}

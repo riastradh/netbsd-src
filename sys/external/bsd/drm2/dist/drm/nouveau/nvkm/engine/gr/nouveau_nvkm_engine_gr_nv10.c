@@ -1190,9 +1190,17 @@ nv10_gr_new_(const struct nvkm_gr_func *func, struct nvkm_device *device,
 	return nvkm_gr_ctor(func, device, index, true, &gr->base);
 }
 
+static void *
+nv10_gr_dtor(struct nvkm_gr *gr)
+{
+	spin_lock_destroy(&nv10_gr(gr)->lock);
+	return gr;
+}
+
 static const struct nvkm_gr_func
 nv10_gr = {
 	.init = nv10_gr_init,
+	.dtor = nv10_gr_dtor,
 	.intr = nv10_gr_intr,
 	.tile = nv10_gr_tile,
 	.chan_new = nv10_gr_chan_new,

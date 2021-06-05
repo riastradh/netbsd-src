@@ -2033,6 +2033,8 @@ gf100_gr_dtor(struct nvkm_gr *base)
 	vfree(gr->sw_ctx);
 	vfree(gr->sw_nonctx);
 
+	mutex_destroy(&gr->fecs.mutex);
+
 	return gr;
 }
 

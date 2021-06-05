@@ -199,6 +199,8 @@ nvkm_falcon_cmdq_del(struct nvkm_falcon_cmdq **pcmdq)
 {
 	struct nvkm_falcon_cmdq *cmdq = *pcmdq;
 	if (cmdq) {
+		destroy_completion(&cmdq->ready);
+		mutex_destroy(&cmdq->mutex);
 		kfree(*pcmdq);
 		*pcmdq = NULL;
 	}
