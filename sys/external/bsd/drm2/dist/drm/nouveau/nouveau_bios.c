@@ -2132,4 +2132,8 @@ nouveau_bios_init(struct drm_device *dev)
 void
 nouveau_bios_takedown(struct drm_device *dev)
 {
+	struct nouveau_drm *drm = nouveau_drm(dev);
+	struct nvbios *legacy = &drm->vbios;
+
+	spin_lock_destroy(&legacy->lock);
 }

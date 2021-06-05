@@ -339,6 +339,7 @@ nvkm_fifo_dtor(struct nvkm_engine *engine)
 	nvkm_event_fini(&fifo->kevent);
 	nvkm_event_fini(&fifo->cevent);
 	nvkm_event_fini(&fifo->uevent);
+	spin_lock_destroy(&fifo->lock);
 	return data;
 }
 

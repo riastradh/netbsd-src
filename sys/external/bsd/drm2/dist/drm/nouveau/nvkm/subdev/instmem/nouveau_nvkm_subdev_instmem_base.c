@@ -264,6 +264,7 @@ static void *
 nvkm_instmem_dtor(struct nvkm_subdev *subdev)
 {
 	struct nvkm_instmem *imem = nvkm_instmem(subdev);
+	spin_lock_destroy(&imem->lock);
 	if (imem->func->dtor)
 		return imem->func->dtor(imem);
 	return imem;

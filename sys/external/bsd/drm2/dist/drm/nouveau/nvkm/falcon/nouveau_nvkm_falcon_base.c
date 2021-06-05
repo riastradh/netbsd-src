@@ -232,6 +232,8 @@ nvkm_falcon_del(struct nvkm_falcon **pfalcon)
 {
 	if (*pfalcon) {
 		nvkm_falcon_dtor(*pfalcon);
+		mutex_destroy(&(*pfalcon)->mutex);
+		mutex_destroy(&(*pfalcon)->dmem_mutex);
 		kfree(*pfalcon);
 		*pfalcon = NULL;
 	}

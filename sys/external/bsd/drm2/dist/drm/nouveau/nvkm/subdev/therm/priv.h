@@ -50,6 +50,7 @@ struct nvkm_fan {
 
 	int (*get)(struct nvkm_therm *);
 	int (*set)(struct nvkm_therm *, int percent);
+	void (*dtor)(struct nvkm_fan *);
 
 	struct dcb_gpio_func tach;
 };
@@ -63,6 +64,7 @@ void nvkm_therm_ic_ctor(struct nvkm_therm *);
 int nvkm_therm_sensor_ctor(struct nvkm_therm *);
 
 int nvkm_therm_fan_ctor(struct nvkm_therm *);
+void nvkm_therm_fan_dtor(struct nvkm_therm *);
 int nvkm_therm_fan_init(struct nvkm_therm *);
 int nvkm_therm_fan_fini(struct nvkm_therm *, bool suspend);
 int nvkm_therm_fan_get(struct nvkm_therm *);

@@ -19,6 +19,7 @@ struct nvkm_mc_map {
 
 struct nvkm_mc_func {
 	void (*init)(struct nvkm_mc *);
+	void *(*dtor)(struct nvkm_mc *);
 	const struct nvkm_mc_map *intr;
 	/* disable reporting of interrupts to host */
 	void (*intr_unarm)(struct nvkm_mc *);

@@ -778,9 +778,17 @@ nv50_gr_new_(const struct nvkm_gr_func *func, struct nvkm_device *device,
 	return nvkm_gr_ctor(func, device, index, true, &gr->base);
 }
 
+static void *
+nv50_gr_dtor(struct nvkm_gr *gr)
+{
+	spin_lock_destroy(&nv50_gr(gr)->lock);
+	return gr;
+}
+
 static const struct nvkm_gr_func
 nv50_gr = {
 	.init = nv50_gr_init,
+	.dtor = nv50_gr_dtor,
 	.intr = nv50_gr_intr,
 	.chan_new = nv50_gr_chan_new,
 	.units = nv50_gr_units,
