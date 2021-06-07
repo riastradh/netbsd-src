@@ -38,6 +38,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 static u32 df_v3_6_channel_number[] = {1, 2, 0, 4, 0, 8, 0,
 				       16, 32, 0, 0, 0, 2, 4, 8};
 
+#ifndef __NetBSD__		/* XXX amdgpu sysfs */
+
 /* init df format attrs */
 AMDGPU_PMU_ATTR(event,		"config:0-7");
 AMDGPU_PMU_ATTR(instance,	"config:8-15");
@@ -100,6 +102,8 @@ const struct attribute_group *df_v3_6_attr_groups[] = {
 		&df_v3_6_event_attr_group,
 		NULL
 };
+
+#endif	/* __NetBSD__ */
 
 static uint64_t df_v3_6_get_fica(struct amdgpu_device *adev,
 				 uint32_t ficaa_val)
@@ -246,6 +250,8 @@ static int df_v3_6_perfmon_arm_with_retry(struct amdgpu_device *adev,
 	return countdown > 0 ? 0 : -ETIME;
 }
 
+#ifndef __NetBSD__		/* XXX amdgpu sysfs */
+
 /* get the number of df counters available */
 static ssize_t df_v3_6_get_df_cntr_avail(struct device *dev,
 		struct device_attribute *attr,
@@ -269,6 +275,8 @@ static ssize_t df_v3_6_get_df_cntr_avail(struct device *dev,
 
 /* device attr for available perfmon counters */
 static DEVICE_ATTR(df_cntr_avail, S_IRUGO, df_v3_6_get_df_cntr_avail, NULL);
+
+#endif	/* __NetBSD__ */
 
 static void df_v3_6_query_hashes(struct amdgpu_device *adev)
 {
@@ -301,9 +309,13 @@ static void df_v3_6_sw_init(struct amdgpu_device *adev)
 {
 	int i, ret;
 
+#ifdef __NetBSD__		/* XXX amdgpu sysfs */
+	__USE(ret);
+#else
 	ret = device_create_file(adev->dev, &dev_attr_df_cntr_avail);
 	if (ret)
 		DRM_ERROR("failed to create file for available df counters\n");
+#endif
 
 	for (i = 0; i < AMDGPU_MAX_DF_PERFMONS; i++)
 		adev->df_perfmon_config_assign_mask[i] = 0;
@@ -314,7 +326,9 @@ static void df_v3_6_sw_init(struct amdgpu_device *adev)
 static void df_v3_6_sw_fini(struct amdgpu_device *adev)
 {
 
+#ifndef __NetBSD__		/* XXX amdgpu sysfs */
 	device_remove_file(adev->dev, &dev_attr_df_cntr_avail);
+#endif
 
 }
 
@@ -485,7 +499,7 @@ static int df_v3_6_pmc_get_ctrl_settings(struct amdgpu_device *adev,
 	*lo_val = (unitmask << 8) | (instance_10 << 6) | eventsel | (1 << 22);
 	*hi_val = (instance_76 << 29) | instance_5432;
 
-	DRM_DEBUG_DRIVER("config=%llx addr=%08x:%08x val=%08x:%08x",
+	DRM_DEBUG_DRIVER("config=%"PRIx64" addr=%08x:%08x val=%08x:%08x",
 		config, *lo_base_addr, *hi_base_addr, *lo_val, *hi_val);
 
 	return 0;
