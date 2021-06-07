@@ -446,7 +446,7 @@ static void dcn_bw_calc_rq_dlg_ttu(
 		struct pipe_ctx *pipe,
 		int in_idx)
 {
-	struct display_mode_lib *dml = (struct display_mode_lib *)(&dc->dml);
+	struct display_mode_lib *dml = (struct display_mode_lib *)__UNCONST(&dc->dml);
 	struct _vcs_dpi_display_dlg_regs_st *dlg_regs = &pipe->dlg_regs;
 	struct _vcs_dpi_display_ttu_regs_st *ttu_regs = &pipe->ttu_regs;
 	struct _vcs_dpi_display_rq_regs_st *rq_regs = &pipe->rq_regs;
