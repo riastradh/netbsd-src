@@ -48,6 +48,7 @@ struct hrtimer {
 enum hrtimer_mode {
 	HRTIMER_MODE_ABS,
 	HRTIMER_MODE_REL,
+	HRTIMER_MODE_REL_PINNED,
 };
 
 enum hrtimer_restart {
