@@ -242,9 +242,9 @@ trace_i915_request_retire(struct i915_request *request)
 
 I915_DEFINE_TRACE_REQ(i915,, request__wait__begin);
 static inline void
-trace_i915_request_wait_begin(struct i915_request *request)
+trace_i915_request_wait_begin(struct i915_request *request, unsigned int flags)
 {
-	I915_TRACE_REQ(i915,, request__wait__begin, request, 0);
+	I915_TRACE_REQ(i915,, request__wait__begin, request, flags);
 }
 
 I915_DEFINE_TRACE_REQ(i915,, request__wait__end);
