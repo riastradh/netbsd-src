@@ -398,7 +398,7 @@ drm_ioctl_shim(struct file *fp, unsigned long cmd, void *data)
 }
 
 static int
-drm_poll(struct file *fp __unused, int events __unused)
+drm_poll(struct file *fp, int events)
 {
 	struct drm_file *const file = fp->f_data;
 	struct drm_device *const dev = file->minor->dev;
