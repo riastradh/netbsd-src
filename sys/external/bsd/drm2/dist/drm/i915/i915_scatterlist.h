@@ -45,12 +45,6 @@ i915_sg_segment_size(void)
 	return PAGE_SIZE;
 }
 
-static inline bool
-i915_sg_trim(struct sg_table *sgt)
-{
-	return true;
-}
-
 #else
 
 /*
@@ -162,8 +156,8 @@ static inline unsigned int i915_sg_segment_size(void)
 	return size;
 }
 
-bool i915_sg_trim(struct sg_table *orig_st);
-
 #endif
+
+bool i915_sg_trim(struct sg_table *orig_st);
 
 #endif

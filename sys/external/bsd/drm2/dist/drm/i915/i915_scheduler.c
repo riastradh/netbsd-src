@@ -22,12 +22,17 @@ static struct i915_global_scheduler {
 	struct kmem_cache *slab_priorities;
 } global;
 
+#ifdef __NetBSD__
+static spinlock_t schedule_lock;
+spinlock_t *const i915_schedule_lock = &schedule_lock;
+#else
 static DEFINE_SPINLOCK(schedule_lock);
+#endif
 
 static const struct i915_request *
 node_to_request(const struct i915_sched_node *node)
 {
-	return container_of(node, const struct i915_request, sched);
+	return const_container_of(node, const struct i915_request, sched);
 }
 
 static inline bool node_started(const struct i915_sched_node *node)
