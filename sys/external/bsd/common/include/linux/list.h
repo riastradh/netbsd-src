@@ -107,7 +107,6 @@ static inline bool
 list_is_first(const struct list_head *entry, const struct list_head *head)
 {
 	return head == entry->prev;
-	
 }
 
 static inline bool
@@ -272,6 +271,9 @@ list_del_init(struct list_head *node)
 	for ((VAR) = list_first((HEAD));				\
 		((VAR) != (HEAD)) && ((NEXT) = list_next((VAR)), 1);	\
 		(VAR) = (NEXT))
+
+#define	list_safe_reset_next(VAR, NEXT, FIELD)				\
+	(NEXT) = list_next_entry(VAR, FIELD)
 
 #define	list_for_each_entry(VAR, HEAD, FIELD)				\
 	for ((VAR) = list_entry(list_first((HEAD)), typeof(*(VAR)), FIELD); \
