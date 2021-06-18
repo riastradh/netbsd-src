@@ -96,6 +96,29 @@ synchronize_rcu(void)
 }
 
 /*
+ * cookie = get_state_synchronize_rcu(), cond_synchronize_rcu(cookie)
+ *
+ *	Optimization for synchronize_rcu -- skip if it has already
+ *	happened between get_state_synchronize_rcu and
+ *	cond_synchronize_rcu.  get_state_synchronize_rcu implies a full
+ *	SMP memory barrier (membar_sync).
+ */
+unsigned long
+get_state_synchronize_rcu(void)
+{
+
+	membar_sync();
+	return 0;
+}
+
+void
+cond_synchronize_rcu(unsigned long cookie)
+{
+
+	synchronize_rcu();
+}
+
+/*
  * rcu_barrier()
  *
  *	Wait for all pending RCU callbacks to complete.
