@@ -63,6 +63,11 @@
 #define	IS_REACHABLE(option)	(option)
 
 #define	might_sleep	ASSERT_SLEEPABLE
+#define	might_sleep_if(C) do						      \
+{									      \
+	if (C)								      \
+		might_sleep();						      \
+} while (0)
 
 #define	DEFINE_STATIC_KEY_FALSE(N)	bool N __unused = false
 
