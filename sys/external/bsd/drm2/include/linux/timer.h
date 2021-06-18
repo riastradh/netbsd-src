@@ -50,6 +50,8 @@ struct timer_list {
 
 #define	from_timer(V, T, F)	container_of(T, __typeof__(*(V)), F)
 
+#define	TIMER_IRQSAFE		__BIT(0)
+
 static inline void
 timer_setup(struct timer_list *timer, void (*fn)(struct timer_list *),
     uintptr_t flags)
