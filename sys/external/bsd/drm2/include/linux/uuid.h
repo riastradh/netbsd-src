@@ -34,4 +34,32 @@
 
 #define	UUID_STRING_LEN		36
 
+static inline int
+uuid_is_valid(const char uuid[static 36])
+{
+	unsigned i;
+
+	for (i = 0; i < 36; i++) {
+		switch (i) {
+		case 8:		/* xxxxxxxx[-]xxxx-xxxx-xxxx-xxxxxxxxxxxx */
+		case 12 + 1:	/* xxxxxxxx-xxxx[-]xxxx-xxxx-xxxxxxxxxxxx */
+		case 16 + 2:	/* xxxxxxxx-xxxx-xxxx[-]xxxx-xxxxxxxxxxxx */
+		case 20 + 3:	/* xxxxxxxx-xxxx-xxxx-xxxx[-]xxxxxxxxxxxx */
+			if (uuid[i] == '-')
+				continue;
+			return 0;
+		default:
+			if ('0' <= uuid[i] && uuid[i] <= '9')
+				continue;
+			if ('a' <= uuid[i] && uuid[i] <= 'f')
+				continue;
+			if ('A' <= uuid[i] && uuid[i] <= 'F')
+				continue;
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
 #endif  /* _LINUX_UUID_H_ */

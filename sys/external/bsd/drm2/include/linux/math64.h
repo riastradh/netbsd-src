@@ -56,6 +56,12 @@ div64_s64(int64_t dividend, int64_t divisor)
 	return dividend / divisor;
 }
 
+static inline uint64_t
+DIV64_U64_ROUND_UP(uint64_t dividend, uint64_t divisor)
+{
+	return (dividend + (divisor - 1))/divisor;
+}
+
 static inline int64_t
 div_s64(int64_t dividend, int32_t divisor)
 {

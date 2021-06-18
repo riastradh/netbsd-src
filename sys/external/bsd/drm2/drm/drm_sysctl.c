@@ -122,7 +122,6 @@ drm_sysctl_node(const char *name, const struct sysctlnode **node,
 	    CTLFLAG_PERMANENT, CTLTYPE_NODE, name, NULL,
 	    NULL, 0, NULL, 0, CTL_CREATE, CTL_EOL);
 }
-	
 
 void
 drm_sysctl_init(struct drm_sysctl_def *def)
@@ -155,7 +154,6 @@ drm_sysctl_init(struct drm_sysctl_def *def)
 				continue;
 			}
 		}
-			
 	        if ((error = sysctl_createv(&def->log, 0, &cnode,
 		    &cnode, p->mode == 0600 ? CTLFLAG_READWRITE : 0,
 		    drm_sysctl_get_type(p), n,
