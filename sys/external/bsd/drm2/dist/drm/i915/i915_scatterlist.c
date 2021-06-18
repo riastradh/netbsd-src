@@ -13,6 +13,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 bool i915_sg_trim(struct sg_table *orig_st)
 {
+#ifndef __NetBSD__
 	struct sg_table new_st;
 	struct scatterlist *sg, *new_sg;
 	unsigned int i;
@@ -36,6 +37,7 @@ bool i915_sg_trim(struct sg_table *orig_st)
 	sg_free_table(orig_st);
 
 	*orig_st = new_st;
+#endif
 	return true;
 }
 
