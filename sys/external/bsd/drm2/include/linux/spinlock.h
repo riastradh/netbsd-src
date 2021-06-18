@@ -94,6 +94,9 @@ spin_lock_nested(spinlock_t *spinlock, int subclass)
 	spin_lock(spinlock);
 }
 
+#define	spin_lock_irqsave_nested(SPINLOCK, FLAGS, SUBCLASS)		      \
+	spin_lock_irqsave(SPINLOCK, FLAGS)
+
 static inline void
 spin_lock_init(spinlock_t *spinlock)
 {
