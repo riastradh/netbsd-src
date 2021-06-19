@@ -132,6 +132,22 @@ list_add(struct list_head *node, struct list_head *head)
 }
 
 static inline void
+list_add_rcu(struct list_head *node, struct list_head *head)
+{
+	struct list_head *next = head->next;
+
+	/* Initialize the new node first.  */
+	node->next = next;
+	node->prev = head;
+
+	/* Now publish it.  */
+	atomic_store_release(&head->next, node);
+
+	/* Fix up back pointers, not protected by RCU.  */
+	next->prev = node;
+}
+
+static inline void
 list_add_tail(struct list_head *node, struct list_head *head)
 {
 	__list_add_between(head->prev, node, head);
