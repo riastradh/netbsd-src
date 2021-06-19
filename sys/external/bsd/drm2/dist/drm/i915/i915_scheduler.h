@@ -55,4 +55,6 @@ static inline void i915_priolist_free(struct i915_priolist *p)
 		__i915_priolist_free(p);
 }
 
+void i915_sched_init(struct intel_engine_execlists *);
+
 #endif /* _I915_SCHEDULER_H_ */
