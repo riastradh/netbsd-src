@@ -1,11 +1,8 @@
-/*	$NetBSD: i915_sysfs.c,v 1.2 2014/03/18 18:20:42 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*-
- * Copyright (c) 2013 The NetBSD Foundation, Inc.
+ * Copyright (c) 2021 The NetBSD Foundation, Inc.
  * All rights reserved.
- *
- * This code is derived from software contributed to The NetBSD Foundation
- * by Taylor R. Campbell.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,19 +26,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* i915_sysfs.c stubs */
+/* i915_switcheroo.c stubs */
 
-#include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: i915_sysfs.c,v 1.2 2014/03/18 18:20:42 riastradh Exp $");
+#include "i915_switcheroo.h"
 
-#include "i915_sysfs.h"
-
-void
-i915_setup_sysfs(struct drm_i915_private *dev __unused)
+int
+i915_switcheroo_register(struct drm_i915_private *i915)
 {
+
+	return 0;
 }
 
 void
-i915_teardown_sysfs(struct drm_i915_private *dev __unused)
+i915_switcheroo_unregister(struct drm_i915_private *i915)
 {
 }
