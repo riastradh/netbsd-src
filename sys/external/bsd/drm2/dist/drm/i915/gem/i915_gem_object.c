@@ -65,6 +65,7 @@ void i915_gem_object_init(struct drm_i915_gem_object *obj,
 
 	spin_lock_init(&obj->vma.lock);
 	INIT_LIST_HEAD(&obj->vma.list);
+	i915_vma_tree_init(obj);
 
 	INIT_LIST_HEAD(&obj->mm.link);
 

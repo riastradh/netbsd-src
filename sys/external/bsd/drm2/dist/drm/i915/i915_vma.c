@@ -43,6 +43,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "i915_trace.h"
 #include "i915_vma.h"
 
+#include <linux/nbsd-namespace.h>
+
 static struct i915_global_vma {
 	struct i915_global base;
 	struct kmem_cache *slab_vmas;
@@ -141,9 +143,9 @@ void
 i915_vma_tree_init(struct drm_i915_gem_object *obj)
 {
 #ifdef __NetBSD__
-	rb_tree_init(&obj->vma_tree.rbr_tree, &vma_tree_rb_ops);
+	rb_tree_init(&obj->vma.tree.rbr_tree, &vma_tree_rb_ops);
 #else
-	obj->vma_tree = RB_ROOT;
+	obj->vma.tree = RB_ROOT;
 #endif
 }
 
@@ -233,7 +235,7 @@ vma_create(struct drm_i915_gem_object *obj,
 	__USE(rb);
 	__USE(p);
 	struct i915_vma *collision __diagused;
-	collision = rb_tree_insert_node(&obj->vma_tree.rbr_tree, vma);
+	collision = rb_tree_insert_node(&obj->vma.tree.rbr_tree, vma);
 	KASSERT(collision == vma);
 #else
 	spin_lock(&obj->vma.lock);
@@ -296,7 +298,7 @@ vma_lookup(struct drm_i915_gem_object *obj,
 #ifdef __NetBSD__
 	const struct i915_vma_key key = { .vm = vm, .view = view };
 
-	return rb_tree_find_node(&obj->vma_tree.rbr_tree, &key);
+	return rb_tree_find_node(&obj->vma.tree.rbr_tree, &key);
 #else
 	struct rb_node *rb;
 
@@ -510,7 +512,11 @@ void __iomem *i915_vma_pin_iomap(struct i915_vma *vma)
 		}
 
 		if (unlikely(cmpxchg(&vma->iomap, NULL, ptr))) {
+#ifdef __NetBSD__
+			io_mapping_unmap(&i915_vm_to_ggtt(vma->vm)->iomap, ptr);
+#else
 			io_mapping_unmap(ptr);
+#endif
 			ptr = vma->iomap;
 		}
 	}
@@ -579,7 +585,7 @@ bool i915_vma_misplaced(const struct i915_vma *vma,
 	if (!drm_mm_node_allocated(&vma->node))
 		return false;
 
-	if (test_bit(I915_VMA_ERROR_BIT, __i915_vma_flags(vma)))
+	if (test_bit(I915_VMA_ERROR_BIT, __i915_vma_flags_const(vma)))
 		return true;
 
 	if (vma->node.size < size)
