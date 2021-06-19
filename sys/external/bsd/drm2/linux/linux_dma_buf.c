@@ -104,6 +104,7 @@ dma_buf_fd(struct dma_buf *dmabuf, int flags)
 	unsigned refcnt __diagused;
 	int ret;
 
+	/* XXX errno NetBSD->Linux */
 	ret = -fd_allocfile(&file, &fd);
 	if (ret)
 		goto out0;
