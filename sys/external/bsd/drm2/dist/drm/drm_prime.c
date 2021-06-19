@@ -243,7 +243,12 @@ static struct dma_buf *drm_prime_lookup_buf_by_handle(struct drm_prime_file_priv
 						      uint32_t handle)
 {
 #ifdef __NetBSD__
-	return rb_tree_find_node(&prime_fpriv->handles.rbr_tree, &handle);
+	struct drm_prime_member *member;
+
+	member = rb_tree_find_node(&prime_fpriv->handles.rbr_tree, &handle);
+	if (member == NULL)
+		return NULL;
+	return member->dma_buf;
 #else
 	struct rb_node *rb;
 
