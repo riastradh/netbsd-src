@@ -20,6 +20,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_engine_pm.h"
 #include "intel_ring.h"
 
+#include <linux/nbsd-namespace.h>
+
 static struct i915_global_context {
 	struct i915_global base;
 	struct kmem_cache *slab_ce;

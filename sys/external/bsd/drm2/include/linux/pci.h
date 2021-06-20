@@ -84,6 +84,10 @@ struct pci_device_id {
 	unsigned long	driver_data;
 };
 
+#define	PCI_DEVICE(VENDOR, DEVICE)					      \
+	.vendor = (VENDOR),						      \
+	.device = (DEVICE)
+
 #define	PCI_ANY_ID		(~0)
 
 #define	PCI_BASE_CLASS_DISPLAY	PCI_CLASS_DISPLAY
@@ -196,6 +200,7 @@ enum pci_bus_speed {
 #define	pci_bus_write_config_word	linux_pci_bus_write_config_word
 #define	pci_clear_master		linux_pci_clear_master
 #define	pci_dev_dev			linux_pci_dev_dev
+#define	pci_dev_present			linux_pci_dev_present
 #define	pci_dev_put			linux_pci_dev_put
 #define	pci_disable_msi			linux_pci_disable_msi
 #define	pci_disable_rom			linux_pci_disable_rom
@@ -287,6 +292,7 @@ int		pci_bus_alloc_resource(struct pci_bus *, struct resource *,
 /* XXX Kludges only -- do not use without checking the implementation!  */
 struct pci_dev *pci_get_domain_bus_and_slot(int, int, int);
 struct pci_dev *pci_get_class(uint32_t, struct pci_dev *); /* i915 kludge */
+int		pci_dev_present(const struct pci_device_id *);
 void		pci_dev_put(struct pci_dev *);
 
 void __pci_rom_iomem *

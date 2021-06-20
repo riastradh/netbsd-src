@@ -29,6 +29,7 @@
 
 #include <linux/bitfield.h>
 #include <linux/bits.h>
+#include <linux/types.h>
 
 /**
  * DOC: The i915 register macro definition style guide

@@ -474,4 +474,42 @@ trace_i915_pipe_update_end(struct intel_crtc *crtc, uint32_t frame,
 	TRACE3(i915,, pipe__update__end,  crtc->pipe, frame, scanline);
 }
 
+DEFINE_TRACE2(i915,, update__plane,
+    "struct drm_plane *"/*plane*/,
+    "struct intel_crtc *"/*crtc*/);
+
+static inline void
+trace_intel_update_plane(struct drm_plane *plane, struct intel_crtc *crtc)
+{
+	TRACE2(i915,, update__plane,  plane, crtc);
+}
+
+DEFINE_TRACE2(i915,, disable__plane,
+    "struct drm_plane *"/*plane*/,
+    "struct intel_crtc *"/*crtc*/);
+
+static inline void
+trace_intel_disable_plane(struct drm_plane *plane, struct intel_crtc *crtc)
+{
+	TRACE2(i915,, disable__plane,  plane, crtc);
+}
+
+DEFINE_TRACE1(i915,, pipe__enable,
+    "struct intel_crtc *"/*crtc*/);
+
+static inline void
+trace_intel_pipe_enable(struct intel_crtc *crtc)
+{
+	TRACE1(i915,, pipe__enable,  crtc);
+}
+
+DEFINE_TRACE1(i915,, pipe__disable,
+    "struct intel_crtc *"/*crtc*/);
+
+static inline void
+trace_intel_pipe_disable(struct intel_crtc *crtc)
+{
+	TRACE1(i915,, pipe__disable,  crtc);
+}
+
 #endif  /* _I915_TRACE_H_ */

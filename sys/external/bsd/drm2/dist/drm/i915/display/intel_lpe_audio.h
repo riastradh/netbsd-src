@@ -10,6 +10,9 @@
 
 #include <linux/types.h>
 
+#include <sys/file.h>
+#define	pipe	pipe_drmhack	/* see intel_display.h */
+
 enum pipe;
 enum port;
 struct drm_i915_private;

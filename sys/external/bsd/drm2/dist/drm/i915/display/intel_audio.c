@@ -805,6 +805,8 @@ void intel_init_audio_hooks(struct drm_i915_private *dev_priv)
 	}
 }
 
+#ifndef __NetBSD__		/* XXX intel audio */
+
 static void glk_force_audio_cdclk(struct drm_i915_private *dev_priv,
 				  bool enable)
 {
@@ -842,8 +844,6 @@ retry:
 	drm_modeset_drop_locks(&ctx);
 	drm_modeset_acquire_fini(&ctx);
 }
-
-#ifndef __NetBSD__		/* XXX intel audio */
 
 static unsigned long i915_audio_component_get_power(struct device *kdev)
 {
