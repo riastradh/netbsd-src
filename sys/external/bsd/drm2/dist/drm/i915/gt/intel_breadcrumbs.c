@@ -36,6 +36,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_gt_pm.h"
 #include "intel_gt_requests.h"
 
+#include <linux/nbsd-namespace.h>
+
 static void irq_enable(struct intel_engine_cs *engine)
 {
 	if (!engine->irq_enable)
@@ -380,8 +382,9 @@ void intel_engine_print_breadcrumbs(struct intel_engine_cs *engine,
 	spin_lock_irq(&b->irq_lock);
 	list_for_each_entry(ce, &b->signalers, signal_link) {
 		list_for_each_entry(rq, &ce->signals, signal_link) {
-			drm_printf(p, "\t[%llx:%llx%s] @ %dms\n",
-				   rq->fence.context, rq->fence.seqno,
+			drm_printf(p, "\t[%"PRIx64":%"PRIx64"%s] @ %dms\n",
+				   (uint64_t)rq->fence.context,
+				   (uint64_t)rq->fence.seqno,
 				   i915_request_completed(rq) ? "!" :
 				   i915_request_started(rq) ? "*" :
 				   "",

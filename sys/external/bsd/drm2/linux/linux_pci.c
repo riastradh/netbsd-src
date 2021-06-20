@@ -449,6 +449,14 @@ pci_get_class(uint32_t class_subclass_shifted __unused, struct pci_dev *from)
 	return pdev;
 }
 
+int
+pci_dev_present(const struct pci_device_id *ids)
+{
+
+	/* XXX implement me -- pci_find_device doesn't pass a cookie */
+	return 0;
+}
+
 void
 pci_unmap_rom(struct pci_dev *pdev, void __pci_rom_iomem *vaddr __unused)
 {

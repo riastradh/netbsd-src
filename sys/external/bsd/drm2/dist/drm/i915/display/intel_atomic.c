@@ -61,8 +61,8 @@ int intel_digital_connector_atomic_get_property(struct drm_connector *connector,
 {
 	struct drm_device *dev = connector->dev;
 	struct drm_i915_private *dev_priv = to_i915(dev);
-	struct intel_digital_connector_state *intel_conn_state =
-		to_intel_digital_connector_state(state);
+	const struct intel_digital_connector_state *intel_conn_state =
+		const_container_of(state, struct intel_digital_connector_state, base);
 
 	if (property == dev_priv->force_audio_property)
 		*val = intel_conn_state->force_audio;

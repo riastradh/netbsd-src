@@ -8,6 +8,9 @@
 #include <linux/bitops.h>
 #include <linux/types.h>
 
+#include <sys/file.h>
+#define	pipe	pipe_drmhack	/* see intel_display.h */
+
 struct drm_i915_private;
 enum pipe;
 

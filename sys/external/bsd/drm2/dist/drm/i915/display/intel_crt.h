@@ -10,6 +10,9 @@
 
 #include "i915_reg.h"
 
+#include <sys/file.h>
+#define	pipe	pipe_drmhack	/* see intel_display.h */
+
 enum pipe;
 struct drm_encoder;
 struct drm_i915_private;

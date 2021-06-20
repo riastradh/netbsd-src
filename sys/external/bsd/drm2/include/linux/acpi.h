@@ -44,4 +44,6 @@
 #include <dev/acpi/acpivar.h>
 #endif
 
+#include <linux/uuid.h>
+
 #endif  /* _LINUX_ACPI_H_ */
