@@ -32,4 +32,14 @@
 #ifndef _DRM_MIPI_DSI_H_
 #define _DRM_MIPI_DSI_H_
 
+struct mipi_dsi_host_ops;
+
+enum mipi_dsi_pixel_format {
+	MIPI_DSI_PIXEL_NFORMATS,
+};
+
+struct mipi_dsi_host {
+	char dummy;
+};
+
 #endif /*_DRM_MIPI_DSI_H_*/

@@ -24,6 +24,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_tc.h"
 #include "intel_vga.h"
 
+#include <linux/nbsd-namespace.h>
+
 bool intel_display_power_well_is_enabled(struct drm_i915_private *dev_priv,
 					 enum i915_power_well_id power_well_id);
 
@@ -1314,7 +1316,11 @@ static void vlv_display_power_well_deinit(struct drm_i915_private *dev_priv)
 	intel_power_sequencer_reset(dev_priv);
 
 	/* Prevent us from re-enabling polling on accident in late suspend */
+#ifdef __NetBSD__
+	if (device_activation(dev_priv->drm.dev, DEVACT_LEVEL_FULL))
+#else
 	if (!dev_priv->drm.dev->power.is_suspended)
+#endif
 		intel_hpd_poll_init(dev_priv);
 }
 

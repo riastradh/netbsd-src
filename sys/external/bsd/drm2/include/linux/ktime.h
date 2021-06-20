@@ -132,6 +132,13 @@ ktime_get_real(void)
 }
 
 static inline ktime_t
+ktime_get_boottime(void)
+{
+	/* XXX include time spent in suspend */
+	return ktime_get();
+}
+
+static inline ktime_t
 ktime_get_raw(void)
 {
 	/* XXX */

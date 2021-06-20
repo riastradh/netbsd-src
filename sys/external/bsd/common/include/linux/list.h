@@ -283,6 +283,11 @@ list_del_init(struct list_head *node)
 		(VAR) != (HEAD);					\
 		(VAR) = list_next((VAR)))
 
+#define	list_for_each_prev(VAR, HEAD)					\
+	for ((VAR) = list_last((HEAD));					\
+		(VAR) != (HEAD);					\
+		(VAR) = list_prev((VAR)))
+
 #define	list_for_each_safe(VAR, NEXT, HEAD)				\
 	for ((VAR) = list_first((HEAD));				\
 		((VAR) != (HEAD)) && ((NEXT) = list_next((VAR)), 1);	\

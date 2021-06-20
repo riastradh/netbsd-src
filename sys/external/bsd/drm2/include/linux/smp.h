@@ -35,6 +35,8 @@
 #include <sys/systm.h>
 #include <sys/cpu.h>
 
+#define	smp_processor_id()	cpu_number()
+
 static inline int
 get_cpu(void)
 {
