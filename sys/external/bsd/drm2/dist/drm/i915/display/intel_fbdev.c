@@ -333,6 +333,7 @@ out_unlock:
 	intel_runtime_pm_put(&dev_priv->runtime_pm, wakeref);
 	return ret;
 }
+
 #ifdef __NetBSD__
 #  undef	__iomem
 #endif
