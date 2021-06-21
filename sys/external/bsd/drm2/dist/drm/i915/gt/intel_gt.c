@@ -8,7 +8,11 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/kernel.h>
+
+#if IS_ENABLED(CONFIG_DEBUGFS)
 #include "debugfs_gt.h"
+#endif
 #include "i915_drv.h"
 #include "intel_context.h"
 #include "intel_gt.h"
@@ -204,7 +208,7 @@ static void gen6_check_faults(struct intel_gt *gt)
 		fault = GEN6_RING_FAULT_REG_READ(engine);
 		if (fault & RING_FAULT_VALID) {
 			DRM_DEBUG_DRIVER("Unexpected fault\n"
-					 "\tAddr: 0x%08lx\n"
+					 "\tAddr: 0x%08"PRIx32"\n"
 					 "\tAddress space: %s\n"
 					 "\tSource ID: %d\n"
 					 "\tType: %d\n",
@@ -326,7 +330,9 @@ void intel_gt_driver_register(struct intel_gt *gt)
 {
 	intel_rps_driver_register(&gt->rps);
 
+#if IS_ENABLED(CONFIG_DEBUGFS)
 	debugfs_gt_register(gt);
+#endif
 }
 
 static int intel_gt_init_scratch(struct intel_gt *gt, unsigned int size)

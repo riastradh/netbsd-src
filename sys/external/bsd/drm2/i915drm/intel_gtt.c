@@ -185,9 +185,10 @@ intel_gtt_insert_page(bus_addr_t addr, unsigned va_page, unsigned flags)
 }
 
 void
-intel_gtt_insert_sg_entries(bus_dmamap_t dmamap, unsigned va_page,
+intel_gtt_insert_sg_entries(struct sg_table *sg, unsigned va_page,
     unsigned flags)
 {
+	bus_dmamap_t dmamap = sg->sgl[0].sg_dmamap;
 	struct agp_i810_softc *const isc = agp_i810_sc->as_chipc;
 	off_t va = (off_t)va_page << PAGE_SHIFT;
 	unsigned seg;
