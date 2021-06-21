@@ -1184,27 +1184,19 @@ static void intel_get_hpd_pins(struct drm_i915_private *dev_priv,
 static void gmbus_irq_handler(struct drm_i915_private *dev_priv)
 {
 
-#ifdef __NetBSD__
 	spin_lock(&dev_priv->gmbus_wait_lock);
 	DRM_SPIN_WAKEUP_ALL(&dev_priv->gmbus_wait_queue,
 	    &dev_priv->gmbus_wait_lock);
 	spin_unlock(&dev_priv->gmbus_wait_lock);
-#else
-	wake_up_all(&dev_priv->gmbus_wait_queue);
-#endif
 }
 
 static void dp_aux_irq_handler(struct drm_i915_private *dev_priv)
 {
 
-#ifdef __NetBSD__
 	spin_lock(&dev_priv->gmbus_wait_lock);
 	DRM_SPIN_WAKEUP_ALL(&dev_priv->gmbus_wait_queue,
 	    &dev_priv->gmbus_wait_lock);
 	spin_unlock(&dev_priv->gmbus_wait_lock);
-#else
-	wake_up_all(&dev_priv->gmbus_wait_queue);
-#endif
 }
 
 #if defined(CONFIG_DEBUG_FS)

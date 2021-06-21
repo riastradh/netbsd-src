@@ -9,6 +9,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/sched/signal.h>
 #include <linux/workqueue.h>
 
 #include "i915_drv.h" /* for_each_engine() */
@@ -18,6 +19,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_gt_pm.h"
 #include "intel_gt_requests.h"
 #include "intel_timeline.h"
+
+#include <linux/nbsd-namespace.h>
 
 static bool retire_requests(struct intel_timeline *tl)
 {
@@ -122,6 +125,11 @@ void intel_engine_fini_retire(struct intel_engine_cs *engine)
 	GEM_BUG_ON(engine->retire);
 }
 
+static void
+null_release(struct kref *kref)
+{
+}
+
 long intel_gt_retire_requests_timeout(struct intel_gt *gt, long timeout)
 {
 	struct intel_gt_timelines *timelines = &gt->timelines;
@@ -172,7 +180,7 @@ long intel_gt_retire_requests_timeout(struct intel_gt *gt, long timeout)
 		mutex_unlock(&tl->mutex);
 
 		/* Defer the final release to after the spinlock */
-		if (refcount_dec_and_test(&tl->kref.refcount)) {
+		if (kref_put(&tl->kref, null_release)) {
 			GEM_BUG_ON(atomic_read(&tl->active_count));
 			list_add(&tl->link, &free);
 		}

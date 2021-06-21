@@ -555,7 +555,7 @@ static void hsw_read_infoframe(struct intel_encoder *encoder,
 {
 	struct drm_i915_private *dev_priv = to_i915(encoder->base.dev);
 	enum transcoder cpu_transcoder = crtc_state->cpu_transcoder;
-	u32 val, *data = frame;
+	u32 val __unused, *data = frame;
 	int i;
 
 	val = I915_READ(HSW_TVIDEO_DIP_CTL(cpu_transcoder));

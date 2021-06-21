@@ -115,28 +115,37 @@ strscpy(char *dst, const char *src, size_t dstsize)
 	return dstsize - n;
 }
 
-static inline void
-memset32(uint32_t *p, uint32_t v, size_t n)
+static inline void *
+memset32(uint32_t *buf, uint32_t v, size_t n)
 {
+	uint32_t *p = buf;
 
 	while (n --> 0)
 		*p++ = v;
+
+	return buf;
 }
 
-static inline void
-memset64(uint64_t *p, uint64_t v, size_t n)
+static inline void *
+memset64(uint64_t *buf, uint64_t v, size_t n)
 {
+	uint64_t *p = buf;
 
 	while (n --> 0)
 		*p++ = v;
+
+	return buf;
 }
 
-static inline void
-memset_p(void **p, void *v, size_t n)
+static inline void *
+memset_p(void **buf, void *v, size_t n)
 {
+	void **p = buf;
 
 	while (n --> 0)
 		*p++ = v;
+
+	return buf;
 }
 
 #define str_has_prefix(str, prefix) strncmp(str, prefix, strlen(prefix))
