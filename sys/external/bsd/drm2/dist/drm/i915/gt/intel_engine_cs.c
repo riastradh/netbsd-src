@@ -490,7 +490,7 @@ void intel_engine_init_execlists(struct intel_engine_cs *engine)
 		memset(execlists->inflight, 0, sizeof(execlists->inflight));
 
 	execlists->queue_priority_hint = INT_MIN;
-	execlists->queue = RB_ROOT_CACHED;
+	i915_sched_init(execlists);
 }
 
 static void cleanup_status_page(struct intel_engine_cs *engine)
