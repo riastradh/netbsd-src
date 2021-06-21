@@ -110,6 +110,11 @@ llist_del_first(struct llist_head *head)
 	    llist_entry(_NODE, __typeof__(*(ENTRY)), FIELD));		      \
 })
 
+#define	llist_for_each_safe(NODE, TMP, HEAD)				      \
+	for ((NODE) = (HEAD);						      \
+		(NODE) && ((TMP) = (NODE)->next, 1);			      \
+		(NODE) = (TMP))
+
 #define	llist_for_each_entry(ENTRY, NODE, FIELD)			      \
 	for ((ENTRY) = ((NODE) == NULL ? NULL :				      \
 		    (membar_datadep_consumer(),				      \
