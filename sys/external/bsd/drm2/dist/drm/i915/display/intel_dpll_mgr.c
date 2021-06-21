@@ -30,6 +30,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_dpio_phy.h"
 #include "intel_dpll_mgr.h"
 
+#include <linux/nbsd-namespace.h>
+
 /**
  * DOC: Display PLLs
  *

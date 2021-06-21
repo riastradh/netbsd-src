@@ -12,6 +12,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "i915_drv.h"
 #include "intel_display_types.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define DSB_BUF_SIZE    (2 * PAGE_SIZE)
 
 /**
