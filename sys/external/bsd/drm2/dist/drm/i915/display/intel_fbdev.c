@@ -568,7 +568,9 @@ void intel_fbdev_unregister(struct drm_i915_private *dev_priv)
 		return;
 
 	cancel_work_sync(&dev_priv->fbdev_suspend_work);
+#ifndef __NetBSD__		/* XXX fb async */
 	if (!current_is_async())
+#endif
 		intel_fbdev_sync(ifbdev);
 
 	drm_fb_helper_unregister_fbi(&ifbdev->helper);
