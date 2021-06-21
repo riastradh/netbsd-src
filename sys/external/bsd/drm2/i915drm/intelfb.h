@@ -42,10 +42,7 @@ struct intelfb_attach_args {
 	struct drm_device			*ifa_drm_dev;
 	struct drm_fb_helper			*ifa_fb_helper;
 	struct drm_fb_helper_surface_size	ifa_fb_sizes;
-	bus_space_tag_t				ifa_fb_bst;
-	bus_addr_t				ifa_fb_addr;
-	bus_size_t				ifa_fb_size;
-	bool					ifa_fb_zero;
+	void*					ifa_fb_vaddr;
 };
 
 #endif	/* _I915DRM_INTELFB_H_ */
