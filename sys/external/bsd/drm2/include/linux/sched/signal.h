@@ -31,4 +31,13 @@
 
 #include <linux/sched.h>
 
+static inline bool
+signal_pending(struct proc *p)
+{
+
+	KASSERT(p == curproc);
+	return __predict_false(curlwp->l_flag & LW_PENDSIG) &&
+	    sigispending(curlwp, 0);
+}
+
 #endif	/* _LINUX_SCHED_SIGNAL_H_ */

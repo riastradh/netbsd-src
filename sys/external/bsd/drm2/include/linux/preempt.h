@@ -39,5 +39,6 @@
 
 #define	in_atomic()	kpreempt_disabled()
 #define	in_task()	!(cpu_intr_p() || cpu_softintr_p() || in_atomic())
+#define	in_irq()	cpu_intr_p()
 
 #endif  /* _LINUX_PREEMPT_H_ */

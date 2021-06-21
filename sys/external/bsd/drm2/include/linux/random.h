@@ -54,4 +54,14 @@ get_random_long(void)
 	return v;
 }
 
+static inline uint32_t
+get_random_u32(void)
+{
+	uint32_t v;
+
+	cprng_strong(kern_cprng, &v, sizeof v, 0);
+
+	return v;
+}
+
 #endif	/* _LINUX_RANDOM_H_ */

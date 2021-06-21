@@ -16,6 +16,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_guc_submission.h"
 #include "i915_drv.h"
 
+#include <linux/nbsd-namespace.h>
+
 /**
  * DOC: GuC
  *

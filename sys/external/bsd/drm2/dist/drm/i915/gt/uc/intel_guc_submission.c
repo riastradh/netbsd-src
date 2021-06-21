@@ -486,7 +486,7 @@ static void guc_reset_cancel(struct intel_engine_cs *engine)
 	/* Remaining _unready_ requests will be nop'ed when submitted */
 
 	execlists->queue_priority_hint = INT_MIN;
-	execlists->queue = RB_ROOT_CACHED;
+	i915_sched_init(execlists);
 
 	spin_unlock_irqrestore(&engine->active.lock, flags);
 }

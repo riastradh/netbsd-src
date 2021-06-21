@@ -45,6 +45,8 @@ __KERNEL_RCSID(0, "$NetBSD: intel_gtt.c,v 1.11 2018/08/27 16:15:23 riastradh Exp
 #include <dev/pci/agpvar.h>
 #include <dev/pci/agp_i810var.h>
 
+#include <linux/scatterlist.h>
+
 #include "drm/intel-gtt.h"
 
 /* Access to this should be single-threaded.  */
