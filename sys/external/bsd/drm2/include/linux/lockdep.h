@@ -37,6 +37,7 @@
 
 #include <lib/libkern/libkern.h>
 
+struct lock_class_key;
 struct mutex;
 struct spinlock;
 
@@ -86,6 +87,16 @@ static inline void
 lockdep_unpin_lock(struct mutex *m, struct pin_cookie cookie)
 {
 	KASSERT(cookie.dummy == (int)(intptr_t)m);
+}
+
+static inline void
+lockdep_set_class(void *m, struct lock_class_key *ck)
+{
+}
+
+static inline void
+lockdep_set_subclass(void *m, unsigned subclass)
+{
 }
 
 #endif	/* _LINUX_LOCKDEP_H_ */
