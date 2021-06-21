@@ -4776,7 +4776,7 @@ intel_dp_setup_hdr_metadata_infoframe_sdp(struct intel_dp *intel_dp,
 	 * Packet Type 80h + Non-audio INFOFRAME Type value
 	 * HDMI_INFOFRAME_TYPE_DRM: 0x87,
 	 */
-	infoframe_sdp.sdp_header.HB1 = drm_infoframe.type;
+	infoframe_sdp.sdp_header.HB1 = drm_infoframe.header.type;
 	/*
 	 * Least Significant Eight Bits of (Data Byte Count – 1)
 	 * infoframe_size - 1,
@@ -4785,9 +4785,9 @@ intel_dp_setup_hdr_metadata_infoframe_sdp(struct intel_dp *intel_dp,
 	/* INFOFRAME SDP Version Number */
 	infoframe_sdp.sdp_header.HB3 = (0x13 << 2);
 	/* CTA Header Byte 2 (INFOFRAME Version Number) */
-	infoframe_sdp.db[0] = drm_infoframe.version;
+	infoframe_sdp.db[0] = drm_infoframe.header.version;
 	/* CTA Header Byte 3 (Length of INFOFRAME): HDMI_DRM_INFOFRAME_SIZE */
-	infoframe_sdp.db[1] = drm_infoframe.length;
+	infoframe_sdp.db[1] = drm_infoframe.header.length;
 	/*
 	 * Copy HDMI_DRM_INFOFRAME_SIZE size from a buffer after
 	 * HDMI_INFOFRAME_HEADER_SIZE
@@ -5924,11 +5924,15 @@ static void intel_dp_hdcp_wait_for_cp_irq(struct intel_hdcp *hdcp, int timeout)
 	long ret;
 
 #define C (hdcp->cp_irq_count_cached != atomic_read(&hdcp->cp_irq_count))
-	ret = wait_event_interruptible_timeout(hdcp->cp_irq_queue, C,
-					       msecs_to_jiffies(timeout));
-
+	unsigned long irqflags;
+	spin_lock_irqsave(&hdcp->cp_irq_lock, irqflags);
+	DRM_SPIN_TIMED_WAIT_UNTIL(ret, &hdcp->cp_irq_queue,
+	    &hdcp->cp_irq_lock,
+	    msecs_to_jiffies(timeout),
+	    C);
 	if (!ret)
 		DRM_DEBUG_KMS("Timedout at waiting for CP_IRQ\n");
+	spin_unlock_irqrestore(&hdcp->cp_irq_lock, irqflags);
 }
 
 static
