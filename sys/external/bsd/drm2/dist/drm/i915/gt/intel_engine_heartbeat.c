@@ -95,9 +95,17 @@ static void heartbeat(struct work_struct *wrk)
 			if (rq->sched.attr.priority >= attr.priority)
 				attr.priority = I915_PRIORITY_BARRIER;
 
+#ifdef __NetBSD__
+			int s = splsoftserial();
+#else
 			local_bh_disable();
+#endif
 			engine->schedule(rq, &attr);
+#ifdef __NetBSD__
+			splx(s);
+#else
 			local_bh_enable();
+#endif
 		} else {
 			if (IS_ENABLED(CONFIG_DRM_I915_DEBUG_GEM))
 				show_heartbeat(rq, engine);

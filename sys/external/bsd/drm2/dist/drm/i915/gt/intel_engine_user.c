@@ -18,6 +18,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_engine_user.h"
 #include "intel_gt.h"
 
+#include <linux/nbsd-namespace.h>
+
 struct intel_engine_cs *
 intel_engine_lookup_user(struct drm_i915_private *i915, u8 class, u8 instance)
 {

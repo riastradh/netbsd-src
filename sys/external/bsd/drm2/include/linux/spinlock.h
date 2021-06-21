@@ -187,4 +187,14 @@ read_unlock(rwlock_t *rw)
 	mutex_spin_exit(&rw->rw_lock);
 }
 
+static inline void
+local_bh_disable(void)
+{
+}
+
+static inline void
+local_bh_enable(void)
+{
+}
+
 #endif  /* _LINUX_SPINLOCK_H_ */
