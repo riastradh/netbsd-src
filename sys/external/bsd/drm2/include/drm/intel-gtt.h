@@ -37,8 +37,9 @@
 
 #include <linux/ioport.h>
 
-struct pci_dev;
 struct agp_bridge_data;
+struct pci_dev;
+struct sg_table;
 
 void	intel_gtt_get(uint64_t * /* GPU VA size in bytes */,
 	    bus_addr_t * /* aperture base */,
@@ -49,7 +50,7 @@ void	intel_gmch_remove(void);
 bool	intel_enable_gtt(void);
 void	intel_gtt_chipset_flush(void);
 void	intel_gtt_insert_page(bus_addr_t, unsigned, unsigned);
-void	intel_gtt_insert_sg_entries(bus_dmamap_t, unsigned, unsigned);
+void	intel_gtt_insert_sg_entries(struct sg_table *, unsigned, unsigned);
 void	intel_gtt_clear_range(unsigned, unsigned);
 
 #define	AGP_USER_MEMORY		1
