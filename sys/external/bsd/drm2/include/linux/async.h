@@ -61,4 +61,15 @@ async_synchronize_full(void)
 {
 }
 
+/*
+ * async_synchronize_cookie(cookie)
+ *
+ *	Wait until the function passed to the async_schedule call that
+ *	returned cookie has completed.
+ */
+static inline void
+async_synchronize_cookie(unsigned long cookie)
+{
+}
+
 #endif /* _LINUX_ASYNC_H_ */
