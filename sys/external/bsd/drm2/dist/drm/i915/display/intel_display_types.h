@@ -387,11 +387,8 @@ struct intel_hdcp {
 	 * Work queue to signal the CP_IRQ. Used for the waiters to read the
 	 * available information from HDCP DP sink.
 	 */
-#ifdef __linux__
-	wait_queue_head_t cp_irq_queue;
-#else
+	spinlock_t cp_irq_lock;
 	drm_waitqueue_t cp_irq_queue;
-#endif
 	atomic_t cp_irq_count;
 	int cp_irq_count_cached;
 
