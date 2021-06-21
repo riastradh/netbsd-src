@@ -47,6 +47,8 @@
 #include <linux/kernel.h>
 #include <linux/types.h>
 
+#define	POISON_INUSE	0x5a	/* XXX */
+
 /*
  * Doubly-linked lists.  Type defined in <linux/types.h>.
  */
