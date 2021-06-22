@@ -457,8 +457,8 @@ hdmi_spd_infoframe_init(struct hdmi_spd_infoframe *frame, const char *vendor,
 	hdmi_infoframe_header_init(&frame->header, HDMI_INFOFRAME_TYPE_SPD,
 	    1, HDMI_SPD_INFOFRAME_SIZE);
 
-	(void)strlcpy(frame->vendor, vendor, sizeof(frame->vendor));
-	(void)strlcpy(frame->product, product, sizeof(frame->product));
+	strncpy(frame->vendor, vendor, sizeof(frame->vendor));
+	strncpy(frame->product, product, sizeof(frame->product));
 
 	return 0;
 }
