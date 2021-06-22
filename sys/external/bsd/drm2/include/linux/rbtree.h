@@ -69,9 +69,12 @@ rb_first(struct rb_root *root)
 }
 
 static inline struct rb_node *
-rb_next2(struct rb_root *root, struct rb_node *rb)
+rb_next2(struct rb_root *root, struct rb_node *rbnode)
 {
-	return RB_TREE_NEXT(&root->rbr_tree, rb);
+	char *vnode = (char *)rbnode;
+
+	vnode -= root->rbr_tree.rbt_ops->rbto_node_offset;
+	return RB_TREE_NEXT(&root->rbr_tree, vnode);
 }
 
 static inline struct rb_node *
