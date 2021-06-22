@@ -558,7 +558,7 @@ hdmi_vendor_infoframe_pack(const struct hdmi_vendor_infoframe *frame,
 		p[3] = __SHIFTIN(0x2, __BITS(6,5));
 		p[4] = __SHIFTIN(frame->s3d_struct, __BITS(7,4));
 		if (frame->s3d_struct >= HDMI_3D_STRUCTURE_SIDE_BY_SIDE_HALF)
-			p[9] = __SHIFTIN(frame->s3d_ext_data, __BITS(7,4));
+			p[5] = __SHIFTIN(frame->s3d_ext_data, __BITS(7,4));
 	} else {
 		p[3] = __SHIFTIN(0x1, __BITS(6,5));
 		p[4] = frame->vic;
