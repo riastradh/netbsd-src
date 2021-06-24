@@ -1521,7 +1521,11 @@ static void execlists_submit_ports(struct intel_engine_cs *engine)
 
 	/* we need to manually load the submit queue */
 	if (execlists->ctrl_reg)
+#ifdef __NetBSD__
+		bus_space_write_4(execlists->bst, execlists->bsh, execlists->ctrl_reg, EL_CTRL_LOAD);
+#else
 		writel(EL_CTRL_LOAD, execlists->ctrl_reg);
+#endif
 }
 
 static bool ctx_single_port_submission(const struct intel_context *ce)
