@@ -11,6 +11,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_memory_region.h"
 #include "i915_drv.h"
 
+#include <linux/nbsd-namespace.h>
+
 /* XXX: Hysterical raisins. BIT(inst) needs to just be (inst) at some point. */
 #define REGION_MAP(type, inst) \
 	BIT((type) + INTEL_MEMORY_TYPE_SHIFT) | BIT(inst)
