@@ -2382,7 +2382,8 @@ static bool intel_hdmi_limited_color_range(const struct intel_crtc_state *crtc_s
 					   const struct drm_connector_state *conn_state)
 {
 	const struct intel_digital_connector_state *intel_conn_state =
-		to_intel_digital_connector_state(conn_state);
+		const_container_of(conn_state,
+		    struct intel_digital_connector_state, base);
 	const struct drm_display_mode *adjusted_mode =
 		&crtc_state->hw.adjusted_mode;
 
