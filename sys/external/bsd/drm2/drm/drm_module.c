@@ -128,7 +128,7 @@ drm_init(void)
 
 	spin_lock_init(&drm_minor_lock);
 	idr_init(&drm_minors_idr);
-	srcu_init(&drm_unplug_srcu, "drmunplg");
+	_init_srcu_struct(&drm_unplug_srcu, "drmunplg");
 	linux_mutex_init(&drm_global_mutex);
 	linux_mutex_init(&drm_kernel_fb_helper_lock);
 	drm_connector_ida_init();
@@ -163,7 +163,7 @@ drm_fini(void)
 	drm_connector_ida_destroy();
 	linux_mutex_destroy(&drm_kernel_fb_helper_lock);
 	linux_mutex_destroy(&drm_global_mutex);
-	srcu_fini(&drm_unplug_srcu);
+	cleanup_srcu_struct(&drm_unplug_srcu);
 	idr_destroy(&drm_minors_idr);
 	spin_lock_destroy(&drm_minor_lock);
 	drm_agp_hooks_fini();

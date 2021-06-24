@@ -1,11 +1,8 @@
 /*	$NetBSD$	*/
 
 /*-
- * Copyright (c) 2018 The NetBSD Foundation, Inc.
+ * Copyright (c) 2021 The NetBSD Foundation, Inc.
  * All rights reserved.
- *
- * This code is derived from software contributed to The NetBSD Foundation
- * by Taylor R. Campbell.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,12 +26,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LINUX_PERF_EVENT_H_
-#define _LINUX_PERF_EVENT_H_
+#include <sys/cdefs.h>
+__KERNEL_RCSID(0, "$NetBSD$");
 
-#include <linux/rculist.h>
+#include <sys/errno.h>
 
-struct pmu {
-};
+#include "display/intel_dsi_dcs_backlight.h"
 
-#endif  /* _LINUX_PERF_EVENT_H_ */
+int
+intel_dsi_dcs_init_backlight_funcs(struct intel_connector *intel_connector)
+{
+
+	return -ENOSYS;
+}

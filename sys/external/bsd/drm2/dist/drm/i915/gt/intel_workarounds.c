@@ -16,6 +16,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_ring.h"
 #include "intel_workarounds.h"
 
+#include <linux/nbsd-namespace.h>
+
 /**
  * DOC: Hardware workarounds
  *

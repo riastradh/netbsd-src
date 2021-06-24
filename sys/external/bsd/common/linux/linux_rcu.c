@@ -84,6 +84,8 @@ synchronize_rcu_xc(void *a, void *b)
  *	Wait for any pending RCU read section on every CPU to complete
  *	by triggering on every CPU activity that is blocked by an RCU
  *	read section.
+ *
+ *	May sleep.  (Practically guaranteed to sleep!)
  */
 void
 synchronize_rcu(void)
@@ -92,6 +94,24 @@ synchronize_rcu(void)
 	SDT_PROBE0(sdt, linux, rcu, synchronize__start);
 	xc_wait(xc_broadcast(0, &synchronize_rcu_xc, NULL, NULL));
 	SDT_PROBE0(sdt, linux, rcu, synchronize__done);
+}
+
+/*
+ * synchronize_rcu_expedited()
+ *
+ *	Wait for any pending RCU read section on every CPU to complete
+ *	by triggering on every CPU activity that is blocked by an RCU
+ *	read section.  Try to get an answer faster than
+ *	synchronize_rcu, at the cost of more activity triggered on
+ *	other CPUs.
+ *
+ *	May sleep.  (Practically guaranteed to sleep!)
+ */
+void
+synchronize_rcu_expedited(void)
+{
+
+	synchronize_rcu();
 }
 
 /*

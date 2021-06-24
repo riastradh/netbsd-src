@@ -32,8 +32,9 @@
 #ifndef	_LINUX_SMP_H_
 #define	_LINUX_SMP_H_
 
-#include <sys/systm.h>
 #include <sys/cpu.h>
+#include <sys/systm.h>
+#include <sys/xcall.h>
 
 #define	smp_processor_id()	cpu_number()
 
@@ -50,6 +51,25 @@ put_cpu(void)
 {
 
 	kpreempt_disable();
+}
+
+static inline void
+on_each_cpu_xc(void *a, void *b)
+{
+	void (**fp)(void *) = a;
+	void *cookie = b;
+
+	(**fp)(cookie);
+}
+
+static inline void
+on_each_cpu(void (*f)(void *), void *cookie, int wait)
+{
+	uint64_t ticket;
+
+	ticket = xc_broadcast(0, &on_each_cpu_xc, &f, cookie);
+	if (wait)
+		xc_wait(ticket);
 }
 
 #endif	/* _LINUX_SMP_H_ */

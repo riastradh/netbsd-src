@@ -36,6 +36,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_psr.h"
 #include "intel_sprite.h"
 
+#include <linux/nbsd-namespace.h>
+
 /**
  * DOC: Panel Self Refresh (PSR/SRD)
  *
@@ -1168,7 +1170,7 @@ int intel_psr_debug_set(struct drm_i915_private *dev_priv, u64 val)
 
 	if (val & ~(I915_PSR_DEBUG_IRQ | I915_PSR_DEBUG_MODE_MASK) ||
 	    mode > I915_PSR_DEBUG_FORCE_PSR1) {
-		DRM_DEBUG_KMS("Invalid debug mask %llx\n", val);
+		DRM_DEBUG_KMS("Invalid debug mask %"PRIx64"\n", val);
 		return -EINVAL;
 	}
 

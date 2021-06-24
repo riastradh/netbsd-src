@@ -53,6 +53,8 @@
 		aprint_error("error: " FMT, ##__VA_ARGS__);		      \
 } while (0)
 
+#define	dev_err_once	dev_err	/* XXX rate-limit */
+
 #define	dev_warn(DEV, FMT, ...)	do {					      \
 	if (DEV)							      \
 		aprint_error_dev((DEV), "warn: " FMT, ##__VA_ARGS__);	      \

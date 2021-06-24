@@ -33,13 +33,15 @@
 #define _LINUX_SCHED_H_
 
 #include <sys/param.h>
+
 #include <sys/cdefs.h>
 #include <sys/kernel.h>
 #include <sys/proc.h>
 
-#include <asm/param.h>
 #include <asm/barrier.h>
+#include <asm/param.h>
 #include <asm/processor.h>
+
 #include <linux/device.h>
 #include <linux/errno.h>
 

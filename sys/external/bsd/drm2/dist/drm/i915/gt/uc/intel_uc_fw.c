@@ -600,7 +600,7 @@ size_t intel_uc_fw_copy_rsa(struct intel_uc_fw *uc_fw, void *dst, u32 max_len)
 	uio.uio_rw = UIO_READ;
 	UIO_SETUP_SYSSPACE(&uio);
 	/* XXX errno NetBSD->Linux */
-	return -ubc_uiomove(uc_fw->obj.base.filp, &uio, size, UVM_ADV_NORMAL,
+	return -ubc_uiomove(uc_fw->obj->base.filp, &uio, size, UVM_ADV_NORMAL,
 	    UBC_READ);
 #else
 	return sg_pcopy_to_buffer(pages->sgl, pages->nents, dst, size, offset);

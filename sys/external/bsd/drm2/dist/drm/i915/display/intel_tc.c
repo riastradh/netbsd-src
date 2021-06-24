@@ -14,6 +14,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_dp_mst.h"
 #include "intel_tc.h"
 
+#include <linux/nbsd-namespace.h>
+
 static const char *tc_port_mode_name(enum tc_port_mode mode)
 {
 	static const char * const names[] = {

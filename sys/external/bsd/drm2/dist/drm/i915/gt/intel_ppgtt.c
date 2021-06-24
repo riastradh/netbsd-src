@@ -88,7 +88,11 @@ __set_pd_entry(struct i915_page_directory * const pd,
 
 	atomic_inc(px_used(pd));
 	pd->entry[idx] = to;
+#ifdef __NetBSD__
+	write_dma_entry(px_base(pd), idx, encode(to->map->dm_segs[0].ds_addr, I915_CACHE_LLC));
+#else
 	write_dma_entry(px_base(pd), idx, encode(to->daddr, I915_CACHE_LLC));
+#endif
 }
 
 void
@@ -211,7 +215,11 @@ void ppgtt_init(struct i915_ppgtt *ppgtt, struct intel_gt *gt)
 
 	ppgtt->vm.gt = gt;
 	ppgtt->vm.i915 = i915;
+#ifdef __NetBSD__
+	ppgtt->vm.dmat = i915->drm.dmat;
+#else
 	ppgtt->vm.dma = &i915->drm.pdev->dev;
+#endif
 	ppgtt->vm.total = BIT_ULL(INTEL_INFO(i915)->ppgtt_size);
 
 	i915_address_space_init(&ppgtt->vm, VM_CLASS_PPGTT);

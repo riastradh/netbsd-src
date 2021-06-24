@@ -1,7 +1,7 @@
 /*	$NetBSD$	*/
 
 /*-
- * Copyright (c) 2018 The NetBSD Foundation, Inc.
+ * Copyright (c) 2021 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
  * This code is derived from software contributed to The NetBSD Foundation
@@ -29,12 +29,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LINUX_PERF_EVENT_H_
-#define _LINUX_PERF_EVENT_H_
+/* intel_lpe_audio.c stubs */
 
-#include <linux/rculist.h>
+#include <sys/cdefs.h>
+__KERNEL_RCSID(0, "$NetBSD$");
 
-struct pmu {
-};
+#include "i915_drv.h"
 
-#endif  /* _LINUX_PERF_EVENT_H_ */
+#include "display/intel_lpe_audio.h"
+
+int
+intel_lpe_audio_init(struct drm_i915_private *dev_priv)
+{
+	return 0;
+}
+
+void
+intel_lpe_audio_teardown(struct drm_i915_private *dev_priv)
+{
+}
+
+void
+intel_lpe_audio_irq_handler(struct drm_i915_private *dev_priv)
+{
+}
+
+void
+intel_lpe_audio_notify(struct drm_i915_private *dev_priv, enum pipe pipe,
+    enum port port, const void *eld, int ls_clock, bool dp_output)
+{
+}

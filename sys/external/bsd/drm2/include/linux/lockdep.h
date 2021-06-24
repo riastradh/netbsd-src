@@ -48,6 +48,7 @@ struct spinlock;
 #define	mutex_release(m, ip)		__nothing
 
 #define	__lockdep_used			__unused
+#define	lockdep_init_map(a,b,c,d)	__nothing
 #define	lock_acquire_shared_recursive(l, s, t, n, i)	__nothing
 #define	lock_release(l, n)		__nothing
 #ifdef notyet
