@@ -65,7 +65,7 @@ void atomic_notifier_chain_register(struct atomic_notifier_head *,
     struct notifier_block *);
 void atomic_notifier_chain_unregister(struct atomic_notifier_head *,
     struct notifier_block *);
-void atomic_notifier_chain_call(struct atomic_notifier_head *, unsigned long,
+void atomic_notifier_call_chain(struct atomic_notifier_head *, unsigned long,
     void *);
 
 #endif  /* _LINUX_NOTIFIER_H_ */
