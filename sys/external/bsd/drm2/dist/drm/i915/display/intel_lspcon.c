@@ -388,7 +388,7 @@ static bool _lspcon_write_avi_infoframe_mca(struct drm_dp_aux *aux,
 	while (val < len) {
 		/* DPCD write for AVI IF can fail on a slow FW day, so retry */
 		for (retry = 0; retry < 5; retry++) {
-			ret = drm_dp_dpcd_write(aux, reg, (void *)data, 1);
+			ret = drm_dp_dpcd_write(aux, reg, (void *)__UNCONST(data), 1);
 			if (ret == 1) {
 				break;
 			} else if (retry < 4) {
