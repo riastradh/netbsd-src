@@ -79,7 +79,7 @@ atomic_notifier_chain_unregister(struct atomic_notifier_head *H,
 }
 
 void
-atomic_notifier_chain_call(struct atomic_notifier_head *H,
+atomic_notifier_call_chain(struct atomic_notifier_head *H,
     unsigned long arg0, void *arg1)
 {
 	struct notifier_block *B;
