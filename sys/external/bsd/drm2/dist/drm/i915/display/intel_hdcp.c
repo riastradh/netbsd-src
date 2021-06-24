@@ -27,6 +27,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_sideband.h"
 #include "intel_connector.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define KEY_LOAD_TRIES	5
 #define ENCRYPT_STATUS_CHANGE_TIMEOUT_MS	50
 #define HDCP2_LC_RETRY_CNT			3
@@ -2039,7 +2041,9 @@ void intel_hdcp_component_fini(struct drm_i915_private *dev_priv)
 	dev_priv->hdcp_comp_added = false;
 	mutex_unlock(&dev_priv->hdcp_comp_mutex);
 
+#ifndef __NetBSD__		/* XXX i915 hdmi audio */
 	component_del(dev_priv->drm.dev, &i915_hdcp_component_ops);
+#endif
 }
 
 void intel_hdcp_cleanup(struct intel_connector *connector)

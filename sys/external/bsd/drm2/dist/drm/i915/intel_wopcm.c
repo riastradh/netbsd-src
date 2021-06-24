@@ -11,6 +11,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_wopcm.h"
 #include "i915_drv.h"
 
+#include <linux/nbsd-namespace.h>
+
 /**
  * DOC: WOPCM Layout
  *

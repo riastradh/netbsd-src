@@ -101,7 +101,7 @@ u32 intel_sseu_make_rpcs(struct drm_i915_private *i915,
 			 * amount of half of all available subslices per slice.
 			 */
 			ctx_sseu.subslice_mask =
-				~(~0 << (hweight8(ctx_sseu.subslice_mask) / 2));
+				~(~0u << (hweight8(ctx_sseu.subslice_mask) / 2));
 			ctx_sseu.slice_mask = 0x1;
 		}
 	}
