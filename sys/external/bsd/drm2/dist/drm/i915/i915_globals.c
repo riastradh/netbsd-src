@@ -20,6 +20,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "i915_scheduler.h"
 #include "i915_vma.h"
 
+#include <linux/nbsd-namespace.h>
+
 static LIST_HEAD(globals);
 
 static atomic_t active;

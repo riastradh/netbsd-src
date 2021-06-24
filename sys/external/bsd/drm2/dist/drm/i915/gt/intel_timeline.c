@@ -17,6 +17,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_ring.h"
 #include "intel_timeline.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define ptr_set_bit(ptr, bit) ((typeof(ptr))((unsigned long)(ptr) | BIT(bit)))
 #define ptr_test_bit(ptr, bit) ((unsigned long)(ptr) & BIT(bit))
 

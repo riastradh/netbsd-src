@@ -1,7 +1,7 @@
 /*	$NetBSD$	*/
 
 /*-
- * Copyright (c) 2018 The NetBSD Foundation, Inc.
+ * Copyright (c) 2021 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
  * This code is derived from software contributed to The NetBSD Foundation
@@ -29,12 +29,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LINUX_PERF_EVENT_H_
-#define _LINUX_PERF_EVENT_H_
+/* intel_region_lmem.c stubs */
 
-#include <linux/rculist.h>
+#include <sys/cdefs.h>
+__KERNEL_RCSID(0, "$NetBSD$");
 
-struct pmu {
-};
+#include <linux/err.h>
 
-#endif  /* _LINUX_PERF_EVENT_H_ */
+#include "intel_region_lmem.h"
+
+struct intel_memory_region *
+intel_setup_fake_lmem(struct drm_i915_private *i915)
+{
+	return ERR_PTR(-ENOSYS);
+}

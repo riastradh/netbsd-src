@@ -91,15 +91,10 @@ void intel_pipe_update_start(const struct intel_crtc_state *new_crtc_state)
 	const struct drm_display_mode *adjusted_mode = &new_crtc_state->hw.adjusted_mode;
 	long timeout = msecs_to_jiffies_timeout(1);
 	int scanline, min, max, vblank_start;
-#ifdef __NetBSD__
 	drm_waitqueue_t *wq = drm_crtc_vblank_waitqueue(&crtc->base);
 	int ret;
-#else
-	wait_queue_head_t *wq = drm_crtc_vblank_waitqueue(&crtc->base);
 	bool need_vlv_dsi_wa = (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv)) &&
 		intel_crtc_has_type(new_crtc_state, INTEL_OUTPUT_DSI);
-	DEFINE_WAIT(wait);
-#endif
 	u32 psr_status;
 
 	vblank_start = adjusted_mode->crtc_vblank_start;
@@ -126,54 +121,20 @@ void intel_pipe_update_start(const struct intel_crtc_state *new_crtc_state)
 		DRM_ERROR("PSR idle timed out 0x%x, atomic update may fail\n",
 			  psr_status);
 
-#ifdef __NetBSD__
-	spin_lock(&dev->vbl_lock);
-#else
-	local_irq_disable();
-#endif
+	spin_lock(&dev_priv->drm.vbl_lock);
 
 	crtc->debug.min_vbl = min;
 	crtc->debug.max_vbl = max;
 	trace_intel_pipe_update_start(crtc);
 
-#ifdef __NetBSD__
-	DRM_SPIN_TIMED_WAIT_NOINTR_UNTIL(ret, wq, &dev->vbl_lock, timeout,
+	DRM_SPIN_TIMED_WAIT_NOINTR_UNTIL(ret, wq, &dev_priv->drm.vbl_lock,
+	    timeout,
 	    (scanline = intel_get_crtc_scanline(crtc),
 		scanline < min || scanline > max));
 	if (ret <= 0)
 		DRM_ERROR("Potential atomic update failure on pipe %c: %d\n",
 		    pipe_name(crtc->pipe), ret ? ret : -EWOULDBLOCK);
 	drm_crtc_vblank_put_locked(&crtc->base);
-#else
-	for (;;) {
-		/*
-		 * prepare_to_wait() has a memory barrier, which guarantees
-		 * other CPUs can see the task state update by the time we
-		 * read the scanline.
-		 */
-		prepare_to_wait(wq, &wait, TASK_UNINTERRUPTIBLE);
-
-		scanline = intel_get_crtc_scanline(crtc);
-		if (scanline < min || scanline > max)
-			break;
-
-		if (!timeout) {
-			DRM_ERROR("Potential atomic update failure on pipe %c\n",
-				  pipe_name(crtc->pipe));
-			break;
-		}
-
-		local_irq_enable();
-
-		timeout = schedule_timeout(timeout);
-
-		local_irq_disable();
-	}
-
-	finish_wait(wq, &wait);
-
-	drm_crtc_vblank_put(&crtc->base);
-#endif
 
 	/*
 	 * On VLV/CHV DSI the scanline counter would appear to
@@ -201,7 +162,7 @@ void intel_pipe_update_start(const struct intel_crtc_state *new_crtc_state)
 	return;
 
 irq_disable:
-	local_irq_disable();
+	spin_lock(&dev_priv->drm.vbl_lock);
 }
 
 /**
@@ -238,11 +199,7 @@ void intel_pipe_update_end(struct intel_crtc_state *new_crtc_state)
 		new_crtc_state->uapi.event = NULL;
 	}
 
-#ifdef __NetBSD__
-	spin_unlock(&dev->vbl_lock);
-#else
-	local_irq_enable();
-#endif
+	spin_unlock(&dev_priv->drm.vbl_lock);
 
 	if (intel_vgpu_active(dev_priv))
 		return;

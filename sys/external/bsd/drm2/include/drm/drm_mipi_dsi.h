@@ -32,6 +32,8 @@
 #ifndef _DRM_MIPI_DSI_H_
 #define _DRM_MIPI_DSI_H_
 
+struct drm_dsc_picture_parameter_set;
+struct mipi_dsi_device;
 struct mipi_dsi_host_ops;
 
 enum mipi_dsi_pixel_format {
@@ -41,5 +43,16 @@ enum mipi_dsi_pixel_format {
 struct mipi_dsi_host {
 	char dummy;
 };
+
+static inline void
+mipi_dsi_picture_parameter_set(struct mipi_dsi_device *dsi,
+    struct drm_dsc_picture_parameter_set *pps)
+{
+}
+
+static inline void
+mipi_dsi_compression_mode(struct mipi_dsi_device *dsi, bool mode)
+{
+}
 
 #endif /*_DRM_MIPI_DSI_H_*/

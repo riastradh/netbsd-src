@@ -29,6 +29,7 @@
 #ifndef	_LINUX_SCHED_SIGNAL_H_
 #define	_LINUX_SCHED_SIGNAL_H_
 
+#include <linux/rculist.h>
 #include <linux/sched.h>
 
 static inline bool

@@ -1,11 +1,8 @@
 /*	$NetBSD$	*/
 
 /*-
- * Copyright (c) 2018 The NetBSD Foundation, Inc.
+ * Copyright (c) 2021 The NetBSD Foundation, Inc.
  * All rights reserved.
- *
- * This code is derived from software contributed to The NetBSD Foundation
- * by Taylor R. Campbell.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,12 +26,67 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LINUX_PERF_EVENT_H_
-#define _LINUX_PERF_EVENT_H_
+#include <sys/cdefs.h>
+__KERNEL_RCSID(0, "$NetBSD$");
 
-#include <linux/rculist.h>
+#include "gt/uc/intel_guc_log.h"
 
-struct pmu {
-};
+void
+intel_guc_log_init_early(struct intel_guc_log *log)
+{
+}
 
-#endif  /* _LINUX_PERF_EVENT_H_ */
+int
+intel_guc_log_create(struct intel_guc_log *log)
+{
+
+	return 0;
+}
+
+void
+intel_guc_log_destroy(struct intel_guc_log *log)
+{
+}
+
+int
+intel_guc_log_set_level(struct intel_guc_log *log, u32 level)
+{
+
+	return -ENOSYS;
+}
+
+bool
+intel_guc_log_relay_created(const struct intel_guc_log *log)
+{
+
+	return false;
+}
+
+int
+intel_guc_log_relay_open(struct intel_guc_log *log)
+{
+
+	return -ENOSYS;
+}
+
+int
+intel_guc_log_relay_start(struct intel_guc_log *log)
+{
+
+	return -ENOSYS;
+}
+
+void
+intel_guc_log_relay_flush(struct intel_guc_log *log)
+{
+}
+
+void
+intel_guc_log_relay_close(struct intel_guc_log *log)
+{
+}
+
+void
+intel_guc_log_handle_flush_event(struct intel_guc_log *log)
+{
+}

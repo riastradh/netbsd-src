@@ -511,6 +511,19 @@ static void set_hws_pga(struct intel_engine_cs *engine, phys_addr_t phys)
 	intel_uncore_write(engine->uncore, HWS_PGA, addr);
 }
 
+#ifdef __NetBSD__
+static void
+ring_setup_phys_status_page(struct intel_engine_cs *engine)
+{
+	struct drm_i915_gem_object *obj = engine->status_page.vma->obj;
+	bus_addr_t addr;
+
+	GEM_BUG_ON(!i915_gem_object_has_pinned_pages(obj));
+	addr = obj->mm.pages->sgl[0].sg_dmamap->dm_segs[0].ds_addr;
+	set_hws_pga(engine, addr);
+	set_hwstam(engine, ~0u);
+}
+#else
 static struct page *status_page(struct intel_engine_cs *engine)
 {
 	struct drm_i915_gem_object *obj = engine->status_page.vma->obj;
@@ -524,6 +537,7 @@ static void ring_setup_phys_status_page(struct intel_engine_cs *engine)
 	set_hws_pga(engine, PFN_PHYS(page_to_pfn(status_page(engine))));
 	set_hwstam(engine, ~0u);
 }
+#endif
 
 static void set_hwsp(struct intel_engine_cs *engine, u32 offset)
 {

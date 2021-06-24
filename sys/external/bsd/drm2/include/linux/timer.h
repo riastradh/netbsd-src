@@ -71,12 +71,15 @@ teardown_timer(struct timer_list *timer)
 	callout_destroy(&timer->tl_callout);
 }
 
-static inline void
+static inline int
 mod_timer(struct timer_list *timer, unsigned long then)
 {
 	const unsigned long now = jiffies;
+	int pending;
 
+	pending = callout_pending(&timer->tl_callout);
 	callout_schedule(&timer->tl_callout, (now < then? (then - now) : 0));
+	return pending;
 }
 
 static inline void

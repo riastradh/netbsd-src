@@ -1425,7 +1425,7 @@ static void intel_tv_pre_enable(struct intel_encoder *encoder,
 	struct intel_crtc *intel_crtc = to_intel_crtc(pipe_config->uapi.crtc);
 	struct intel_tv *intel_tv = enc_to_tv(encoder);
 	const struct intel_tv_connector_state *tv_conn_state =
-		to_intel_tv_connector_state(conn_state);
+		const_container_of(conn_state, struct intel_tv_connector_state, base);
 	const struct tv_mode *tv_mode = intel_tv_mode_find(conn_state);
 	u32 tv_ctl, tv_filter_ctl;
 	u32 scctl1, scctl2, scctl3;
