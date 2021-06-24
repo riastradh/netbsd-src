@@ -82,6 +82,10 @@ spin_unlock_irq(spinlock_t *spinlock)
 		mutex_enter(&((spinlock_t *)(SPINLOCK))->sl_lock);	\
 	} while (0)
 
+#define	spin_trylock_irqsave(SPINLOCK, FLAGS)				\
+		( (FLAGS) = 0,						\
+		mutex_tryenter(&((spinlock_t *)(SPINLOCK))->sl_lock) )
+
 static inline void
 spin_unlock_irqrestore(spinlock_t *spinlock, unsigned long __unused flags)
 {
