@@ -153,6 +153,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_ring.h"
 #include "intel_workarounds.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define RING_EXECLIST_QFULL		(1 << 0x2)
 #define RING_EXECLIST1_VALID		(1 << 0x3)
 #define RING_EXECLIST0_VALID		(1 << 0x4)
@@ -1395,7 +1397,7 @@ trace_ports(const struct intel_engine_execlists *execlists,
 	    struct i915_request * const *ports)
 {
 	const struct intel_engine_cs *engine =
-		container_of(execlists, typeof(*engine), execlists);
+		const_container_of(execlists, typeof(*engine), execlists);
 
 	if (!ports[0])
 		return;
