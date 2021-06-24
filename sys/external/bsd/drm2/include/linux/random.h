@@ -64,4 +64,17 @@ get_random_u32(void)
 	return v;
 }
 
+static inline uint32_t
+prandom_u32_max(uint32_t bound)
+{
+	uint32_t v, min;
+
+	min = (-bound) % bound;
+	do {
+		v = get_random_u32();
+	} while (v < min);
+
+	return v % bound;
+}
+
 #endif	/* _LINUX_RANDOM_H_ */

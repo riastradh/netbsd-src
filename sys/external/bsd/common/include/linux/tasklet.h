@@ -81,6 +81,7 @@ void	linux_tasklets_fini(void);
 
 void	tasklet_init(struct tasklet_struct *, void (*)(unsigned long),
 	    unsigned long);
+void	tasklet_disable_nosync(struct tasklet_struct *);
 void	tasklet_disable(struct tasklet_struct *);
 void	tasklet_enable(struct tasklet_struct *);
 void	tasklet_schedule(struct tasklet_struct *);

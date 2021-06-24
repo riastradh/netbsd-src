@@ -46,7 +46,8 @@ struct opregion_asle;
 struct intel_opregion {
 #ifdef __NetBSD__
 	bus_space_tag_t bst;
-	bus_space_handle_t bsh;
+	bus_space_handle_t asls_bsh;
+	bus_space_handle_t rvda_bsh;
 #endif
 	struct opregion_header *header;
 	struct opregion_acpi *acpi;
