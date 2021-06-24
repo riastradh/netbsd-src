@@ -43,6 +43,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_frontbuffer.h"
 #include "intel_overlay.h"
 
+#include <linux/nbsd-namespace.h>
+
 /* Limits for overlay size. According to intel doc, the real limits are:
  * Y width: 4095, UV width (planar): 2047, Y height: 2047,
  * UV width (planar): * 1023. But the xorg thinks 2048 for height and width. Use
@@ -1079,7 +1081,6 @@ int intel_overlay_put_image_ioctl(struct drm_device *dev, void *data,
 	struct intel_overlay *overlay;
 	struct drm_crtc *drmmode_crtc;
 	struct intel_crtc *crtc;
-	struct drm_gem_object *new_gbo;
 	struct drm_i915_gem_object *new_bo;
 	int ret;
 
