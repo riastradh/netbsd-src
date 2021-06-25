@@ -88,6 +88,13 @@ mul_u32_u32(uint32_t a, uint32_t b)
 	return (uint64_t)a * (uint64_t)b;
 }
 
+static inline uint64_t
+mul_u64_u32_div(uint64_t a, uint32_t b, uint32_t div)
+{
+	/* XXX implement to account for overflow */
+	return (a * b) / div;
+}
+
 /* return floor((a*b) / 2^c) */
 static inline uint64_t
 mul_u64_u32_shr(uint64_t a, uint32_t b, unsigned c)
