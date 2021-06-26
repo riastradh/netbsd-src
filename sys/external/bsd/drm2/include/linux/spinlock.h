@@ -37,6 +37,7 @@
 
 #include <machine/limits.h>
 
+#include <linux/atomic.h>
 #include <linux/irqflags.h>
 #include <linux/lockdep.h>
 #include <linux/preempt.h>
@@ -199,6 +200,33 @@ local_bh_disable(void)
 static inline void
 local_bh_enable(void)
 {
+}
+
+#define	atomic_dec_and_lock_irqsave(A, L, F)				      \
+	_atomic_dec_and_lock_irqsave(A, L, &(F))
+
+static inline bool __must_check
+_atomic_dec_and_lock_irqsave(atomic_t *atomic, spinlock_t *lock,
+    unsigned long *flagsp)
+{
+	unsigned old, new;
+
+	do {
+		old = atomic_read(atomic);
+		KASSERT(old);
+		if (old == 1) {
+			spin_lock_irqsave(lock, *flagsp);
+			if (atomic_dec_return(atomic) == 0)
+				return true;
+			spin_unlock_irqrestore(lock, *flagsp);
+			return false;
+		}
+		new = old - 1;
+	} while (atomic_cmpxchg(atomic, old, new) != old);
+
+	KASSERT(old != 1);
+	KASSERT(new != 0);
+	return false;
 }
 
 #endif  /* _LINUX_SPINLOCK_H_ */
