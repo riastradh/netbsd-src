@@ -480,7 +480,7 @@ next_hole(struct drm_mm *mm,
 	default:
 	case DRM_MM_INSERT_BEST:
 #ifdef __NetBSD__
-		return RB_TREE_NEXT(&mm->holes_size.rb_root.rbr_tree, node);
+		return RB_TREE_PREV(&mm->holes_size.rb_root.rbr_tree, node);
 #else
 		return rb_hole_size_to_node(rb_prev(&node->rb_hole_size));
 #endif
