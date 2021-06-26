@@ -100,7 +100,9 @@ int i915_ggtt_init_hw(struct drm_i915_private *i915)
 {
 	int ret;
 
+#ifndef __NetBSD__
 	stash_init(&i915->mm.wc_stash);
+#endif
 
 	/*
 	 * Note that we use page colouring to enforce a guard page at the
