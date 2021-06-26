@@ -29,6 +29,7 @@
 #ifndef _LINUX_IRQ_WORK_H
 #define _LINUX_IRQ_WORK_H
 
+#include <sys/queue.h>
 #include <sys/stdbool.h>
 
 #include <asm/cpufeature.h>
@@ -38,11 +39,17 @@
 #define	irq_work_queue	linux_irq_work_queue
 
 struct irq_work {
+	SIMPLEQ_ENTRY(irq_work)	iw_entry;
+	volatile unsigned	iw_flags;
+
 	/* Linux API */
-	void		(*func)(struct irq_work *);
+	void			(*func)(struct irq_work *);
 };
 
 void	init_irq_work(struct irq_work *, void (*)(struct irq_work *));
 bool	irq_work_queue(struct irq_work *);
+
+void	linux_irq_work_init(void);
+void	linux_irq_work_fini(void);
 
 #endif  /* _LINUX_IRQ_WORK_H */
