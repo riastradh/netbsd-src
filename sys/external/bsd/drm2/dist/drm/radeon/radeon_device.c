@@ -1430,12 +1430,8 @@ int radeon_device_init(struct radeon_device *rdev,
 	mutex_init(&rdev->srbm_mutex);
 	init_rwsem(&rdev->pm.mclk_lock);
 	init_rwsem(&rdev->exclusive_lock);
-#ifdef __NetBSD__
 	spin_lock_init(&rdev->irq.vblank_lock);
 	DRM_INIT_WAITQUEUE(&rdev->irq.vblank_queue, "radvblnk");
-#else
-	init_waitqueue_head(&rdev->irq.vblank_queue);
-#endif
 	r = radeon_gem_init(rdev);
 	if (r)
 		return r;
@@ -1710,12 +1706,10 @@ void radeon_device_fini(struct radeon_device *rdev)
 	if (rdev->family >= CHIP_BONAIRE)
 		radeon_doorbell_fini(rdev);
 
-#ifdef __NetBSD__
 	DRM_DESTROY_WAITQUEUE(&rdev->irq.vblank_queue);
 	spin_lock_destroy(&rdev->irq.vblank_lock);
 	destroy_rwsem(&rdev->exclusive_lock);
 	destroy_rwsem(&rdev->pm.mclk_lock);
-#endif
 	mutex_destroy(&rdev->srbm_mutex);
 	mutex_destroy(&rdev->gpu_clock_mutex);
 	mutex_destroy(&rdev->pm.mutex);
