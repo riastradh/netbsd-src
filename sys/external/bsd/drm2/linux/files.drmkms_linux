@@ -9,6 +9,7 @@ file	external/bsd/drm2/linux/linux_atomic64.c	drmkms_linux
 file	external/bsd/drm2/linux/linux_backlight.c	drmkms_linux
 file	external/bsd/drm2/linux/linux_dma_buf.c		drmkms_linux
 file	external/bsd/drm2/linux/linux_dma_fence.c	drmkms_linux
+file	external/bsd/drm2/linux/linux_dma_fence_array.c	drmkms_linux
 file	external/bsd/drm2/linux/linux_dma_fence_chain.c	drmkms_linux
 file	external/bsd/drm2/linux/linux_dma_resv.c	drmkms_linux
 file	external/bsd/drm2/linux/linux_dmi.c		drmkms_linux
