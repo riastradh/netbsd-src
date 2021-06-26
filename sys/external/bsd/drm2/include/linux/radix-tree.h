@@ -40,6 +40,7 @@
 #define	radix_tree_empty		linux_radix_tree_empty
 #define	radix_tree_exception		linux_radix_tree_exception
 #define	radix_tree_insert		linux_radix_tree_insert
+#define	radix_tree_iter_delete		linux_radix_tree_iter_delete
 #define	radix_tree_iter_init		linux_radix_tree_iter_init
 #define	radix_tree_lookup		linux_radix_tree_lookup
 #define	radix_tree_next_chunk		linux_radix_tree_next_chunk
