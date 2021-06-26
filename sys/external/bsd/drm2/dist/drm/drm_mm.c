@@ -298,9 +298,9 @@ compare_hole_sizes(void *cookie, const void *va, const void *vb)
 {
 	const struct drm_mm_node *a = va, *b = vb;
 
-	if (a->hole_size < b->hole_size)
-		return -1;
 	if (a->hole_size > b->hole_size)
+		return -1;
+	if (a->hole_size < b->hole_size)
 		return +1;
 	return (a < b ? -1 : a > b ? +1 : 0);
 }
@@ -311,9 +311,9 @@ compare_hole_size_key(void *cookie, const void *vn, const void *vk)
 	const struct drm_mm_node *n = vn;
 	const u64 *k = vk;
 
-	if (n->hole_size < *k)
-		return -1;
 	if (n->hole_size > *k)
+		return -1;
+	if (n->hole_size < *k)
 		return +1;
 	return 0;
 }
