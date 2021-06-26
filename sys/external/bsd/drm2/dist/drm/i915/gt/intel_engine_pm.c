@@ -229,11 +229,10 @@ static void call_idle_barriers(struct intel_engine_cs *engine)
 	struct llist_node *node, *next;
 
 	llist_for_each_safe(node, next, llist_del_all(&engine->barrier_tasks)) {
-		struct dma_fence_cb *cb =
-			container_of((struct list_head *)node,
-				     typeof(*cb), node);
+		struct i915_active_fence *fence =
+		    container_of(node, struct i915_active_fence, llist);
 
-		cb->func(ERR_PTR(-EAGAIN), cb);
+		fence->cb.func(ERR_PTR(-EAGAIN), &fence->cb);
 	}
 }
 
