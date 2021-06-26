@@ -32,9 +32,10 @@
 #ifndef _LINUX_CPUFREQ_H_
 #define _LINUX_CPUFREQ_H_
 
+#include <sys/cpu.h>
 #include <sys/cpufreq.h>
 #include <sys/kmem.h>
-#include <machine/cpu.h>
+
 #include <machine/cpu_counter.h>
 
 struct cpufreq_policy {
