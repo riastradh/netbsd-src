@@ -28,7 +28,7 @@
 
 struct drm_i915_private;
 
-#ifdef CONFIG_DRM_I915_GVT
+#if IS_ENABLED(CONFIG_DRM_I915_GVT)
 int intel_gvt_init(struct drm_i915_private *dev_priv);
 void intel_gvt_driver_remove(struct drm_i915_private *dev_priv);
 int intel_gvt_init_device(struct drm_i915_private *dev_priv);
