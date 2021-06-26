@@ -30,6 +30,7 @@
 #define _LINUX_RADIX_TREE_H_
 
 #include <sys/radixtree.h>
+#include <sys/lock.h>
 
 #include <linux/gfp.h>
 
@@ -45,12 +46,13 @@
 #define	radix_tree_next_slot		linux_radix_tree_next_slot
 
 struct radix_tree_root {
-	struct radix_tree rtr_tree;
+	struct radix_tree	rtr_tree;
+	__cpu_simple_lock_t	rtr_lock; /* XXX lame-o */
 };
 
 struct radix_tree_iter {
-	unsigned long		index;
-	struct radix_tree	*rti_tree;
+	unsigned long			index;
+	const struct radix_tree_root	*rti_tree;
 };
 
 void	INIT_RADIX_TREE(struct radix_tree_root *, gfp_t);
