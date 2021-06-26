@@ -1093,12 +1093,14 @@ restart:
 
 wait:
 	/*
-	 * Exit the RCU read section and wait for it.  If we time out
-	 * or fail, bail.  Otherwise, go back to the top.
+	 * Exit the RCU read section, wait for it, and release the
+	 * fence when we're done.  If we time out or fail, bail.
+	 * Otherwise, go back to the top.
 	 */
 	KASSERT(fence != NULL);
 	rcu_read_unlock();
 	ret = dma_fence_wait_timeout(fence, intr, timeout);
+	dma_fence_put(fence);
 	if (ret <= 0)
 		return ret;
 	KASSERT(ret <= timeout);
