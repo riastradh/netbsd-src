@@ -38,3 +38,9 @@ void
 vlv_dsi_init(struct drm_i915_private *dev_priv)
 {
 }
+
+bool
+bxt_dsi_pll_is_enabled(struct drm_i915_private *dev_priv)
+{
+	return 0;
+}
