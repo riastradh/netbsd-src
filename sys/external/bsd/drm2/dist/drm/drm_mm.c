@@ -401,7 +401,7 @@ static inline u64 rb_hole_size(struct rb_node *rb)
 static struct drm_mm_node *best_hole(struct drm_mm *mm, u64 size)
 {
 #ifdef __NetBSD__
-	return rb_tree_find_node_geq(&mm->holes_size.rb_root.rbr_tree, &size);
+	return rb_tree_find_node_leq(&mm->holes_size.rb_root.rbr_tree, &size);
 #else
 	struct rb_node *rb = mm->holes_size.rb_root.rb_node;
 	struct drm_mm_node *best = NULL;
