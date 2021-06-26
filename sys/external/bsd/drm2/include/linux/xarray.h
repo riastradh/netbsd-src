@@ -55,6 +55,7 @@ struct xa_limit {
 #define	XA_FLAGS_ALLOC	0
 
 #define	xa_alloc	linux_xa_alloc
+#define	xa_destroy	linux_xa_destroy
 #define	xa_erase	linux_xa_erase
 #define	xa_find		linux_xa_find
 #define	xa_find_after	linux_xa_find_after
