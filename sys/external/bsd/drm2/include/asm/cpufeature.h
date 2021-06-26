@@ -32,7 +32,7 @@
 #ifndef	_LINUX_ASM_CPUFEATURE_H_
 #define	_LINUX_ASM_CPUFEATURE_H_
 
-#include <machine/cpu.h>
+#include <sys/cpu.h>
 
 #if defined(__i386__) || defined(__x86_64__)
 
