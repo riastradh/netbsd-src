@@ -41,6 +41,7 @@ __KERNEL_RCSID(0, "$NetBSD: linux_module.c,v 1.9 2018/08/27 15:08:54 riastradh E
 #include <linux/highmem.h>
 #include <linux/idr.h>
 #include <linux/io.h>
+#include <linux/irq_work.h>
 #include <linux/mutex.h>
 #include <linux/rcupdate.h>
 #include <linux/tasklet.h>
@@ -103,6 +104,8 @@ linux_init(void)
 		goto fail7;
 	}
 
+	linux_irq_work_init();
+
 	return 0;
 
 fail8: __unused
@@ -134,6 +137,7 @@ static void
 linux_fini(void)
 {
 
+	linux_irq_work_fini();
 	linux_wait_bit_fini();
 	linux_tasklets_fini();
 	linux_atomic64_fini();
