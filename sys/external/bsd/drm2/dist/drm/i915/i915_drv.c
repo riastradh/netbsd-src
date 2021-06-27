@@ -102,10 +102,6 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 static struct drm_driver driver;
 
-#ifdef __NetBSD__
-/* XXX Kludge to expose this to NetBSD driver attachment goop.  */
-struct drm_driver *const i915_drm_driver = &driver;
-#endif
 struct vlv_s0ix_state {
 	/* GAM */
 	u32 wr_watermark;
