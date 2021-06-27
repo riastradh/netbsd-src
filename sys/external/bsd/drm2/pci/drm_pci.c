@@ -59,10 +59,10 @@ drm_pci_attach_args(struct drm_device *dev)
 }
 
 int
-drm_pci_attach(struct drm_device *dev, const struct pci_attach_args *pa,
-    struct pci_dev *pdev)
+drm_pci_attach(struct drm_device *dev, struct pci_dev *pdev)
 {
 	device_t self = dev->dev;
+	const struct pci_attach_args *pa = &pdev->pd_pa;
 	unsigned int unit;
 	int ret;
 
