@@ -151,13 +151,18 @@ hrtimer_cancel(struct hrtimer *hrt)
 		 */
 		active = callout_pending(&H->ch);
 	}
+	return active;
+}
+
+void
+hrtimer_destroy(struct hrtimer *hrt)
+{
+	struct hrtimer_private *H = hrt->hrt_private;
 
 	callout_destroy(&H->ch);
 	kmem_free(H, sizeof(*H));
 
 	explicit_memset(hrt, 0, sizeof(*hrt)); /* paranoia */
-
-	return active;
 }
 
 bool
