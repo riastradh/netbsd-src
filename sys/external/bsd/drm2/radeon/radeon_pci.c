@@ -260,7 +260,7 @@ radeon_attach_real(device_t self)
 	}
 
 	/* XXX errno Linux->NetBSD */
-	error = -drm_pci_attach(sc->sc_drm_dev, pa, &sc->sc_pci_dev);
+	error = -drm_pci_attach(sc->sc_drm_dev, &sc->sc_pci_dev);
 	if (error) {
 		aprint_error_dev(self, "unable to attach drm: %d\n", error);
 		goto out;
