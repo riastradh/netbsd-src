@@ -69,8 +69,6 @@ radix_tree_insert(struct radix_tree_root *root, unsigned long key, void *datum)
 	kludge->k_key = key;
 	kludge->k_datum = datum;
 
-	membar_exit();
-
 	__cpu_simple_lock(&root->rtr_lock);
 	error = radix_tree_insert_node(&root->rtr_tree, key, kludge);
 	__cpu_simple_unlock(&root->rtr_lock);
