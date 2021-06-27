@@ -140,7 +140,11 @@ drm_pci_detach(struct drm_device *dev)
 {
 
 	/* Tear down AGP stuff if necessary.  */
-	drm_pci_agp_destroy(dev);
+	if (dev->agp) {
+		arch_phys_wc_del(dev->agp->agp_mtrr);
+		drm_agp_fini(dev);
+		KASSERT(dev->agp == NULL);
+	}
 
 	/* Free the record of available bus space mappings.  */
 	dev->bus_nmaps = 0;
@@ -149,17 +153,6 @@ drm_pci_detach(struct drm_device *dev)
 	/* Tear down bus space and bus DMA tags.  */
 	if (dev->dmat_subregion_p) {
 		bus_dmatag_destroy(dev->dmat);
-	}
-}
-
-void
-drm_pci_agp_destroy(struct drm_device *dev)
-{
-
-	if (dev->agp) {
-		arch_phys_wc_del(dev->agp->agp_mtrr);
-		drm_agp_fini(dev);
-		KASSERT(dev->agp == NULL);
 	}
 }
 
