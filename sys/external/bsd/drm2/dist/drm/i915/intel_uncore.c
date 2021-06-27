@@ -1519,6 +1519,7 @@ static void fw_domain_fini(struct intel_uncore *uncore,
 	uncore->fw_domains &= ~BIT(domain_id);
 	WARN_ON(d->wake_count);
 	WARN_ON(hrtimer_cancel(&d->timer));
+	hrtimer_destroy(&d->timer);
 	kfree(d);
 }
 
