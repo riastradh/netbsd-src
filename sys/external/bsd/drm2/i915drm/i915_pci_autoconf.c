@@ -180,22 +180,6 @@ i915drmkms_attach_real(device_t self)
 	/* Initialize the Linux PCI device descriptor.  */
 	linux_pci_dev_init(&sc->sc_pci_dev, self, device_parent(self), pa, 0);
 
-	sc->sc_drm_dev = drm_dev_alloc(i915_drm_driver, self);
-	if (IS_ERR(sc->sc_drm_dev)) {
-		aprint_error_dev(self, "unable to create drm device: %ld\n",
-		    PTR_ERR(sc->sc_drm_dev));
-		sc->sc_drm_dev = NULL;
-		return;
-	}
-
-	/* XXX errno Linux->NetBSD */
-	error = -drm_pci_attach(sc->sc_drm_dev, &sc->sc_pci_dev);
-	if (error) {
-		aprint_error_dev(self, "unable to attach drm: %d\n", error);
-		return;
-	}
-	sc->sc_pci_attached = true;
-
 	/* XXX errno Linux->NetBSD */
 	error = -i915_driver_probe(&sc->sc_pci_dev, ent);
 	if (error) {
@@ -203,6 +187,7 @@ i915drmkms_attach_real(device_t self)
 		return;
 	}
 	sc->sc_dev_registered = true;
+	sc->sc_drm_dev = pci_get_drvdata(&sc->sc_pci_dev);
 
 	while (!SIMPLEQ_EMPTY(&sc->sc_task_u.attach)) {
 		struct i915drmkms_task *const task =
@@ -243,14 +228,8 @@ i915drmkms_detach(device_t self, int flags)
 
 	if (sc->sc_drm_dev == NULL)
 		goto out0;
-	if (!sc->sc_pci_attached)
-		goto out1;
-	if (!sc->sc_dev_registered)
-		goto out2;
 
-	drm_dev_unregister(sc->sc_drm_dev);
-out2:	drm_pci_detach(sc->sc_drm_dev);
-out1:	drm_dev_put(sc->sc_drm_dev);
+	i915_driver_remove(sc->sc_drm_dev->dev_private);
 	sc->sc_drm_dev = NULL;
 out0:	linux_pci_dev_destroy(&sc->sc_pci_dev);
 	pmf_device_deregister(self);
