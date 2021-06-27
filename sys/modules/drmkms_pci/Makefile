@@ -13,7 +13,6 @@ KMOD=	drmkms_pci
 SRCS+=	drmfb_pci.c
 SRCS+=	linux_pci.c
 
-#SRCS+=	ati_pcigart.c		# XXX Restore for ATI support.
 SRCS+=	drm_agpsupport.c
 SRCS+=	drm_pci.c
 SRCS+=	drm_pci_module.c
