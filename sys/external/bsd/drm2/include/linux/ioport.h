@@ -35,9 +35,10 @@
 #include <sys/types.h>
 #include <sys/bus.h>
 
-#define	IORESOURCE_IO	0
-#define	IORESOURCE_MEM	1
-#define	IORESOURCE_IRQ	2
+#define	IORESOURCE_IO		__BIT(0)
+#define	IORESOURCE_MEM		__BIT(1)
+#define	IORESOURCE_IRQ		__BIT(2)
+#define	IORESOURCE_UNSET	__BIT(3)
 
 struct resource {
 	bus_addr_t start;
