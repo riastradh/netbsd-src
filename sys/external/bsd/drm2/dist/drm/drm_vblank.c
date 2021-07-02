@@ -463,7 +463,6 @@ void drm_vblank_cleanup(struct drm_device *dev)
 			drm_core_check_feature(dev, DRIVER_MODESET));
 
 		del_timer_sync(&vblank->disable_timer);
-		teardown_timer(&vblank->disable_timer);
 		seqlock_destroy(&vblank->seqlock);
 	}
 

@@ -29,13 +29,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * Notes on porting:
- *
- * - Linux does not have teardown_timer.  You must add it yourself in
- *   the appropriate place.
- */
-
 #ifndef _LINUX_TIMER_H_
 #define _LINUX_TIMER_H_
 
@@ -62,13 +55,6 @@ timer_setup(struct timer_list *timer, void (*fn)(struct timer_list *),
 	/* XXX Super-sketchy casts!  */
 	callout_setfunc(&timer->tl_callout, (void (*)(void *))(void *)fn,
 	    (void *)timer);
-}
-
-static inline void
-teardown_timer(struct timer_list *timer)
-{
-
-	callout_destroy(&timer->tl_callout);
 }
 
 static inline int
