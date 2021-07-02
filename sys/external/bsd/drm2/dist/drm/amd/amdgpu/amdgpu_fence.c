@@ -549,7 +549,6 @@ void amdgpu_fence_driver_fini(struct amdgpu_device *adev)
 		ring->fence_drv.fences = NULL;
 		ring->fence_drv.initialized = false;
 		spin_lock_destroy(&ring->fence_drv.lock);
-		timer_teardown(&ring->fence_drv.fallback_timer);
 	}
 }
 
