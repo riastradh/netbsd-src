@@ -184,7 +184,6 @@ i915_sw_fence_wait(struct i915_sw_fence *fence)
 	struct i915_sw_fence_wq sfw;
 	int ret;
 
-	INIT_LIST_HEAD(&waiter.entry);
 	waiter.flags = 0;
 	waiter.func = autoremove_wake_function;
 	waiter.private = &sfw;
@@ -193,6 +192,7 @@ i915_sw_fence_wait(struct i915_sw_fence *fence)
 	DRM_INIT_WAITQUEUE(&sfw.wq, "i915swf");
 
 	spin_lock(&fence->wait.lock);
+	list_add_tail(&waiter.entry, &fence->wait.head);
 	DRM_SPIN_WAIT_NOINTR_UNTIL(ret, &sfw.wq, &fence->wait.lock,
 	    i915_sw_fence_done(fence));
 	spin_unlock(&fence->wait.lock);
