@@ -33,6 +33,8 @@
 
 #include <uvm/uvm_extern.h>
 
+#include <linux/gfp.h>
+
 static inline void
 mmgrab(struct vmspace *vm)
 {
@@ -43,6 +45,16 @@ static inline void
 mmdrop(struct vmspace *vm)
 {
 	uvmspace_free(vm);
+}
+
+static inline void
+fs_reclaim_acquire(gfp_t gfp)
+{
+}
+
+static inline void
+fs_reclaim_release(gfp_t gfp)
+{
 }
 
 #endif	/* _LINUX_SCHED_MM_H_ */
