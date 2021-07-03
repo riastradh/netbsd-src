@@ -833,6 +833,12 @@ i915_gem_mmap_offset_ioctl(struct drm_device *dev, void *data,
 
 #ifdef __NetBSD__
 
+const struct uvm_pagerops i915_gem_uvm_ops = {
+	.pgo_reference = drm_gem_pager_reference,
+	.pgo_detach = drm_gem_pager_detach,
+	.pgo_fault = i915_gem_fault,
+};
+
 int
 i915_gem_mmap_object(struct drm_device *dev, off_t byte_offset, size_t nbytes,
     int prot, struct uvm_object **uobjp, voff_t *uoffsetp, struct file *fp)
