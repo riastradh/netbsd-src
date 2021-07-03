@@ -2875,7 +2875,7 @@ static struct drm_driver driver = {
 	.free_irq = drm_pci_free_irq,
 
 	.mmap_object = &i915_gem_mmap_object,
-	.gem_uvm_ops = NULL,
+	.gem_uvm_ops = &i915_gem_uvm_ops,
 #endif
 
 
