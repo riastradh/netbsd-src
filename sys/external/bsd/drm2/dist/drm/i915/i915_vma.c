@@ -229,6 +229,8 @@ vma_create(struct drm_i915_gem_object *obj,
 		__set_bit(I915_VMA_GGTT_BIT, __i915_vma_flags(vma));
 	}
 
+	spin_lock(&obj->vma.lock);
+
 #ifdef __NetBSD__
 	__USE(rb);
 	__USE(p);
@@ -236,8 +238,6 @@ vma_create(struct drm_i915_gem_object *obj,
 	collision = rb_tree_insert_node(&obj->vma.tree.rbr_tree, vma);
 	KASSERT(collision == vma);
 #else
-	spin_lock(&obj->vma.lock);
-
 	rb = NULL;
 	p = &obj->vma.tree.rb_node;
 	while (*p) {
