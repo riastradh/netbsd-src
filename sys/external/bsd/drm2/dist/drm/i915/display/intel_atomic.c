@@ -496,6 +496,8 @@ intel_atomic_state_alloc(struct drm_device *dev)
 		return NULL;
 	}
 
+	i915_sw_fence_init(&state->commit_ready, intel_atomic_commit_ready);
+
 	return &state->base;
 }
 
