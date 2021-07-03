@@ -61,4 +61,9 @@ int intel_atomic_lock_global_state(struct intel_atomic_state *state);
 
 int intel_atomic_serialize_global_state(struct intel_atomic_state *state);
 
+#include "i915_sw_fence.h"
+int __i915_sw_fence_call
+intel_atomic_commit_ready(struct i915_sw_fence *fence,
+			  enum i915_sw_fence_notify notify);
+
 #endif /* __INTEL_ATOMIC_H__ */
