@@ -208,9 +208,9 @@ kmem_cache_alloc(struct kmem_cache *kc, gfp_t gfp)
 	void *ptr;
 
 	if (gfp & __GFP_WAIT)
-		flags |= PR_NOWAIT;
-	else
 		flags |= PR_WAITOK;
+	else
+		flags |= PR_NOWAIT;
 
 	ptr = pool_cache_get(kc->kc_pool_cache, flags);
 	if (ptr == NULL)
