@@ -15503,7 +15503,7 @@ static void intel_atomic_commit_work(struct work_struct *work)
 	intel_atomic_commit_tail(state);
 }
 
-static int __i915_sw_fence_call
+int __i915_sw_fence_call
 intel_atomic_commit_ready(struct i915_sw_fence *fence,
 			  enum i915_sw_fence_notify notify)
 {
@@ -15560,8 +15560,7 @@ static int intel_atomic_commit(struct drm_device *dev,
 	state->wakeref = intel_runtime_pm_get(&dev_priv->runtime_pm);
 
 	drm_atomic_state_get(&state->base);
-	i915_sw_fence_init(&state->commit_ready,
-			   intel_atomic_commit_ready);
+	i915_sw_fence_reinit(&state->commit_ready);
 
 	/*
 	 * The intel_legacy_cursor_update() fast path takes care
