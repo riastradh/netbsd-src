@@ -156,6 +156,7 @@ rebuild_st:
 		__USE(last_pfn);
 		KASSERT(st->nents == i);
 		sg->sg_pgs[st->nents++] = page;
+		sg_page_sizes |= PAGE_SIZE; /* XXX compress contiguous pages */
 #else
 		if (!i ||
 		    sg->length >= max_segment ||
