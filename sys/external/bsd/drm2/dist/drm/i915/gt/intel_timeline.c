@@ -287,6 +287,8 @@ void intel_timeline_fini(struct intel_timeline *timeline)
 		i915_gem_object_unpin_map(timeline->hwsp_ggtt->obj);
 
 	i915_vma_put(timeline->hwsp_ggtt);
+
+	mutex_destroy(&timeline->mutex);
 }
 
 struct intel_timeline *
