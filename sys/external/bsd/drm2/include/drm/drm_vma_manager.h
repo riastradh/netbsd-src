@@ -122,6 +122,9 @@ struct drm_vma_offset_node *
 struct drm_vma_offset_node *
 	drm_vma_offset_exact_lookup(struct drm_vma_offset_manager *,
 	    unsigned long, unsigned long);
+struct drm_vma_offset_node *
+	drm_vma_offset_exact_lookup_locked(struct drm_vma_offset_manager *,
+	    unsigned long, unsigned long);
 
 int	drm_vma_node_allow(struct drm_vma_offset_node *, struct drm_file *);
 void	drm_vma_node_revoke(struct drm_vma_offset_node *, struct drm_file *);
