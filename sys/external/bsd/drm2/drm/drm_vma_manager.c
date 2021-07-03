@@ -242,24 +242,34 @@ drm_vma_offset_lookup_locked(struct drm_vma_offset_manager *mgr,
 }
 
 struct drm_vma_offset_node *
-drm_vma_offset_exact_lookup(struct drm_vma_offset_manager *mgr,
+drm_vma_offset_exact_lookup_locked(struct drm_vma_offset_manager *mgr,
     unsigned long startpage, unsigned long npages)
 {
 	const vmem_addr_t key = startpage;
 	struct drm_vma_offset_node *node;
 
-	rw_enter(&mgr->vom_lock, RW_READER);
+	KASSERT(rw_lock_held(&mgr->vom_lock));
 
 	node = rb_tree_find_node(&mgr->vom_nodes, &key);
 	if (node == NULL)
-		goto out;
+		return NULL;
 	KASSERT(node->von_startpage == startpage);
-	if (node->von_npages != npages) {
-		node = NULL;
-		goto out;
-	}
+	if (node->von_npages != npages)
+		return NULL;
 
-out:	rw_exit(&mgr->vom_lock);
+	return node;
+}
+
+struct drm_vma_offset_node *
+drm_vma_offset_exact_lookup(struct drm_vma_offset_manager *mgr,
+    unsigned long startpage, unsigned long npages)
+{
+	struct drm_vma_offset_node *node;
+
+	rw_enter(&mgr->vom_lock, RW_READER);
+	node = drm_vma_offset_exact_lookup_locked(mgr, startpage, npages);
+	rw_exit(&mgr->vom_lock);
+
 	return node;
 }
 
