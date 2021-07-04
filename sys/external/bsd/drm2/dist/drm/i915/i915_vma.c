@@ -57,6 +57,7 @@ struct i915_vma *i915_vma_alloc(void)
 
 void i915_vma_free(struct i915_vma *vma)
 {
+	mutex_destroy(&vma->pages_mutex);
 	return kmem_cache_free(global.slab_vmas, vma);
 }
 
