@@ -696,7 +696,7 @@ static void df_v3_6_pmc_get_count(struct amdgpu_device *adev,
 		if (*count >= DF_V3_6_PERFMON_OVERFLOW)
 			*count = 0;
 
-		DRM_DEBUG_DRIVER("config=%llx addr=%08x:%08x val=%08x:%08x",
+		DRM_DEBUG_DRIVER("config=%"PRIx64" addr=%08x:%08x val=%08x:%08x",
 			 config, lo_base_addr, hi_base_addr, lo_val, hi_val);
 
 		break;
