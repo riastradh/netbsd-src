@@ -76,11 +76,18 @@ mod_timer_pinned(struct timer_list *timer, unsigned long then)
 	mod_timer(timer, then);
 }
 
-static inline void
+static inline int
 del_timer(struct timer_list *timer)
 {
 
-	callout_stop(&timer->tl_callout);
+	/*
+	 * Linux: `del_timer of an inactive timer returns 0, del_timer
+	 * of an active timer returns 1.'
+	 *
+	 * NetBSD: `callout_stop will return a non-zero value if the
+	 * callout was EXPIRED.', meaning it is no longer pending.
+	 */
+	return !callout_stop(&timer->tl_callout);
 }
 
 static inline int
