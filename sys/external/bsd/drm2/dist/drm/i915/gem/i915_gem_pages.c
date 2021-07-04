@@ -171,6 +171,8 @@ static void __i915_gem_object_reset_page_iter(struct drm_i915_gem_object *obj)
 static void unmap_object(struct drm_i915_gem_object *obj, void *ptr)
 {
 #ifdef __NetBSD__
+	pmap_kremove((vaddr_t)ptr, obj->base.size);
+	pmap_update(pmap_kernel());
 	uvm_km_free(kernel_map, (vaddr_t)ptr, obj->base.size, UVM_KMF_VAONLY);
 #else
 	if (is_vmalloc_addr(ptr))
