@@ -112,7 +112,7 @@ static enum gpio_result set_config(
 					msleep(3);
 			}
 		} else {
-			uint32_t reg2;
+			uint32_t reg2 __unused;
 			uint32_t sda_pd_dis = 0;
 			uint32_t scl_pd_dis = 0;
 

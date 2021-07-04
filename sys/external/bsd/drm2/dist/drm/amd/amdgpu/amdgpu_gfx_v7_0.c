@@ -56,6 +56,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "oss/oss_2_0_d.h"
 #include "oss/oss_2_0_sh_mask.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define NUM_SIMD_PER_CU 0x4 /* missing from the gfx_7 IP headers */
 
 #define GFX7_NUM_GFX_RINGS     1
@@ -4541,11 +4543,11 @@ static int gfx_v7_0_sw_fini(void *handle)
 	gfx_v7_0_mec_fini(adev);
 	amdgpu_bo_free_kernel(&adev->gfx.rlc.clear_state_obj,
 				&adev->gfx.rlc.clear_state_gpu_addr,
-				(void **)&adev->gfx.rlc.cs_ptr);
+				(void **)__UNVOLATILE(&adev->gfx.rlc.cs_ptr));
 	if (adev->gfx.rlc.cp_table_size) {
 		amdgpu_bo_free_kernel(&adev->gfx.rlc.cp_table_obj,
 				&adev->gfx.rlc.cp_table_gpu_addr,
-				(void **)&adev->gfx.rlc.cp_table_ptr);
+				(void **)__UNVOLATILE(&adev->gfx.rlc.cp_table_ptr));
 	}
 	gfx_v7_0_free_microcode(adev);
 

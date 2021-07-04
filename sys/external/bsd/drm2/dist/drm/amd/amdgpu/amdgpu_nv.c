@@ -63,6 +63,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "mes_v10_1.h"
 #include "mxgpu_nv.h"
 
+#include <linux/nbsd-namespace.h>
+
 static const struct amd_ip_funcs nv_common_ip_funcs;
 
 /*
