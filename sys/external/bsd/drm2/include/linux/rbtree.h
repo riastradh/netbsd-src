@@ -87,7 +87,10 @@ rb_next2(const struct rb_root *root, const struct rb_node *rbnode)
 	char *vnode = (char *)__UNCONST(rbnode);
 
 	vnode -= root->rbr_tree.rbt_ops->rbto_node_offset;
-	return RB_TREE_NEXT(__UNCONST(&root->rbr_tree), vnode);
+	vnode = RB_TREE_NEXT(__UNCONST(&root->rbr_tree), vnode);
+	if (vnode)
+		vnode += root->rbr_tree.rbt_ops->rbto_node_offset;
+	return (struct rb_node *)vnode;
 }
 
 static inline struct rb_node *
