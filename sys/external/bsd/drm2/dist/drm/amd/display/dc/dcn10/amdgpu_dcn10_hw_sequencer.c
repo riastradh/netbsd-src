@@ -886,7 +886,6 @@ static void dcn10_reset_back_end_for_pipe(
 			dc->hwss.disable_audio_stream(pipe_ctx);
 
 		if (pipe_ctx->stream_res.audio) {
-#ifndef __NetBSD__		/* XXX amdgpu audio */
 			/*disable az_endpoint*/
 			pipe_ctx->stream_res.audio->funcs->az_disable(pipe_ctx->stream_res.audio);
 
@@ -898,7 +897,6 @@ static void dcn10_reset_back_end_for_pipe(
 						pipe_ctx->stream_res.audio, false);
 				pipe_ctx->stream_res.audio = NULL;
 			}
-#endif	/* __NetBSD__ */
 		}
 	}
 
@@ -1335,11 +1333,9 @@ void dcn10_init_hw(struct dc *dc)
 	}
 
 	for (i = 0; i < res_pool->audio_count; i++) {
-#ifndef __NetBSD__		/* XXX amdgpu audio */
 		struct audio *audio = res_pool->audios[i];
 
 		audio->funcs->hw_init(audio);
-#endif
 	}
 
 	if (abm != NULL) {
