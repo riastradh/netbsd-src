@@ -40,8 +40,12 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_module.c,v 1.4 2018/08/28 03:35:08 riastradh 
 #include <sys/systm.h>
 
 #include <drm/drm_device.h>
+#include <drm/drm_drv.h>
 #include <drm/drm_sysctl.h>
 
+#include <linux/mutex.h>
+
+#include "amdgpu.h"
 #include "amdgpu_amdkfd.h"
 #include "amdgpu_drv.h"
 
@@ -53,7 +57,7 @@ MODULE(MODULE_CLASS_DRIVER, amdgpu, "drmkms,drmkms_pci"); /* XXX drmkms_i2c, drm
 
 /* XXX Kludge to get these from amdgpu_drv.c.  */
 extern struct drm_driver *const amdgpu_drm_driver;
-extern int amdgpu_max_kms_ioctl;
+extern struct amdgpu_mgpu_info mgpu_info;
 
 struct drm_sysctl_def amdgpu_def = DRM_SYSCTL_INIT();
 
@@ -68,6 +72,8 @@ amdgpu_init(void)
 
 	amdgpu_drm_driver->num_ioctls = amdgpu_max_kms_ioctl;
 	amdgpu_drm_driver->driver_features |= DRIVER_MODESET;
+
+	linux_mutex_init(&mgpu_info.mutex);
 
 #if notyet			/* XXX amdgpu acpi */
 	amdgpu_register_atpx_handler();
@@ -101,6 +107,8 @@ amdgpu_fini(void)
 #if notyet			/* XXX amdgpu acpi */
 	amdgpu_unregister_atpx_handler();
 #endif
+
+	linux_mutex_destroy(&mgpu_info.mutex);
 }
 
 static int

@@ -66,6 +66,8 @@ __link_set_add_data(linux_module_param_info, info_ ## NAME)
 #define	module_param(VAR, TYPE, MODE)	module_param_named(VAR, VAR, TYPE, MODE)
 #define	module_param_unsafe		module_param
 #define	module_param_named_unsafe	module_param_named
+#define	module_param_string(VAR, TYPE, SIZE, MODE)			      \
+	CTASSERT(1)		/* XXX */
 
 struct linux_module_param_desc {
 	const char *name;
