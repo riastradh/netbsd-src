@@ -174,7 +174,8 @@ dma_buf_put(struct dma_buf *dmabuf)
 }
 
 struct dma_buf_attachment *
-dma_buf_attach(struct dma_buf *dmabuf, bus_dma_tag_t dmat)
+dma_buf_dynamic_attach(struct dma_buf *dmabuf, bus_dma_tag_t dmat,
+    bool dynamic_mapping)
 {
 	struct dma_buf_attachment *attach;
 	int ret = 0;
@@ -182,6 +183,7 @@ dma_buf_attach(struct dma_buf *dmabuf, bus_dma_tag_t dmat)
 	attach = kmem_zalloc(sizeof(*attach), KM_SLEEP);
 	attach->dmabuf = dmabuf;
 	attach->dev = dmat;
+	attach->dynamic_mapping = dynamic_mapping;
 
 	mutex_enter(&dmabuf->db_lock);
 	if (dmabuf->ops->attach)
@@ -190,10 +192,20 @@ dma_buf_attach(struct dma_buf *dmabuf, bus_dma_tag_t dmat)
 	if (ret)
 		goto fail0;
 
+	if (attach->dynamic_mapping != dmabuf->ops->dynamic_mapping)
+		panic("%s: NYI", __func__);
+
 	return attach;
 
 fail0:	kmem_free(attach, sizeof(*attach));
 	return ERR_PTR(ret);
+}
+
+struct dma_buf_attachment *
+dma_buf_attach(struct dma_buf *dmabuf, bus_dma_tag_t dmat)
+{
+
+	return dma_buf_dynamic_attach(dmabuf, dmat, /*dynamic_mapping*/false);
 }
 
 void
@@ -212,8 +224,15 @@ struct sg_table *
 dma_buf_map_attachment(struct dma_buf_attachment *attach,
     enum dma_data_direction dir)
 {
+	struct sg_table *sg;
 
-	return attach->dmabuf->ops->map_dma_buf(attach, dir);
+	if (attach->dmabuf->ops->dynamic_mapping)
+		dma_resv_lock(attach->dmabuf->resv, NULL);
+	sg = attach->dmabuf->ops->map_dma_buf(attach, dir);
+	if (attach->dmabuf->ops->dynamic_mapping)
+		dma_resv_unlock(attach->dmabuf->resv);
+
+	return sg;
 }
 
 void
@@ -221,7 +240,11 @@ dma_buf_unmap_attachment(struct dma_buf_attachment *attach,
     struct sg_table *sg, enum dma_data_direction dir)
 {
 
-	return attach->dmabuf->ops->unmap_dma_buf(attach, sg, dir);
+	if (attach->dmabuf->ops->dynamic_mapping)
+		dma_resv_lock(attach->dmabuf->resv, NULL);
+	attach->dmabuf->ops->unmap_dma_buf(attach, sg, dir);
+	if (attach->dmabuf->ops->dynamic_mapping)
+		dma_resv_unlock(attach->dmabuf->resv);
 }
 
 static int
