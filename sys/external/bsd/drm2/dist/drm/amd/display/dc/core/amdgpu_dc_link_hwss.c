@@ -334,10 +334,8 @@ void dp_retrain_link_dp_test(struct dc_link *link,
 			dp_receiver_power_ctrl(link, false);
 
 			link->dc->hwss.disable_stream(&pipes[i]);
-#ifndef __NetBSD__		/* XXX amdgpu audio */
 			if ((&pipes[i])->stream_res.audio && !link->dc->debug.az_endpoint_mute_only)
 				(&pipes[i])->stream_res.audio->funcs->az_disable((&pipes[i])->stream_res.audio);
-#endif
 
 			link->link_enc->funcs->disable_output(
 					link->link_enc,
@@ -359,7 +357,6 @@ void dp_retrain_link_dp_test(struct dc_link *link,
 			link->dc->hwss.unblank_stream(&pipes[i],
 					link_setting);
 
-#ifndef __NetBSD__		/* XXX amdgpu audio */
 			if (pipes[i].stream_res.audio) {
 				/* notify audio driver for
 				 * audio modes of monitor */
@@ -373,7 +370,6 @@ void dp_retrain_link_dp_test(struct dc_link *link,
 				audio_mute_control(
 					pipes[i].stream_res.stream_enc, false);
 			}
-#endif
 		}
 	}
 }

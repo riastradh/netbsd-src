@@ -2035,7 +2035,6 @@ static void dcn20_reset_back_end_for_pipe(
 
 		/* free acquired resources */
 		if (pipe_ctx->stream_res.audio) {
-#ifndef __NetBSD__		/* XXX amdgpu audio */
 			/*disable az_endpoint*/
 			pipe_ctx->stream_res.audio->funcs->az_disable(pipe_ctx->stream_res.audio);
 
@@ -2047,7 +2046,6 @@ static void dcn20_reset_back_end_for_pipe(
 						pipe_ctx->stream_res.audio, false);
 				pipe_ctx->stream_res.audio = NULL;
 			}
-#endif
 		}
 	}
 	else if (pipe_ctx->stream_res.dsc) {
