@@ -65,6 +65,14 @@ pci_get_drvdata(struct pci_dev *pdev)
 	return pdev->pd_drvdata;
 }
 
+const char *
+pci_name(struct pci_dev *pdev)
+{
+
+	/* XXX not sure this has the right format */
+	return device_xname(pci_dev_dev(pdev));
+}
+
 void
 linux_pci_dev_init(struct pci_dev *pdev, device_t dev, device_t parent,
     const struct pci_attach_args *pa, int kludges)
