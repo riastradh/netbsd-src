@@ -60,7 +60,7 @@ static int mes_v10_1_resume_gang(struct amdgpu_mes *mes,
 	return 0;
 }
 
-static const struct amdgpu_mes_funcs mes_v10_1_funcs = {
+static const struct amdgpu_mes_funcs mes_v10_1_funcs __unused = {
 	.add_hw_queue = mes_v10_1_add_hw_queue,
 	.remove_hw_queue = mes_v10_1_remove_hw_queue,
 	.suspend_gang = mes_v10_1_suspend_gang,

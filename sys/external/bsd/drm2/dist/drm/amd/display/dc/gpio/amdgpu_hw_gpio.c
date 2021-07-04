@@ -79,7 +79,7 @@ enum gpio_result dal_hw_gpio_get_value(
 	const struct hw_gpio_pin *ptr,
 	uint32_t *value)
 {
-	const struct hw_gpio *gpio = FROM_HW_GPIO_PIN(ptr);
+	const struct hw_gpio *gpio = const_container_of(ptr, struct hw_gpio, base);
 
 	enum gpio_result result = GPIO_RESULT_OK;
 
@@ -101,7 +101,7 @@ enum gpio_result dal_hw_gpio_set_value(
 	const struct hw_gpio_pin *ptr,
 	uint32_t value)
 {
-	struct hw_gpio *gpio = FROM_HW_GPIO_PIN(ptr);
+	const struct hw_gpio *gpio = const_container_of(ptr, struct hw_gpio, base);
 
 	/* This is the public interface
 	 * where the input comes from client, not shifted yet
