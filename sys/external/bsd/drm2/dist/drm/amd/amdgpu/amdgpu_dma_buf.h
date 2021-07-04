@@ -34,8 +34,8 @@ struct drm_gem_object *amdgpu_gem_prime_import(struct drm_device *dev,
 void *amdgpu_gem_prime_vmap(struct drm_gem_object *obj);
 void amdgpu_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr);
 #ifdef __NetBSD__
-int amdgpu_gem_prime_mmap_object(struct drm_gem_object *, off_t *, size_t, int,
-    int *, struct uvm_object **, int *);
+int amdgpu_gem_prime_mmap(struct drm_gem_object *, off_t *, size_t, int,
+    int *, int *, struct uvm_object **, int *);
 #else
 int amdgpu_gem_prime_mmap(struct drm_gem_object *obj,
 			  struct vm_area_struct *vma);
