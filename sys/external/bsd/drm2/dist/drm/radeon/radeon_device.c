@@ -1489,15 +1489,13 @@ int radeon_device_init(struct radeon_device *rdev,
 
 #ifdef __NetBSD__
 	r = drm_limit_dma_space(rdev->ddev, 0, __BITS(dma_bits - 1, 0));
-	if (r)
-		DRM_ERROR("No suitable DMA available.\n");
 #else
 	r = dma_set_mask_and_coherent(&rdev->pdev->dev, DMA_BIT_MASK(dma_bits));
+#endif
 	if (r) {
 		pr_warn("radeon: No suitable DMA available\n");
 		return r;
 	}
-#endif
 	rdev->need_swiotlb = drm_need_swiotlb(dma_bits);
 
 	/* Registers mapping */
