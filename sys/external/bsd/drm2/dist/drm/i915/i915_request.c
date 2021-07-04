@@ -1607,7 +1607,7 @@ long i915_request_wait(struct i915_request *rq,
 		    i915_request_completed(rq));
 	}
 	if (timeout > 0)	/* succeeded before timeout */
-		dma_fence_signal(&rq->fence);
+		dma_fence_signal_locked(&rq->fence);
 	spin_unlock(rq->fence.lock);
 	DRM_DESTROY_WAITQUEUE(&wait.wq);
 #else
