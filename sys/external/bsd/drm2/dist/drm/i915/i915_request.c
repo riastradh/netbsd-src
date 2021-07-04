@@ -1204,10 +1204,10 @@ void i915_request_skip(struct i915_request *rq, int error)
 	 */
 	head = rq->infix;
 	if (rq->postfix < head) {
-		memset((char *)vaddr + head, 0, rq->ring->size - head);
+		memset(vaddr + head, 0, rq->ring->size - head);
 		head = 0;
 	}
-	memset((char *)vaddr + head, 0, rq->postfix - head);
+	memset(vaddr + head, 0, rq->postfix - head);
 	rq->infix = rq->postfix;
 }
 
