@@ -34,13 +34,21 @@
 
 #include <sys/stdbool.h>
 
+#include <linux/dma-fence.h>
+
+#define	dma_fence_array_create		linux_dma_fence_array_create
 #define	dma_fence_is_array		linux_dma_fence_is_array
 #define	to_dma_fence_array		linux_to_dma_fence_array
 
 struct dma_fence_array {
+	struct dma_fence	base;
 	struct dma_fence	**fences;
 	unsigned		num_fences;
 };
+
+struct dma_fence_array *
+	dma_fence_array_create(int, struct dma_fence **, unsigned, unsigned,
+	    bool);
 
 bool	dma_fence_is_array(struct dma_fence *);
 struct dma_fence_array *
