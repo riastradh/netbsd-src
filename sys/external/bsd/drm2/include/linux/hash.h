@@ -50,4 +50,10 @@ hash_32(uint32_t value, unsigned int bits)
 	return (value * 0x61c88647) >> (32 - bits);
 }
 
+static inline uint64_t
+hash_64(uint64_t value, unsigned int bits)
+{
+	return (value * 0x61c8864680b583ebull) >> (64 - bits);
+}
+
 #endif  /* _LINUX_HASH_H_ */

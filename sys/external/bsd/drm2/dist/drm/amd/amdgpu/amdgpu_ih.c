@@ -126,7 +126,7 @@ fail3: __unused		bus_dmamem_unmap(adev->ddev->dmat, kva, size);
 		r = amdgpu_bo_create_kernel(adev, ih->ring_size, PAGE_SIZE,
 					    AMDGPU_GEM_DOMAIN_GTT,
 					    &ih->ring_obj, &ih->gpu_addr,
-					    (void **)&ih->ring);
+					    (void **)__UNVOLATILE(&ih->ring));
 		if (r) {
 			amdgpu_device_wb_free(adev, rptr_offs);
 			amdgpu_device_wb_free(adev, wptr_offs);
@@ -173,7 +173,7 @@ void amdgpu_ih_ring_fini(struct amdgpu_device *adev, struct amdgpu_ih_ring *ih)
 		ih->ring = NULL;
 	} else {
 		amdgpu_bo_free_kernel(&ih->ring_obj, &ih->gpu_addr,
-				      (void **)&ih->ring);
+				      (void **)__UNVOLATILE(&ih->ring));
 		amdgpu_device_wb_free(adev, (ih->wptr_addr - ih->gpu_addr) / 4);
 		amdgpu_device_wb_free(adev, (ih->rptr_addr - ih->gpu_addr) / 4);
 	}

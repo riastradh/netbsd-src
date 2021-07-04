@@ -45,6 +45,10 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include "asic_reg/mp/mp_11_0_sh_mask.h"
 
+/* XXX *@!#^@&*!#& */
+#define	sprintf(buf, fmt, ...)						      \
+	snprintf(buf, (size_t)-1, fmt, ##__VA_ARGS__)
+
 #define FEATURE_MASK(feature) (1ULL << feature)
 #define SMC_DPM_FEATURE ( \
 	FEATURE_MASK(FEATURE_DPM_PREFETCHER_BIT) | \
@@ -1189,7 +1193,7 @@ static int navi10_get_current_activity_percent(struct smu_context *smu,
 
 static bool navi10_is_dpm_running(struct smu_context *smu)
 {
-	int ret = 0;
+	int ret __unused = 0;
 	uint32_t feature_mask[2];
 	unsigned long feature_enabled;
 	ret = smu_feature_get_enabled_mask(smu, feature_mask, 2);

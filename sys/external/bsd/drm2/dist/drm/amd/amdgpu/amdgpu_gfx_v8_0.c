@@ -2084,12 +2084,12 @@ static int gfx_v8_0_sw_fini(void *handle)
 	amdgpu_gfx_rlc_fini(adev);
 	amdgpu_bo_free_kernel(&adev->gfx.rlc.clear_state_obj,
 				&adev->gfx.rlc.clear_state_gpu_addr,
-				(void **)&adev->gfx.rlc.cs_ptr);
+				(void **)__UNVOLATILE(&adev->gfx.rlc.cs_ptr));
 	if ((adev->asic_type == CHIP_CARRIZO) ||
 	    (adev->asic_type == CHIP_STONEY)) {
 		amdgpu_bo_free_kernel(&adev->gfx.rlc.cp_table_obj,
 				&adev->gfx.rlc.cp_table_gpu_addr,
-				(void **)&adev->gfx.rlc.cp_table_ptr);
+				(void **)__UNVOLATILE(&adev->gfx.rlc.cp_table_ptr));
 	}
 	gfx_v8_0_free_microcode(adev);
 

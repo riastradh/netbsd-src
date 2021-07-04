@@ -172,7 +172,7 @@ static const uint32_t ecc_umc_mcumc_ctrl_mask_addrs[] = {
 	(0x001d43e0 + 0x00001800),
 };
 
-static const uint32_t ecc_umc_mcumc_status_addrs[] = {
+static const uint32_t ecc_umc_mcumc_status_addrs[] __unused = {
 	(0x000143c2 + 0x00000000),
 	(0x000143c2 + 0x00000800),
 	(0x000143c2 + 0x00001000),
@@ -361,7 +361,7 @@ static int gmc_v9_0_process_interrupt(struct amdgpu_device *adev,
 			entry->src_id, entry->ring_id, entry->vmid,
 			entry->pasid, task_info.process_name, task_info.tgid,
 			task_info.task_name, task_info.pid);
-		dev_err(adev->dev, "  in page starting at address 0x%016llx from client %d\n",
+		dev_err(adev->dev, "  in page starting at address 0x%016"PRIx64" from client %d\n",
 			addr, entry->client_id);
 		if (!amdgpu_sriov_vf(adev)) {
 			dev_err(adev->dev,
@@ -1185,7 +1185,11 @@ static int gmc_v9_0_sw_init(void *handle)
 	 */
 	adev->gmc.mc_mask = 0xffffffffffffULL; /* 48 bit MC */
 
+#ifdef __NetBSD__
+	r = drm_limit_dma_space(adev->ddev, 0, DMA_BIT_MASK(44));
+#else
 	r = dma_set_mask_and_coherent(adev->dev, DMA_BIT_MASK(44));
+#endif
 	if (r) {
 		printk(KERN_WARNING "amdgpu: No suitable DMA available.\n");
 		return r;

@@ -51,10 +51,12 @@ static inline unsigned long long complete_integer_division_u64(
 	unsigned long long *remainder)
 {
 	unsigned long long result;
+	uint64_t r64;
 
 	ASSERT(divisor);
 
-	result = div64_u64_rem(dividend, divisor, remainder);
+	result = div64_u64_rem(dividend, divisor, &r64);
+	*remainder = r64;
 
 	return result;
 }

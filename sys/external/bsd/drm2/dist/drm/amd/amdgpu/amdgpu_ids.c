@@ -34,6 +34,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "amdgpu.h"
 #include "amdgpu_trace.h"
 
+#include <linux/nbsd-namespace.h>
+
 /*
  * PASID manager
  *
@@ -43,7 +45,11 @@ __KERNEL_RCSID(0, "$NetBSD$");
  * space. Therefore PASIDs are allocated using a global IDA. VMs are
  * looked up from the PASID per amdgpu_device.
  */
+#ifdef __NetBSD__		/* XXX */
+struct ida amdgpu_pasid_ida;
+#else
 static DEFINE_IDA(amdgpu_pasid_ida);
+#endif
 
 /* Helper to free pasid from a fence callback */
 struct amdgpu_pasid_cb {

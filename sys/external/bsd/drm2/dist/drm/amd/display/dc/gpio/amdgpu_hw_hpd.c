@@ -73,7 +73,8 @@ static enum gpio_result get_value(
 	const struct hw_gpio_pin *ptr,
 	uint32_t *value)
 {
-	struct hw_hpd *hpd = HW_HPD_FROM_BASE(ptr);
+	const struct hw_gpio *gpio = const_container_of(ptr, struct hw_gpio, base);
+	const struct hw_hpd *hpd = const_container_of(gpio, struct hw_hpd, base);
 	uint32_t hpd_delayed = 0;
 
 	/* in Interrupt mode we ask for SENSE bit */

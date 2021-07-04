@@ -449,7 +449,7 @@ out:
 
 uint8_t mod_hdcp_execute_and_set(
 		mod_hdcp_action func, uint8_t *flag,
-		enum mod_hdcp_status *status, struct mod_hdcp *hdcp, char *str)
+		enum mod_hdcp_status *status, struct mod_hdcp *hdcp, const char *str)
 {
 	*status = func(hdcp);
 	if (*status == MOD_HDCP_STATUS_SUCCESS && *flag != PASS) {

@@ -67,7 +67,7 @@ MODULE_FIRMWARE("amdgpu/si58_mc.bin");
 #define MC_SEQ_MISC0__MT__DDR3   0xB0000000
 
 
-static const u32 crtc_offsets[6] =
+static const u32 crtc_offsets[6] __unused =
 {
 	SI_CRTC0_REGISTER_OFFSET,
 	SI_CRTC1_REGISTER_OFFSET,
@@ -861,7 +861,11 @@ static int gmc_v6_0_sw_init(void *handle)
 
 	adev->gmc.mc_mask = 0xffffffffffULL;
 
+#ifdef __NetBSD__
+	r = drm_limit_dma_space(adev->ddev, 0, DMA_BIT_MASK(44));
+#else
 	r = dma_set_mask_and_coherent(adev->dev, DMA_BIT_MASK(44));
+#endif
 	if (r) {
 		dev_warn(adev->dev, "amdgpu: No suitable DMA available.\n");
 		return r;

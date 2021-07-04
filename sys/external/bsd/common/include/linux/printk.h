@@ -58,6 +58,8 @@
 #define	KERN_DEBUG	"kern debug: "
 #define	KERN_CONT	""
 
+#define	printk_ratelimit()	0 /* XXX */
+
 struct va_format {
 	const char	*fmt;
 	va_list		*va;
