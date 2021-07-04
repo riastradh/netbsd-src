@@ -61,4 +61,11 @@ unregister_reboot_notifier(struct notifier_block *block)
 	return 0;
 }
 
+static inline void
+emergency_restart(void)
+{
+
+	kern_reboot(0, NULL);
+}
+
 #endif	/* _LINUX_REBOOT_H_ */

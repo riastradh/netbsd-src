@@ -32,4 +32,8 @@
 #ifndef _LINUX_SUSPEND_H_
 #define _LINUX_SUSPEND_H_
 
+#include <sys/cdefs.h>
+
+#define	ksys_sync_helper()	__nothing
+
 #endif  /* _LINUX_SUSPEND_H_ */
