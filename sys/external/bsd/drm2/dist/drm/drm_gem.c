@@ -1064,7 +1064,6 @@ drm_gem_object_release(struct drm_gem_object *obj)
 #endif
 
 #ifdef __NetBSD__
-	drm_vma_node_destroy(&obj->vma_node);
 	if (obj->filp)
 		uao_detach(obj->filp);
 	uvm_obj_destroy(&obj->gemo_uvmobj, /*free lock*/true);
@@ -1075,6 +1074,9 @@ drm_gem_object_release(struct drm_gem_object *obj)
 
 	dma_resv_fini(&obj->_resv);
 	drm_gem_free_mmap_offset(obj);
+#ifdef __NetBSD__
+	drm_vma_node_destroy(&obj->vma_node);
+#endif
 }
 EXPORT_SYMBOL(drm_gem_object_release);
 
