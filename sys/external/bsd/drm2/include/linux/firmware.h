@@ -49,9 +49,12 @@ struct firmware {
 #define	firmware_request_nowarn		linux_firmware_request_nowarn
 #define	release_firmware		linux_release_firmware
 #define	request_firmware		linux_request_firmware
+#define	request_firmware_direct		linux_request_firmware_direct
 #define	request_firmware_nowait		linux_request_firmware_nowait
 
 int	request_firmware(const struct firmware **, const char *,
+	    struct device *);
+int	request_firmware_direct(const struct firmware **, const char *,
 	    struct device *);
 int	firmware_request_nowarn(const struct firmware **, const char *,
 	    struct device *);

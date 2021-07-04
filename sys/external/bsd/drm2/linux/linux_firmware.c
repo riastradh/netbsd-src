@@ -98,6 +98,14 @@ fail0:	KASSERT(ret);
 }
 
 int
+request_firmware_direct(const struct firmware **fwp, const char *image_name,
+    struct device *dev)
+{
+
+	return request_firmware(fwp, image_name, dev);
+}
+
+int
 firmware_request_nowarn(const struct firmware **fwp, const char *image_name,
     struct device *dev)
 {
