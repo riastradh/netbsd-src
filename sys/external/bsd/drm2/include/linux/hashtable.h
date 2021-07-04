@@ -34,6 +34,7 @@
 
 #include <sys/cdefs.h>
 
+#include <linux/hash.h>
 #include <linux/list.h>
 
 #define DECLARE_HASHTABLE(name, bits)					      \

@@ -121,7 +121,7 @@ struct protection_properties {
 		struct hdcp_protection_message *message_info);
 };
 
-static const struct protection_properties non_supported_protection = {
+static const struct protection_properties non_supported_protection __unused = {
 	.supported = false
 };
 
@@ -184,7 +184,7 @@ static bool hdmi_14_process_transaction(
 	return result;
 }
 
-static const struct protection_properties hdmi_14_protection = {
+static const struct protection_properties hdmi_14_protection __unused = {
 	.supported = true,
 	.process_transaction = hdmi_14_process_transaction
 };
@@ -322,7 +322,7 @@ static bool dp_11_process_transaction(
 		hdcp_cmd_is_read[message_info->msg_id]);
 }
 
-static const struct protection_properties dp_11_protection = {
+static const struct protection_properties dp_11_protection __unused = {
 	.supported = true,
 	.process_transaction = dp_11_process_transaction
 };
