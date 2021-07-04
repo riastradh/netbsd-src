@@ -228,6 +228,7 @@ static void __i915_gem_free_objects(struct drm_i915_private *i915,
 				continue;
 			drm_vma_offset_remove(obj->base.dev->vma_offset_manager,
 					      &mmo->vma_node);
+			drm_vma_node_destroy(&mmo->vma_node);
 			kfree(mmo);
 		}
 		memset(obj->mmo.offsets, 0, sizeof(obj->mmo.offsets));

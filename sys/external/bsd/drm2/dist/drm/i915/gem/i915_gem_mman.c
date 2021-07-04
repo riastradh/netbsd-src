@@ -785,8 +785,6 @@ insert_mmo(struct drm_i915_gem_object *obj, struct i915_mmap_offset *mmo)
 
 	spin_lock(&obj->mmo.lock);
 	if (obj->mmo.offsets[mmo->mmap_type]) {
-		drm_vma_offset_remove(obj->base.dev->vma_offset_manager,
-		    &mmo->vma_node);
 		to_free = mmo;
 		mmo = obj->mmo.offsets[mmo->mmap_type];
 	} else {
@@ -794,8 +792,12 @@ insert_mmo(struct drm_i915_gem_object *obj, struct i915_mmap_offset *mmo)
 	}
 	spin_unlock(&obj->mmo.lock);
 
-	if (to_free)
+	if (to_free) {
+		drm_vma_offset_remove(obj->base.dev->vma_offset_manager,
+		    &to_free->vma_node);
+		drm_vma_node_destroy(&to_free->vma_node);
 		kfree(to_free);
+	}
 
 	return mmo;
 #else
