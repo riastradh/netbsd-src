@@ -275,4 +275,10 @@ static_branch_likely(const bool *flagp)
 	return __predict_true(*flagp);
 }
 
+static inline int
+sscanf(const char *fmt, ...)
+{
+	return 0;		/* XXX */
+}
+
 #endif  /* _LINUX_KERNEL_H_ */
