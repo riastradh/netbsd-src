@@ -177,6 +177,11 @@ static void __i915_gem_free_object_rcu(struct rcu_head *head)
 		container_of(head, typeof(*obj), rcu);
 	struct drm_i915_private *i915 = to_i915(obj->base.dev);
 
+	/* i915_gem_object_init */
+	spin_lock_destroy(&obj->mmo.lock);
+	spin_lock_destroy(&obj->vma.lock);
+	mutex_destroy(&obj->mm.lock);
+
 	dma_resv_fini(&obj->base._resv);
 	drm_vma_node_destroy(&obj->base.vma_node);
 	i915_gem_object_free(obj);
