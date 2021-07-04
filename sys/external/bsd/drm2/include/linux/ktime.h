@@ -146,6 +146,12 @@ ktime_get_raw(void)
 }
 
 static inline uint64_t
+ktime_get_ns(void)
+{
+	return ktime_to_ns(ktime_get());
+}
+
+static inline uint64_t
 ktime_get_raw_ns(void)
 {
 	return ktime_to_ns(ktime_get_raw());
