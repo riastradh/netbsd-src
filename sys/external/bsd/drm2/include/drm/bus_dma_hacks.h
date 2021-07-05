@@ -196,18 +196,18 @@ bus_dmamem_export_pages(bus_dma_tag_t dmat, const bus_dma_segment_t *segs,
     int nsegs, struct page **pgs, unsigned npgs)
 {
 	int seg;
-	unsigned i;
+	unsigned pg;
 
-	i = 0;
+	pg = 0;
 	for (seg = 0; seg < nsegs; seg++) {
-		bus_addr_t baddr = segs[i].ds_addr;
-		bus_size_t len = segs[i].ds_len;
+		bus_addr_t baddr = segs[seg].ds_addr;
+		bus_size_t len = segs[seg].ds_len;
 
 		while (len >= PAGE_SIZE) {
 			paddr_t paddr = BUS_MEM_TO_PHYS(dmat, baddr);
 
-			KASSERT(i < npgs);
-			pgs[i++] = container_of(PHYS_TO_VM_PAGE(paddr),
+			KASSERT(pg < npgs);
+			pgs[pg++] = container_of(PHYS_TO_VM_PAGE(paddr),
 			    struct page, p_vmp);
 
 			baddr += PAGE_SIZE;
@@ -215,7 +215,7 @@ bus_dmamem_export_pages(bus_dma_tag_t dmat, const bus_dma_segment_t *segs,
 		}
 		KASSERT(len == 0);
 	}
-	KASSERT(i == npgs);
+	KASSERT(pg == npgs);
 
 	return 0;
 }
