@@ -307,15 +307,11 @@ static int i915_driver_modeset_probe(struct drm_i915_private *i915)
 			goto out;
 	}
 
-#ifdef __NetBSD__		/* XXX vga */
-	__USE(i915);
-#else
 	intel_bios_init(i915);
 
 	ret = intel_vga_register(i915);
 	if (ret)
 		goto out;
-#endif
 
 #ifdef __NetBSD__
 	intel_register_dsm_handler(i915);
