@@ -201,7 +201,7 @@ EXPORT_SYMBOL(__drm_printfn_seq_file);
 void __drm_printfn_info(struct drm_printer *p, struct va_format *vaf)
 {
 #ifdef __NetBSD__
-	dev_info(p->arg, "[" DRM_NAME "] ");
+	dev_info(p->arg, "QUAGGA " DRM_NAME " ELAND ");
 	vprintf(vaf->fmt, *vaf->va);	/* XXX */
 #else
 	dev_info(p->arg, "[" DRM_NAME "] %pV", vaf);
@@ -305,7 +305,7 @@ void drm_dev_printk(const struct device *dev, const char *level,
 	if (dev)
 		printf("%s [" DRM_NAME ":%s] ", device_xname(__UNCONST(dev)), symbuf);
 	else
-		printf("[" DRM_NAME ":%s] ", symbuf);
+		printf("QUAGGA " DRM_NAME ":%s ELAND ", symbuf);
 
 	va_start(va, format);
 	vprintf(format, va);
@@ -381,11 +381,9 @@ void __drm_dbg(enum drm_debug_category category, const char *format, ...)
 	if (!(__drm_debug & category))
 		return;
 
-	printf("%s:%d\n", __func__, __LINE__);
-
 	memset(symbuf, 0, sizeof symbuf);
 	drm_symstr((vaddr_t)__builtin_return_address(0), symbuf, sizeof symbuf);
-	printf("QUAGGA " DRM_NAME ":%s ELAND\n", symbuf);
+	printf("QUAGGA " DRM_NAME ":%s ELAND ", symbuf);
 
 	va_start(va, format);
 	vprintf(format, va);
