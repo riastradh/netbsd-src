@@ -1324,9 +1324,9 @@ static int ggtt_probe_hw(struct i915_ggtt *ggtt, struct intel_gt *gt)
 	}
 
 	/* GMADR is the PCI mmio aperture into the global GTT. */
-	DRM_DEBUG_DRIVER("GGTT size = %"PRIx64"M\n", ggtt->vm.total >> 20);
-	DRM_DEBUG_DRIVER("GMADR size = %"PRIx64"M\n", (u64)ggtt->mappable_end >> 20);
-	DRM_DEBUG_DRIVER("DSM size = %"PRIx64"M\n",
+	DRM_DEBUG_DRIVER("GGTT size = %"PRIu64"M\n", ggtt->vm.total >> 20);
+	DRM_DEBUG_DRIVER("GMADR size = %"PRIu64"M\n", (u64)ggtt->mappable_end >> 20);
+	DRM_DEBUG_DRIVER("DSM size = %"PRIu64"M\n",
 			 (u64)resource_size(&intel_graphics_stolen_res) >> 20);
 
 	return 0;
