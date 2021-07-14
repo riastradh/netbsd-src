@@ -381,8 +381,17 @@ void __drm_dbg(enum drm_debug_category category, const char *format, ...)
 	if (!(__drm_debug & category))
 		return;
 
+	printf("%s:%d\n", __func__, __LINE__);
+
+	memset(symbuf, 0, sizeof symbuf);
 	drm_symstr((vaddr_t)__builtin_return_address(0), symbuf, sizeof symbuf);
+#if 1
+	printf("[" DRM_NAME ":");
+	printf("%zu", strlen(symbuf));
+	printf("] ");
+#else
 	printf("[" DRM_NAME ":%s] ", symbuf);
+#endif
 
 	va_start(va, format);
 	vprintf(format, va);
