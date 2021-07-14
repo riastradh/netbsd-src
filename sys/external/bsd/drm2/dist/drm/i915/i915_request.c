@@ -118,8 +118,10 @@ static void i915_fence_release(struct dma_fence *fence)
 	 * freed when the slab cache itself is freed, and so we would get
 	 * caught trying to reuse dead objects.
 	 */
+#ifndef __NetBSD__
 	i915_sw_fence_fini(&rq->submit);
 	i915_sw_fence_fini(&rq->semaphore);
+#endif
 
 	kmem_cache_free(global.slab_requests, rq);
 }
@@ -613,6 +615,10 @@ static void __i915_request_dtor(void *arg)
 	struct i915_request *rq = arg;
 
 	dma_fence_destroy(&rq->fence);
+#ifdef __NetBSD__
+	i915_sw_fence_fini(&rq->submit);
+	i915_sw_fence_fini(&rq->semaphore);
+#endif
 	spin_lock_destroy(&rq->lock);
 }
 
