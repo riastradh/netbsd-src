@@ -385,7 +385,7 @@ void __drm_dbg(enum drm_debug_category category, const char *format, ...)
 
 	memset(symbuf, 0, sizeof symbuf);
 	drm_symstr((vaddr_t)__builtin_return_address(0), symbuf, sizeof symbuf);
-	printf("[" DRM_NAME ":%s]\n", symbuf);
+	printf("QUAGGA " DRM_NAME ":%s ELAND\n", symbuf);
 
 	va_start(va, format);
 	vprintf(format, va);
