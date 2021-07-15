@@ -79,7 +79,7 @@ drm_symstr(vaddr_t val, char *out, size_t outsize)
 	const char *mod;
 	const char *sym;
 
-	if (curcpu()->ci_spin_locks == 0 &&
+	if (0 &&
 	    !cpu_intr_p() &&
 	    ksyms_getname(&mod, &sym, val, KSYMS_PROC|KSYMS_CLOSEST) == 0) {
 		char offset[32];
