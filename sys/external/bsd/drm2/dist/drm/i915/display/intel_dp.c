@@ -5845,7 +5845,7 @@ intel_dp_connector_register(struct drm_connector *connector)
 
 #ifdef __NetBSD__
 	DRM_DEBUG_KMS("registering %s bus for %s\n",
-		      intel_dp->aux.name, device_xname(connector->kdev));
+		      intel_dp->aux.name, connector->name);
 #else
 	DRM_DEBUG_KMS("registering %s bus for %s\n",
 		      intel_dp->aux.name, connector->kdev->kobj.name);
