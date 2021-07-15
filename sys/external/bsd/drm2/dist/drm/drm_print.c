@@ -35,6 +35,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #ifdef __NetBSD__
 #include <sys/param.h>
 #include <sys/stdarg.h>
+#include <sys/cpu.h>
 #include <sys/device.h>
 #include <sys/ksyms.h>
 #else
@@ -78,7 +79,8 @@ drm_symstr(vaddr_t val, char *out, size_t outsize)
 	const char *mod;
 	const char *sym;
 
-	if (ksyms_getname(&mod, &sym, val, KSYMS_PROC|KSYMS_CLOSEST) == 0) {
+	if (!cpu_intr_p() &&
+	    ksyms_getname(&mod, &sym, val, KSYMS_PROC|KSYMS_CLOSEST) == 0) {
 		char offset[32];
 
 		if (ksyms_getval(mod, sym, &naddr, KSYMS_ANY) == 0 &&
