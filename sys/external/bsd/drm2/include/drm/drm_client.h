@@ -81,6 +81,9 @@ void	drm_client_modeset_free(struct drm_client_dev *);
 
 #define drm_client_for_each_modeset(MODESET, CLIENT)		   \
 	KASSERT(mutex_is_locked(&(CLIENT)->modeset_mutex));	   \
+	drm_client_for_each_modeset_unlocked(MODESET, CLIENT)
+
+#define drm_client_for_each_modeset_unlocked(MODESET, CLIENT)	   \
 	for ((MODESET) = (CLIENT)->modesets; (MODESET)->crtc; (MODESET)++)
 
 #define drm_client_for_each_connector_iter(CONNECTOR, ITER)		      \
