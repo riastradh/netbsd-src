@@ -171,8 +171,7 @@ int drm_fb_helper_debug_enter_fb(struct drm_fb_helper *helper)
 	struct drm_mode_set *mode_set;
 
 	list_for_each_entry(helper, &kernel_fb_helper_list, kernel_fb_list) {
-		mutex_lock(&helper->client.modeset_mutex);
-		drm_client_for_each_modeset(mode_set, &helper->client) {
+		drm_client_for_each_modeset_unlocked(mode_set, &helper->client) {
 			if (!mode_set->crtc->enabled)
 				continue;
 
@@ -189,7 +188,6 @@ int drm_fb_helper_debug_enter_fb(struct drm_fb_helper *helper)
 						    mode_set->y,
 						    ENTER_ATOMIC_MODE_SET);
 		}
-		mutex_unlock(&helper->client.modeset_mutex);
 	}
 
 	return 0;
@@ -209,8 +207,7 @@ int drm_fb_helper_debug_leave_fb(struct drm_fb_helper *helper)
 	struct drm_mode_set *mode_set;
 	struct drm_framebuffer *fb;
 
-	mutex_lock(&client->modeset_mutex);
-	drm_client_for_each_modeset(mode_set, client) {
+	drm_client_for_each_modeset_unlocked(mode_set, client) {
 		crtc = mode_set->crtc;
 		if (drm_drv_uses_atomic_modeset(crtc->dev))
 			continue;
@@ -233,7 +230,6 @@ int drm_fb_helper_debug_leave_fb(struct drm_fb_helper *helper)
 		funcs->mode_set_base_atomic(mode_set->crtc, fb, crtc->x,
 					    crtc->y, LEAVE_ATOMIC_MODE_SET);
 	}
-	mutex_unlock(&client->modeset_mutex);
 
 	return 0;
 }
