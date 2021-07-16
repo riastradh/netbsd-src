@@ -230,11 +230,13 @@ struct drm_device {
 	 *  Protects vblank count and time updates during vblank enable/disable
 	 */
 	spinlock_t vblank_time_lock;
+#ifndef __NetBSD__		/* merged into event_lock */
 	/**
 	 * @vbl_lock: Top-level vblank references lock, wraps the low-level
 	 * @vblank_time_lock.
 	 */
 	spinlock_t vbl_lock;
+#endif
 
 	/**
 	 * @max_vblank_count:

@@ -215,7 +215,7 @@ int drm_irq_uninstall(struct drm_device *dev)
 	 * disabled when uninstalling the irq handler.
 	 */
 	if (dev->num_crtcs) {
-		spin_lock_irqsave(&dev->vbl_lock, irqflags);
+		spin_lock_irqsave(&dev->event_lock, irqflags);
 		for (i = 0; i < dev->num_crtcs; i++) {
 			struct drm_vblank_crtc *vblank = &dev->vblank[i];
 
@@ -226,12 +226,13 @@ int drm_irq_uninstall(struct drm_device *dev)
 
 			drm_vblank_disable_and_save(dev, i);
 #ifdef __NetBSD__
-			DRM_SPIN_WAKEUP_ONE(&vblank->queue, &dev->vbl_lock);
+			DRM_SPIN_WAKEUP_ONE(&vblank->queue,
+			    &dev->event_lock);
 #else
 			wake_up(&vblank->queue);
 #endif
 		}
-		spin_unlock_irqrestore(&dev->vbl_lock, irqflags);
+		spin_unlock_irqrestore(&dev->event_lock, irqflags);
 	}
 
 	if (!irq_enabled)
