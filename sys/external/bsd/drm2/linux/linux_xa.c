@@ -157,7 +157,7 @@ void *
 xa_find_after(struct xarray *xa, unsigned long *startp, unsigned long max,
     unsigned tagmask)
 {
-	unsigned long start = *startp;
+	unsigned long start = *startp + 1;
 	void *found;
 
 	if (start == max)
