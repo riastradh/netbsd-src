@@ -53,6 +53,7 @@ struct i915_page_directory *alloc_pd(struct i915_address_space *vm)
 		return ERR_PTR(-ENOMEM);
 
 	if (unlikely(setup_page_dma(vm, px_base(pd)))) {
+		spin_lock_destroy(&pd->lock);
 		kfree(pd);
 		return ERR_PTR(-ENOMEM);
 	}
