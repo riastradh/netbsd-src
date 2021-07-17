@@ -161,6 +161,7 @@ static void __gen8_ppgtt_cleanup(struct i915_address_space *vm,
 		} while (pde++, --count);
 	}
 
+	spin_lock_destroy(&pd->lock);
 	free_px(vm, pd);
 }
 
@@ -340,8 +341,15 @@ static int __gen8_ppgtt_alloc(struct i915_address_space * const vm,
 	} while (idx++, --len);
 	spin_unlock(&pd->lock);
 out:
-	if (alloc)
+	if (alloc) {
+		if (lvl) {
+			struct i915_page_directory *allocpd =
+			    container_of(alloc, struct i915_page_directory,
+				pt);
+			spin_lock_destroy(&allocpd->lock);
+		}
 		free_px(vm, alloc);
+	}
 	return ret;
 }
 
