@@ -77,6 +77,7 @@ static void fence_release(struct dma_fence *fence)
 
 	BUILD_BUG_ON(offsetof(typeof(*f), dma));
 	dma_fence_free(&f->dma);
+	spin_lock_destroy(&f->lock);
 }
 
 static const struct dma_fence_ops fence_ops = {
