@@ -319,6 +319,7 @@ static void gen6_ppgtt_cleanup(struct i915_address_space *vm)
 
 	mutex_destroy(&ppgtt->flush);
 	mutex_destroy(&ppgtt->pin_mutex);
+	spin_lock_destroy(&ppgtt->base.pd->lock);
 	kfree(ppgtt->base.pd);
 }
 
@@ -535,6 +536,7 @@ struct i915_ppgtt *gen6_ppgtt_create(struct intel_gt *gt)
 err_scratch:
 	free_scratch(&ppgtt->base.vm);
 err_pd:
+	spin_lock_destroy(&ppgtt->base.pd->lock);
 	kfree(ppgtt->base.pd);
 err_free:
 	mutex_destroy(&ppgtt->pin_mutex);
