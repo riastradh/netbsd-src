@@ -698,14 +698,16 @@ void i915_gem_object_release_mmap_offset(struct drm_i915_gem_object *obj)
 	for (t = 0; t < I915_MMAP_NTYPES; t++) {
 		if (t == I915_MMAP_TYPE_GTT)
 			continue;
-		/*
-		 * XXX Gotta take some uvm object's lock, outside the
-		 * spin lock, probably?
-		 */
 		for (i = 0; i < obj->base.size >> PAGE_SHIFT; i++) {
 			page = obj->mm.pages->sgl->sg_pgs[i];
 			vm_page = &page->p_vmp;
+			/*
+			 * XXX Why do we have to have the spin lock
+			 * here at all?
+			 */
+			spin_unlock(&obj->mmo.lock);
 			pmap_page_protect(vm_page, VM_PROT_NONE);
+			spin_lock(&obj->mmo.lock);
 		}
 	}
 #else
