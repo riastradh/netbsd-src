@@ -684,33 +684,22 @@ out:
 
 void i915_gem_object_release_mmap_offset(struct drm_i915_gem_object *obj)
 {
-	struct i915_mmap_offset *mmo, *mn;
-
-	spin_lock(&obj->mmo.lock);
 #ifdef __NetBSD__
-	enum i915_mmap_type t;
 	struct page *page;
 	struct vm_page *vm_page;
 	unsigned i;
 
-	(void)mmo;
-	(void)mn;
-	for (t = 0; t < I915_MMAP_NTYPES; t++) {
-		if (t == I915_MMAP_TYPE_GTT)
-			continue;
-		for (i = 0; i < obj->base.size >> PAGE_SHIFT; i++) {
-			page = obj->mm.pages->sgl->sg_pgs[i];
-			vm_page = &page->p_vmp;
-			/*
-			 * XXX Why do we have to have the spin lock
-			 * here at all?
-			 */
-			spin_unlock(&obj->mmo.lock);
-			pmap_page_protect(vm_page, VM_PROT_NONE);
-			spin_lock(&obj->mmo.lock);
-		}
+	if (obj->mm.pages == NULL)
+		return;
+	for (i = 0; i < obj->base.size >> PAGE_SHIFT; i++) {
+		page = obj->mm.pages->sgl->sg_pgs[i];
+		vm_page = &page->p_vmp;
+		pmap_page_protect(vm_page, VM_PROT_NONE);
 	}
 #else
+	struct i915_mmap_offset *mmo, *mn;
+
+	spin_lock(&obj->mmo.lock);
 	rbtree_postorder_for_each_entry_safe(mmo, mn,
 					     &obj->mmo.offsets, offset) {
 		/*
@@ -725,8 +714,8 @@ void i915_gem_object_release_mmap_offset(struct drm_i915_gem_object *obj)
 				   obj->base.dev->anon_inode->i_mapping);
 		spin_lock(&obj->mmo.lock);
 	}
-#endif
 	spin_unlock(&obj->mmo.lock);
+#endif
 }
 
 /**
