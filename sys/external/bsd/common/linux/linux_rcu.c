@@ -34,9 +34,11 @@ __KERNEL_RCSID(0, "$NetBSD: linux_rcu.c,v 1.5 2021/07/21 06:34:52 skrll Exp $");
 
 #include <sys/param.h>
 #include <sys/types.h>
+
 #include <sys/condvar.h>
 #include <sys/cpu.h>
 #include <sys/kthread.h>
+#include <sys/lockdebug.h>
 #include <sys/mutex.h>
 #include <sys/sdt.h>
 #include <sys/xcall.h>
@@ -190,6 +192,8 @@ call_rcu(struct rcu_head *head, void (*callback)(struct rcu_head *))
 void
 _kfree_rcu(struct rcu_head *head, void *obj)
 {
+
+	LOCKDEBUG_MEM_CHECK(obj, ((struct linux_malloc *)obj - 1)->lm_size);
 
 	head->rcuh_u.obj = obj;
 
