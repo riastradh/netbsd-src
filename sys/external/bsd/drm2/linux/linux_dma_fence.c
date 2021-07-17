@@ -344,27 +344,31 @@ dma_fence_put(struct dma_fence *fence)
 static int
 dma_fence_ensure_signal_enabled(struct dma_fence *fence)
 {
+	bool already_enabled;
 
 	KASSERT(dma_fence_referenced_p(fence));
 	KASSERT(spin_is_locked(fence->lock));
+
+	/* Determine whether signalling was enabled, and enable it.  */
+	already_enabled = test_and_set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT,
+	    &fence->flags);
 
 	/* If the fence was already signalled, fail with -ENOENT.  */
 	if (fence->flags & (1u << DMA_FENCE_FLAG_SIGNALED_BIT))
 		return -ENOENT;
 
 	/*
-	 * If the enable signaling callback has been called, success.
-	 * Otherwise, set the bit indicating it.
+	 * Otherwise, if it wasn't enabled yet, try to enable
+	 * signalling, or fail if the fence doesn't support that.
 	 */
-	if (test_and_set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &fence->flags))
-		return 0;
-
-	/* Otherwise, note that we've called it and call it.  */
-	KASSERT(fence->ops->enable_signaling);
-	if (!(*fence->ops->enable_signaling)(fence)) {
-		/* If it failed, signal and return -ENOENT.  */
-		dma_fence_signal_locked(fence);
-		return -ENOENT;
+	if (!already_enabled) {
+		if (fence->ops->enable_signaling == NULL)
+			return -ENOENT;
+		if (!(*fence->ops->enable_signaling)(fence)) {
+			/* If it failed, signal and return -ENOENT.  */
+			dma_fence_signal_locked(fence);
+			return -ENOENT;
+		}
 	}
 
 	/* Success!  */
