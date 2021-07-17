@@ -63,7 +63,7 @@ radix_tree_insert(struct radix_tree_root *root, unsigned long key, void *datum)
 	int error;
 
 	/* XXX No way to know whether the caller can sleep or not...  */
-	if ((kludge = kzalloc(sizeof(*kludge), GFP_NOWAIT)) == NULL)
+	if ((kludge = kzalloc(sizeof(*kludge), GFP_ATOMIC)) == NULL)
 		return -ENOMEM;
 
 	kludge->k_key = key;
