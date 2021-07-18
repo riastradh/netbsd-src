@@ -175,11 +175,11 @@ int drm_fb_helper_debug_enter_fb(struct drm_fb_helper *helper)
 			if (!mode_set->crtc->enabled)
 				continue;
 
-			funcs =	mode_set->crtc->helper_private;
-			if (funcs->mode_set_base_atomic == NULL)
+			if (drm_drv_uses_atomic_modeset(mode_set->crtc->dev))
 				continue;
 
-			if (drm_drv_uses_atomic_modeset(mode_set->crtc->dev))
+			funcs =	mode_set->crtc->helper_private;
+			if (funcs->mode_set_base_atomic == NULL)
 				continue;
 
 			funcs->mode_set_base_atomic(mode_set->crtc,
