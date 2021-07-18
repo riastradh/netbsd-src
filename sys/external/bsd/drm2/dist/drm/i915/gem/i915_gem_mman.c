@@ -1077,7 +1077,6 @@ i915_gem_mmap_object(struct drm_device *dev, off_t byte_offset, size_t nbytes,
 	}
 
 	/* Success!  */
-	drm_gem_object_get(&obj->base);
 	*uobjp = &obj->base.gemo_uvmobj;
 	*uoffsetp = 0;
 	return 0;
