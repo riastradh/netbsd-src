@@ -413,10 +413,15 @@ dma_fence_add_callback(struct dma_fence *fence, struct dma_fence_cb *fcb,
 	fcb->func = fn;
 	TAILQ_INSERT_TAIL(&fence->f_callbacks, fcb, fcb_entry);
 	fcb->fcb_onqueue = true;
+	ret = 0;
 
 	/* Release the lock and we're done.  */
 out1:	spin_unlock(fence->lock);
-out0:	return ret;
+out0:	if (ret) {
+		fcb->func = NULL;
+		fcb->fcb_onqueue = false;
+	}
+	return ret;
 }
 
 /*
