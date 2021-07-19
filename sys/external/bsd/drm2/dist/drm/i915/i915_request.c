@@ -614,6 +614,11 @@ static void __i915_request_dtor(void *arg)
 {
 	struct i915_request *rq = arg;
 
+#ifdef __NetBSD__
+	/* XXX pool cache does not guarantee this for us.  */
+	synchronize_rcu();
+#endif
+
 	dma_fence_destroy(&rq->fence);
 #ifdef __NetBSD__
 	i915_sw_fence_fini(&rq->submit);
