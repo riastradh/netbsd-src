@@ -708,7 +708,7 @@ top:
 	 * one.  If we can't, start over.
 	 */
 	if (fence) {
-		if (dma_fence_get_rcu(fence) == NULL)
+		if ((fence = dma_fence_get_rcu(fence)) == NULL)
 			goto restart;
 	}
 
