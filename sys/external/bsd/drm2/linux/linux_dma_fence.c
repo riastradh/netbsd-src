@@ -465,7 +465,8 @@ dma_fence_enable_sw_signaling(struct dma_fence *fence)
 	KASSERT(dma_fence_referenced_p(fence));
 
 	spin_lock(fence->lock);
-	(void)dma_fence_ensure_signal_enabled(fence);
+	if ((fence->flags & (1u << DMA_FENCE_FLAG_SIGNALED_BIT)) == 0)
+		(void)dma_fence_ensure_signal_enabled(fence);
 	spin_unlock(fence->lock);
 }
 
