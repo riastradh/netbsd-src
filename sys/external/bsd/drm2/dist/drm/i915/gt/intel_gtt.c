@@ -267,14 +267,16 @@ void clear_pages(struct i915_vma *vma)
 {
 	GEM_BUG_ON(!vma->pages);
 
-#ifdef __NetBSD__		/* XXX rotate pages */
-	GEM_BUG_ON(vma->pages != vma->obj->mm.pages);
-#else
 	if (vma->pages != vma->obj->mm.pages) {
+#ifdef __NetBSD__
+		if (vma->pages->sgl->sg_dmamap) {
+			bus_dma_tag_t dmat = vma->obj->base.dev->dmat;
+			bus_dmamap_destroy(dmat, vma->pages->sgl->sg_dmamap);
+		}
+#endif
 		sg_free_table(vma->pages);
 		kfree(vma->pages);
 	}
-#endif
 	vma->pages = NULL;
 
 	memset(&vma->page_sizes, 0, sizeof(vma->page_sizes));
