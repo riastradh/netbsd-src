@@ -35,15 +35,34 @@ __KERNEL_RCSID(0, "$NetBSD: i915_gem_userptr.c,v 1.1 2018/08/27 07:56:13 riastra
 #include "i915_drv.h"
 #include "../dist/drm/i915/gem/i915_gem_ioctls.h"
 
+#include <linux/nbsd-namespace.h>
+
+/*
+ * XXX this file is dumb and maybe shouldn't exist; it exists because
+ * riastradh is a lazybones
+ */
+
 int
-i915_gem_init_userptr(struct drm_i915_private *i915)
+i915_gem_init_userptr(struct drm_i915_private *dev_priv)
 {
+	mutex_init(&dev_priv->mm_lock);
+	hash_init(dev_priv->mm_structs);
+
+	dev_priv->mm.userptr_wq =
+		alloc_workqueue("i915-userptr-acquire",
+				WQ_HIGHPRI | WQ_UNBOUND,
+				0);
+	if (!dev_priv->mm.userptr_wq)
+		return -ENOMEM;
+
 	return 0;
 }
 
 void
-i915_gem_cleanup_userptr(struct drm_i915_private *i915)
+i915_gem_cleanup_userptr(struct drm_i915_private *dev_priv)
 {
+	destroy_workqueue(dev_priv->mm.userptr_wq);
+	mutex_destroy(&dev_priv->mm_lock);
 }
 
 int
