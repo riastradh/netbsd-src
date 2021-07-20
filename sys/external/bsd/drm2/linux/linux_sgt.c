@@ -160,8 +160,10 @@ dma_map_sg_attrs(bus_dma_tag_t dmat, struct scatterlist *sg, int nents,
 		flags |= BUS_DMA_READ;
 		break;
 	case DMA_BIDIRECTIONAL:
+		flags |= BUS_DMA_READ|BUS_DMA_WRITE;
 		break;
 	case DMA_NONE:
+	default:
 		panic("invalid DMA direction %d", dir);
 	}
 
@@ -181,6 +183,7 @@ dma_map_sg_attrs(bus_dma_tag_t dmat, struct scatterlist *sg, int nents,
 	KASSERT(sg->sg_dmamap->dm_nsegs > 0);
 	KASSERT(sg->sg_dmamap->dm_nsegs <= nents);
 	ret = sg->sg_dmamap->dm_nsegs;
+	error = 0;
 
 out:	if (error) {
 		if (loaded)
