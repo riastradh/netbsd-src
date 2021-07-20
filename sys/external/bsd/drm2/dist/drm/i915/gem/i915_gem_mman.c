@@ -434,9 +434,6 @@ static vm_fault_t vm_fault_gtt(struct vm_fault *vmf)
 				       PIN_MAPPABLE |
 				       PIN_NONBLOCK /* NOWARN */ |
 				       PIN_NOEVICT);
-#ifdef __NetBSD__		/* XXX i915 partial views */
-	(void)compute_partial_view;
-#else
 	if (IS_ERR(vma)) {
 		/* Use a partial view if it is bigger than available space */
 		struct i915_ggtt_view view =
@@ -462,7 +459,6 @@ static vm_fault_t vm_fault_gtt(struct vm_fault *vmf)
 		/* The entire mappable GGTT is pinned? Unexpected! */
 		GEM_BUG_ON(vma == ERR_PTR(-ENOSPC));
 	}
-#endif
 	if (IS_ERR(vma)) {
 		ret = PTR_ERR(vma);
 		goto err_reset;
