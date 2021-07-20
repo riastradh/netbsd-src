@@ -118,7 +118,7 @@ pm_runtime_forbid(struct device *dev __unused)
 static inline int
 pm_runtime_get_if_in_use(struct device *dev __unused)
 {
-	return 0;
+	return 1;
 }
 
 #endif  /* _LINUX_PM_RUNTIME_H_ */
