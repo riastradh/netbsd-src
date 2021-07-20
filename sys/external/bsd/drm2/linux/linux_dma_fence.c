@@ -306,6 +306,8 @@ dma_fence_release(struct kref *refcount)
 	struct dma_fence *fence = container_of(refcount, struct dma_fence,
 	    refcount);
 
+	KASSERTMSG(TAILQ_EMPTY(&fence->f_callbacks),
+	    "fence %p has pending callbacks", fence);
 	KASSERT(!dma_fence_referenced_p(fence));
 
 	if (fence->ops->release)
