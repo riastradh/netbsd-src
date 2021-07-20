@@ -118,7 +118,8 @@ compare_vma(void *cookie, const void *va, const void *vb)
 {
 	const struct i915_vma *a = va;
 	const struct i915_vma *b = vb;
-	long cmp = i915_vma_compare(__UNCONST(a), b->vm, &b->ggtt_view);
+	long cmp = i915_vma_compare(__UNCONST(a), b->vm,
+	    b->ggtt_view.type == I915_GGTT_VIEW_NORMAL ? NULL : &b->ggtt_view);
 
 	return (cmp < 0 ? -1 : cmp > 0 ? +1 : 0);
 }
