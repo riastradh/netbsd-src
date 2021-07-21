@@ -58,6 +58,7 @@ struct sg_table {
 	struct scatterlist {
 		struct page	**sg_pgs;
 		unsigned	sg_npgs;
+		bus_dma_tag_t	sg_dmat;
 		bus_dmamap_t	sg_dmamap;
 	} sgl[1];
 	unsigned	nents;

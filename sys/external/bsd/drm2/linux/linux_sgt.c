@@ -128,7 +128,10 @@ void
 sg_free_table(struct sg_table *sgt)
 {
 
-	KASSERT(sgt->sgl->sg_dmamap == NULL);
+	if (sgt->sgl->sg_dmamap) {
+		KASSERT(sgt->sgl->sg_dmat);
+		bus_dmamap_destroy(sgt->sgl->sg_dmat, sgt->sgl->sg_dmamap);
+	}
 	kfree(sgt->sgl->sg_pgs);
 	sgt->sgl->sg_pgs = NULL;
 	sgt->sgl->sg_npgs = 0;
@@ -182,6 +185,7 @@ dma_map_sg_attrs(bus_dma_tag_t dmat, struct scatterlist *sg, int nents,
 	/* Success! */
 	KASSERT(sg->sg_dmamap->dm_nsegs > 0);
 	KASSERT(sg->sg_dmamap->dm_nsegs <= nents);
+	sg->sg_dmat = dmat;
 	ret = sg->sg_dmamap->dm_nsegs;
 	error = 0;
 
