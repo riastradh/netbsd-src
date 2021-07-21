@@ -15275,9 +15275,9 @@ static void intel_atomic_helper_free_state_worker(struct work_struct *work)
 
 static int
 intel_atomic_commit_fence_wake(struct i915_sw_fence_waiter *waiter,
-    unsigned mode, int flags, void *cookie)
+    unsigned mode, int flags, void *not_a_cookie)
 {
-	struct intel_atomic_state *intel_state = cookie;
+	struct intel_atomic_state *intel_state = waiter->private;
 	struct drm_i915_private *dev_priv = to_i915(intel_state->base.dev);
 
 	spin_lock(&dev_priv->atomic_commit_lock);
