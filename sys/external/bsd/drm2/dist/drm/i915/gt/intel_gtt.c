@@ -268,12 +268,6 @@ void clear_pages(struct i915_vma *vma)
 	GEM_BUG_ON(!vma->pages);
 
 	if (vma->pages != vma->obj->mm.pages) {
-#ifdef __NetBSD__
-		if (vma->pages->sgl->sg_dmamap) {
-			bus_dma_tag_t dmat = vma->obj->base.dev->dmat;
-			bus_dmamap_destroy(dmat, vma->pages->sgl->sg_dmamap);
-		}
-#endif
 		sg_free_table(vma->pages);
 		kfree(vma->pages);
 	}

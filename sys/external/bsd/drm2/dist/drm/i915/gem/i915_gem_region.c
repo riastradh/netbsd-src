@@ -22,7 +22,6 @@ i915_gem_object_put_pages_buddy(struct drm_i915_gem_object *obj,
 	obj->mm.dirty = false;
 #ifdef __NetBSD__
 	bus_dmamap_unload(obj->base.dev->dmat, pages->sgl->sg_dmamap);
-	bus_dmamap_destroy(obj->base.dev->dmat, pages->sgl->sg_dmamap);
 #endif
 	sg_free_table(pages);
 	kfree(pages);
@@ -91,8 +90,11 @@ i915_gem_object_get_pages_buddy(struct drm_i915_gem_object *obj)
 	/* XXX errno NetBSD->Linux */
 	ret = -bus_dmamap_create(dmat, size, nsegs, size, 0, BUS_DMA_WAITOK,
 	    &sg->sg_dmamap);
-	if (ret)
+	if (ret) {
+		sg->sg_dmamap = NULL;
 		goto err;
+	}
+	sg->sg_dmat = dmat;
 
 	/* XXX errno NetBSD->Linux */
 	ret = -bus_dmamap_load_raw(dmat, sg->sg_dmamap, segs, nsegs, size,
@@ -153,8 +155,6 @@ i915_gem_object_get_pages_buddy(struct drm_i915_gem_object *obj)
 err:
 	if (loaded)
 		bus_dmamap_unload(dmat, st->sgl->sg_dmamap);
-	if (st->sgl->sg_dmamap)
-		bus_dmamap_destroy(dmat, st->sgl->sg_dmamap);
 	if (segs)
 		kmem_free(segs, nsegs * sizeof(segs[0]));
 	__intel_memory_region_put_pages_buddy(mem, blocks);
