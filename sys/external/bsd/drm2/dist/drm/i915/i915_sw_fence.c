@@ -165,9 +165,9 @@ struct i915_sw_fence_wq {
 
 static int
 autoremove_wake_function(struct i915_sw_fence_waiter *waiter, unsigned mode,
-    int flags, void *cookie)
+    int flags, void *donottouch_no_really)
 {
-	struct i915_sw_fence_wq *sfw = cookie;
+	struct i915_sw_fence_wq *sfw = waiter->private;
 
 	/* Caller presumably already completed the fence.  */
 	DRM_SPIN_WAKEUP_ALL(&sfw->wq, &sfw->fence->wait.lock);
