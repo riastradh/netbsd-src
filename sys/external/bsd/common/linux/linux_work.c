@@ -1449,20 +1449,13 @@ flush_workqueue_locked(struct workqueue_struct *wq)
 	gen = wq->wq_gen;
 
 	/*
-	 * If there's a batch of work in progress, we must wait for the
-	 * worker thread to finish that batch.
+	 * If there's any work in progress -- whether currently running
+	 * or queued to run -- we must wait for the worker thread to
+	 * finish that batch.
 	 */
-	if (wq->wq_current_work != NULL) {
-		gen++;
-		work_queued = true;
-	}
-
-	/*
-	 * If there's any work yet to be claimed from the queue by the
-	 * worker thread, we must wait for it to finish one more batch
-	 * too.
-	 */
-	if (!TAILQ_EMPTY(&wq->wq_queue) || !TAILQ_EMPTY(&wq->wq_dqueue)) {
+	if (wq->wq_current_work != NULL ||
+	    !TAILQ_EMPTY(&wq->wq_queue) ||
+	    !TAILQ_EMPTY(&wq->wq_dqueue)) {
 		gen++;
 		work_queued = true;
 	}
