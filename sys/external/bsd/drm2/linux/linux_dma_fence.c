@@ -644,6 +644,10 @@ dma_fence_signal_locked(struct dma_fence *fence)
 	if (test_and_set_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
 		return -EINVAL;
 
+	/* Set the timestamp.  */
+	fence->timestamp = ktime_get();
+	set_bit(DMA_FENCE_FLAG_TIMESTAMP_BIT, &fence->flags);
+
 	/* Wake waiters.  */
 	cv_broadcast(&fence->f_cv);
 
@@ -989,8 +993,9 @@ __dma_fence_signal(struct dma_fence *fence)
 /*
  * __dma_fence_signal_wake(fence)
  *
- *	Wake fence's waiters.  Caller must have previously called
- *	__dma_fence_signal and it must have previously returned true.
+ *	Set fence's timestamp and wake fence's waiters.  Caller must
+ *	have previously called __dma_fence_signal and it must have
+ *	previously returned true.
  */
 void
 __dma_fence_signal_wake(struct dma_fence *fence, ktime_t timestamp)
@@ -1003,6 +1008,10 @@ __dma_fence_signal_wake(struct dma_fence *fence, ktime_t timestamp)
 	spin_lock(fence->lock);
 
 	KASSERT(fence->flags & DMA_FENCE_FLAG_SIGNALED_BIT);
+
+	/* Set the timestamp.  */
+	fence->timestamp = timestamp;
+	set_bit(DMA_FENCE_FLAG_TIMESTAMP_BIT, &fence->flags);
 
 	/* Wake waiters.  */
 	cv_broadcast(&fence->f_cv);
