@@ -859,8 +859,13 @@ void i915_request_add_active_barriers(struct i915_request *rq)
 		KASSERT(active->cb.func == node_retire ||
 		    active->cb.func == excl_retire ||
 		    active->cb.func == i915_active_noop);
-		(void)dma_fence_add_callback(active->fence, &active->cb,
-		    active->cb.func);
+		dma_fence_func_t func = active->cb.func;
+		if (dma_fence_add_callback(active->fence, &active->cb, func)) {
+			printf("%s:%d active=%p fence=%p func=%p already signalled, firing callback\n", __func__, __LINE__, active, active->fence, active->cb.func);
+			spin_lock(&rq->lock);
+			(*func)(active->fence, &active->cb);
+			spin_unlock(&rq->lock);
+		}
 		spin_lock(&rq->lock);
 #else
 		list_add_tail((struct list_head *)node, &rq->fence.cb_list);
@@ -938,7 +943,15 @@ __i915_active_fence_set(struct i915_active_fence *active,
 	KASSERT(active->cb.func == node_retire ||
 	    active->cb.func == excl_retire ||
 	    active->cb.func == i915_active_noop);
-	dma_fence_add_callback(fence, &active->cb, active->cb.func);
+	printf("%s: fence=%p callback=%p func=%p\n", __func__,
+	    fence, &active->cb, active->cb.func);
+	dma_fence_func_t func = active->cb.func;
+	if (dma_fence_add_callback(fence, &active->cb, func)) {
+		printf("%s:%d active=%p fence=%p func=%p already signalled, firing callback\n", __func__, __LINE__, active, fence, func);
+		spin_lock(fence->lock);
+		(*func)(fence, &active->cb);
+		spin_unlock(fence->lock);
+	}
 #endif
 
 	return prev;
