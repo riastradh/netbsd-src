@@ -1457,6 +1457,12 @@ flush_workqueue(struct workqueue_struct *wq)
 {
 	struct flush_work fw;
 
+	if (lwp_getspecific(workqueue_key) == wq) {
+		printf("%s: running from workqueue %s\n", __func__,
+		    wq->wq_name);
+		return;
+	}
+
 	mutex_init(&fw.fw_lock, MUTEX_DEFAULT, IPL_VM);
 	cv_init(&fw.fw_cv, "lxwqflsh");
 	INIT_WORK(&fw.fw_work, &flush_work_cb);
