@@ -159,9 +159,9 @@ static void __gen8_ppgtt_cleanup(struct i915_address_space *vm,
 
 			__gen8_ppgtt_cleanup(vm, *pde, GEN8_PDES, lvl - 1);
 		} while (pde++, --count);
+		spin_lock_destroy(&pd->lock);
 	}
 
-	spin_lock_destroy(&pd->lock);
 	free_px(vm, pd);
 }
 
