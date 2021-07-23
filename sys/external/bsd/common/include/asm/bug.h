@@ -48,11 +48,19 @@
 	    : 0)
 
 #define	WARN_ONCE(CONDITION, FMT, ...)					\
-	WARN(CONDITION, FMT, ##__VA_ARGS__) /* XXX */
+({									\
+	static volatile unsigned __warn_once_done = 0;			\
+	linux_warning((CONDITION)					\
+	    ? (atomic_swap_uint(&__warn_once_done, 1) == 0		\
+		? (printf("warning: %s:%d: " FMT, __FILE__, __LINE__,	\
+			##__VA_ARGS__), 1)				\
+		: 1)							\
+	    : 0);							\
+})
 
 #define	WARN_ON(CONDITION)	WARN(CONDITION, "%s\n", #CONDITION)
 #define	WARN_ON_SMP(CONDITION)	WARN_ON(CONDITION) /* XXX */
-#define	WARN_ON_ONCE(CONDITION)	WARN_ON(CONDITION) /* XXX */
+#define	WARN_ON_ONCE(CONDITION)	WARN_ONCE(CONDITION, "%s\n", #CONDITION)
 
 /* XXX Kludge to avoid GCC warning about statements without effect.  */
 static inline int
