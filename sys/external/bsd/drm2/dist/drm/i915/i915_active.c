@@ -143,6 +143,10 @@ compare_nodes(void *cookie, const void *va, const void *vb)
 		return -1;
 	if (a->timeline > b->timeline)
 		return +1;
+	if ((uintptr_t)a < (uintptr_t)b)
+		return -1;
+	if ((uintptr_t)a > (uintptr_t)b)
+		return +1;
 	return 0;
 }
 
