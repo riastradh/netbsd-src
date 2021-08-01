@@ -228,8 +228,11 @@ static u64 __gen8_ppgtt_clear(struct i915_address_space * const vm,
 			start += count;
 		}
 
-		if (release_pd_entry(pd, idx, pt, scratch))
+		if (release_pd_entry(pd, idx, pt, scratch)) {
+			if (lvl)
+				spin_lock_destroy(&as_pd(pt)->lock);
 			free_px(vm, pt);
+		}
 	} while (idx++, --len);
 
 	return start;
