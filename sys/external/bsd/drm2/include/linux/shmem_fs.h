@@ -80,6 +80,8 @@ shmem_truncate_range(struct uvm_object *uobj, voff_t start, voff_t end)
 		KASSERT(0 <= start);
 		KASSERT(start <= end);
 	}
+
+	rw_enter(uobj->vmobjlock, RW_WRITER);
 	(*uobj->pgops->pgo_put)(uobj, start, end, flags);
 }
 
