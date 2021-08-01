@@ -1206,7 +1206,7 @@ void i915_vma_revoke_mmap(struct i915_vma *vma)
 	paddr_t pa = i915->ggtt.gmadr.start + vma->node.start;
 	vsize_t npgs = vma->size >> PAGE_SHIFT;
 	while (npgs --> 0)
-		pmap_pv_protect(pa = (npgs << PAGE_SHIFT), VM_PROT_NONE);
+		pmap_pv_protect(pa + (npgs << PAGE_SHIFT), VM_PROT_NONE);
 #else
 	node = &vma->mmo->vma_node;
 	vma_offset = vma->ggtt_view.partial.offset << PAGE_SHIFT;
