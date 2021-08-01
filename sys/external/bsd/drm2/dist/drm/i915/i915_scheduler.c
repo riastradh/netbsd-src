@@ -90,9 +90,9 @@ compare_priolists(void *cookie, const void *va, const void *vb)
 	const struct i915_priolist *a = va;
 	const struct i915_priolist *b = vb;
 
-	if (a->priority < b->priority)
-		return -1;
 	if (a->priority > b->priority)
+		return -1;
+	if (a->priority < b->priority)
 		return +1;
 	return 0;
 }
@@ -103,10 +103,10 @@ compare_priolist_key(void *cookie, const void *vp, const void *vk)
 	const struct i915_priolist *p = vp;
 	const int *priorityp = vk, priority = *priorityp;
 
-	if (p->priority < priority)
-		return -1;
 	if (p->priority > priority)
 		return -1;
+	if (p->priority < priority)
+		return +1;
 	return 0;
 }
 
