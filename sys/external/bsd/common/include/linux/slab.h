@@ -71,7 +71,7 @@ linux_gfp_to_kmem(gfp_t gfp)
 	 * rather than allocate memory without respecting parameters we
 	 * don't understand.
 	 */
-	KASSERT((gfp == GFP_ATOMIC) ||
+	KASSERT((gfp == GFP_ATOMIC) || (gfp == GFP_NOWAIT) ||
 	    ((gfp & ~__GFP_WAIT) == (GFP_KERNEL & ~__GFP_WAIT)));
 
 	if (ISSET(gfp, __GFP_WAIT)) {
