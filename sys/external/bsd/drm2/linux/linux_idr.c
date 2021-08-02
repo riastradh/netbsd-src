@@ -423,7 +423,6 @@ idr_for_each(struct idr *idr, int (*proc)(int, void *, void *), void *arg)
 	int error = 0;
 
 	/* XXX Caller must exclude modifications.  */
-	membar_consumer();
 	RB_TREE_FOREACH(node, &idr->idr_tree) {
 		error = (*proc)(node->in_index, node->in_data, arg);
 		if (error)
