@@ -1293,6 +1293,8 @@ excl:
 		 * assume the event is not ready.
 		 */
 		if (!claimed || callback) {
+			dma_fence_put(fence);
+			fence = NULL;
 			revents = 0;
 			break;
 		}
