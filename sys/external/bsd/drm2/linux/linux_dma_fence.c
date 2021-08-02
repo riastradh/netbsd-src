@@ -246,18 +246,21 @@ dma_fence_get_stub(void)
 /*
  * dma_fence_get(fence)
  *
- *	Acquire a reference to fence.  The fence must not be being
- *	destroyed.  Return the fence.
+ *	Acquire a reference to fence and return it, or return NULL if
+ *	fence is NULL.  The fence, if nonnull, must not be being
+ *	destroyed.
  */
 struct dma_fence *
 dma_fence_get(struct dma_fence *fence)
 {
 
+	if (fence == NULL)
+		return NULL;
+
 	KASSERTMSG(fence->f_magic != FENCE_MAGIC_BAD, "fence %p", fence);
 	KASSERTMSG(fence->f_magic == FENCE_MAGIC_GOOD, "fence %p", fence);
 
-	if (fence)
-		kref_get(&fence->refcount);
+	kref_get(&fence->refcount);
 	return fence;
 }
 
@@ -266,7 +269,7 @@ dma_fence_get(struct dma_fence *fence)
  *
  *	Attempt to acquire a reference to a fence that may be about to
  *	be destroyed, during a read section.  Return the fence on
- *	success, or NULL on failure.
+ *	success, or NULL on failure.  The fence must be nonnull.
  */
 struct dma_fence *
 dma_fence_get_rcu(struct dma_fence *fence)
