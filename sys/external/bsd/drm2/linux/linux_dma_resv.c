@@ -793,7 +793,7 @@ top:
 		dst_list->shared_count = 0;
 		for (i = 0; i < shared_count; i++) {
 			fence = atomic_load_relaxed(&src_list->shared[i]);
-			if ((fence = dma_fence_get_rcu(fence)) != NULL)
+			if ((fence = dma_fence_get_rcu(fence)) == NULL)
 				goto restart;
 			if (dma_fence_is_signaled(fence)) {
 				dma_fence_put(fence);
