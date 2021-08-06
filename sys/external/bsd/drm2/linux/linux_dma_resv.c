@@ -232,6 +232,18 @@ dma_resv_unlock(struct dma_resv *robj)
 }
 
 /*
+ * dma_resv_is_locked(robj)
+ *
+ *	True if robj is locked.
+ */
+bool
+dma_resv_is_locked(struct dma_resv *robj)
+{
+
+	return ww_mutex_is_locked(&robj->lock);
+}
+
+/*
  * dma_resv_held(robj)
  *
  *	True if robj is locked.

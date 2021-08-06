@@ -48,7 +48,6 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #ifndef __NetBSD__		/* XXX sysfs */
 static int amdgpu_debugfs_pm_init(struct amdgpu_device *adev);
-#endif
 
 static const struct cg_flag_name clocks[] = {
 	{AMD_CG_SUPPORT_GFX_MGCG, "Graphics Medium Grain Clock Gating"},
@@ -89,6 +88,7 @@ static const struct hwmon_temp_label {
 	{PP_TEMP_JUNCTION, "junction"},
 	{PP_TEMP_MEM, "mem"},
 };
+#endif	/* __NetBSD__ */
 
 void amdgpu_pm_acpi_event_handler(struct amdgpu_device *adev)
 {

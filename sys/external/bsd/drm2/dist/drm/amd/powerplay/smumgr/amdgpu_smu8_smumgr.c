@@ -45,6 +45,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "gca/gfx_8_0_sh_mask.h"
 #include "smumgr.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define SIZE_ALIGN_32(x)    (((x) + 31) / 32 * 32)
 
 static const enum smu8_scratch_entry firmware_list[] = {
@@ -100,7 +102,7 @@ static int smu8_send_msg_to_smc_with_parameter(struct pp_hwmgr *hwmgr,
 
 	elapsed_us = ktime_us_delta(ktime_get(), t_start);
 
-	WARN(result, "%s(0x%04x, %#x) timed out after %lld us\n",
+	WARN(result, "%s(0x%04x, %#x) timed out after %"PRId64" us\n",
 			__func__, msg, parameter, elapsed_us);
 
 	return result;

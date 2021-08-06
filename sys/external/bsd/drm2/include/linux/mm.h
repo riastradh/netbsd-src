@@ -36,6 +36,8 @@
 #include <uvm/uvm_object.h>
 
 #include <asm/page.h>
+
+#include <linux/pfn.h>
 #include <linux/shrinker.h>
 #include <linux/slab.h>
 #include <linux/sizes.h>

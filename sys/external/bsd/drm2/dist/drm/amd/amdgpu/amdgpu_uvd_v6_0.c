@@ -420,7 +420,7 @@ static int uvd_v6_0_sw_init(void *handle)
 	}
 
 	ring = &adev->uvd.inst->ring;
-	snprintf(ring->name, sizeof ring->naem, "uvd");
+	snprintf(ring->name, sizeof ring->name, "uvd");
 	r = amdgpu_ring_init(adev, ring, 512, &adev->uvd.inst->irq, 0);
 	if (r)
 		return r;

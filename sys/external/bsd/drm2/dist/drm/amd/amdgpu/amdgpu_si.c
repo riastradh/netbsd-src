@@ -55,6 +55,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "bif/bif_3_0_d.h"
 #include "bif/bif_3_0_sh_mask.h"
 
+#include <linux/nbsd-namespace.h>
+
 static const u32 tahiti_golden_registers[] =
 {
 	mmAZALIA_SCLK_CONTROL, 0x00000030, 0x00000011,
@@ -1654,6 +1656,7 @@ static void si_init_golden_registers(struct amdgpu_device *adev)
 
 static void si_pcie_gen3_enable(struct amdgpu_device *adev)
 {
+#ifndef __NetBSD__		/* XXX amdgpu pcie */
 	struct pci_dev *root = adev->pdev->bus->self;
 	u32 speed_cntl, current_data_rate;
 	int i;
@@ -1824,6 +1827,7 @@ static void si_pcie_gen3_enable(struct amdgpu_device *adev)
 			break;
 		udelay(1);
 	}
+#endif	/* __NetBSD__ */
 }
 
 static inline u32 si_pif_phy0_rreg(struct amdgpu_device *adev, u32 reg)
@@ -1998,6 +2002,9 @@ static void si_program_aspm(struct amdgpu_device *adev)
 
 			if (!disable_clkreq &&
 			    !pci_is_root_bus(adev->pdev->bus)) {
+#ifdef __NetBSD__		/* XXX amdgpu pcie */
+				clk_req_support = false;
+#else
 				struct pci_dev *root = adev->pdev->bus->self;
 				u32 lnkcap;
 
@@ -2005,6 +2012,7 @@ static void si_program_aspm(struct amdgpu_device *adev)
 				pcie_capability_read_dword(root, PCI_EXP_LNKCAP, &lnkcap);
 				if (lnkcap & PCI_EXP_LNKCAP_CLKPM)
 					clk_req_support = true;
+#endif
 			} else {
 				clk_req_support = false;
 			}
@@ -2075,6 +2083,7 @@ static void si_program_aspm(struct amdgpu_device *adev)
 
 static void si_fix_pci_max_read_req_size(struct amdgpu_device *adev)
 {
+#ifndef __NetBSD__		/* XXX amdgpu pcie */
 	int readrq;
 	u16 v;
 
@@ -2082,6 +2091,7 @@ static void si_fix_pci_max_read_req_size(struct amdgpu_device *adev)
 	v = ffs(readrq) - 8;
 	if ((v == 0) || (v == 6) || (v == 7))
 		pcie_set_readrq(adev->pdev, 512);
+#endif
 }
 
 static int si_common_hw_init(void *handle)

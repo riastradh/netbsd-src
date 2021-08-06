@@ -66,7 +66,7 @@ DMA_BIT_MASK(unsigned nbits)
 }
 
 static inline bool
-dma_addressing_limited(device_t *dev)
+dma_addressing_limited(device_t dev)
 {
 
 	return false;

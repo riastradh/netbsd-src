@@ -7487,6 +7487,7 @@ static void si_dpm_fini(struct amdgpu_device *adev)
 static void si_dpm_debugfs_print_current_performance_level(void *handle,
 						    struct seq_file *m)
 {
+#ifndef __NetBSD__		/* XXX amdgpu debugfs */
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct evergreen_power_info *eg_pi = evergreen_get_pi(adev);
 	struct amdgpu_ps *rps = &eg_pi->current_rps;
@@ -7504,6 +7505,7 @@ static void si_dpm_debugfs_print_current_performance_level(void *handle,
 		seq_printf(m, "power level %d    sclk: %u mclk: %u vddc: %u vddci: %u pcie gen: %u\n",
 			   current_index, pl->sclk, pl->mclk, pl->vddc, pl->vddci, pl->pcie_gen + 1);
 	}
+#endif
 }
 
 static int si_dpm_set_interrupt_state(struct amdgpu_device *adev,
