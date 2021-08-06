@@ -32,6 +32,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/bits.h>
 #include "smu_v11_0_i2c.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define EEPROM_I2C_TARGET_ADDR_ARCTURUS  0xA8
 #define EEPROM_I2C_TARGET_ADDR_VEGA20    0xA0
 

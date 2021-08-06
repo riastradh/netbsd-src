@@ -33,7 +33,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 int psm_init_power_state_table(struct pp_hwmgr *hwmgr)
 {
-	int result;
+	int result __unused;
 	unsigned int i;
 	unsigned int table_entries;
 	struct pp_power_state *state;

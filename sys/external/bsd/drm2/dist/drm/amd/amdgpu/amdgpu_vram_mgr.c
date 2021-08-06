@@ -39,6 +39,8 @@ struct amdgpu_vram_mgr {
 	atomic64_t vis_usage;
 };
 
+#ifndef __NetBSD__		/* XXX amdgpu sysfs */
+
 /**
  * DOC: mem_info_vram_total
  *
@@ -153,6 +155,8 @@ static DEVICE_ATTR(mem_info_vis_vram_used, S_IRUGO,
 static DEVICE_ATTR(mem_info_vram_vendor, S_IRUGO,
 		   amdgpu_mem_info_vram_vendor, NULL);
 
+#endif	/* __NetBSD__ */
+
 /**
  * amdgpu_vram_mgr_init - init VRAM manager and DRM MM
  *
@@ -176,6 +180,10 @@ static int amdgpu_vram_mgr_init(struct ttm_mem_type_manager *man,
 	spin_lock_init(&mgr->lock);
 	man->priv = mgr;
 
+#ifdef __NetBSD__	     /* XXX amdgpu sysfs */
+	__USE(adev);
+	__USE(ret);
+#else
 	/* Add the two VRAM-related sysfs files */
 	ret = device_create_file(adev->dev, &dev_attr_mem_info_vram_total);
 	if (ret) {
@@ -202,6 +210,7 @@ static int amdgpu_vram_mgr_init(struct ttm_mem_type_manager *man,
 		DRM_ERROR("Failed to create device file mem_info_vram_vendor\n");
 		return ret;
 	}
+#endif	/* __NetBSD__ */
 
 	return 0;
 }
@@ -224,11 +233,15 @@ static int amdgpu_vram_mgr_fini(struct ttm_mem_type_manager *man)
 	spin_unlock(&mgr->lock);
 	kfree(mgr);
 	man->priv = NULL;
+#ifdef __NetBSD__		/* XXX amdgpu sysfs */
+	__USE(adev);
+#else
 	device_remove_file(adev->dev, &dev_attr_mem_info_vram_total);
 	device_remove_file(adev->dev, &dev_attr_mem_info_vis_vram_total);
 	device_remove_file(adev->dev, &dev_attr_mem_info_vram_used);
 	device_remove_file(adev->dev, &dev_attr_mem_info_vis_vram_used);
 	device_remove_file(adev->dev, &dev_attr_mem_info_vram_vendor);
+#endif
 	return 0;
 }
 
@@ -508,7 +521,7 @@ static void amdgpu_vram_mgr_debug(struct ttm_mem_type_manager *man,
 	drm_mm_print(&mgr->mm, printer);
 	spin_unlock(&mgr->lock);
 
-	drm_printf(printer, "man size:%llu pages, ram usage:%lluMB, vis usage:%lluMB\n",
+	drm_printf(printer, "man size:%"PRIu64" pages, ram usage:%"PRIu64"MB, vis usage:%"PRIu64"MB\n",
 		   man->size, amdgpu_vram_mgr_usage(man) >> 20,
 		   amdgpu_vram_mgr_vis_usage(man) >> 20);
 }

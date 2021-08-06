@@ -84,6 +84,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "mxgpu_vi.h"
 #include "amdgpu_dm.h"
 
+#include <linux/nbsd-namespace.h>
+
 /*
  * Indirect registers accessor
  */

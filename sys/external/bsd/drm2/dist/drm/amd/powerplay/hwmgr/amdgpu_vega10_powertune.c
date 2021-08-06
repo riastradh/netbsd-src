@@ -656,7 +656,7 @@ static const struct vega10_didt_config_reg   PSMSEEDCStallDelayConfig_Vega10[] =
 	{   0xFFFFFFFF  }  /* End of list */
 };
 
-static const struct vega10_didt_config_reg   PSMSEEDCThresholdConfig_Vega10[] =
+static const struct vega10_didt_config_reg   PSMSEEDCThresholdConfig_Vega10[] __unused =
 {
 /* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  *      Offset                             Mask                                                 Shift                                                  Value
@@ -712,7 +712,7 @@ static const struct vega10_didt_config_reg   PSMSEEDCCtrlConfig_Vega10[] =
 	{   0xFFFFFFFF  }  /* End of list */
 };
 
-static const struct vega10_didt_config_reg   PSMGCEDCThresholdConfig_vega10[] =
+static const struct vega10_didt_config_reg   PSMGCEDCThresholdConfig_vega10[] __unused =
 {
 /* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  *      Offset                             Mask                                                 Shift                                                  Value

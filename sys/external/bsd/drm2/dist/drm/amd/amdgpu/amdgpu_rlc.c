@@ -101,7 +101,7 @@ int amdgpu_gfx_rlc_init_sr(struct amdgpu_device *adev, u32 dws)
 				      AMDGPU_GEM_DOMAIN_VRAM,
 				      &adev->gfx.rlc.save_restore_obj,
 				      &adev->gfx.rlc.save_restore_gpu_addr,
-				      (void **)&adev->gfx.rlc.sr_ptr);
+				      (void **)__UNVOLATILE(&adev->gfx.rlc.sr_ptr));
 	if (r) {
 		dev_warn(adev->dev, "(%d) create RLC sr bo failed\n", r);
 		amdgpu_gfx_rlc_fini(adev);
@@ -138,7 +138,7 @@ int amdgpu_gfx_rlc_init_csb(struct amdgpu_device *adev)
 				      AMDGPU_GEM_DOMAIN_VRAM,
 				      &adev->gfx.rlc.clear_state_obj,
 				      &adev->gfx.rlc.clear_state_gpu_addr,
-				      (void **)&adev->gfx.rlc.cs_ptr);
+				      (void **)__UNVOLATILE(&adev->gfx.rlc.cs_ptr));
 	if (r) {
 		dev_err(adev->dev, "(%d) failed to create rlc csb bo\n", r);
 		amdgpu_gfx_rlc_fini(adev);
@@ -164,7 +164,7 @@ int amdgpu_gfx_rlc_init_cpt(struct amdgpu_device *adev)
 				      PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM,
 				      &adev->gfx.rlc.cp_table_obj,
 				      &adev->gfx.rlc.cp_table_gpu_addr,
-				      (void **)&adev->gfx.rlc.cp_table_ptr);
+				      (void **)__UNVOLATILE(&adev->gfx.rlc.cp_table_ptr));
 	if (r) {
 		dev_err(adev->dev, "(%d) failed to create cp table bo\n", r);
 		amdgpu_gfx_rlc_fini(adev);
@@ -264,16 +264,16 @@ void amdgpu_gfx_rlc_fini(struct amdgpu_device *adev)
 	if (adev->gfx.rlc.save_restore_obj) {
 		amdgpu_bo_free_kernel(&adev->gfx.rlc.save_restore_obj,
 				      &adev->gfx.rlc.save_restore_gpu_addr,
-				      (void **)&adev->gfx.rlc.sr_ptr);
+				      (void **)__UNVOLATILE(&adev->gfx.rlc.sr_ptr));
 	}
 
 	/* clear state block */
 	amdgpu_bo_free_kernel(&adev->gfx.rlc.clear_state_obj,
 			      &adev->gfx.rlc.clear_state_gpu_addr,
-			      (void **)&adev->gfx.rlc.cs_ptr);
+			      (void **)__UNVOLATILE(&adev->gfx.rlc.cs_ptr));
 
 	/* jump table block */
 	amdgpu_bo_free_kernel(&adev->gfx.rlc.cp_table_obj,
 			      &adev->gfx.rlc.cp_table_gpu_addr,
-			      (void **)&adev->gfx.rlc.cp_table_ptr);
+			      (void **)__UNVOLATILE(&adev->gfx.rlc.cp_table_ptr));
 }

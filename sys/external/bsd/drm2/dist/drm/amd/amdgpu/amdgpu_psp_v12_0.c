@@ -77,7 +77,7 @@ static int psp_v12_0_init_microcode(struct psp_context *psp)
 	adev->psp.asd_fw_version = le32_to_cpu(asd_hdr->header.ucode_version);
 	adev->psp.asd_feature_version = le32_to_cpu(asd_hdr->ucode_feature_version);
 	adev->psp.asd_ucode_size = le32_to_cpu(asd_hdr->header.ucode_size_bytes);
-	adev->psp.asd_start_addr = (uint8_t *)asd_hdr +
+	adev->psp.asd_start_addr = (const uint8_t *)asd_hdr +
 				le32_to_cpu(asd_hdr->header.ucode_array_offset_bytes);
 
 	return 0;

@@ -832,7 +832,7 @@ static int amdgpu_uvd_cs_pass2(struct amdgpu_uvd_cs_ctx *ctx)
 
 	r = amdgpu_cs_find_mapping(ctx->parser, addr, &bo, &mapping);
 	if (r) {
-		DRM_ERROR("Can't find BO for addr 0x%08Lx\n", addr);
+		DRM_ERROR("Can't find BO for addr 0x%08"PRIx64"\n", addr);
 		return r;
 	}
 

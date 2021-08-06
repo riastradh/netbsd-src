@@ -422,6 +422,12 @@ uint64_t	atomic64_cmpxchg(struct atomic64 *, uint64_t, uint64_t);
 
 #endif
 
+static inline void
+atomic64_inc(struct atomic64 *a)
+{
+	atomic64_add(1, a);
+}
+
 static inline int64_t
 atomic64_inc_return(struct atomic64 *a)
 {

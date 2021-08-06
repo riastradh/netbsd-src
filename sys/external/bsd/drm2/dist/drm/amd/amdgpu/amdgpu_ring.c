@@ -40,6 +40,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "amdgpu.h"
 #include "atom.h"
 
+#include <linux/nbsd-namespace.h>
+
 /*
  * Rings
  * Most engines on the GPU are fed via ring buffers.  Ring
@@ -324,7 +326,7 @@ int amdgpu_ring_init(struct amdgpu_device *adev, struct amdgpu_ring *ring,
 					    AMDGPU_GEM_DOMAIN_GTT,
 					    &ring->ring_obj,
 					    &ring->gpu_addr,
-					    (void **)&ring->ring);
+					    (void **)__UNVOLATILE(&ring->ring));
 		if (r) {
 			dev_err(adev->dev, "(%d) ring create failed\n", r);
 			return r;
@@ -370,7 +372,7 @@ void amdgpu_ring_fini(struct amdgpu_ring *ring)
 
 	amdgpu_bo_free_kernel(&ring->ring_obj,
 			      &ring->gpu_addr,
-			      (void **)&ring->ring);
+			      (void **)__UNVOLATILE(&ring->ring));
 
 	amdgpu_debugfs_ring_fini(ring);
 
