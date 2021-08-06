@@ -254,7 +254,7 @@ static void rn_dump_clk_registers(struct clk_state_registers_and_bypass *regs_an
 		struct clk_mgr *clk_mgr_base, struct clk_log_info *log_info)
 {
 	struct rn_clk_internal internal = {0};
-	char *bypass_clks[5] = {"0x0 DFS", "0x1 REFCLK", "0x2 ERROR", "0x3 400 FCH", "0x4 600 FCH"};
+	const char *bypass_clks[5] = {"0x0 DFS", "0x1 REFCLK", "0x2 ERROR", "0x3 400 FCH", "0x4 600 FCH"};
 	unsigned int chars_printed = 0;
 	unsigned int remaining_buffer = log_info->bufSize;
 

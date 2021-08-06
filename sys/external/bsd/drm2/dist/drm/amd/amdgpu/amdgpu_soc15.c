@@ -82,6 +82,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "amdgpu_xgmi.h"
 #include <uapi/linux/kfd_ioctl.h>
 
+#include <linux/nbsd-namespace.h>
+
 #define mmMP0_MISC_CGTT_CTRL0                                                                   0x01b9
 #define mmMP0_MISC_CGTT_CTRL0_BASE_IDX                                                          0
 #define mmMP0_MISC_LIGHT_SLEEP_CTRL                                                             0x01ba

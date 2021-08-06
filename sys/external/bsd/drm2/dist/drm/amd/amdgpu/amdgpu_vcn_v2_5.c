@@ -40,6 +40,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "vcn/vcn_2_5_sh_mask.h"
 #include "ivsrcid/vcn/irqsrcs_vcn_2_0.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define mmUVD_CONTEXT_ID_INTERNAL_OFFSET			0x27
 #define mmUVD_GPCOM_VCPU_CMD_INTERNAL_OFFSET			0x0f
 #define mmUVD_GPCOM_VCPU_DATA0_INTERNAL_OFFSET			0x10
@@ -194,7 +196,7 @@ static int vcn_v2_5_sw_init(void *handle)
 
 		ring->doorbell_index = (adev->doorbell_index.vcn.vcn_ring0_1 << 1) +
 				(amdgpu_sriov_vf(adev) ? 2*j : 8*j);
-		sprintf(ring->name, "vcn_dec_%d", j);
+		snprintf(ring->name, sizeof(ring->name), "vcn_dec_%d", j);
 		r = amdgpu_ring_init(adev, ring, 512, &adev->vcn.inst[j].irq, 0);
 		if (r)
 			return r;
@@ -206,7 +208,7 @@ static int vcn_v2_5_sw_init(void *handle)
 			ring->doorbell_index = (adev->doorbell_index.vcn.vcn_ring0_1 << 1) +
 					(amdgpu_sriov_vf(adev) ? (1 + i + 2*j) : (2 + i + 8*j));
 
-			sprintf(ring->name, "vcn_enc_%d.%d", j, i);
+			snprintf(ring->name, sizeof(ring->name), "vcn_enc_%d.%d", j, i);
 			r = amdgpu_ring_init(adev, ring, 512, &adev->vcn.inst[j].irq, 0);
 			if (r)
 				return r;
@@ -534,7 +536,7 @@ static void vcn_v2_5_mc_resume_dpg_mode(struct amdgpu_device *adev, int inst_idx
 static void vcn_v2_5_disable_clock_gating(struct amdgpu_device *adev)
 {
 	uint32_t data;
-	int ret = 0;
+	int ret __unused = 0;
 	int i;
 
 	for (i = 0; i < adev->vcn.num_vcn_inst; ++i) {
@@ -1132,7 +1134,7 @@ static int vcn_v2_5_sriov_start(struct amdgpu_device *adev)
 	uint32_t table_size = 0;
 	struct mmsch_v1_0_cmd_direct_write direct_wt = { { 0 } };
 	struct mmsch_v1_0_cmd_direct_read_modify_write direct_rd_mod_wt = { { 0 } };
-	struct mmsch_v1_0_cmd_direct_polling direct_poll = { { 0 } };
+	struct mmsch_v1_0_cmd_direct_polling direct_poll __unused = { { 0 } };
 	struct mmsch_v1_0_cmd_end end = { { 0 } };
 	uint32_t *init_table = adev->virt.mm_table.cpu_addr;
 	struct mmsch_v1_1_init_header *header = (struct mmsch_v1_1_init_header *)init_table;
@@ -1269,7 +1271,7 @@ static int vcn_v2_5_sriov_start(struct amdgpu_device *adev)
 
 static int vcn_v2_5_stop_dpg_mode(struct amdgpu_device *adev, int inst_idx)
 {
-	int ret_code = 0;
+	int ret_code __unused = 0;
 	uint32_t tmp;
 
 	/* Wait for power status to be 1 */

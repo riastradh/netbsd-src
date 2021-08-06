@@ -28,6 +28,7 @@
 #define ATOM_H
 
 #include <linux/types.h>
+#include <linux/mutex.h>
 
 struct drm_device;
 

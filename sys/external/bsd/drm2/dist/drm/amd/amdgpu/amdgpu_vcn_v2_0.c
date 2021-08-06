@@ -39,6 +39,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "vcn/vcn_2_0_0_sh_mask.h"
 #include "ivsrcid/vcn/irqsrcs_vcn_2_0.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define mmUVD_CONTEXT_ID_INTERNAL_OFFSET			0x1fd
 #define mmUVD_GPCOM_VCPU_CMD_INTERNAL_OFFSET			0x503
 #define mmUVD_GPCOM_VCPU_DATA0_INTERNAL_OFFSET			0x504
@@ -133,7 +135,7 @@ static int vcn_v2_0_sw_init(void *handle)
 	ring->use_doorbell = true;
 	ring->doorbell_index = adev->doorbell_index.vcn.vcn_ring0_1 << 1;
 
-	sprintf(ring->name, "vcn_dec");
+	snprintf(ring->name, sizeof(ring->name), "vcn_dec");
 	r = amdgpu_ring_init(adev, ring, 512, &adev->vcn.inst->irq, 0);
 	if (r)
 		return r;
@@ -160,7 +162,7 @@ static int vcn_v2_0_sw_init(void *handle)
 		ring = &adev->vcn.inst->ring_enc[i];
 		ring->use_doorbell = true;
 		ring->doorbell_index = (adev->doorbell_index.vcn.vcn_ring0_1 << 1) + 2 + i;
-		sprintf(ring->name, "vcn_enc%d", i);
+		snprintf(ring->name, sizeof(ring->name), "vcn_enc%d", i);
 		r = amdgpu_ring_init(adev, ring, 512, &adev->vcn.inst->irq, 0);
 		if (r)
 			return r;
@@ -661,7 +663,7 @@ static void vcn_v2_0_enable_clock_gating(struct amdgpu_device *adev)
 static void vcn_v2_0_disable_static_power_gating(struct amdgpu_device *adev)
 {
 	uint32_t data = 0;
-	int ret;
+	int ret __unused;
 
 	if (adev->pg_flags & AMD_PG_SUPPORT_VCN) {
 		data = (1 << UVD_PGFSM_CONFIG__UVDM_PWR_CONFIG__SHIFT
@@ -708,7 +710,7 @@ static void vcn_v2_0_disable_static_power_gating(struct amdgpu_device *adev)
 static void vcn_v2_0_enable_static_power_gating(struct amdgpu_device *adev)
 {
 	uint32_t data = 0;
-	int ret;
+	int ret __unused;
 
 	if (adev->pg_flags & AMD_PG_SUPPORT_VCN) {
 		/* Before power off, this indicator has to be turned on */
@@ -1039,7 +1041,7 @@ static int vcn_v2_0_start(struct amdgpu_device *adev)
 
 static int vcn_v2_0_stop_dpg_mode(struct amdgpu_device *adev)
 {
-	int ret_code = 0;
+	int ret_code __unused = 0;
 	uint32_t tmp;
 
 	/* Wait for power status to be 1 */

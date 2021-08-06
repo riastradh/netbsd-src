@@ -140,6 +140,9 @@ struct amdgpu_gmc {
 	 */
 	resource_size_t		aper_size;
 	resource_size_t		aper_base;
+#ifdef __NetBSD__
+	bus_space_tag_t		aper_tag;
+#endif
 	/* for some chips with <= 32MB we need to lie
 	 * about vram size near mc fb location */
 	u64			mc_vram_size;

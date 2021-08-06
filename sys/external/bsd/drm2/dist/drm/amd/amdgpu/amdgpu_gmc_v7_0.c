@@ -385,6 +385,10 @@ static int gmc_v7_0_mc_init(struct amdgpu_device *adev)
 	adev->gmc.aper_base = pci_resource_start(adev->pdev, 0);
 	adev->gmc.aper_size = pci_resource_len(adev->pdev, 0);
 
+#ifdef __NetBSD__
+	adev->gmc.aper_tag = adev->pdev->pd_pa.pa_memt;
+#endif
+
 #ifdef CONFIG_X86_64
 	if (adev->flags & AMD_IS_APU &&
 	    adev->gmc.real_vram_size > adev->gmc.aper_size) {

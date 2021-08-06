@@ -682,7 +682,7 @@ int smu_v11_0_i2c_eeprom_control_init(struct i2c_adapter *control)
 
 	control->owner = THIS_MODULE;
 	control->class = I2C_CLASS_SPD;
-	control->dev.parent = &adev->pdev->dev;
+	control->dev.parent = pci_dev_dev(adev->pdev);
 	control->algo = &smu_v11_0_i2c_eeprom_i2c_algo;
 	snprintf(control->name, sizeof(control->name), "RAS EEPROM");
 	control->lock_ops = &smu_v11_0_i2c_i2c_lock_ops;

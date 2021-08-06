@@ -46,6 +46,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include "ivsrcid/vce/irqsrcs_vce_4_0.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define VCE_STATUS_VCPU_REPORT_FW_LOADED_MASK	0x02
 
 #define VCE_V4_0_FW_SIZE	(384 * 1024)
@@ -468,7 +470,7 @@ static int vce_v4_0_sw_init(void *handle)
 
 	for (i = 0; i < adev->vce.num_rings; i++) {
 		ring = &adev->vce.ring[i];
-		sprintf(ring->name, "vce%d", i);
+		snprintf(ring->name, sizeof(ring->name), "vce%d", i);
 		if (amdgpu_sriov_vf(adev)) {
 			/* DOORBELL only works under SRIOV */
 			ring->use_doorbell = true;
