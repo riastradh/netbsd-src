@@ -501,7 +501,7 @@ static int arcturus_check_powerplay_table(struct smu_context *smu)
 
 static int arcturus_store_powerplay_table(struct smu_context *smu)
 {
-	struct smu_11_0_powerplay_table *powerplay_table = NULL;
+	const struct smu_11_0_powerplay_table *powerplay_table = NULL;
 	struct smu_table_context *table_context = &smu->smu_table;
 	struct smu_baco_context *smu_baco = &smu->smu_baco;
 	int ret = 0;

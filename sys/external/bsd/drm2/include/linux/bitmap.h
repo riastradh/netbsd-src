@@ -167,6 +167,22 @@ bitmap_clear(unsigned long *bitmap, size_t startbit, size_t nbits)
 }
 
 /*
+ * bitmap_copy(dst, src, nbits)
+ *
+ *	Copy the bitmap from src to dst.  dst and src may alias (but
+ *	why would you bother?).
+ */
+static inline void
+bitmap_copy(unsigned long *dst, const unsigned long *src, size_t nbits)
+{
+	const size_t bpl = NBBY * sizeof(unsigned long);
+	size_t n = howmany(nbits, bpl);
+
+	while (n --> 0)
+		*dst++ = *src++;
+}
+
+/*
  * bitmap_complement(dst, src, nbits)
  *
  *	Set dst to the the bitwise NOT of src.  dst and src may alias.
@@ -197,6 +213,24 @@ bitmap_and(unsigned long *dst, const unsigned long *src1,
 
 	while (n --> 0)
 		*dst++ = *src1++ & *src2++;
+}
+
+/*
+ * bitmap_andnot(dst, src1, src2, nbits)
+ *
+ *	Set dst to be the bitwise AND of src1 and ~src2, all bitmaps
+ *	allocated to have nbits bits.  Yes, this modifies bits past
+ *	nbits.  Any pair of {dst, src1, src2} may be aliases.
+ */
+static inline void
+bitmap_andnot(unsigned long *dst, const unsigned long *src1,
+    const unsigned long *src2, size_t nbits)
+{
+	const size_t bpl = NBBY * sizeof(unsigned long);
+	size_t n = howmany(nbits, bpl);
+
+	while (n --> 0)
+		*dst++ = *src1++ & ~*src2++;
 }
 
 /*

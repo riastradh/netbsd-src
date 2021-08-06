@@ -34,6 +34,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <linux/io.h>
 #include <linux/list.h>
 #include <linux/slab.h>
 
@@ -476,7 +477,7 @@ static bool amdgpu_bo_validate_size(struct amdgpu_device *adev,
 	return true;
 
 fail:
-	DRM_DEBUG("BO size %lu > total memory in domain: %llu\n", size,
+	DRM_DEBUG("BO size %lu > total memory in domain: %"PRIu64"\n", size,
 		  man->size << PAGE_SHIFT);
 	return false;
 }

@@ -36,6 +36,7 @@
 
 #include <dev/wsfb/genfbvar.h>
 
+struct drm_device;
 struct drm_fb_helper;
 struct drm_fb_helper_surface_sizes;
 

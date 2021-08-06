@@ -973,6 +973,10 @@ static int gmc_v9_0_mc_init(struct amdgpu_device *adev)
 	adev->gmc.aper_base = pci_resource_start(adev->pdev, 0);
 	adev->gmc.aper_size = pci_resource_len(adev->pdev, 0);
 
+#ifdef __NetBSD__
+	adev->gmc.aper_tag = adev->pdev->pd_pa.pa_memt;
+#endif
+
 #ifdef CONFIG_X86_64
 	if (adev->flags & AMD_IS_APU) {
 		adev->gmc.aper_base = gfxhub_v1_0_get_mc_fb_offset(adev);
