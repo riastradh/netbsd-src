@@ -276,8 +276,7 @@ static int radeonfb_create(struct drm_fb_helper *helper,
 	rfa.rfa_fb_linebytes = mode_cmd.pitches[0];
 
 	helper->fbdev = config_found(rdev->ddev->dev, &rfa, NULL,
-	    CFARG_IATTR, "radeonfbbus",
-	    CFARG_EOL);
+	    CFARGS(.iattr = "radeonfbbus"));
 	if (helper->fbdev == NULL) {
 		DRM_ERROR("failed to attach genfb\n");
 		goto out_unref;
