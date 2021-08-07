@@ -261,8 +261,7 @@ static int amdgpufb_create(struct drm_fb_helper *helper,
 	afa.afa_fb_linebytes = mode_cmd.pitches[0];
 
 	helper->fbdev = config_found(adev->ddev->dev, &afa, NULL,
-	    CFARG_IATTR, "amdgpufbbus",
-	    CFARG_EOL);
+	    CFARGS(.iattr = "amdgpufbbus"));
 	if (helper->fbdev == NULL) {
 		DRM_ERROR("failed to attach amdgpufb\n");
 		goto out_unref;

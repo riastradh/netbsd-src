@@ -252,8 +252,7 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	 * dev->struct_mutex.
 	 */
 	helper->fbdev = config_found(dev->dev, &ifa, NULL,
-	    CFARG_IATTR, "intelfbbus",
-	    CFARG_EOL);
+	    CFARGS(.iattr = "intelfbbus"));
 	if (helper->fbdev == NULL) {
 		DRM_ERROR("unable to attach intelfb\n");
 		ret = -ENXIO;
