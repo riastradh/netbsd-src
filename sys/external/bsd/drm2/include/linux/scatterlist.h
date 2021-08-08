@@ -34,6 +34,8 @@
 
 #include <sys/bus.h>
 
+#include <asm/io.h>
+
 #include <linux/mm.h>
 #include <linux/mm_types.h>
 #include <linux/gfp.h>
