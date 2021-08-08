@@ -79,7 +79,7 @@ __struct_size(size_t basesize, size_t elemsize, size_t nelem)
 
 #define	struct_size(p, member, n)					      \
 ({									      \
-	CTASSERT(sizeof(*(p)) == offsetof(__typeof__(*(p)), member));	      \
+	CTASSERT(sizeof(*(p)) >= offsetof(__typeof__(*(p)), member));	      \
 	__struct_size(sizeof(*(p)), sizeof((p)->member[0]), (n));	      \
 })
 
