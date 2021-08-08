@@ -39,6 +39,7 @@
 #include <uvm/uvm_extern.h>	/* For PAGE_SIZE.  */
 
 #include <linux/gfp.h>
+#include <linux/overflow.h>
 #include <linux/rcupdate.h>
 
 #define	ARCH_KMALLOC_MINALIGN	4 /* XXX ??? */
