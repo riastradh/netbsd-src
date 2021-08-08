@@ -36,6 +36,7 @@
 #include <sys/endian.h>
 #include <sys/kernel.h>
 #include <sys/time.h>
+#include <sys/timevar.h>
 
 #include <linux/jiffies.h>
 #include <linux/time.h>
@@ -214,6 +215,12 @@ static inline bool
 ktime_after(ktime_t a, ktime_t b)
 {
 	return ktime_to_ns(a) > ktime_to_ns(b);
+}
+
+static inline time_t
+ktime_get_real_seconds(void)
+{
+	return time_second;
 }
 
 #endif  /* _LINUX_KTIME_H_ */
