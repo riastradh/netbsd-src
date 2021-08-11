@@ -57,4 +57,17 @@ fs_reclaim_release(gfp_t gfp)
 {
 }
 
+static inline unsigned
+memalloc_nofs_save(void)
+{
+	return 0xeb13162c;
+}
+
+static inline void
+memalloc_nofs_restore(unsigned flags)
+{
+
+	KASSERT(flags == 0xeb13162c);
+}
+
 #endif	/* _LINUX_SCHED_MM_H_ */
