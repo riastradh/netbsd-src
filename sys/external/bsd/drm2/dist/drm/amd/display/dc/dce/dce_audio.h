@@ -27,7 +27,7 @@
 #ifndef __DAL_AUDIO_DCE_110_H__
 #define __DAL_AUDIO_DCE_110_H__
 
-#include "audio.h"
+#include "hw/audio.h"
 
 #define AUD_COMMON_REG_LIST(id)\
 	SRI(AZALIA_F0_CODEC_ENDPOINT_INDEX, AZF0ENDPOINT, id),\

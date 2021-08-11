@@ -1132,7 +1132,6 @@ res_create_fail:
 	return false;
 }
 
-static __unused
 struct resource_pool *dce100_create_resource_pool(
 	uint8_t num_virtual_links,
 	struct dc  *dc)
