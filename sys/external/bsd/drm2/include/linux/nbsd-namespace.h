@@ -46,4 +46,7 @@
 /* Disable our historic malloc(9) compatibility macro.  */
 #undef	free
 
+/* This should not appear in NetBSD code -- we do not sprintf!  */
+#define	sprintf(BUF, FMT, ARGS...)	snprintf(BUF, SIZE_MAX, FMT, ##ARGS)
+
 #endif  /* _LINUX_NBSD_NAMESPACE_H_ */
