@@ -40,6 +40,7 @@
 	/* nothing */
 
 #define	DEFINE_EVENT(CLASS, NAME, PROTOTYPE, ARGS)			      \
-	static inline void trace_##NAME PROTOTYPE {}
+	static inline void trace_##NAME PROTOTYPE {}			      \
+	static inline bool trace_##NAME##_enabled(void) { return false; }
 
 #endif	/* _LINUX_TRACEPOINT_H_ */
