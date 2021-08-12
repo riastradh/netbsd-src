@@ -35,15 +35,26 @@
 #include <sys/stdbool.h>
 
 #include <linux/dma-fence.h>
+#include <linux/irq_work.h>
 
 #define	dma_fence_array_create		linux_dma_fence_array_create
 #define	dma_fence_is_array		linux_dma_fence_is_array
 #define	to_dma_fence_array		linux_to_dma_fence_array
 
+struct dma_fence_array_cb {
+	struct dma_fence_array	*dfac_array;
+	struct dma_fence_cb	dfac_cb;
+};
+
 struct dma_fence_array {
-	struct dma_fence	base;
-	struct dma_fence	**fences;
-	unsigned		num_fences;
+	struct dma_fence		base;
+	struct dma_fence		**fences;
+	unsigned			num_fences;
+
+	spinlock_t			dfa_lock;
+	int				dfa_npending;
+	struct irq_work			dfa_work;
+	struct dma_fence_array_cb	dfa_cb[];
 };
 
 struct dma_fence_array *
