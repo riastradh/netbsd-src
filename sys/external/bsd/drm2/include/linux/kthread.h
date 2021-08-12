@@ -32,4 +32,29 @@
 #ifndef _LINUX_KTHREAD_H_
 #define _LINUX_KTHREAD_H_
 
+struct task_struct;
+
+#define	__kthread_should_park	linux___kthread_should_park
+#define	kthread_park		linux_kthread_park
+#define	kthread_parkme		linux_kthread_parkme
+#define	kthread_run		linux_kthread_run
+#define	kthread_should_park	linux_kthread_should_park
+#define	kthread_should_stop	linux_kthread_should_stop
+#define	kthread_stop		linux_kthread_stop
+#define	kthread_unpark		linux_kthread_unpark
+
+struct task_struct *kthread_run(int (*)(void *), void *, const char *);
+
+int kthread_stop(struct task_struct *);
+int kthread_should_stop(void);
+
+void kthread_park(struct task_struct *);
+void kthread_unpark(struct task_struct *);
+int __kthread_should_park(struct task_struct *);
+int kthread_should_park(void);
+void kthread_parkme(void);
+
+int linux_kthread_init(void);
+void linux_kthread_fini(void);
+
 #endif  /* _LINUX_KTHREAD_H_ */

@@ -42,6 +42,7 @@ __KERNEL_RCSID(0, "$NetBSD: linux_module.c,v 1.9 2018/08/27 15:08:54 riastradh E
 #include <linux/idr.h>
 #include <linux/io.h>
 #include <linux/irq_work.h>
+#include <linux/kthread.h>
 #include <linux/mutex.h>
 #include <linux/rcupdate.h>
 #include <linux/tasklet.h>
@@ -104,12 +105,19 @@ linux_init(void)
 		goto fail7;
 	}
 
+	error = linux_kthread_init();
+	if (error) {
+		printf("linux: unable to initialize kthread: %d\n", error);
+		goto fail8;
+	}
+
 	linux_irq_work_init();
 
 	return 0;
 
-fail8: __unused
-	linux_wait_bit_fini();
+fail9: __unused
+	linux_kthread_fini();
+fail8:	linux_wait_bit_fini();
 fail7:	linux_tasklets_fini();
 fail6:	linux_atomic64_fini();
 fail5:	linux_writecomb_fini();
@@ -138,6 +146,7 @@ linux_fini(void)
 {
 
 	linux_irq_work_fini();
+	linux_kthread_fini();
 	linux_wait_bit_fini();
 	linux_tasklets_fini();
 	linux_atomic64_fini();
