@@ -171,8 +171,14 @@ kthread_stop(struct task_struct *T)
 int
 kthread_should_stop(void)
 {
+	struct task_struct *T = linux_kthread();
+	bool shouldstop;
 
-	return linux_kthread()->kt_shouldstop;
+	mutex_enter(&T->kt_lock);
+	shouldstop = T->kt_shouldstop;
+	mutex_exit(&T->kt_lock);
+
+	return shouldstop;
 }
 
 void
