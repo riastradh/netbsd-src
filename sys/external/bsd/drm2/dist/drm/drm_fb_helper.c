@@ -1752,6 +1752,7 @@ static void drm_setup_crtcs_fb(struct drm_fb_helper *fb_helper)
 
 	mutex_lock(&client->modeset_mutex);
 	drm_client_for_each_modeset(modeset, client) {
+DRM_DEBUG_KMS("modeset num_connectors %lu fb_helper->fb %p\n", modeset->num_connectors, fb_helper->fb);
 		if (!modeset->num_connectors)
 			continue;
 

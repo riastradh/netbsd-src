@@ -43,6 +43,7 @@ __KERNEL_RCSID(0, "$NetBSD: anx_dp.c,v 1.2 2020/01/04 12:08:32 jmcneill Exp $");
 #include <dev/audio/audio_dai.h>
 #endif
 
+#include <drm/drm_atomic_state_helper.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_dp_helper.h>
@@ -248,10 +249,12 @@ anxdp_connector_destroy(struct drm_connector *connector)
 }
 
 static const struct drm_connector_funcs anxdp_connector_funcs = {
-	.dpms = drm_helper_connector_dpms,
 	.detect = anxdp_connector_detect,
 	.fill_modes = drm_helper_probe_single_connector_modes,
 	.destroy = anxdp_connector_destroy,
+	.reset = drm_atomic_helper_connector_reset,
+	.atomic_duplicate_state = drm_atomic_helper_connector_duplicate_state,
+	.atomic_destroy_state = drm_atomic_helper_connector_destroy_state,
 };
 
 static void
@@ -367,8 +370,17 @@ anxdp_connector_get_modes(struct drm_connector *connector)
 	return error;
 }
 
+static struct drm_encoder *
+anxdp_connector_best_encoder(struct drm_connector *connector)
+{
+	struct anxdp_connector *anxdp_connector = to_anxdp_connector(connector);
+
+	return anxdp_connector->encoder;
+}
+
 static const struct drm_connector_helper_funcs anxdp_connector_helper_funcs = {
 	.get_modes = anxdp_connector_get_modes,
+	.best_encoder = anxdp_connector_best_encoder,
 };
 
 static int
@@ -1000,21 +1012,6 @@ out:
 	return ret;
 }
 
-void
-anxdp_dpms(struct anxdp_softc *sc, int mode)
-{
-	switch (mode) {
-	case DRM_MODE_DPMS_ON:
-		pmf_event_inject(NULL, PMFE_DISPLAY_ON);
-		break;
-	case DRM_MODE_DPMS_STANDBY:
-	case DRM_MODE_DPMS_SUSPEND:
-	case DRM_MODE_DPMS_OFF:
-		pmf_event_inject(NULL, PMFE_DISPLAY_OFF);
-		break;
-	}
-}
-
 int
 anxdp_attach(struct anxdp_softc *sc)
 {
@@ -1048,9 +1045,10 @@ anxdp_bind(struct anxdp_softc *sc, struct drm_encoder *encoder)
 {
 	int error;
 
+	sc->sc_connector.encoder = encoder;
+
 	sc->sc_bridge.driver_private = sc;
 	sc->sc_bridge.funcs = &anxdp_bridge_funcs;
-	sc->sc_bridge.encoder = encoder;
 
 	error = drm_bridge_attach(encoder, &sc->sc_bridge, NULL);
 	if (error != 0)

@@ -45,6 +45,7 @@ struct anxdp_softc;
 struct anxdp_connector {
 	struct drm_connector	base;
 	struct anxdp_softc	*sc;
+	struct drm_encoder	*encoder;
 #if ANXDP_AUDIO
 
 	bool			monitor_audio;
@@ -66,7 +67,7 @@ struct anxdp_softc {
 	struct anxdp_connector	sc_connector;
 	struct drm_bridge	sc_bridge;
 	struct drm_dp_aux       sc_dpaux;
-	struct drm_panel *	sc_panel;
+	struct drm_panel	*sc_panel;
 	uint8_t			sc_dpcd[DP_RECEIVER_CAP_SIZE];
 
 	struct drm_display_mode	sc_curmode;
