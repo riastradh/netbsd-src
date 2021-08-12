@@ -124,7 +124,7 @@ drm_init(void)
 #endif
 
 	if (ISSET(boothowto, AB_DEBUG))
-		__drm_debug = DRM_UT_CORE | DRM_UT_DRIVER | DRM_UT_KMS;
+		__drm_debug = DRM_UT_CORE | DRM_UT_DRIVER | DRM_UT_KMS | DRM_UT_ATOMIC;
 
 	spin_lock_init(&drm_minor_lock);
 	idr_init(&drm_minors_idr);
