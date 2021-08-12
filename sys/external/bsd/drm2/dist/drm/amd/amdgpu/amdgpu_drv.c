@@ -1376,7 +1376,6 @@ static const struct file_operations amdgpu_driver_kms_fops = {
 static const struct uvm_pagerops amdgpu_gem_uvm_ops;
 #endif
 
-#ifndef __NetBSD__
 int amdgpu_file_to_fpriv(struct file *filp, struct amdgpu_fpriv **fpriv)
 {
         struct drm_file *file;
@@ -1384,15 +1383,22 @@ int amdgpu_file_to_fpriv(struct file *filp, struct amdgpu_fpriv **fpriv)
 	if (!filp)
 		return -EINVAL;
 
+#ifdef __NetBSD__
+	if (filp->f_ops != &drm_fileops)
+		return -EINVAL;
+	file = filp->f_data;
+	if (file->minor->dev->driver != &kms_driver)
+		return -EINVAL;
+#else
 	if (filp->f_op != &amdgpu_driver_kms_fops) {
 		return -EINVAL;
 	}
 
 	file = filp->private_data;
+#endif
 	*fpriv = file->driver_priv;
 	return 0;
 }
-#endif
 
 static bool
 amdgpu_get_crtc_scanout_position(struct drm_device *dev, unsigned int pipe,
