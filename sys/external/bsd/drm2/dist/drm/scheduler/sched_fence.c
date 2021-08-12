@@ -36,6 +36,11 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 static struct kmem_cache *sched_fence_slab;
 
+#ifdef __NetBSD__		/* XXX module init/fini */
+#define	__init
+#define	__exit
+#endif
+
 static int __init drm_sched_fence_slab_init(void)
 {
 	sched_fence_slab = kmem_cache_create(
@@ -185,3 +190,23 @@ module_exit(drm_sched_fence_slab_fini);
 
 MODULE_DESCRIPTION("DRM GPU scheduler");
 MODULE_LICENSE("GPL and additional rights");
+
+#ifdef __NetBSD__
+MODULE(MODULE_CLASS_MISC, drmsched, "drmsched");
+static int
+drmsched_modcmd(modcmd_t cmd, void *arg)
+{
+
+	switch (cmd) {
+	case MODULE_CMD_INIT:
+		return drm_sched_fence_slab_init();
+	case MODULE_CMD_FINI:
+		drm_sched_fence_slab_fini();
+		return 0;
+	case MODULE_CMD_AUTOUNLOAD:
+		return EBUSY;
+	default:
+		return ENOTTY;
+	}
+}
+#endif
