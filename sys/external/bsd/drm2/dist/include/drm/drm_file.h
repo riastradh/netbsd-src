@@ -391,8 +391,9 @@ static inline bool drm_is_render_client(const struct drm_file *file_priv)
 }
 
 #ifdef __NetBSD__
-extern int drm_open_file(struct drm_file *, void *, struct drm_minor *);
-extern void drm_close_file(struct drm_file *);
+extern const struct fileops drm_fileops;
+int drm_open_file(struct drm_file *, void *, struct drm_minor *);
+void drm_close_file(struct drm_file *);
 #else
 int drm_open(struct inode *inode, struct file *filp);
 ssize_t drm_read(struct file *filp, char __user *buffer,

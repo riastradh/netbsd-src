@@ -101,7 +101,7 @@ const struct cdevsw drm_cdevsw = {
 	.d_flag = D_NEGOFFSAFE,
 };
 
-static const struct fileops drm_fileops = {
+const struct fileops drm_fileops = {
 	.fo_name = "drm",
 	.fo_read = drm_read,
 	.fo_write = fbadop_write,
