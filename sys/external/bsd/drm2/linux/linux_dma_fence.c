@@ -824,8 +824,8 @@ dma_fence_wait_timeout(struct dma_fence *fence, bool intr, long timeout)
 {
 
 	KASSERT(dma_fence_referenced_p(fence));
-	KASSERT(timeout >= 0);
-	KASSERT(timeout < MAX_SCHEDULE_TIMEOUT);
+	KASSERTMSG(timeout >= 0, "timeout %ld", timeout);
+	KASSERTMSG(timeout < MAX_SCHEDULE_TIMEOUT, "timeout %ld", timeout);
 
 	if (fence->ops->wait)
 		return (*fence->ops->wait)(fence, intr, timeout);
