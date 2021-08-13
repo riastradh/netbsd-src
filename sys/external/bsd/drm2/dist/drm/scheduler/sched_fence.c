@@ -192,7 +192,7 @@ MODULE_DESCRIPTION("DRM GPU scheduler");
 MODULE_LICENSE("GPL and additional rights");
 
 #ifdef __NetBSD__
-MODULE(MODULE_CLASS_MISC, drmsched, "drmsched");
+MODULE(MODULE_CLASS_MISC, drmsched, NULL);
 static int
 drmsched_modcmd(modcmd_t cmd, void *arg)
 {
