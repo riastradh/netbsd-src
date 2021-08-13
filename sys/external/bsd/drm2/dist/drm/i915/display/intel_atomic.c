@@ -426,7 +426,7 @@ int intel_atomic_setup_scalers(struct drm_i915_private *dev_priv,
 		int idx;
 
 		/* skip if scaler not required */
-		if (!(scaler_state->scaler_users & (1U << i)))
+		if (!(scaler_state->scaler_users & (1 << i)))
 			continue;
 
 		if (i == SKL_CRTC_INDEX) {
