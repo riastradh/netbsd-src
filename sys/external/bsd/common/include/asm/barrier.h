@@ -46,6 +46,11 @@
 #define	mb()	__asm __volatile ("dsb sy" ::: "memory")
 #define	wmb()	__asm __volatile ("dsb st" ::: "memory")
 #define	rmb()	__asm __volatile ("dsb ld" ::: "memory")
+#elif defined(__x86_64__)
+#include <x86/cpufunc.h>
+#define	mb()	x86_mfence()
+#define	wmb()	x86_sfence()
+#define	rmb()	x86_lfence()
 #else
 #define	mb	membar_sync
 #define	wmb	membar_producer
