@@ -156,7 +156,7 @@ static inline void i915_vma_put(struct i915_vma *vma)
 
 static __always_inline ptrdiff_t ptrdiff(const void *a, const void *b)
 {
-	return (const char *)a - (const char *)b;
+	return a - b;
 }
 
 static inline long
