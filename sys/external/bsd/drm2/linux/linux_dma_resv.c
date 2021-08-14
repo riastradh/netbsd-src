@@ -1350,11 +1350,8 @@ top:	KASSERT(fence == NULL);
 		 * Test whether it is signalled.  If not, stop and
 		 * request a callback.
 		 */
-		if (dma_fence_is_signaled(fence)) {
-			dma_fence_put(fence);
-			fence = NULL;
+		if (dma_fence_is_signaled(fence))
 			break;
-		}
 
 		/* Put ourselves on the selq if we haven't already.  */
 		if (!recorded) {
@@ -1369,8 +1366,6 @@ top:	KASSERT(fence == NULL);
 		 * assume the event is not ready.
 		 */
 		if (!claimed || callback) {
-			dma_fence_put(fence);
-			fence = NULL;
 			revents = 0;
 			break;
 		}
@@ -1383,16 +1378,15 @@ top:	KASSERT(fence == NULL);
 		 */
 		if (!dma_fence_add_callback(fence, &rpoll->rp_fcb,
 			dma_resv_poll_cb)) {
-			dma_fence_put(fence);
-			fence = NULL;
 			revents = 0;
 			callback = true;
 			break;
 		}
+	} while (0);
+	if (fence != NULL) {
 		dma_fence_put(fence);
 		fence = NULL;
-	} while (0);
-	KASSERT(fence == NULL);
+	}
 
 	/* All done reading the fences.  */
 	rcu_read_unlock();
