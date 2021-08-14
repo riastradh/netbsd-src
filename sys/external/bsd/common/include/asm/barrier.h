@@ -62,9 +62,9 @@
 #  define	smp_wmb				membar_producer
 #  define	smp_rmb				membar_consumer
 #else
-#  define	smp_mb()			do {} while (0)
-#  define	smp_wmb()			do {} while (0)
-#  define	smp_rmb()			do {} while (0)
+#  define	smp_mb()			__insn_barrier()
+#  define	smp_wmb()			__insn_barrier()
+#  define	smp_rmb()			__insn_barrier()
 #endif
 
 #if defined(MULTIPROCESSOR) && !defined(__HAVE_ATOMIC_AS_MEMBAR)
