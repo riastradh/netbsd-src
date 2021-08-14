@@ -752,9 +752,6 @@ shmem_pwrite(struct page *page, int offset, int len, char __user *user_data,
 	     bool needs_clflush_before,
 	     bool needs_clflush_after)
 {
-#ifdef __NetBSD__
-	return -EFAULT;
-#else
 	char *vaddr;
 	int ret;
 
@@ -770,7 +767,6 @@ shmem_pwrite(struct page *page, int offset, int len, char __user *user_data,
 	kunmap(page);
 
 	return ret ? -EFAULT : 0;
-#endif
 }
 
 static int
