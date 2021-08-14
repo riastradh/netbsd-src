@@ -258,15 +258,14 @@ int i915_gem_evict_for_node(struct i915_address_space *vm,
 			    struct drm_mm_node *target,
 			    unsigned int flags)
 {
-	struct list_head eviction_list;
+	LIST_HEAD(eviction_list);
 	struct drm_mm_node *node;
 	u64 start = target->start;
 	u64 end = start + target->size;
 	struct i915_vma *vma, *next;
 	int ret = 0;
 
-	INIT_LIST_HEAD(&eviction_list);
-	lockdep_assert_held(&vm->i915->drm.struct_mutex);
+	lockdep_assert_held(&vm->mutex);
 	GEM_BUG_ON(!IS_ALIGNED(start, I915_GTT_PAGE_SIZE));
 	GEM_BUG_ON(!IS_ALIGNED(end, I915_GTT_PAGE_SIZE));
 
