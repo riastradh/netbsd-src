@@ -813,10 +813,14 @@ top:	KASSERT(fence == NULL);
 		 * and record the number of elements.  Could safely use
 		 * memcpy here, because even if we race with a writer
 		 * it'll invalidate the read ticket and we'll start
-		 * ove, but atomic_load in a loop will pacify kcsan.
+		 * over, but atomic_load in a loop will pacify kcsan.
 		 */
 		for (i = 0; i < shared_count; i++)
 			shared[i] = atomic_load_relaxed(&list->shared[i]);
+
+		/* If anything changed while we were copying, restart.  */
+		if (!dma_resv_read_valid(robj, &ticket))
+			goto restart;
 	}
 
 	/* If there is an exclusive fence, grab it.  */
@@ -910,6 +914,10 @@ top:	KASSERT(fence == NULL);
 			dst_list->shared[dst_list->shared_count++] = fence;
 			fence = NULL;
 		}
+
+		/* If anything changed while we were copying, restart.  */
+		if (!dma_resv_read_valid(src_robj, &read_ticket))
+			goto restart;
 	}
 
 	/* Get the exclusive fence.  */
@@ -1031,6 +1039,10 @@ top:	KASSERT(fence == NULL);
 			if (!signaled)
 				goto out;
 		}
+
+		/* If anything changed while we were testing, restart.  */
+		if (!dma_resv_read_valid(robj, &ticket))
+			goto restart;
 	}
 
 	/* If there is an exclusive fence, test it.  */
@@ -1114,6 +1126,10 @@ top:	KASSERT(fence == NULL);
 			dma_fence_put(fence);
 			fence = NULL;
 		}
+
+		/* If anything changed while we were testing, restart.  */
+		if (!dma_resv_read_valid(robj, &ticket))
+			goto restart;
 	}
 
 	/* If there is an exclusive fence, test it.  */
