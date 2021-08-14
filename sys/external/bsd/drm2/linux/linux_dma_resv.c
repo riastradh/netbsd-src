@@ -741,6 +741,14 @@ dma_resv_get_excl_rcu(const struct dma_resv *robj)
 
 /*
  * dma_resv_get_fences_rcu(robj, fencep, nsharedp, sharedp)
+ *
+ *	Get a snapshot of the exclusive and shared fences of robj.  The
+ *	shared fences are returned as a pointer *sharedp to an array,
+ *	to be freed by the caller with kfree, of *nsharedp elements.
+ *
+ *	Returns zero on success, negative (Linux-style) error code on
+ *	failure.  On failure, *fencep, *nsharedp, and *sharedp are
+ *	untouched.
  */
 int
 dma_resv_get_fences_rcu(const struct dma_resv *robj,
