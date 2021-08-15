@@ -405,7 +405,7 @@ gtt_user_read(struct io_mapping *mapping,
 					 (void __force *)vaddr + offset,
 					 length);
 #ifdef __NetBSD__
-		io_mapping_unmap(mapping, vaddr);
+		io_mapping_unmap(mapping, vaddr, PAGE_SIZE);
 #else
 		io_mapping_unmap(vaddr);
 #endif
