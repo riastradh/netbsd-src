@@ -711,9 +711,13 @@ static void revoke_mmaps(struct intel_gt *gt)
 		vma_offset = vma->ggtt_view.partial.offset << PAGE_SHIFT;
 
 #ifdef __NetBSD__
-		__USE(node);
 		__USE(vma_offset);
-		panic("NYI");
+		__USE(node);
+		paddr_t pa = gt->i915->ggtt.gmadr.start + vma->node.start;
+		vsize_t npgs = vma->size >> PAGE_SHIFT;
+		while (npgs --> 0)
+			pmap_pv_protect(pa + (npgs << PAGE_SHIFT),
+			    VM_PROT_NONE);
 #else
 		unmap_mapping_range(gt->i915->drm.anon_inode->i_mapping,
 				    drm_vma_node_offset_addr(node) + vma_offset,
