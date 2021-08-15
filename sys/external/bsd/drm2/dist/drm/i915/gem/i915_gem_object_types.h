@@ -78,7 +78,11 @@ struct i915_mmap_offset {
 	struct drm_i915_gem_object *obj;
 	enum i915_mmap_type mmap_type;
 
+#ifdef __NetBSD__
+	struct uvm_object uobj;
+#else
 	struct rb_node offset;
+#endif
 };
 
 struct drm_i915_gem_object {
