@@ -1458,7 +1458,7 @@ flush_workqueue(struct workqueue_struct *wq)
 	struct flush_work fw;
 
 	if (lwp_getspecific(workqueue_key) == wq) {
-		printf("%s: running from workqueue %s\n", __func__,
+		aprint_debug("%s: running from workqueue %s\n", __func__,
 		    wq->wq_name);
 		return;
 	}
