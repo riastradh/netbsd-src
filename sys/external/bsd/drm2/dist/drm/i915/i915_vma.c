@@ -513,7 +513,8 @@ void __iomem *i915_vma_pin_iomap(struct i915_vma *vma)
 
 		if (unlikely(cmpxchg(&vma->iomap, NULL, ptr))) {
 #ifdef __NetBSD__
-			io_mapping_unmap(&i915_vm_to_ggtt(vma->vm)->iomap, ptr);
+			io_mapping_unmap(&i915_vm_to_ggtt(vma->vm)->iomap, ptr,
+			    vma->node.size);
 #else
 			io_mapping_unmap(ptr);
 #endif
@@ -1181,7 +1182,8 @@ static void __i915_vma_iounmap(struct i915_vma *vma)
 		return;
 
 #ifdef __NetBSD__
-	io_mapping_unmap(&i915_vm_to_ggtt(vma->vm)->iomap, vma->iomap);
+	io_mapping_unmap(&i915_vm_to_ggtt(vma->vm)->iomap, vma->iomap,
+	    vma->node.size);
 #else
 	io_mapping_unmap(vma->iomap);
 #endif
