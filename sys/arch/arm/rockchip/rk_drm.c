@@ -129,6 +129,16 @@ rk_drm_attach(device_t parent, device_t self, void *aux)
 	prop_dictionary_t dict = device_properties(self);
 	bool is_disabled;
 
+	aprint_naive("\n");
+
+	if (prop_dictionary_get_bool(dict, "disabled", &is_disabled) &&
+	    is_disabled) {
+		aprint_normal(": (disabled)\n");
+		return;
+	}
+
+	aprint_normal("\n");
+
 	sc->sc_dev = self;
 	sc->sc_dmat = faa->faa_dmat;
 	sc->sc_bst = faa->faa_bst;
@@ -141,15 +151,6 @@ rk_drm_attach(device_t parent, device_t self, void *aux)
 		sc->sc_task_wq = NULL;
 		return;
 	}
-
-	aprint_naive("\n");
-
-	if (prop_dictionary_get_bool(dict, "disabled", &is_disabled) && is_disabled) {
-		aprint_normal(": (disabled)\n");
-		return;
-	}
-
-	aprint_normal("\n");
 
 	sc->sc_ddev = drm_dev_alloc(driver, sc->sc_dev);
 	if (IS_ERR(sc->sc_ddev)) {
