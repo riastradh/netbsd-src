@@ -57,9 +57,9 @@
 
 #define	dev_warn(DEV, FMT, ...)	do {					      \
 	if (DEV)							      \
-		aprint_error_dev((DEV), "warn: " FMT, ##__VA_ARGS__);	      \
+		aprint_normal_dev((DEV), "warn: " FMT, ##__VA_ARGS__);	      \
 	else								      \
-		aprint_error("warn: " FMT, ##__VA_ARGS__);		      \
+		aprint_normal("warn: " FMT, ##__VA_ARGS__);		      \
 } while (0)
 #define	dev_WARN	dev_warn
 
