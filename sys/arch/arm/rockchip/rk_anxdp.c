@@ -172,7 +172,7 @@ rk_anxdp_ep_activate(device_t dev, struct fdt_endpoint *ep, bool activate)
 		break;
 	}
 
-	sc->sc_encoder.possible_crtcs = 0x3; /* XXX */
+	sc->sc_encoder.possible_crtcs = 0x2; /* VOPB only */
 	drm_encoder_init(crtc->dev, &sc->sc_encoder, &rk_anxdp_encoder_funcs,
 	    DRM_MODE_ENCODER_TMDS, NULL);
 	drm_encoder_helper_add(&sc->sc_encoder, &rk_anxdp_encoder_helper_funcs);
