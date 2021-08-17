@@ -77,7 +77,7 @@ fail0:			KASSERT(r);
 			return r;
 		}
 		KASSERT(rseg == 1);
-		r = -bus_dmamap_create(adev->ddev->dmat, size, 1, PAGE_SIZE, 0,
+		r = -bus_dmamap_create(adev->ddev->dmat, size, 1, size, 0,
 		    BUS_DMA_WAITOK, &ih->ring_map);
 		if (r) {
 fail1:			bus_dmamem_free(adev->ddev->dmat, &ih->ring_seg, 1);
