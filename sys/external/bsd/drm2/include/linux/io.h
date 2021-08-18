@@ -33,6 +33,7 @@
 #define _LINUX_IO_H_
 
 #include <linux/types.h>
+#include <linux/err.h>
 
 #include <asm/io.h>
 
