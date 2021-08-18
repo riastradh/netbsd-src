@@ -302,6 +302,8 @@ void drm_sched_entity_fini(struct drm_sched_entity *entity)
 		drm_sched_rq_remove_entity(entity->rq, entity);
 	}
 
+	spin_lock_destroy(&entity->rq_lock);
+
 	/* Consumption of existing IBs wasn't completed. Forcefully
 	 * remove them here.
 	 */
@@ -323,6 +325,8 @@ void drm_sched_entity_fini(struct drm_sched_entity *entity)
 
 		drm_sched_entity_kill_jobs(entity);
 	}
+
+	destroy_completion(&entity->entity_idle);
 
 	dma_fence_put(entity->last_scheduled);
 	entity->last_scheduled = NULL;
