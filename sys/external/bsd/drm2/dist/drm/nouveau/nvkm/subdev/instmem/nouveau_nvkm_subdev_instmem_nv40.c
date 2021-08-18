@@ -301,9 +301,8 @@ nv40_instmem_new(struct nvkm_device *device, int index,
 	iomembase = device->func->resource_addr(device, bar);
 	iomemsz = device->func->resource_size(device, bar);
 	/* XXX errno NetBSD->Linux */
-	/* XXX post-merge: switch to WC */
 	ret = -bus_space_map(imem->iomemt, iomembase, iomemsz,
-	    BUS_SPACE_MAP_LINEAR, &imem->iomemh);
+	    BUS_SPACE_MAP_LINEAR|BUS_SPACE_MAP_PREFETCHABLE, &imem->iomemh);
 	if (ret) {
 		nvkm_error(&imem->base.subdev, "unable to map PRAMIN BAR %d"
 		    ": %d\n", bar, ret);
