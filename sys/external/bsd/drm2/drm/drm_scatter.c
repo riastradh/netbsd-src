@@ -37,6 +37,7 @@ __KERNEL_RCSID(0, "$NetBSD: drm_scatter.c,v 1.5 2018/08/27 07:02:06 riastradh Ex
 #include <sys/errno.h>
 #include <sys/systm.h>
 
+#include <linux/mm.h>
 #include <linux/slab.h>
 
 #include <drm/drm_device.h>
