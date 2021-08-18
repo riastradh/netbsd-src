@@ -223,4 +223,11 @@ ktime_get_real_seconds(void)
 	return time_second;
 }
 
+static inline void
+ktime_get_ts64(struct timespec64 *ts)
+{
+
+	nanotime(ts);
+}
+
 #endif  /* _LINUX_KTIME_H_ */

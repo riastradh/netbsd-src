@@ -32,6 +32,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <drm/drm_drv.h>
 #include <drm/drm_file.h>
+#include <drm/drm_pci.h>
 #include <drm/drm_pciids.h>
 #include <drm/via_drm.h>
 

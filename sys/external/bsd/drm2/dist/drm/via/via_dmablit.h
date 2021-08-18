@@ -33,6 +33,9 @@
 #define _VIA_DMABLIT_H
 
 #include <linux/dma-mapping.h>
+#include <linux/workqueue.h>
+
+#include <drm/drm_wait_netbsd.h>
 
 #define VIA_NUM_BLIT_ENGINES 2
 #define VIA_NUM_BLIT_SLOTS 8
@@ -55,11 +58,7 @@ typedef struct _drm_via_sg_info {
 	struct _drm_via_descriptor **desc_pages;
 	int num_desc_pages;
 	int num_desc;
-#ifdef __NetBSD__
-	enum { DMA_FROM_DEVICE, DMA_TO_DEVICE } direction;
-#else
 	enum dma_data_direction direction;
-#endif
 	dma_addr_t chain_start;
 	uint32_t free_on_sequence;
 	unsigned int descriptors_per_page;
