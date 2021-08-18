@@ -88,7 +88,7 @@ file	external/bsd/drm2/dist/drm/drm_bufs.c		drmums
 file	external/bsd/drm2/dist/drm/drm_context.c	drmums
 file	external/bsd/drm2/dist/drm/drm_dma.c		drmums
 file	external/bsd/drm2/dist/drm/drm_legacy_misc.c	drmums
-file	external/bsd/drm2/dist/drm/drm_lock.c		drmums
+file	external/bsd/drm2/drm/drm_lock.c		drmums
 file	external/bsd/drm2/drm/drm_scatter.c		drmums
 
 # GPU scheduler
