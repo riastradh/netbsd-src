@@ -221,6 +221,17 @@ dma_fence_is_later(struct dma_fence *a, struct dma_fence *b)
 	return a->seqno - b->seqno < INT_MAX;
 }
 
+static const char *dma_fence_stub_name(struct dma_fence *f)
+{
+
+	return "stub";
+}
+
+static const struct dma_fence_ops dma_fence_stub_ops = {
+	.get_driver_name = dma_fence_stub_name,
+	.get_timeline_name = dma_fence_stub_name,
+};
+
 /*
  * dma_fence_get_stub()
  *
@@ -238,6 +249,7 @@ dma_fence_get_stub(void)
 	static struct dma_fence fence = {
 		.refcount = {1}, /* always referenced */
 		.flags = 1u << DMA_FENCE_FLAG_SIGNALED_BIT,
+		.ops = &dma_fence_stub_ops,
 #ifdef DIAGNOSTIC
 		.f_magic = FENCE_MAGIC_GOOD,
 #endif
