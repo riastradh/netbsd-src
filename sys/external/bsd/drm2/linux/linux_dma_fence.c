@@ -238,6 +238,9 @@ dma_fence_get_stub(void)
 	static struct dma_fence fence = {
 		.refcount = {1}, /* always referenced */
 		.flags = 1u << DMA_FENCE_FLAG_SIGNALED_BIT,
+#ifdef DIAGNOSTIC
+		.f_magic = FENCE_MAGIC_GOOD,
+#endif
 	};
 
 	return dma_fence_get(&fence);
