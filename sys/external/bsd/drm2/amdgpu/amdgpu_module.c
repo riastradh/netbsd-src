@@ -75,7 +75,7 @@ amdgpu_init(void)
 		return error;
 
 	amdgpu_drm_driver->num_ioctls = amdgpu_max_kms_ioctl;
-	amdgpu_drm_driver->driver_features |= DRIVER_MODESET;
+	amdgpu_drm_driver->driver_features &= ~DRIVER_ATOMIC;
 
 	linux_mutex_init(&mgpu_info.mutex);
 	ida_init(&amdgpu_pasid_ida);
