@@ -115,7 +115,7 @@ kthread_alloc(int (*func)(void *), void *cookie)
 
 	T = kmem_zalloc(sizeof(*T), KM_SLEEP);
 
-	mutex_init(&T->kt_lock, MUTEX_DEFAULT, IPL_NONE);
+	mutex_init(&T->kt_lock, MUTEX_DEFAULT, IPL_VM);
 	cv_init(&T->kt_cv, "lnxkthrd");
 
 	T->kt_func = func;
