@@ -2836,7 +2836,7 @@ int amdgpu_vm_init(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 				  adev->vm_manager.vm_pte_scheds,
 				  adev->vm_manager.vm_pte_num_scheds, NULL);
 	if (r)
-		return r;
+		goto error_free_destroylock;
 
 	r = drm_sched_entity_init(&vm->delayed, DRM_SCHED_PRIORITY_NORMAL,
 				  adev->vm_manager.vm_pte_scheds,
@@ -2926,9 +2926,13 @@ error_free_delayed:
 	dma_fence_put(vm->last_direct);
 	dma_fence_put(vm->last_delayed);
 	drm_sched_entity_destroy(&vm->delayed);
+	mutex_destroy(&vm->eviction_lock);
 
 error_free_direct:
 	drm_sched_entity_destroy(&vm->direct);
+
+error_free_destroylock:
+	spin_lock_destroy(&vm->invalidated_lock);
 
 	return r;
 }
