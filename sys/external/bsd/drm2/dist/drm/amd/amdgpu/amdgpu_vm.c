@@ -2900,10 +2900,12 @@ int amdgpu_vm_init(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 	if (pasid) {
 		unsigned long flags;
 
+		idr_preload(GFP_ATOMIC);
 		spin_lock_irqsave(&adev->vm_manager.pasid_lock, flags);
 		r = idr_alloc(&adev->vm_manager.pasid_idr, vm, pasid, pasid + 1,
 			      GFP_ATOMIC);
 		spin_unlock_irqrestore(&adev->vm_manager.pasid_lock, flags);
+		idr_preload_end();
 		if (r < 0)
 			goto error_free_root;
 
@@ -3007,10 +3009,12 @@ int amdgpu_vm_make_compute(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 	if (pasid) {
 		unsigned long flags;
 
+		idr_preload(GFP_ATOMIC);
 		spin_lock_irqsave(&adev->vm_manager.pasid_lock, flags);
 		r = idr_alloc(&adev->vm_manager.pasid_idr, vm, pasid, pasid + 1,
 			      GFP_ATOMIC);
 		spin_unlock_irqrestore(&adev->vm_manager.pasid_lock, flags);
+		idr_preload_end();
 
 		if (r == -ENOSPC)
 			goto unreserve_bo;
