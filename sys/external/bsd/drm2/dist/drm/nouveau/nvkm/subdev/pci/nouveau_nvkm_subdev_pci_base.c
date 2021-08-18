@@ -123,14 +123,13 @@ nvkm_pci_oneinit(struct nvkm_subdev *subdev)
 			return ret;
 	}
 
-#ifdef __NetBSD__ /* XXX post-merge audit */
+#ifdef __NetBSD__
     {
 	const char *const name = device_xname(pci_dev_dev(pdev));
 	const struct pci_attach_args *pa = &pdev->pd_pa;
 	const char *intrstr;
 	char intrbuf[PCI_INTRSTR_LEN];
 
-	/* XXX convert to use drm_pci_request_irq() */
 	if (pdev->msi_enabled) {
 		if (pdev->pd_intr_handles == NULL) {
 			if ((ret = pci_msi_alloc_exact(pa, &pci->pci_ihp,
