@@ -1949,7 +1949,6 @@ int intel_hdcp_init(struct intel_connector *connector,
 	}
 
 	hdcp->shim = shim;
-	/* XXX destroy */
 	mutex_init(&hdcp->mutex);
 	INIT_DELAYED_WORK(&hdcp->check_work, intel_hdcp_check_work);
 	INIT_WORK(&hdcp->prop_work, intel_hdcp_prop_work);
@@ -2054,6 +2053,8 @@ void intel_hdcp_cleanup(struct intel_connector *connector)
 	mutex_lock(&connector->hdcp.mutex);
 	kfree(connector->hdcp.port_data.streams);
 	mutex_unlock(&connector->hdcp.mutex);
+
+	mutex_destroy(&connector->hdcp.mutex);
 }
 
 void intel_hdcp_atomic_check(struct drm_connector *connector,

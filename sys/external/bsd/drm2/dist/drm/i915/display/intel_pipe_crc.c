@@ -456,6 +456,17 @@ void intel_display_crc_init(struct drm_i915_private *dev_priv)
 	}
 }
 
+void intel_display_crc_init(struct drm_i915_private *dev_priv)
+{
+	enum pipe pipe;
+
+	for_each_pipe(dev_priv, pipe) {
+		struct intel_pipe_crc *pipe_crc = &dev_priv->pipe_crc[pipe];
+
+		spin_lock_destroy(&pipe_crc->lock);
+	}
+}
+
 static int i8xx_crc_source_valid(struct drm_i915_private *dev_priv,
 				 const enum intel_pipe_crc_source source)
 {

@@ -87,6 +87,11 @@ static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
 	spin_lock_init(&rpm->debug.lock);
 }
 
+static void fini_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
+{
+	spin_lock_fini(&rpm->debug.lock);
+}
+
 static noinline depot_stack_handle_t
 track_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
 {
@@ -307,6 +312,10 @@ out:
 #else
 
 static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
+{
+}
+
+static void fini_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
 {
 }
 
@@ -609,6 +618,7 @@ void intel_runtime_pm_driver_release(struct intel_runtime_pm *rpm)
 	     intel_rpm_wakelock_count(count));
 
 	untrack_all_intel_runtime_pm_wakerefs(rpm);
+	fini_intel_runtime_pm_wakeref(rpm);
 }
 
 void intel_runtime_pm_init_early(struct intel_runtime_pm *rpm)

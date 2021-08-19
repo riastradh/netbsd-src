@@ -4675,6 +4675,11 @@ void i915_perf_fini(struct drm_i915_private *i915)
 	if (!perf->i915)
 		return;
 
+	if (perf->ops.enable_metric_set) {
+		mutex_destroy(&perf->metrics_lock);
+		mutex_destroy(&perf->lock);
+	}
+
 	idr_for_each(&perf->metrics_idr, destroy_config, perf);
 	idr_destroy(&perf->metrics_idr);
 
