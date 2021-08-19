@@ -883,5 +883,14 @@ void drm_sched_fini(struct drm_gpu_scheduler *sched)
 	}
 
 	sched->ready = false;
+
+	spin_lock_destroy(&sched->job_list_lock);
+	DRM_DESTROY_WAITQUEUE(&sched->job_scheduled);
+	DRM_DESTROY_WAITQUEUE(&sched->wake_up_worker);
+
+	for (int i = DRM_SCHED_PRIORITY_MIN; i < DRM_SCHED_PRIORITY_MAX; i++) {
+		struct drm_sched_rq *rq = &sched->sched_rq[i];
+		spin_lock_destroy(&rq->lock);
+	}
 }
 EXPORT_SYMBOL(drm_sched_fini);
