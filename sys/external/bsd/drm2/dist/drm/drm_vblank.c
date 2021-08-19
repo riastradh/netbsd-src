@@ -480,6 +480,8 @@ void drm_vblank_cleanup(struct drm_device *dev)
 	kfree(dev->vblank);
 
 	dev->num_crtcs = 0;
+
+	spin_lock_destroy(&dev->vblank_time_lock);
 }
 
 /**

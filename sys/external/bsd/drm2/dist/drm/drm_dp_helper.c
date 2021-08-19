@@ -1075,6 +1075,7 @@ void drm_dp_aux_unregister(struct drm_dp_aux *aux)
 {
 	drm_dp_aux_unregister_devnode(aux);
 	i2c_del_adapter(&aux->ddc);
+	mutex_destroy(&aux->cec.lock);
 	mutex_destroy(&aux->hw_mutex);
 }
 EXPORT_SYMBOL(drm_dp_aux_unregister);
