@@ -291,6 +291,9 @@ void intel_engine_reset_breadcrumbs(struct intel_engine_cs *engine)
 
 void intel_engine_fini_breadcrumbs(struct intel_engine_cs *engine)
 {
+	struct intel_breadcrumbs *b = &engine->breadcrumbs;
+
+	spin_lock_destroy(&b->irq_lock);
 }
 
 bool i915_request_enable_breadcrumb(struct i915_request *rq)

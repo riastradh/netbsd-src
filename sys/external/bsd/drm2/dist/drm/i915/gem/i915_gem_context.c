@@ -786,6 +786,7 @@ void i915_gem_init__contexts(struct drm_i915_private *i915)
 void i915_gem_driver_release__contexts(struct drm_i915_private *i915)
 {
 	flush_work(&i915->gem.contexts.free_work);
+	spin_lock_destroy(&i915->gem.contexts.lock);
 }
 
 static int vm_idr_cleanup(int id, void *p, void *data)

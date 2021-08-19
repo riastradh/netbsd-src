@@ -14,6 +14,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_runtime_pm.h"
 #include "intel_wakeref.h"
 
+#include <linux/nbsd-namespace.h>
+
 static void rpm_get(struct intel_wakeref *wf)
 {
 	wf->wakeref = intel_runtime_pm_get(wf->rpm);
@@ -62,16 +64,19 @@ int __intel_wakeref_get_first(struct intel_wakeref *wf)
 static void ____intel_wakeref_put_last(struct intel_wakeref *wf)
 {
 	INTEL_WAKEREF_BUG_ON(atomic_read(&wf->count) <= 0);
-	if (unlikely(!atomic_dec_and_test(&wf->count)))
-		goto unlock;
+	if (unlikely(!atomic_dec_and_test(&wf->count))) {
+		mutex_unlock(&wf->mutex);
+		return;
+	}
 
 	/* ops->put() must reschedule its own release on error/deferral */
 	if (likely(!wf->ops->put(wf))) {
 		rpm_put(wf);
 	}
 
-unlock:
 	mutex_unlock(&wf->mutex);
+	DRM_DESTROY_WAITQUEUE(&wf->wq);
+	mutex_destroy(&wf->mutex);
 }
 
 void __intel_wakeref_put_last(struct intel_wakeref *wf, unsigned long flags)
@@ -192,4 +197,5 @@ void intel_wakeref_auto_fini(struct intel_wakeref_auto *wf)
 {
 	intel_wakeref_auto(wf, 0);
 	INTEL_WAKEREF_BUG_ON(wf->wakeref);
+	spin_lock_destroy(&wf->lock);
 }

@@ -574,6 +574,9 @@ void intel_gt_fini_timelines(struct intel_gt *gt)
 
 	GEM_BUG_ON(!list_empty(&timelines->active_list));
 	GEM_BUG_ON(!list_empty(&timelines->hwsp_free_list));
+
+	spin_lock_destroy(&timelines->hwsp_lock);
+	spin_lock_destroy(&timelines->lock);
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_SELFTEST)

@@ -3795,6 +3795,14 @@ void intel_shared_dpll_init(struct drm_device *dev)
 	BUG_ON(dev_priv->num_shared_dpll > I915_NUM_PLLS);
 }
 
+void
+intel_shared_dpll_cleanup(struct drm_device *dev)
+{
+	struct drm_i915_private *dev_priv = to_i915(dev);
+
+	mutex_destroy(&dev_priv->dpll_lock);
+}
+
 /**
  * intel_reserve_shared_dplls - reserve DPLLs for CRTC and encoder combination
  * @state: atomic state

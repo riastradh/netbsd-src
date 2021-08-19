@@ -4733,6 +4733,9 @@ static void virtual_context_destroy(struct kref *kref)
 		__execlists_context_fini(&ve->context);
 	intel_context_fini(&ve->context);
 
+	intel_engine_fini_breadcrumbs(&ve->base);
+	spin_lock_destroy(&ve->base.active.lock);
+
 	kfree(ve->bonds);
 	kfree(ve);
 }
