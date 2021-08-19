@@ -1670,6 +1670,7 @@ intel_partial_pages(const struct i915_ggtt_view *view,
 				continue;
 			}
 			for (k = 0; k < iseg->ds_len >> PAGE_SHIFT; k++) {
+				KASSERT(i < view->partial.size);
 				bus_dma_segment_t *oseg =
 				    &st->sgl->sg_dmamap->dm_segs[i++];
 				oseg->ds_addr = iseg->ds_addr + offset +
