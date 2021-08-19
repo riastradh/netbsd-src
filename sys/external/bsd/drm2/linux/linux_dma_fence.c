@@ -909,6 +909,8 @@ dma_fence_wait(struct dma_fence *fence, bool intr)
 		ret = dma_fence_default_wait(fence, intr,
 		    MAX_SCHEDULE_TIMEOUT);
 	KASSERT(ret != 0);
+	KASSERTMSG(ret == -ERESTARTSYS || ret == MAX_SCHEDULE_TIMEOUT,
+	    "ret=%ld", ret);
 
 	return (ret < 0 ? ret : 0);
 }
