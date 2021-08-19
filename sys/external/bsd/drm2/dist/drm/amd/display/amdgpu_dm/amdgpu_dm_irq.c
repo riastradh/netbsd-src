@@ -414,6 +414,8 @@ void amdgpu_dm_irq_fini(struct amdgpu_device *adev)
 		DM_IRQ_TABLE_UNLOCK(adev, irq_table_flags);
 		flush_work(&lh->work);
 	}
+
+	spin_lock_destroy(&adev->dm.irq_handler_list_table_lock);
 }
 
 int amdgpu_dm_irq_suspend(struct amdgpu_device *adev)

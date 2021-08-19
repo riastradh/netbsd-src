@@ -328,6 +328,7 @@ void amdgpu_gfx_kiq_free_ring(struct amdgpu_ring *ring)
 {
 	amdgpu_device_wb_free(ring->adev, ring->adev->gfx.kiq.reg_val_offs);
 	amdgpu_ring_fini(ring);
+	spin_lock_destroy(&ring->adev->gfx.kiq.ring_lock);
 }
 
 void amdgpu_gfx_kiq_fini(struct amdgpu_device *adev)

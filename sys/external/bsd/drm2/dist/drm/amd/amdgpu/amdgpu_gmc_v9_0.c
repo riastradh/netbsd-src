@@ -1252,6 +1252,8 @@ static int gmc_v9_0_sw_fini(void *handle)
 	amdgpu_bo_fini(adev);
 	amdgpu_gart_fini(adev);
 
+	spin_lock_destroy(&adev->gmc.invalidate_lock);
+
 	return 0;
 }
 

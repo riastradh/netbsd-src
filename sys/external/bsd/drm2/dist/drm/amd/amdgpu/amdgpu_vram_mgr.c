@@ -231,6 +231,7 @@ static int amdgpu_vram_mgr_fini(struct ttm_mem_type_manager *man)
 	spin_lock(&mgr->lock);
 	drm_mm_takedown(&mgr->mm);
 	spin_unlock(&mgr->lock);
+	spin_lock_destroy(&mgr->lock);
 	kfree(mgr);
 	man->priv = NULL;
 #ifdef __NetBSD__		/* XXX amdgpu sysfs */
