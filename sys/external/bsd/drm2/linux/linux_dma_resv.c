@@ -758,7 +758,7 @@ dma_resv_get_fences_rcu(const struct dma_resv *robj,
 	const struct dma_resv_list *list = NULL;
 	struct dma_fence *fence = NULL;
 	struct dma_fence **shared = NULL;
-	unsigned shared_alloc, shared_count, i;
+	unsigned shared_alloc = 0, shared_count, i;
 	struct dma_resv_read_ticket ticket;
 
 top:	KASSERT(fence == NULL);
@@ -851,11 +851,19 @@ top:	KASSERT(fence == NULL);
 
 	/* Success!  */
 	rcu_read_unlock();
+	KASSERT(shared_count <= shared_alloc);
+	KASSERT(shared_alloc == 0 || shared_count < shared_alloc);
+	KASSERT(shared_alloc <= UINT_MAX);
 	if (fencep) {
 		*fencep = fence;
 	} else if (fence) {
-		KASSERT(shared_count < UINT_MAX);
-		shared[shared_count++] = fence;
+		if (shared_count) {
+			shared[shared_count++] = fence;
+		} else {
+			shared = kmalloc(sizeof(shared[0]), GFP_KERNEL);
+			shared[0] = fence;
+			shared_count = 1;
+		}
 	}
 	*nsharedp = shared_count;
 	*sharedp = shared;
