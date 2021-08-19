@@ -381,6 +381,8 @@ void amdgpu_ring_fini(struct amdgpu_ring *ring)
 	ring->me = 0;
 
 	ring->adev->rings[ring->idx] = NULL;
+
+	mutex_destroy(&ring->priority_mutex);
 }
 
 /**

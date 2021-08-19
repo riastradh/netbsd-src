@@ -201,6 +201,7 @@ static void amdgpu_ctx_fini(struct kref *ref)
 	}
 
 	mutex_destroy(&ctx->lock);
+	spin_lock_destroy(&ctx->ring_lock);
 	kfree(ctx);
 }
 

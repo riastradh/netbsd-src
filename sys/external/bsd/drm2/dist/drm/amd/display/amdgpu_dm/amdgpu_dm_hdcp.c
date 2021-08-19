@@ -306,6 +306,7 @@ void hdcp_destroy(struct hdcp_workqueue *hdcp_work)
 	for (i = 0; i < hdcp_work->max_link; i++) {
 		cancel_delayed_work_sync(&hdcp_work[i].callback_dwork);
 		cancel_delayed_work_sync(&hdcp_work[i].watchdog_timer_dwork);
+		mutex_destroy(&hdcp_work[i].mutex);
 	}
 
 	kfree(hdcp_work);
