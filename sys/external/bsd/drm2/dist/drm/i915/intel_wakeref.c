@@ -75,8 +75,6 @@ static void ____intel_wakeref_put_last(struct intel_wakeref *wf)
 	}
 
 	mutex_unlock(&wf->mutex);
-	DRM_DESTROY_WAITQUEUE(&wf->wq);
-	mutex_destroy(&wf->mutex);
 }
 
 void __intel_wakeref_put_last(struct intel_wakeref *wf, unsigned long flags)
@@ -118,6 +116,14 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
 
 	INIT_WORK(&wf->work, __intel_wakeref_put_work);
 	lockdep_init_map(&wf->work.lockdep_map, "wakeref.work", &key->work, 0);
+}
+
+void
+intel_wakeref_fini(struct intel_wakeref *wf)
+{
+
+	DRM_DESTROY_WAITQUEUE(&wf->wq);
+	mutex_destroy(&wf->mutex);
 }
 
 int intel_wakeref_wait_for_idle(struct intel_wakeref *wf)
