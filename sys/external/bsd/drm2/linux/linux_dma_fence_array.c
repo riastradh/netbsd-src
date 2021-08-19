@@ -139,6 +139,7 @@ dma_fence_array_release(struct dma_fence *fence)
 		dma_fence_put(A->fences[i]);
 
 	kfree(A->fences);
+	spin_lock_destroy(&A->dfa_lock);
 	dma_fence_free(fence);
 }
 
