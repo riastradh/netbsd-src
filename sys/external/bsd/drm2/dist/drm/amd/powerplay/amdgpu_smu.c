@@ -974,6 +974,12 @@ static int smu_sw_fini(void *handle)
 		return ret;
 	}
 
+	mutex_destroy(&smu->metrics_lock);
+	mutex_destroy(&smu->sensor_lock);
+	mutex_destroy(&smu->smu_baco.mutex);
+	mutex_destroy(&smu->smu_feature.mutex);
+	mutex_destroy(&smu->mutex);
+
 	return 0;
 }
 

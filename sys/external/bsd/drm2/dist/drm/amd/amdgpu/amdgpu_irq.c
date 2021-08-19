@@ -353,6 +353,8 @@ void amdgpu_irq_fini(struct amdgpu_device *adev)
 		kfree(adev->irq.client[i].sources);
 		adev->irq.client[i].sources = NULL;
 	}
+
+	spin_lock_destroy(&adev->irq.lock);
 }
 
 /**

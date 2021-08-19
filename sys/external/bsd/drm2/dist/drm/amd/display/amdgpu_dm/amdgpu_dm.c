@@ -4455,6 +4455,7 @@ static void amdgpu_dm_connector_destroy(struct drm_connector *connector)
 		i2c_del_adapter(&aconnector->i2c->base);
 		kfree(aconnector->i2c);
 	}
+	mutex_destroy(&aconnector->hpd_lock);
 
 	kfree(connector);
 }
