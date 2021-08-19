@@ -65,5 +65,6 @@ intel_engine_create_kernel_request(struct intel_engine_cs *engine)
 }
 
 void intel_engine_init__pm(struct intel_engine_cs *engine);
+void intel_engine_fini__pm(struct intel_engine_cs *engine);
 
 #endif /* INTEL_ENGINE_PM_H */

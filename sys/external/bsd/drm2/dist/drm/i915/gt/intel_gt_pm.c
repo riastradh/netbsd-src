@@ -177,6 +177,7 @@ void intel_gt_pm_fini(struct intel_gt *gt)
 {
 	intel_rps_fini(&gt->rps);
 	intel_rc6_fini(&gt->rc6);
+	intel_wakeref_fini(&gt->wakeref);
 }
 
 int intel_gt_resume(struct intel_gt *gt)

@@ -292,6 +292,13 @@ void intel_engine_init__pm(struct intel_engine_cs *engine)
 	intel_engine_init_heartbeat(engine);
 }
 
+void
+intel_engine_fini__pm(struct intel_engine_cs *engine)
+{
+
+	intel_wakeref_fini(&engine->wakeref);
+}
+
 #if IS_ENABLED(CONFIG_DRM_I915_SELFTEST)
 #include "selftest_engine_pm.c"
 #endif
