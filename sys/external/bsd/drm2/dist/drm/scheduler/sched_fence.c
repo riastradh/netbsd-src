@@ -105,6 +105,8 @@ static void drm_sched_fence_free(struct rcu_head *rcu)
 	struct dma_fence *f = container_of(rcu, struct dma_fence, rcu);
 	struct drm_sched_fence *fence = to_drm_sched_fence(f);
 
+	spin_lock_destroy(&fence->lock);
+
 	kmem_cache_free(sched_fence_slab, fence);
 }
 
