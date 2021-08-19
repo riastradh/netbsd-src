@@ -818,6 +818,7 @@ top:	KASSERT(fence == NULL);
 			    GFP_KERNEL);
 			if (shared == NULL)
 				return -ENOMEM;
+			goto top;
 		}
 
 		/*
