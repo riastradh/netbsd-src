@@ -171,5 +171,6 @@ EXPORT_SYMBOL(drm_flip_work_init);
 void drm_flip_work_cleanup(struct drm_flip_work *work)
 {
 	WARN_ON(!list_empty(&work->queued) || !list_empty(&work->commited));
+	spin_lock_destroy(&work->lock);
 }
 EXPORT_SYMBOL(drm_flip_work_cleanup);

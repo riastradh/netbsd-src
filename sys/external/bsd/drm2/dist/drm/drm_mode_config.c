@@ -533,9 +533,14 @@ void drm_mode_config_cleanup(struct drm_device *dev)
 		drm_framebuffer_free(&fb->base.refcount);
 	}
 
+	spin_lock_destroy(&dev->mode_config.connector_list_lock);
 	ida_destroy(&dev->mode_config.connector_ida);
 	idr_destroy(&dev->mode_config.tile_idr);
 	idr_destroy(&dev->mode_config.object_idr);
+	mutex_destroy(&dev->mode_config.blob_lock);
+	mutex_destroy(&dev->mode_config.fb_lock);
+	mutex_destroy(&dev->mode_config.idr_mutex);
 	drm_modeset_lock_fini(&dev->mode_config.connection_mutex);
+	mutex_destroy(&dev->mode_config.mutex);
 }
 EXPORT_SYMBOL(drm_mode_config_cleanup);
