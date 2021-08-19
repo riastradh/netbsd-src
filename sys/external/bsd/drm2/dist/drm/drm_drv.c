@@ -761,6 +761,7 @@ err_pswitch:
 	mutex_destroy(&dev->clientlist_mutex);
 	mutex_destroy(&dev->filelist_mutex);
 	mutex_destroy(&dev->struct_mutex);
+	spin_lock_destroy(&dev->event_lock);
 	drm_legacy_destroy_members(dev);
 	return ret;
 }
@@ -843,6 +844,7 @@ void drm_dev_fini(struct drm_device *dev)
 	mutex_destroy(&dev->clientlist_mutex);
 	mutex_destroy(&dev->filelist_mutex);
 	mutex_destroy(&dev->struct_mutex);
+	spin_lock_destroy(&dev->event_lock);
 	drm_legacy_destroy_members(dev);
 	kfree(dev->unique);
 }

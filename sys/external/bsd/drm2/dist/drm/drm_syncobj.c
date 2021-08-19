@@ -465,6 +465,7 @@ void drm_syncobj_free(struct kref *kref)
 						   struct drm_syncobj,
 						   refcount);
 	drm_syncobj_replace_fence(syncobj, NULL);
+	spin_lock_destroy(&syncobj->lock);
 	kfree(syncobj);
 }
 EXPORT_SYMBOL(drm_syncobj_free);
