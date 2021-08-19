@@ -39,6 +39,10 @@
 #include <sys/ioccom.h>
 #include <sys/queue.h>
 
+#ifdef _KERNEL
+#include <sys/pslist.h>
+#endif
+
 struct ksyms_symtab {
 	TAILQ_ENTRY(ksyms_symtab) sd_queue; /* All active tables */
 	const char *sd_name;	/* Name of this table */
@@ -55,6 +59,10 @@ struct ksyms_symtab {
 	int sd_ctfsize;		/* Size in bytes of CTF contents */
 	uint32_t *sd_nmap;	/* Name map for sorted symbols */
 	int sd_nmapsize;	/* Total span of map */
+
+#ifdef _KERNEL
+	struct pslist_entry sd_pslist;
+#endif
 };
 
 /*
