@@ -728,8 +728,11 @@ drm_sched_get_cleanup_job(struct drm_gpu_scheduler *sched)
  */
 static bool drm_sched_blocked(struct drm_gpu_scheduler *sched)
 {
+	assert_spin_locked(&sched->job_list_lock);
 	if (kthread_should_park()) {
+		spin_unlock(&sched->job_list_lock);
 		kthread_parkme();
+		spin_lock(&sched->job_list_lock);
 		return true;
 	}
 
