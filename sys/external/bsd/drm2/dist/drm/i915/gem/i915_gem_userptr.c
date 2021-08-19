@@ -232,8 +232,10 @@ i915_mmu_notifier_find(struct i915_mm_struct *mm)
 	mutex_unlock(&mm->i915->mm_lock);
 	up_write(&mm->mm->mmap_sem);
 
-	if (mn && !IS_ERR(mn))
+	if (mn && !IS_ERR(mn)) {
+		spin_lock_destroy(&mn->lock);
 		kfree(mn);
+	}
 
 	return err ? ERR_PTR(err) : mm->mn;
 }
@@ -282,6 +284,7 @@ i915_mmu_notifier_free(struct i915_mmu_notifier *mn,
 		return;
 
 	mmu_notifier_unregister(&mn->mn, mm);
+	spin_lock_destroy(&mn->lock);
 	kfree(mn);
 }
 

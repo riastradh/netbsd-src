@@ -1272,6 +1272,7 @@ void i915_gem_cleanup_early(struct drm_i915_private *dev_priv)
 	GEM_BUG_ON(atomic_read(&dev_priv->mm.free_count));
 	WARN_ON(dev_priv->mm.shrink_count);
 	spin_lock_destroy(&dev_priv->fb_tracking.lock);
+	spin_lock_destroy(&dev_priv->mm.obj_lock);
 }
 
 int i915_gem_freeze(struct drm_i915_private *dev_priv)

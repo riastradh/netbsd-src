@@ -1677,6 +1677,13 @@ void intel_rps_init(struct intel_rps *rps)
 		rps->pm_intrmsk_mbz |= GEN8_PMINTR_DISABLE_REDIRECT_TO_GUC;
 }
 
+void intel_rps_fini(struct intel_rps *rps)
+{
+
+	mutex_destroy(&rps->power.mutex);
+	mutex_destroy(&rps->lock);
+}
+
 u32 intel_rps_get_cagf(struct intel_rps *rps, u32 rpstat)
 {
 	struct drm_i915_private *i915 = rps_to_i915(rps);

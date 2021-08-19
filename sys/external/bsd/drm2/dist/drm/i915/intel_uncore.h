@@ -202,7 +202,11 @@ intel_uncore_has_fifo(const struct intel_uncore *uncore)
 
 void
 intel_uncore_mmio_debug_init_early(struct intel_uncore_mmio_debug *mmio_debug);
+void
+intel_uncore_mmio_debug_fini_early(struct intel_uncore_mmio_debug *mmio_debug);
 void intel_uncore_init_early(struct intel_uncore *uncore,
+			     struct drm_i915_private *i915);
+void intel_uncore_fini_early(struct intel_uncore *uncore,
 			     struct drm_i915_private *i915);
 int intel_uncore_init_mmio(struct intel_uncore *uncore);
 void intel_uncore_prune_mmio_domains(struct intel_uncore *uncore);

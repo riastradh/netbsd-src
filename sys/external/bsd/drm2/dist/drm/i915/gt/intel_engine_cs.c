@@ -828,6 +828,8 @@ void intel_engine_cleanup_common(struct intel_engine_cs *engine)
 	intel_wa_list_free(&engine->ctx_wa_list);
 	intel_wa_list_free(&engine->wa_list);
 	intel_wa_list_free(&engine->whitelist);
+
+	spin_lock_destroy(&engine->active.lock);
 }
 
 u64 intel_engine_get_active_head(const struct intel_engine_cs *engine)
