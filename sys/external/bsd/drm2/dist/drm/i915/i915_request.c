@@ -1613,7 +1613,10 @@ long i915_request_wait(struct i915_request *rq,
 		goto out;
 	spin_lock(rq->fence.lock);
 #define	C	(i915_request_completed(rq) ? 1 :			      \
-		    (intel_engine_flush_submission(rq->engine), 0))
+		    (spin_unlock(rq->fence.lock),			      \
+			intel_engine_flush_submission(rq->engine),	      \
+			spin_lock(rq->fence.lock),			      \
+			i915_request_completed(rq)))
 	if (flags & I915_WAIT_INTERRUPTIBLE) {
 		DRM_SPIN_TIMED_WAIT_UNTIL(timeout, &wait.wq,
 		    rq->fence.lock, timeout,
