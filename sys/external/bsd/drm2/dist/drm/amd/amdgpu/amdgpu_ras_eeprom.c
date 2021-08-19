@@ -285,6 +285,8 @@ void amdgpu_ras_eeprom_fini(struct amdgpu_ras_eeprom_control *control)
 	default:
 		return;
 	}
+
+	mutex_destroy(&control->tbl_mutex);
 }
 
 static void __encode_table_record_to_buff(struct amdgpu_ras_eeprom_control *control,

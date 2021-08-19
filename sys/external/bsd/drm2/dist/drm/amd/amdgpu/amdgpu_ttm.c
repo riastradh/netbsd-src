@@ -2069,6 +2069,7 @@ void amdgpu_ttm_fini(struct amdgpu_device *adev)
 	ttm_bo_clean_mm(&adev->mman.bdev, AMDGPU_PL_OA);
 	ttm_bo_device_release(&adev->mman.bdev);
 	adev->mman.initialized = false;
+	mutex_destroy(&adev->mman.gtt_window_lock);
 	DRM_INFO("amdgpu: ttm finalized\n");
 }
 

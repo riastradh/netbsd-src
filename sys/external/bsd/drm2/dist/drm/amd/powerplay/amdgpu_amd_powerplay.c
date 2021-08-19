@@ -73,6 +73,7 @@ static void amd_powerplay_destroy(struct amdgpu_device *adev)
 	kfree(hwmgr->hardcode_pp_table);
 	hwmgr->hardcode_pp_table = NULL;
 
+	mutex_destroy(&hwmgr->smu_lock);
 	kfree(hwmgr);
 	hwmgr = NULL;
 }
