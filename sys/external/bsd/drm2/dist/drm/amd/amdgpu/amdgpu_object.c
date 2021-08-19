@@ -1079,6 +1079,10 @@ int amdgpu_bo_init(struct amdgpu_device *adev)
 	/* Add an MTRR for the VRAM */
 	adev->gmc.vram_mtrr = arch_phys_wc_add(adev->gmc.aper_base,
 					      adev->gmc.aper_size);
+#ifdef __NetBSD__
+	if (adev->gmc.aper_base)
+		pmap_pv_track(adev->gmc.aper_base, adev->gmc.aper_size);
+#endif
 	DRM_INFO("Detected VRAM RAM=%"PRIu64"M, BAR=%lluM\n",
 		 adev->gmc.mc_vram_size >> 20,
 		 (unsigned long long)adev->gmc.aper_size >> 20);
@@ -1113,6 +1117,10 @@ int amdgpu_bo_late_init(struct amdgpu_device *adev)
 void amdgpu_bo_fini(struct amdgpu_device *adev)
 {
 	amdgpu_ttm_fini(adev);
+#ifdef __NetBSD__
+	if (adev->gmc.aper_base)
+		pmap_pv_untrack(adev->gmc.aper_base, adev->gmc.aper_size);
+#endif
 	arch_phys_wc_del(adev->gmc.vram_mtrr);
 	arch_io_free_memtype_wc(adev->gmc.aper_base, adev->gmc.aper_size);
 }
