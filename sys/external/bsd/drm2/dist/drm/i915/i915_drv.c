@@ -584,6 +584,8 @@ err_workqueues:
 	mutex_destroy(&dev_priv->backlight_lock);
 	spin_lock_destroy(&dev_priv->gpu_error.lock);
 	spin_lock_destroy(&dev_priv->irq_lock);
+	intel_uncore_fini_early(&dev_priv->uncore, dev_priv);
+	intel_uncore_mmio_debug_fini_early(&dev_priv->mmio_debug);
 	return ret;
 }
 
@@ -594,6 +596,7 @@ err_workqueues:
  */
 static void i915_driver_late_release(struct drm_i915_private *dev_priv)
 {
+	intel_display_crc_fini(dev_priv);
 	intel_irq_fini(dev_priv);
 	intel_power_domains_cleanup(dev_priv);
 	i915_gem_cleanup_early(dev_priv);
@@ -607,10 +610,11 @@ static void i915_driver_late_release(struct drm_i915_private *dev_priv)
 	mutex_destroy(&dev_priv->wm.wm_mutex);
 	mutex_destroy(&dev_priv->av_mutex);
 	mutex_destroy(&dev_priv->sb_lock);
-	mutex_destroy(&dev_priv->sb_lock);
 	mutex_destroy(&dev_priv->backlight_lock);
 	spin_lock_destroy(&dev_priv->gpu_error.lock);
 	spin_lock_destroy(&dev_priv->irq_lock);
+	intel_uncore_fini_early(&dev_priv->uncore, dev_priv);
+	intel_uncore_mmio_debug_fini_early(&dev_priv->mmio_debug);
 }
 
 /**

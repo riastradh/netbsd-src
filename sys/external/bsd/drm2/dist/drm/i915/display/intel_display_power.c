@@ -4362,6 +4362,7 @@ int intel_power_domains_init(struct drm_i915_private *dev_priv)
 void intel_power_domains_cleanup(struct drm_i915_private *dev_priv)
 {
 	kfree(dev_priv->power_domains.power_wells);
+	mutex_destroy(&dev_priv->power_domains.lock);
 }
 
 static void intel_power_domains_sync_hw(struct drm_i915_private *dev_priv)

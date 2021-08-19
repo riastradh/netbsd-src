@@ -1396,6 +1396,7 @@ void intel_gt_fini_reset(struct intel_gt *gt)
 {
 	cleanup_srcu_struct(&gt->reset.backoff_srcu);
 	DRM_DESTROY_WAITQUEUE(&gt->reset.queue);
+	mutex_destroy(&gt->reset.mutex);
 	spin_lock_destroy(&gt->reset.lock);
 }
 

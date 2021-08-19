@@ -550,6 +550,7 @@ err_pool:
 
 void intel_guc_submission_fini(struct intel_guc *guc)
 {
+	spin_lock_destroy(&guc->wq_lock);
 	if (guc->stage_desc_pool) {
 		guc_proc_desc_destroy(guc);
 		guc_workqueue_destroy(guc);

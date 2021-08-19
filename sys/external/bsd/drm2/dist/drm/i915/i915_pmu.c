@@ -1202,4 +1202,5 @@ void i915_pmu_unregister(struct drm_i915_private *i915)
 	if (!is_igp(i915))
 		kfree(pmu->name);
 	free_event_attributes(pmu);
+	spin_lock_destroy(&pmu->lock);
 }
