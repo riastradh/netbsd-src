@@ -38,6 +38,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "drm_crtc_internal.h"
 #include "drm_internal.h"
 
+#include <linux/nbsd-namespace.h>
+
 /**
  * DOC: overview
  *
@@ -256,11 +258,7 @@ int drm_connector_init(struct drm_device *dev,
 
 	INIT_LIST_HEAD(&connector->probed_modes);
 	INIT_LIST_HEAD(&connector->modes);
-#ifdef __NetBSD__
-	linux_mutex_init(&connector->mutex);
-#else
 	mutex_init(&connector->mutex);
-#endif
 	connector->edid_blob_ptr = NULL;
 	connector->tile_blob_ptr = NULL;
 	connector->status = connector_status_unknown;
@@ -473,11 +471,7 @@ void drm_connector_cleanup(struct drm_connector *connector)
 		connector->funcs->atomic_destroy_state(connector,
 						       connector->state);
 
-#ifdef __NetBSD__
-	linux_mutex_destroy(&connector->mutex);
-#else
 	mutex_destroy(&connector->mutex);
-#endif
 
 	memset(connector, 0, sizeof(*connector));
 }
