@@ -398,8 +398,8 @@ int drm_syncobj_find_fence(struct drm_file *file_private,
 	wait.cv = &cv;
 #else
 	wait.task = current;
-	wait.point = point;
 #endif
+	wait.point = point;
 	drm_syncobj_fence_add_wait(syncobj, &wait);
 
 #ifdef __NetBSD__
