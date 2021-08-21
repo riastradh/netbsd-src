@@ -53,8 +53,8 @@ static void stub_release(struct dma_fence *fence)
 	i915_sw_fence_fini(&stub->chain);
 
 	BUILD_BUG_ON(offsetof(typeof(*stub), dma));
-	dma_fence_free(&stub->dma);
 	spin_lock_destroy(&stub->lock);
+	dma_fence_free(&stub->dma);
 }
 
 static const struct dma_fence_ops stub_fence_ops = {
