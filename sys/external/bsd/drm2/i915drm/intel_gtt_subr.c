@@ -398,7 +398,8 @@ static const struct pci_device_id intel_stolen_ids[] = {
 };
 
 void
-intel_gtt_get(uint64_t *va_size, bus_addr_t *aper_base, uint64_t *aper_size)
+intel_gtt_get(uint64_t *va_size, bus_addr_t *aper_base,
+    resource_size_t *aper_size)
 {
 	struct agp_softc *sc;
 	pci_chipset_tag_t pc;
