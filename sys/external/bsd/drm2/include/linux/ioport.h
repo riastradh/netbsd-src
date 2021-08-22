@@ -35,6 +35,8 @@
 #include <sys/types.h>
 #include <sys/bus.h>
 
+#include <linux/types.h>
+
 #define	IORESOURCE_IO		__BIT(0)
 #define	IORESOURCE_MEM		__BIT(1)
 #define	IORESOURCE_IRQ		__BIT(2)
@@ -52,7 +54,7 @@ struct resource {
 #define	DEFINE_RES_MEM(START, SIZE)					      \
 	{ .start = (START), .end = (START) + ((SIZE) - 1) }
 
-static inline bus_size_t
+static inline resource_size_t
 resource_size(struct resource *resource)
 {
 	return resource->end - resource->start + 1;
