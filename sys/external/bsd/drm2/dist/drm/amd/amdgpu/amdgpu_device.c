@@ -484,7 +484,7 @@ u64 amdgpu_mm_rdoorbell64(struct amdgpu_device *adev, u32 index)
 	if (index < adev->doorbell.num_doorbells) {
 #ifdef __NetBSD__
 		return bus_space_read_8(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index);
+		    8*index);
 #else
 		return atomic64_read((atomic64_t *)(adev->doorbell.ptr + index));
 #endif
@@ -509,7 +509,7 @@ void amdgpu_mm_wdoorbell64(struct amdgpu_device *adev, u32 index, u64 v)
 	if (index < adev->doorbell.num_doorbells) {
 #ifdef __NetBSD__
 		bus_space_write_8(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index, v);
+		    8*index, v);
 #else
 		atomic64_set((atomic64_t *)(adev->doorbell.ptr + index), v);
 #endif
