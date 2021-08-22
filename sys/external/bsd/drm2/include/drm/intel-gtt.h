@@ -43,7 +43,7 @@ struct sg_table;
 
 void	intel_gtt_get(uint64_t * /* GPU VA size in bytes */,
 	    bus_addr_t * /* aperture base */,
-	    uint64_t * /* aperture size in bytes */);
+	    resource_size_t * /* aperture size in bytes */);
 int	intel_gmch_probe(struct pci_dev *, struct pci_dev *,
 	    struct agp_bridge_data *);
 void	intel_gmch_remove(void);
