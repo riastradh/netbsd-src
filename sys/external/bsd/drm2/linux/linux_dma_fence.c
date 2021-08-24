@@ -965,11 +965,7 @@ dma_fence_wait(struct dma_fence *fence, bool intr)
 
 	KASSERT(dma_fence_referenced_p(fence));
 
-	if (fence->ops->wait)
-		ret = (*fence->ops->wait)(fence, intr, MAX_SCHEDULE_TIMEOUT);
-	else
-		ret = dma_fence_default_wait(fence, intr,
-		    MAX_SCHEDULE_TIMEOUT);
+	ret = dma_fence_wait_timeout(fence, intr, MAX_SCHEDULE_TIMEOUT);
 	KASSERT(ret != 0);
 	KASSERTMSG(ret == -ERESTARTSYS || ret == MAX_SCHEDULE_TIMEOUT,
 	    "ret=%ld", ret);
