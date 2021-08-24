@@ -3284,7 +3284,6 @@ int amdgpu_vm_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 void amdgpu_vm_get_task_info(struct amdgpu_device *adev, unsigned int pasid,
 			 struct amdgpu_task_info *task_info)
 {
-#ifndef __NetBSD__		/* XXX amdgpu task info */
 	struct amdgpu_vm *vm;
 	unsigned long flags;
 
@@ -3295,7 +3294,6 @@ void amdgpu_vm_get_task_info(struct amdgpu_device *adev, unsigned int pasid,
 		*task_info = vm->task_info;
 
 	spin_unlock_irqrestore(&adev->vm_manager.pasid_lock, flags);
-#endif
 }
 
 /**
@@ -3305,10 +3303,18 @@ void amdgpu_vm_get_task_info(struct amdgpu_device *adev, unsigned int pasid,
  */
 void amdgpu_vm_set_task_info(struct amdgpu_vm *vm)
 {
-#ifndef __NetBSD__		/* XXX amdgpu task info */
 	if (vm->task_info.pid)
 		return;
 
+#ifdef __NetBSD__
+	vm->task_info.pid = curlwp->l_proc->p_pid;
+	vm->task_info.tgid = curlwp->l_lid;
+	strlcpy(vm->task_info.process_name, curlwp->l_proc->p_comm,
+	    sizeof vm->task_info.process_name);
+	if (curlwp->l_name)
+		strlcpy(vm->task_info.task_name, curlwp->l_name,
+		    sizeof vm->task_info.task_name);
+#else
 	vm->task_info.pid = current->pid;
 	get_task_comm(vm->task_info.task_name, current);
 
