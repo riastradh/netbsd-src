@@ -133,6 +133,7 @@ static int ttm_bo_man_takedown(struct ttm_mem_type_manager *man)
 	if (drm_mm_clean(mm)) {
 		drm_mm_takedown(mm);
 		spin_unlock(&rman->lock);
+		spin_lock_destroy(&rman->lock);
 		kfree(rman);
 		man->priv = NULL;
 		return 0;
