@@ -463,18 +463,18 @@ void amdgpu_ctx_add_fence(struct amdgpu_ctx *ctx,
 			  struct dma_fence *fence, uint64_t* handle)
 {
 	struct amdgpu_ctx_entity *centity = to_amdgpu_ctx_entity(entity);
-	uint64_t seq = centity->sequence;
+	uint64_t seq;
 	struct dma_fence *other = NULL;
 	unsigned idx = 0;
 
+	spin_lock(&ctx->ring_lock);
+	seq = centity->sequence;
 	idx = seq & (amdgpu_sched_jobs - 1);
 	other = centity->fences[idx];
 	if (other)
 		BUG_ON(!dma_fence_is_signaled(other));
 
 	dma_fence_get(fence);
-
-	spin_lock(&ctx->ring_lock);
 	centity->fences[idx] = fence;
 	centity->sequence++;
 	spin_unlock(&ctx->ring_lock);
