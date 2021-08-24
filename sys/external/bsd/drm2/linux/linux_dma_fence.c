@@ -406,16 +406,14 @@ dma_fence_ensure_signal_enabled(struct dma_fence *fence)
 
 	/*
 	 * Otherwise, if it wasn't enabled yet, try to enable
-	 * signalling, or fail if the fence doesn't support that.
+	 * signalling.
 	 */
-	if (!already_enabled) {
-		if (fence->ops->enable_signaling == NULL)
-			return -ENOENT;
-		if (!(*fence->ops->enable_signaling)(fence)) {
-			/* If it failed, signal and return -ENOENT.  */
-			dma_fence_signal_locked(fence);
-			return -ENOENT;
-		}
+	if (!already_enabled &&
+	    fence->ops->enable_signaling &&
+	    !(*fence->ops->enable_signaling)(fence)) {
+		/* If it failed, signal and return -ENOENT.  */
+		dma_fence_signal_locked(fence);
+		return -ENOENT;
 	}
 
 	/* Success!  */
