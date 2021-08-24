@@ -44,6 +44,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "power_state.h"
 #include "pp_thermal.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define ixSMUSVI_NB_CURRENTVID 0xD8230044
 #define CURRENT_NB_VID_MASK 0xff000000
 #define CURRENT_NB_VID__SHIFT 24
@@ -1531,7 +1533,7 @@ static int smu8_print_clock_levels(struct pp_hwmgr *hwmgr,
 				CURR_SCLK_INDEX);
 
 		for (i = 0; i < sclk_table->count; i++)
-			size += snprintf(buf + size, SIZE_MAX/*XXX*/, "%d: %uMhz %s\n",
+			size += sprintf(buf + size, "%d: %uMhz %s\n",
 					i, sclk_table->entries[i].clk / 100,
 					(i == now) ? "*" : "");
 		break;
@@ -1543,7 +1545,7 @@ static int smu8_print_clock_levels(struct pp_hwmgr *hwmgr,
 				CURR_MCLK_INDEX);
 
 		for (i = SMU8_NUM_NBPMEMORYCLOCK; i > 0; i--)
-			size += snprintf(buf + size, SIZE_MAX/*XXX*/, "%d: %uMhz %s\n",
+			size += sprintf(buf + size, "%d: %uMhz %s\n",
 					SMU8_NUM_NBPMEMORYCLOCK-i, data->sys_info.nbp_memory_clock[i-1] / 100,
 					(SMU8_NUM_NBPMEMORYCLOCK-i == now) ? "*" : "");
 		break;
