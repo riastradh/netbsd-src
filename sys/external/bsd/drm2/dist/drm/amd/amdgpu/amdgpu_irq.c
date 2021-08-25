@@ -253,7 +253,14 @@ int amdgpu_irq_init(struct amdgpu_device *adev)
 	adev->irq.msi_enabled = false;
 
 	if (amdgpu_msi_ok(adev)) {
-#ifndef __NetBSD__		/* XXX amdgpu msix */
+#ifdef __NetBSD__		/* XXX amdgpu msix */
+		if (pci_enable_msi(adev->pdev) == 0) {
+			adev->irq.msi_enabled = true;
+			dev_dbg(adev->dev, "amdgpu: using MSI/MSI-X.\n");
+		} else {
+			dev_err(adev->dev, "amdgpu: failed to enable MSI\n");
+		}
+#else
 		int nvec = pci_msix_vec_count(adev->pdev);
 		unsigned int flags;
 
