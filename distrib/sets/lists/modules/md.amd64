@@ -28,6 +28,8 @@
 ./@MODULEDIR@/acpiwmi/acpiwmi.kmod		modules-base-kernel	kmod
 ./@MODULEDIR@/aibs				modules-base-kernel	kmod
 ./@MODULEDIR@/aibs/aibs.kmod			modules-base-kernel	kmod
+./@MODULEDIR@/amdgpu				modules-base-kernel	kmod
+./@MODULEDIR@/amdgpu/amdgpu.kmod		modules-base-kernel	kmod
 ./@MODULEDIR@/amdsmn				modules-base-kernel	kmod
 ./@MODULEDIR@/amdsmn/amdsmn.kmod		modules-base-kernel	kmod
 ./@MODULEDIR@/amdtemp				modules-base-kernel	kmod
