@@ -39,13 +39,13 @@ __KERNEL_RCSID(0, "$NetBSD$");
 static const char *
 dma_fence_array_driver_name(struct dma_fence *fence)
 {
-	return "dma-fence-array";
+	return "dma_fence_array";
 }
 
 static const char *
 dma_fence_array_timeline_name(struct dma_fence *fence)
 {
-	return "dma-fence-array-timeline";
+	return "unbound";
 }
 
 static void
