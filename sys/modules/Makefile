@@ -336,13 +336,13 @@ SUBDIR+=	viadrmums
 .if ${MACHINE_ARCH} == "i386" || \
     ${MACHINE_ARCH} == "x86_64"
 SUBDIR+=	compat_linux
-SUBDIR+=	drm
-SUBDIR+=	drmkms
-SUBDIR+=	drmkms_agp
-SUBDIR+=	drmkms_linux
-SUBDIR+=	drmkms_pci
-SUBDIR+=	i915drm
-SUBDIR+=	i915drmkms
+#SUBDIR+=	drm
+#SUBDIR+=	drmkms
+#SUBDIR+=	drmkms_agp
+#SUBDIR+=	drmkms_linux
+#SUBDIR+=	drmkms_pci
+#SUBDIR+=	i915drm
+#SUBDIR+=	i915drmkms
 #
 # ISA modules
 #
@@ -354,6 +354,10 @@ SUBDIR+=	lm_isa
 SUBDIR+=	lm_isa_common
 SUBDIR+=	lm_wbsio
 SUBDIR+=	wbsio
+.endif
+
+.if ${MACHINE_CPU} == "x86_64"
+SUBDIR+=	amdgpu
 .endif
 
 .if ${MACHINE_CPU} == "m68k"
