@@ -1,0 +1,12 @@
+#	$NetBSD$
+
+ioconf amdgpu
+
+include "conf/files"
+include "dev/pci/files.pci"
+
+pseudo-root	pci*
+pseudo-root	amdgpufbbus*
+
+amdgpu*		at pci? dev ? function ?
+amdgpufb*	at amdgpufbbus?
