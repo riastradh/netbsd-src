@@ -103,6 +103,7 @@ dma_fence_chain_walk(struct dma_fence *fence)
 {
 
 	/* XXX */
+	dma_fence_put(fence);
 	return NULL;
 }
 
