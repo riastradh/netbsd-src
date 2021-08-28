@@ -367,6 +367,10 @@ SUBDIR+=	wbsio
 SUBDIR+=	compat_linux
 .endif
 
+.if ${MACHINE_CPU} == "x86_64"
+SUBDIR+=	amdgpu
+.endif
+
 .if ${MACHINE_CPU} == "m68k"
 SUBDIR+=	compat_aoutm68k
 #SUBDIR+=	compat_linux
