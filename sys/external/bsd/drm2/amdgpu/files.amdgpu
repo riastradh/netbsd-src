@@ -3,7 +3,7 @@
 version	20180827
 
 define	amdgpufbbus	{ }
-device	amdgpu: drmkms, drmkms_pci, drmkms_ttm, drmsched, amdgpufbbus, firmload
+device	amdgpu: drmkms, drmkms_pci, drmkms_ttm, amdgpufbbus, firmload
 attach	amdgpu at pci
 
 defflag	opt_amdgpu_cik.h AMDGPU_CIK
