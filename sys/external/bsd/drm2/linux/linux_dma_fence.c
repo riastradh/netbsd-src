@@ -394,20 +394,15 @@ dma_fence_get_rcu(struct dma_fence *fence)
 struct dma_fence *
 dma_fence_get_rcu_safe(struct dma_fence *volatile const *fencep)
 {
-	struct dma_fence *fence, *fence0;
+	struct dma_fence *fence;
 
 retry:
-	fence = *fencep;
-
-	/* Load fence only once.  */
-	__insn_barrier();
-
-	/* If there's nothing there, give up.  */
-	if (fence == NULL)
+	/*
+	 * Load the fence, ensuring we observe the fully initialized
+	 * content.
+	 */
+	if ((fence = atomic_load_consume(fencep)) == NULL)
 		return NULL;
-
-	/* Make sure we don't load stale fence guts.  */
-	membar_datadep_consumer();
 
 	/* Try to acquire a reference.  If we can't, try again.  */
 	if (!dma_fence_get_rcu(fence))
@@ -417,9 +412,7 @@ retry:
 	 * Confirm that it's still the same fence.  If not, release it
 	 * and retry.
 	 */
-	fence0 = *fencep;
-	__insn_barrier();
-	if (fence != fence0) {
+	if (fence != atomic_load_relaxed(fencep)) {
 		dma_fence_put(fence);
 		goto retry;
 	}
