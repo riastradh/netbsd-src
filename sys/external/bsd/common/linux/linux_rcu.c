@@ -276,6 +276,15 @@ gc_thread(void *cookie)
 		/* Finished a batch of work.  Notify rcu_barrier.  */
 		gc.gen++;
 		cv_broadcast(&gc.cv);
+
+		/*
+		 * Limit ourselves to one batch per tick, in an attempt
+		 * to make the batches larger.
+		 *
+		 * XXX We should maybe also limit the size of each
+		 * batch.
+		 */
+		(void)kpause("lxrcubat", /*intr*/false, /*timo*/1, &gc.lock);
 	}
 	KASSERT(gc.first_callback == NULL);
 	KASSERT(gc.first_kfree == NULL);
