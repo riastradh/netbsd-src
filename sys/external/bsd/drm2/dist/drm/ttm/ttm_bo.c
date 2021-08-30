@@ -57,27 +57,29 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <linux/nbsd-namespace.h>
 
-#ifndef __NetBSD__
+#ifndef __NetBSD__		/* XXX sysfs */
 static void ttm_bo_global_kobj_release(struct kobject *kobj);
 #endif
 
-#ifdef __linux__		/* XXX sysfs */
 /**
  * ttm_global_mutex - protecting the global BO state
  */
+#ifdef __NetBSD__
+static struct mutex ttm_global_mutex;
+unsigned ttm_bo_glob_use_count;
+struct ttm_bo_global ttm_bo_glob;
+#else
 DEFINE_MUTEX(ttm_global_mutex);
 unsigned ttm_bo_glob_use_count;
 struct ttm_bo_global ttm_bo_glob;
 EXPORT_SYMBOL(ttm_bo_glob);
+#endif
 
+#ifndef __NetBSD__		/* XXX sysfs */
 static struct attribute ttm_bo_count = {
 	.name = "bo_count",
 	.mode = S_IRUGO
 };
-#else
-static struct mutex ttm_global_mutex;
-unsigned ttm_bo_glob_use_count;
-struct ttm_bo_global ttm_bo_glob;
 #endif
 
 /* default destructor */

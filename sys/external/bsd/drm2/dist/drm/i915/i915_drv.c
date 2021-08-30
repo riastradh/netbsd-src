@@ -1237,7 +1237,7 @@ static int i915_driver_hw_probe(struct drm_i915_private *dev_priv)
 
 	pci_set_master(pdev);
 
-#ifdef __linux__
+#ifndef __NetBSD__
 	/*
 	 * We don't have a max segment size, so set it to the max so sg's
 	 * debugging layer doesn't complain

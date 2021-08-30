@@ -59,7 +59,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 unsigned int __drm_debug;
 EXPORT_SYMBOL(__drm_debug);
 
-#ifdef __linux__
+#ifndef __NetBSD__
 MODULE_PARM_DESC(debug, "Enable debug output, where each bit enables a debug category.\n"
 "\t\tBit 0 (0x01)  will enable CORE messages (drm core code)\n"
 "\t\tBit 1 (0x02)  will enable DRIVER messages (drm controller code)\n"
