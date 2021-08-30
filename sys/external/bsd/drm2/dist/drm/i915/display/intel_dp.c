@@ -1197,12 +1197,12 @@ intel_dp_aux_wait_done(struct intel_dp *intel_dp)
 		    &i915->gmbus_wait_queue, &i915->gmbus_wait_lock,
 		    msecs_to_jiffies_timeout(timeout_ms),
 		    C);
-		if (ret < 0)	/* Failure: pretend same as done.  */
-			done = true;
-		else if (ret == 0) /* Timed out: not done.  */
-			done = false;
-		else		/* Succeeded (ret > 0): done.  */
-			done = true;
+		/*
+		 * ret<0 on error (-ERESTARTSYS, interrupt); ret=0 on
+		 * timeout; ret>0 on success.  We care about success
+		 * only.
+		 */
+		done = (ret > 0);
 		spin_unlock(&i915->gmbus_wait_lock);
 	} else {
 		done = wait_for_atomic(C, timeout_ms) == 0;
