@@ -487,6 +487,10 @@ nvkm_ioctl(struct nvkm_client *client, bool supervisor,
 			client->data = NULL;
 		}
 	}
+#ifdef __NetBSD__
+	else
+		ret = 0;
+#endif
 
 	return ret;
 }
