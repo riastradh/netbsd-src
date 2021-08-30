@@ -6908,7 +6908,7 @@ int si_dpm_init(struct radeon_device *rdev)
 	struct si_power_info *si_pi;
 	struct atom_clock_dividers dividers;
 	enum pci_bus_speed speed_cap = PCI_SPEED_UNKNOWN;
-#ifdef __linux__		/* XXX radeon pcie */
+#ifndef __NetBSD__		/* XXX radeon pcie */
 	struct pci_dev *root = rdev->pdev->bus->self;
 #endif
 	int ret;
@@ -6921,7 +6921,7 @@ int si_dpm_init(struct radeon_device *rdev)
 	eg_pi = &ni_pi->eg;
 	pi = &eg_pi->rv7xx;
 
-#ifdef __linux__
+#ifndef __NetBSD__		/* XXX radeon pcie */
 	if (!pci_is_root_bus(rdev->pdev->bus))
 		speed_cap = pcie_get_speed_cap(root);
 #endif

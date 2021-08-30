@@ -35,7 +35,7 @@
 
 #include <linux/mm.h>
 
-#if defined(CONFIG_X86) && defined(__linux__)
+#if defined(CONFIG_X86) && !defined(__NetBSD__)
 
 #include <asm/set_memory.h>
 

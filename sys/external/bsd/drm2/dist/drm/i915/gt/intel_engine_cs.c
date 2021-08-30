@@ -1375,10 +1375,10 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 				   idx, hws[idx * 2], hws[idx * 2 + 1]);
 		}
 
-#ifdef __linux__
-		execlists_active_lock_bh(execlists);
-#else
+#ifdef __NetBSD__
 		int s = execlists_active_lock_bh(execlists);
+#else
+		execlists_active_lock_bh(execlists);
 #endif
 		rcu_read_lock();
 		for (port = execlists->active; (rq = *port); port++) {
