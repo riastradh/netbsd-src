@@ -1024,6 +1024,17 @@ void drm_dp_aux_init(struct drm_dp_aux *aux)
 EXPORT_SYMBOL(drm_dp_aux_init);
 
 /**
+ * drm_dp_aux_fini() - undo what drm_dp_aux_init() does.
+ * @aux: DisplayPort AUX channel
+ */
+void drm_dp_aux_fini(struct drm_dp_aux *aux)
+{
+	mutex_destroy(&aux->cec.lock);
+	mutex_destroy(&aux->hw_mutex);
+}
+EXPORT_SYMBOL(drm_dp_aux_fini);
+
+/**
  * drm_dp_aux_register() - initialise and register aux channel
  * @aux: DisplayPort AUX channel
  *
@@ -1075,8 +1086,7 @@ void drm_dp_aux_unregister(struct drm_dp_aux *aux)
 {
 	drm_dp_aux_unregister_devnode(aux);
 	i2c_del_adapter(&aux->ddc);
-	mutex_destroy(&aux->cec.lock);
-	mutex_destroy(&aux->hw_mutex);
+	drm_dp_aux_fini(aux);
 }
 EXPORT_SYMBOL(drm_dp_aux_unregister);
 
