@@ -880,9 +880,7 @@ EXPORT_SYMBOL(drm_sched_init);
 void drm_sched_fini(struct drm_gpu_scheduler *sched)
 {
 	if (sched->thread) {
-		spin_lock(&sched->job_list_lock);
 		kthread_stop(sched->thread);
-		spin_unlock(&sched->job_list_lock);
 	}
 
 	sched->ready = false;
