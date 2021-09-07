@@ -816,8 +816,11 @@ static int amdgpu_device_doorbell_init(struct amdgpu_device *adev)
 static void amdgpu_device_doorbell_fini(struct amdgpu_device *adev)
 {
 #ifdef __NetBSD__
-	bus_space_unmap(adev->doorbell.bst, adev->doorbell.bsh,
-	    adev->doorbell.num_doorbells * sizeof(u32));
+	if (adev->doorbell.num_doorbells) {
+		bus_space_unmap(adev->doorbell.bst, adev->doorbell.bsh,
+		    adev->doorbell.num_doorbells * sizeof(u32));
+		adev->doorbell.num_doorbells = 0;
+	}
 #else
 	iounmap(adev->doorbell.ptr);
 	adev->doorbell.ptr = NULL;
