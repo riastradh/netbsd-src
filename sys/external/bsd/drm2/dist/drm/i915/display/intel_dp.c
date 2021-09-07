@@ -1730,6 +1730,7 @@ static i915_reg_t skl_aux_data_reg(struct intel_dp *intel_dp, int index)
 static void
 intel_dp_aux_fini(struct intel_dp *intel_dp)
 {
+	drm_dp_aux_fini(&intel_dp->aux);
 	kfree(__UNCONST(intel_dp->aux.name));
 }
 
