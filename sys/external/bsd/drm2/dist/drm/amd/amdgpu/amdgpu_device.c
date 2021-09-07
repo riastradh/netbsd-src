@@ -272,8 +272,7 @@ uint32_t amdgpu_mm_rreg(struct amdgpu_device *adev, uint32_t reg,
 uint8_t amdgpu_mm_rreg8(struct amdgpu_device *adev, uint32_t offset) {
 	if (offset < adev->rmmio_size)
 #ifdef __NetBSD__
-		return bus_space_read_1(adev->rmmiot, adev->rmmioh,
-		    adev->rmmio_base + offset);
+		return bus_space_read_1(adev->rmmiot, adev->rmmioh, offset);
 #else
 		return (readb(adev->rmmio + offset));
 #endif
@@ -298,8 +297,7 @@ uint8_t amdgpu_mm_rreg8(struct amdgpu_device *adev, uint32_t offset) {
 void amdgpu_mm_wreg8(struct amdgpu_device *adev, uint32_t offset, uint8_t value) {
 	if (offset < adev->rmmio_size)
 #ifdef __NetBSD__
-		bus_space_write_1(adev->rmmiot, adev->rmmioh,
-		    adev->rmmio_base + offset, value);
+		bus_space_write_1(adev->rmmiot, adev->rmmioh, offset, value);
 #else
 		writeb(value, adev->rmmio + offset);
 #endif
