@@ -67,4 +67,10 @@
 #define	TRACE6(m,p,n,a,b,c,d,e,f)	SDT_PROBE6(sdt,m,p,n,a,b,c,d,e,f)
 #define	TRACE7(m,p,n,a,b,c,d,e,f,g)	SDT_PROBE7(sdt,m,p,n,a,b,c,d,e,f,g)
 
+#ifdef KDTRACE_HOOKS
+#define	__trace_used	/* empty */
+#else
+#define	__trace_used	__unused
+#endif
+
 #endif	/* _LINUX_TRACEPOINT_H_ */
