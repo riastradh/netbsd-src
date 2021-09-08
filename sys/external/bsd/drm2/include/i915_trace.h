@@ -262,7 +262,7 @@ static inline void
 trace_i915_reg_rw(bool write, i915_reg_t reg, uint64_t value, size_t len,
     bool trace)
 {
-	uint32_t regoff = i915_mmio_reg_offset(reg);
+	uint32_t regoff __trace_used = i915_mmio_reg_offset(reg);
 
 	if (!trace)
 		return;
