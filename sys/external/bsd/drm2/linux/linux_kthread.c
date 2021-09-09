@@ -275,6 +275,9 @@ kthread_parkme(void)
 {
 	struct task_struct *T = linux_kthread();
 
+	assert_spin_locked(T->kt_interlock);
+
+	spin_unlock(T->kt_interlock);
 	mutex_enter(&T->kt_lock);
 	while (T->kt_shouldpark) {
 		T->kt_parked = true;
@@ -283,4 +286,5 @@ kthread_parkme(void)
 		T->kt_parked = false;
 	}
 	mutex_exit(&T->kt_lock);
+	spin_lock(T->kt_interlock);
 }
