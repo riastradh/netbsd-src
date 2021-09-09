@@ -32,6 +32,10 @@
 #ifndef _LINUX_KTHREAD_H_
 #define _LINUX_KTHREAD_H_
 
+#include <linux/spinlock.h>
+
+#include <drm/drm_wait_netbsd.h>
+
 struct task_struct;
 
 #define	__kthread_should_park	linux___kthread_should_park
@@ -43,7 +47,8 @@ struct task_struct;
 #define	kthread_stop		linux_kthread_stop
 #define	kthread_unpark		linux_kthread_unpark
 
-struct task_struct *kthread_run(int (*)(void *), void *, const char *);
+struct task_struct *kthread_run(int (*)(void *), void *, const char *,
+    spinlock_t *, drm_waitqueue_t *);
 
 int kthread_stop(struct task_struct *);
 int kthread_should_stop(void);
