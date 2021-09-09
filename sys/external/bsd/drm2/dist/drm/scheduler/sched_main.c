@@ -877,9 +877,8 @@ EXPORT_SYMBOL(drm_sched_init);
  */
 void drm_sched_fini(struct drm_gpu_scheduler *sched)
 {
-	if (sched->thread) {
+	if (sched->thread)
 		kthread_stop(sched->thread);
-	}
 
 	sched->ready = false;
 
