@@ -857,7 +857,8 @@ int drm_sched_init(struct drm_gpu_scheduler *sched,
 	atomic64_set(&sched->job_id_count, 0);
 
 	/* Each scheduler will run on a seperate kernel thread */
-	sched->thread = kthread_run(drm_sched_main, sched, sched->name);
+	sched->thread = kthread_run(drm_sched_main, sched, sched->name,
+	    &sched->job_list_lock, &sched->wake_up_worker);
 	if (IS_ERR(sched->thread)) {
 		ret = PTR_ERR(sched->thread);
 		sched->thread = NULL;
