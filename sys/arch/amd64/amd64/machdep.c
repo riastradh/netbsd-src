@@ -700,8 +700,15 @@ cpu_reboot(int howto, char *bootstr)
 		       config_detach_all(boothowto) ||
 		       vfs_unmount_forceone(curlwp))
 			;	/* do nothing */
-	} else
-		suspendsched();
+	} else {
+		int ddb = 0;
+#ifdef DDB
+		extern int db_active; /* XXX */
+		ddb = db_active;
+#endif
+		if (!ddb)
+			suspendsched();
+	}
 
 	pmf_system_shutdown(boothowto);
 
