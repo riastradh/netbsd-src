@@ -41,6 +41,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <sys/mutex.h>
 #include <sys/specificdata.h>
 
+#include <linux/err.h>
 #include <linux/kthread.h>
 #include <linux/spinlock.h>
 
@@ -153,7 +154,7 @@ kthread_run(int (*func)(void *), void *cookie, const char *name,
 	    linux_kthread_start, T, &T->kt_lwp, "%s", name);
 	if (error) {
 		kthread_free(T);
-		T = NULL;
+		return ERR_PTR(-error); /* XXX errno NetBSD->Linux */
 	}
 
 	return T;
