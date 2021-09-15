@@ -643,7 +643,7 @@ drm_sched_select_entity(struct drm_gpu_scheduler *sched)
 	int i;
 
 	if (!drm_sched_ready(sched))
-		return printf("%s:%d\n", __func__, __LINE__), NULL;
+		return NULL;
 
 	/* Kernel run queue has higher priority than normal run queue*/
 	for (i = DRM_SCHED_PRIORITY_MAX - 1; i >= DRM_SCHED_PRIORITY_MIN; i--) {
@@ -652,7 +652,7 @@ drm_sched_select_entity(struct drm_gpu_scheduler *sched)
 			break;
 	}
 
-	return printf("%s:%d entity=%p\n", __func__, __LINE__, entity), entity;
+	return entity;
 }
 
 /**
@@ -702,7 +702,7 @@ drm_sched_get_cleanup_job(struct drm_gpu_scheduler *sched)
 	if ((sched->timeout != MAX_SCHEDULE_TIMEOUT &&
 	    !cancel_delayed_work(&sched->work_tdr)) ||
 	    __kthread_should_park(sched->thread))
-		return printf("%s:%d\n", __func__, __LINE__), NULL;
+		return NULL;
 
 	job = list_first_entry_or_null(&sched->ring_mirror_list,
 				       struct drm_sched_job, node);
@@ -710,13 +710,13 @@ drm_sched_get_cleanup_job(struct drm_gpu_scheduler *sched)
 	if (job && dma_fence_is_signaled(&job->s_fence->finished)) {
 		/* remove job from ring_mirror_list */
 		list_del_init(&job->node);
-	} else {printf("%s:%d\n", __func__, __LINE__);
+	} else {
 		job = NULL;
 		/* queue timeout for next job */
 		drm_sched_start_timeout(sched);
 	}
 
-	return printf("%s:%d job=%p\n", __func__, __LINE__, job), job;
+	return job;
 }
 
 /**
@@ -728,12 +728,12 @@ drm_sched_get_cleanup_job(struct drm_gpu_scheduler *sched)
  */
 static bool drm_sched_blocked(struct drm_gpu_scheduler *sched)
 {
-	if (kthread_should_park()) {printf("%s:%d\n", __func__, __LINE__);
+	if (kthread_should_park()) {
 		kthread_parkme();
 		return true;
 	}
 
-	return printf("%s:%d\n", __func__, __LINE__), false;
+	return false;
 }
 
 /**
