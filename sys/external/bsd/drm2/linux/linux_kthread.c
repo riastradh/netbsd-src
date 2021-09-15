@@ -157,9 +157,6 @@ kthread_run(int (*func)(void *), void *cookie, const char *name,
 		return ERR_PTR(-error); /* XXX errno NetBSD->Linux */
 	}
 
-	printf("%s: curlwp=%p T=%p lwp=%p name=%s\n", __func__, curlwp, T,
-	    T->kt_lwp, name);
-
 	return T;
 }
 
@@ -168,14 +165,9 @@ kthread_stop(struct task_struct *T)
 {
 	int ret;
 
-	printf("%s: curlwp=%p T=%p enter\n", __func__, curlwp, T);
-
 	/* Lock order: interlock, then kthread lock.  */
 	spin_lock(T->kt_interlock);
 	mutex_enter(&T->kt_lock);
-
-	printf("%s: curlwp=%p T=%p parked=%d\n", __func__, curlwp, T,
-	    T->kt_parked);
 
 	/*
 	 * Notify the thread that it's stopping, and wake it if it's
@@ -190,15 +182,11 @@ kthread_stop(struct task_struct *T)
 	mutex_exit(&T->kt_lock);
 	spin_unlock(T->kt_interlock);
 
-	printf("%s: curlwp=%p T=%p wait\n", __func__, curlwp, T);
-
 	/* Wait for the (NetBSD) kthread to exit.  */
 	ret = kthread_join(T->kt_lwp);
 
 	/* Free the (Linux) kthread.  */
 	kthread_free(T);
-
-	printf("%s: curlwp=%p T=%p return ret=%d\n", __func__, curlwp, T, ret);
 
 	/* Return what the thread returned.  */
 	return ret;
@@ -214,17 +202,12 @@ kthread_should_stop(void)
 	shouldstop = T->kt_shouldstop;
 	mutex_exit(&T->kt_lock);
 
-	printf("%s: curlwp=%p T=%p shouldstop=%d\n", __func__, curlwp, T,
-	    shouldstop);
-
 	return shouldstop;
 }
 
 void
 kthread_park(struct task_struct *T)
 {
-
-	printf("%s: curlwp=%p T=%p enter\n", __func__, curlwp, T);
 
 	/* Lock order: interlock, then kthread lock.  */
 	spin_lock(T->kt_interlock);
@@ -256,15 +239,11 @@ kthread_park(struct task_struct *T)
 
 	/* Release the kthread lock too.  */
 	mutex_exit(&T->kt_lock);
-
-	printf("%s: curlwp=%p T=%p return\n", __func__, curlwp, T);
 }
 
 void
 kthread_unpark(struct task_struct *T)
 {
-
-	printf("%s: curlwp=%p T=%p\n", __func__, curlwp, T);
 
 	mutex_enter(&T->kt_lock);
 	T->kt_shouldpark = false;
@@ -280,9 +259,6 @@ __kthread_should_park(struct task_struct *T)
 	mutex_enter(&T->kt_lock);
 	shouldpark = T->kt_shouldpark;
 	mutex_exit(&T->kt_lock);
-
-	printf("%s: curlwp=%p T=%p shouldpark=%d\n", __func__, curlwp, T,
-	    shouldpark);
 
 	return shouldpark;
 }
@@ -302,8 +278,6 @@ kthread_parkme(void)
 
 	assert_spin_locked(T->kt_interlock);
 
-	printf("%s: curlwp=%p T=%p enter\n", __func__, curlwp, T);
-
 	spin_unlock(T->kt_interlock);
 	mutex_enter(&T->kt_lock);
 	while (T->kt_shouldpark) {
@@ -314,6 +288,4 @@ kthread_parkme(void)
 	}
 	mutex_exit(&T->kt_lock);
 	spin_lock(T->kt_interlock);
-
-	printf("%s: curlwp=%p T=%p return\n", __func__, curlwp, T);
 }
