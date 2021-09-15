@@ -214,8 +214,8 @@ kthread_should_stop(void)
 	shouldstop = T->kt_shouldstop;
 	mutex_exit(&T->kt_lock);
 
-	printf("%s: curlwp=%p T=%p shouldstop=%d caller=%p\n", __func__, curlwp, T,
-	    shouldstop, (void *)__builtin_return_address(0));
+	printf("%s: curlwp=%p T=%p shouldstop=%d\n", __func__, curlwp, T,
+	    shouldstop);
 
 	return shouldstop;
 }
@@ -281,8 +281,8 @@ __kthread_should_park(struct task_struct *T)
 	shouldpark = T->kt_shouldpark;
 	mutex_exit(&T->kt_lock);
 
-	printf("%s: curlwp=%p T=%p shouldpark=%d caller=%p\n", __func__, curlwp, T,
-	    shouldpark, (void *)__builtin_return_address(0));
+	printf("%s: curlwp=%p T=%p shouldpark=%d\n", __func__, curlwp, T,
+	    shouldpark);
 
 	return shouldpark;
 }
