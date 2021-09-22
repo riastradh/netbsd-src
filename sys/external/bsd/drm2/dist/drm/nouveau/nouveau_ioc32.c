@@ -1,4 +1,4 @@
-/*	$NetBSD: nouveau_ioc32.c,v 1.2 2018/08/27 04:58:24 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /**
  * \file mga_ioc32.c
@@ -34,11 +34,12 @@
  */
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: nouveau_ioc32.c,v 1.2 2018/08/27 04:58:24 riastradh Exp $");
+__KERNEL_RCSID(0, "$NetBSD$");
 
 #include <linux/compat.h>
 
-#include <drm/drmP.h>
+#include <drm/drm.h>
+#include <drm/drm_ioctl.h>
 
 #include "nouveau_ioctl.h"
 

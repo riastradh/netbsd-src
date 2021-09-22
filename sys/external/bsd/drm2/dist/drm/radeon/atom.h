@@ -1,4 +1,4 @@
-/*	$NetBSD: atom.h,v 1.3 2018/08/27 04:58:35 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2008 Advanced Micro Devices, Inc.
@@ -27,8 +27,8 @@
 #ifndef ATOM_H
 #define ATOM_H
 
+#include <linux/mutex.h>
 #include <linux/types.h>
-#include <drm/drmP.h>
 
 #define ATOM_BIOS_MAGIC		0xAA55
 #define ATOM_ATI_MAGIC_PTR	0x30

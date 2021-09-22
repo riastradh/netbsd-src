@@ -1,4 +1,4 @@
-/*	$NetBSD: gfx_7_0_d.h,v 1.2 2018/08/27 04:58:21 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * GFX_7_0 Register documentation

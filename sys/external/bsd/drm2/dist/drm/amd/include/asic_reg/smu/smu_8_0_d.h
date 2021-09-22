@@ -1,4 +1,4 @@
-/*	$NetBSD: smu_8_0_d.h,v 1.2 2018/08/27 04:58:23 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * SMU_8_0 Register documentation

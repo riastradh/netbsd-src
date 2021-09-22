@@ -1,5 +1,6 @@
-/*	$NetBSD: os.h,v 1.2 2018/08/27 04:58:35 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
+/* SPDX-License-Identifier: MIT */
 #ifndef __NVKM_PWR_OS_H__
 #define __NVKM_PWR_OS_H__
 

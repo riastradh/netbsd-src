@@ -1,4 +1,4 @@
-/*	$NetBSD: amdgpu_connectors.h,v 1.2 2018/08/27 04:58:19 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2014 Advanced Micro Devices, Inc.

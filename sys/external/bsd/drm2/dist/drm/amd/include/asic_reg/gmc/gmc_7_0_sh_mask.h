@@ -1,4 +1,4 @@
-/*	$NetBSD: gmc_7_0_sh_mask.h,v 1.2 2018/08/27 04:58:22 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * GMC_7_0 Register documentation

@@ -1,5 +1,6 @@
-/*	$NetBSD: M0209.h,v 1.2 2018/08/27 04:58:30 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
+/* SPDX-License-Identifier: MIT */
 #ifndef __NVBIOS_M0209_H__
 #define __NVBIOS_M0209_H__
 u32 nvbios_M0209Te(struct nvkm_bios *,

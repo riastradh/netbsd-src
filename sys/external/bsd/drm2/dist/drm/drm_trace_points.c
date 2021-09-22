@@ -1,9 +1,10 @@
-/*	$NetBSD: drm_trace_points.c,v 1.3 2018/08/27 04:58:19 riastradh Exp $	*/
+/*	$NetBSD$	*/
+
 
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: drm_trace_points.c,v 1.3 2018/08/27 04:58:19 riastradh Exp $");
+__KERNEL_RCSID(0, "$NetBSD$");
 
-#include <drm/drmP.h>
+#include <drm/drm_file.h>
 
 #define CREATE_TRACE_POINTS
 #include "drm_trace.h"

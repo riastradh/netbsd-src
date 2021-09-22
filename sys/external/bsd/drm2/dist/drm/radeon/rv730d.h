@@ -1,4 +1,4 @@
-/*	$NetBSD: rv730d.h,v 1.3 2019/08/17 17:03:32 msaitoh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2011 Advanced Micro Devices, Inc.
