@@ -411,6 +411,8 @@ rk_drm_load(struct drm_device *ddev, unsigned long flags)
 		goto drmerr;
 	}
 
+	drm_mode_config_reset(ddev);
+
 	fbdev = kmem_zalloc(sizeof(*fbdev), KM_SLEEP);
 
 	drm_fb_helper_prepare(ddev, &fbdev->helper, &rk_drm_fb_helper_funcs);
