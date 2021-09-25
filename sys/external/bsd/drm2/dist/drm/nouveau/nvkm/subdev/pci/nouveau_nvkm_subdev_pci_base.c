@@ -276,6 +276,7 @@ nvkm_pci_new_(const struct nvkm_pci_func *func, struct nvkm_device *device,
 		break;
 	default:
 		switch (device->chipset) {
+		case 0x84:	/* G84, no mode switch with MSI */
 		case 0xaa:
 			/* reported broken, nv also disable it */
 			break;
