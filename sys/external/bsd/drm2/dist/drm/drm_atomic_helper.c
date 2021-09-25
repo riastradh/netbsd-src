@@ -1466,13 +1466,27 @@ drm_atomic_helper_wait_for_vblanks(struct drm_device *dev,
 			continue;
 
 #ifdef __NetBSD__
-		spin_lock(&dev->event_lock);
-		DRM_SPIN_WAIT_ON(ret, &dev->vblank[i].queue,
-		    &dev->event_lock,
-		    msecs_to_jiffies(50),
-		    (old_state->crtcs[i].last_vblank_count !=
-			drm_crtc_vblank_count(crtc)));
-		spin_unlock(&dev->event_lock);
+		if (cold) {
+			unsigned timo = 100;
+
+			ret = -ETIMEDOUT;
+			while (timo --> 0 && ret) {
+				spin_lock(&dev->event_lock);
+				if (old_state->crtcs[i].last_vblank_count !=
+				    drm_crtc_vblank_count(crtc)) {
+					ret = 0;
+				}
+				spin_unlock(&dev->event_lock);
+			}
+		} else {
+			spin_lock(&dev->event_lock);
+			DRM_SPIN_WAIT_ON(ret, &dev->vblank[i].queue,
+			    &dev->event_lock,
+			    msecs_to_jiffies(100),
+			    (old_state->crtcs[i].last_vblank_count !=
+				drm_crtc_vblank_count(crtc)));
+			spin_unlock(&dev->event_lock);
+		}
 #else
 		ret = wait_event_timeout(dev->vblank[i].queue,
 				old_state->crtcs[i].last_vblank_count !=
