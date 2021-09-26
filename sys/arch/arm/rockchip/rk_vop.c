@@ -43,6 +43,7 @@ __KERNEL_RCSID(0, "$NetBSD: rk_vop.c,v 1.10 2021/01/27 03:10:19 thorpej Exp $");
 
 #include <arm/rockchip/rk_drm.h>
 
+#include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
@@ -246,16 +247,79 @@ static const struct device_compatible_entry compat_data[] = {
 	DEVICE_COMPAT_EOL
 };
 
+static int
+rk_vop_plane_atomic_check(struct drm_plane *plane,
+    struct drm_plane_state *state)
+{
+	struct drm_crtc_state *crtc_state;
+
+	if (state->crtc == NULL)
+		return 0;
+
+	crtc_state = drm_atomic_get_new_crtc_state(state->state, state->crtc);
+	if (IS_ERR(crtc_state))
+		return PTR_ERR(crtc_state);
+
+	return drm_atomic_helper_check_plane_state(state, crtc_state,
+	    DRM_PLANE_HELPER_NO_SCALING, DRM_PLANE_HELPER_NO_SCALING,
+	    false, true);
+}
+
 static void
-rk_vop_plane_atomic_update(struct drm_plane *plane, struct drm_plane_state *state)
+rk_vop_plane_atomic_update(struct drm_plane *plane,
+    struct drm_plane_state *old_state)
 {
 	struct rk_vop_plane *vop_plane = to_rk_vop_plane(plane);
 	struct rk_vop_softc * const sc = vop_plane->sc;
-	struct rk_drm_framebuffer *sfb = to_rk_drm_framebuffer(plane->state->fb);
+	struct rk_drm_framebuffer *sfb =
+	    to_rk_drm_framebuffer(plane->state->fb);
+	struct drm_display_mode *mode = &plane->state->crtc->mode;
+	struct drm_rect *src = &plane->state->src;
+	struct drm_rect *dst = &plane->state->dst;
+	uint32_t act_width, act_height, dsp_width, dsp_height;
+	uint32_t htotal, hsync_start;
+	uint32_t vtotal, vsync_start;
+	uint32_t lb_mode;
 	uint32_t block_h, block_w, x, y, block_start_y, num_hblocks;
+	uint64_t paddr;
+	uint32_t val;
 
-	uint64_t paddr = (uint64_t)sfb->obj->dmamap->dm_segs[0].ds_addr;
+	act_width = drm_rect_width(src) >> 16;
+	act_height = drm_rect_height(src) >> 16;
+	val = __SHIFTIN(act_width - 1, WIN0_ACT_WIDTH) |
+	      __SHIFTIN(act_height - 1, WIN0_ACT_HEIGHT);
+	WR4(sc, VOP_WIN0_ACT_INFO, val);
 
+	dsp_width = drm_rect_width(dst);
+	dsp_height = drm_rect_height(dst);
+	val = __SHIFTIN(dsp_width - 1, WIN0_DSP_WIDTH) |
+	      __SHIFTIN(dsp_height - 1, WIN0_DSP_HEIGHT);
+	WR4(sc, VOP_WIN0_DSP_INFO, val);
+
+	htotal = mode->htotal;
+	hsync_start = mode->hsync_start;
+	vtotal = mode->vtotal;
+	vsync_start = mode->vsync_start;
+	val = __SHIFTIN(dst->x1 + htotal - hsync_start, WIN0_DSP_XST) |
+	      __SHIFTIN(dst->y1 + vtotal - vsync_start, WIN0_DSP_YST);
+	WR4(sc, VOP_WIN0_DSP_ST, val);
+
+	WR4(sc, VOP_WIN0_COLOR_KEY, 0);
+
+	if (act_width > 2560)
+		lb_mode = WIN0_LB_MODE_RGB_3840X2;
+	else if (act_width > 1920)
+		lb_mode = WIN0_LB_MODE_RGB_2560X4;
+	else if (act_width > 1280)
+		lb_mode = WIN0_LB_MODE_RGB_1920X5;
+	else
+		lb_mode = WIN0_LB_MODE_RGB_1280X8;
+	val = __SHIFTIN(lb_mode, WIN0_LB_MODE) |
+	      __SHIFTIN(WIN0_DATA_FMT_ARGB888, WIN0_DATA_FMT) |
+	      WIN0_EN;
+	WR4(sc, VOP_WIN0_CTRL, val);
+
+	paddr = (uint64_t)sfb->obj->dmamap->dm_segs[0].ds_addr;
 	paddr += sfb->base.offsets[0];
 
 	block_h = drm_format_info_block_height(sfb->base.format, 0);
@@ -272,15 +336,11 @@ rk_vop_plane_atomic_update(struct drm_plane *plane, struct drm_plane_state *stat
 
 	KASSERT((paddr & ~0xffffffff) == 0);
 
-	const uint32_t vir = __SHIFTIN(sfb->base.pitches[0] / 4,
-	    WIN0_VIR_STRIDE);
-	WR4(sc, VOP_WIN0_VIR, vir);
+	val = __SHIFTIN(sfb->base.pitches[0] / 4, WIN0_VIR_STRIDE);
+	WR4(sc, VOP_WIN0_VIR, val);
 
 	/* Framebuffer start address */
 	WR4(sc, VOP_WIN0_YRGB_MST, (uint32_t)paddr);
-
-	/* Commit changes */
-	WR4(sc, VOP_REG_CFG_DONE, REG_LOAD_EN);
 }
 
 static void
@@ -290,6 +350,7 @@ rk_vop_plane_atomic_disable(struct drm_plane *plane, struct drm_plane_state *sta
 }
 
 static const struct drm_plane_helper_funcs rk_vop_plane_helper_funcs = {
+	.atomic_check = rk_vop_plane_atomic_check,
 	.atomic_update = rk_vop_plane_atomic_update,
 	.atomic_disable = rk_vop_plane_atomic_disable,
 #if 0
@@ -308,68 +369,62 @@ rk_vop_format_mod_supported(struct drm_plane *plane, uint32_t format,
 static const struct drm_plane_funcs rk_vop_plane_funcs = {
 	.update_plane = drm_atomic_helper_update_plane,
 	.disable_plane = drm_atomic_helper_disable_plane,
-	.destroy = drm_primary_helper_destroy,
+	.destroy = drm_plane_cleanup,
 	.reset = drm_atomic_helper_plane_reset,
 	.atomic_duplicate_state = drm_atomic_helper_plane_duplicate_state,
 	.atomic_destroy_state = drm_atomic_helper_plane_destroy_state,
 	.format_mod_supported = rk_vop_format_mod_supported,
 };
 
-static const struct drm_crtc_funcs rk_vop_crtc_funcs = {
-	.set_config = drm_atomic_helper_set_config,
-	.destroy = drm_crtc_cleanup,
-	.page_flip = drm_atomic_helper_page_flip,
-	.reset = drm_atomic_helper_crtc_reset,
-	.atomic_duplicate_state = drm_atomic_helper_crtc_duplicate_state,
-	.atomic_destroy_state = drm_atomic_helper_crtc_destroy_state,
-};
+static void
+rk_vop_dpms(struct drm_crtc *crtc, int mode)
+{
+	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
+	struct rk_vop_softc * const sc = mixer_crtc->sc;
+	uint32_t val;
+
+	val = RD4(sc, VOP_SYS_CTRL);
+
+	switch (mode) {
+	case DRM_MODE_DPMS_ON:
+		val &= ~VOP_STANDBY_EN;
+		break;
+	case DRM_MODE_DPMS_STANDBY:
+	case DRM_MODE_DPMS_SUSPEND:
+	case DRM_MODE_DPMS_OFF:
+		val |= VOP_STANDBY_EN;
+		break;
+	}
+
+	WR4(sc, VOP_SYS_CTRL, val);
+
+	/* Commit settings */
+	WR4(sc, VOP_REG_CFG_DONE, REG_LOAD_EN);
+}
+
+static int
+rk_vop_atomic_check(struct drm_crtc *crtc, struct drm_crtc_state *state)
+{
+	bool enabled = state->plane_mask & drm_plane_mask(crtc->primary);
+
+	if (enabled != state->enable)
+		return -EINVAL;
+
+	return drm_atomic_add_affected_planes(state->state, crtc);
+}
 
 static void
 rk_vop_atomic_enable(struct drm_crtc *crtc, struct drm_crtc_state *state)
 {
 	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
 	struct rk_vop_softc * const sc = mixer_crtc->sc;
-	uint32_t val;
-
-	val = RD4(sc, VOP_SYS_CTRL);
-	val &= ~VOP_STANDBY_EN;
-	WR4(sc, VOP_SYS_CTRL, val);
-}
-
-static void
-rk_vop_atomic_disable(struct drm_crtc *crtc, struct drm_crtc_state *state)
-{
-	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
-	struct rk_vop_softc * const sc = mixer_crtc->sc;
-	uint32_t val;
-
-	val = RD4(sc, VOP_SYS_CTRL);
-	val |= VOP_STANDBY_EN;
-	WR4(sc, VOP_SYS_CTRL, val);
-}
-
-static void
-rk_vop_atomic_flush(struct drm_crtc *crtc, struct drm_crtc_state *state)
-{
-	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
-	struct rk_vop_softc * const sc = mixer_crtc->sc;
-
-	WR4(sc, VOP_REG_CFG_DONE, REG_LOAD_EN);
-}
-
-static void
-rk_vop_mode_set_nofb(struct drm_crtc *crtc)
-{
-	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
-	struct rk_vop_softc * const sc = mixer_crtc->sc;
 	struct drm_display_mode *adjusted_mode = &crtc->state->adjusted_mode;
 	uint32_t val;
-	u_int lb_mode;
-	int error;
 	u_int pol;
 	int connector_type = 0;
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
+	int error;
 
 	const u_int hactive = adjusted_mode->hdisplay;
 	const u_int hsync_len = adjusted_mode->hsync_end - adjusted_mode->hsync_start;
@@ -382,36 +437,8 @@ rk_vop_mode_set_nofb(struct drm_crtc *crtc)
 	const u_int vfront_porch = adjusted_mode->vsync_start - adjusted_mode->vdisplay;
 
 	error = clk_set_rate(sc->sc_dclk, adjusted_mode->clock * 1000);
-	if (error != 0)
+	if (error)
 		DRM_ERROR("couldn't set pixel clock: %d\n", error);
-
-	val = __SHIFTIN(hactive - 1, WIN0_ACT_WIDTH) |
-	      __SHIFTIN(vactive - 1, WIN0_ACT_HEIGHT);
-	WR4(sc, VOP_WIN0_ACT_INFO, val);
-
-	val = __SHIFTIN(hactive - 1, WIN0_DSP_WIDTH) |
-	      __SHIFTIN(vactive - 1, WIN0_DSP_HEIGHT);
-	WR4(sc, VOP_WIN0_DSP_INFO, val);
-
-	val = __SHIFTIN(hsync_len + hback_porch, WIN0_DSP_XST) |
-	      __SHIFTIN(vsync_len + vback_porch, WIN0_DSP_YST);
-	WR4(sc, VOP_WIN0_DSP_ST, val);
-
-	WR4(sc, VOP_WIN0_COLOR_KEY, 0);
-
-	if (adjusted_mode->hdisplay > 2560)
-		lb_mode = WIN0_LB_MODE_RGB_3840X2;
-	else if (adjusted_mode->hdisplay > 1920)
-		lb_mode = WIN0_LB_MODE_RGB_2560X4;
-	else if (adjusted_mode->hdisplay > 1280)
-		lb_mode = WIN0_LB_MODE_RGB_1920X5;
-	else
-		lb_mode = WIN0_LB_MODE_RGB_1280X8;
-
-	val = __SHIFTIN(lb_mode, WIN0_LB_MODE) |
-	      __SHIFTIN(WIN0_DATA_FMT_ARGB888, WIN0_DATA_FMT) |
-	      WIN0_EN;
-	WR4(sc, VOP_WIN0_CTRL, val);
 
 	pol = DSP_DCLK_POL;
 	if ((adjusted_mode->flags & DRM_MODE_FLAG_PHSYNC) != 0)
@@ -485,11 +512,30 @@ rk_vop_mode_set_nofb(struct drm_crtc *crtc)
 	WR4(sc, VOP_DSP_VTOTAL_VS_END, val);
 }
 
+static void
+rk_vop_atomic_flush(struct drm_crtc *crtc, struct drm_crtc_state *state)
+{
+	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
+	struct rk_vop_softc * const sc = mixer_crtc->sc;
+
+	/* Commit settings */
+	WR4(sc, VOP_REG_CFG_DONE, REG_LOAD_EN);
+}
+
 static const struct drm_crtc_helper_funcs rk_vop_crtc_helper_funcs = {
+	.dpms = rk_vop_dpms,
+	.atomic_check = rk_vop_atomic_check,
 	.atomic_enable = rk_vop_atomic_enable,
-	.atomic_disable = rk_vop_atomic_disable,
 	.atomic_flush = rk_vop_atomic_flush,
-	.mode_set_nofb = rk_vop_mode_set_nofb,
+};
+
+static const struct drm_crtc_funcs rk_vop_crtc_funcs = {
+	.set_config = drm_atomic_helper_set_config,
+	.destroy = drm_crtc_cleanup,
+	.page_flip = drm_atomic_helper_page_flip,
+	.reset = drm_atomic_helper_crtc_reset,
+	.atomic_duplicate_state = drm_atomic_helper_crtc_duplicate_state,
+	.atomic_destroy_state = drm_atomic_helper_crtc_destroy_state,
 };
 
 static int
