@@ -457,8 +457,6 @@ rk_vop_atomic_enable(struct drm_crtc *crtc, struct drm_crtc_state *state)
 	}
 	drm_connector_list_iter_end(&conn_iter);
 
-	DRM_DEBUG_KMS("mode_set connector_type 0x%X\n", connector_type);
-
 	switch (connector_type) {
 	case DRM_MODE_CONNECTOR_HDMIA:
 		sc->sc_conf->set_polarity(sc, VOP_EP_HDMI, pol);
