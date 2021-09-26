@@ -554,10 +554,6 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 	dev = set->crtc->dev;
 	WARN_ON(drm_drv_uses_atomic_modeset(dev));
 
-	DRM_DEBUG_KMS("[CRTC:%d:%s] mode=%p fb=%p\n",
-		      set->crtc->base.id, set->crtc->name,
-		      set->mode, set->fb);
-
 	if (!set->mode)
 		set->fb = NULL;
 

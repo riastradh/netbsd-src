@@ -326,10 +326,8 @@ drm_atomic_helper_plane_duplicate_state(struct drm_plane *plane)
 {
 	struct drm_plane_state *state;
 
-	if (WARN_ON(!plane->state)) {
-		cpu_Debugger();
+	if (WARN_ON(!plane->state))
 		return NULL;
-	}
 
 	state = kmalloc(sizeof(*state), GFP_KERNEL);
 	if (state)

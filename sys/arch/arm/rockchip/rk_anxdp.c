@@ -114,7 +114,6 @@ rk_anxdp_encoder_prepare(struct drm_encoder *encoder)
 	struct rk_anxdp_softc * const sc = to_rk_anxdp_encoder(encoder);
 	const u_int crtc_index = drm_crtc_index(encoder->crtc);
 
-	device_printf(sc->sc_base.sc_dev, "prepare crtc_index=%u\n", crtc_index);
 	rk_anxdp_select_input(sc, crtc_index);
 }
 
