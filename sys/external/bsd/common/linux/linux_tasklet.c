@@ -32,7 +32,9 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include <sys/param.h>
 #include <sys/types.h>
+
 #include <sys/atomic.h>
 #include <sys/cpu.h>
 #include <sys/errno.h>
