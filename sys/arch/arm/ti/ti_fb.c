@@ -38,7 +38,7 @@ __KERNEL_RCSID(0, "$NetBSD: ti_fb.c,v 1.1 2019/11/03 22:59:06 jmcneill Exp $");
 #include <dev/fdt/fdtvar.h>
 #include <dev/fdt/fdt_port.h>
 
-#include <drm/drmP.h>
+#include <drm/drm_drv.h>
 #include <drm/drmfb.h>
 
 #include <arm/ti/ti_lcdc.h>
@@ -62,7 +62,6 @@ static int	ti_fb_ioctl(struct drmfb_softc *, u_long, void *, int,
 static const struct drmfb_params tifb_drmfb_params = {
 	.dp_mmapfb = ti_fb_mmapfb,
 	.dp_ioctl = ti_fb_ioctl,
-	
 };
 
 CFATTACH_DECL_NEW(ti_fb, sizeof(struct ti_fb_softc),

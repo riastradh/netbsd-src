@@ -29,6 +29,7 @@
 #ifndef _ARM_TI_TI_LCDC_H
 #define _ARM_TI_TI_LCDC_H
 
+#include <drm/drm_encoder.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_gem_cma_helper.h>
 
