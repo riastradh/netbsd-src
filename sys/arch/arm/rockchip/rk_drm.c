@@ -296,6 +296,10 @@ static struct drm_mode_config_funcs rk_drm_mode_config_funcs = {
 	.atomic_commit = drm_atomic_helper_commit,
 };
 
+static struct drm_mode_config_helper_funcs rk_drm_mode_config_helper_funcs = {
+	.atomic_commit_tail = drm_atomic_helper_commit_tail_rpm,
+};
+
 static int
 rk_drm_fb_probe(struct drm_fb_helper *helper, struct drm_fb_helper_surface_size *sizes)
 {
@@ -386,6 +390,7 @@ rk_drm_load(struct drm_device *ddev, unsigned long flags)
 	ddev->mode_config.max_width = RK_DRM_MAX_WIDTH;
 	ddev->mode_config.max_height = RK_DRM_MAX_HEIGHT;
 	ddev->mode_config.funcs = &rk_drm_mode_config_funcs;
+	ddev->mode_config.helper_private = &rk_drm_mode_config_helper_funcs;
 
 	num_crtc = 0;
 	data = fdtbus_get_prop(sc->sc_phandle, "ports", &datalen);
