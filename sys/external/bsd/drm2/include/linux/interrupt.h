@@ -32,6 +32,9 @@
 #ifndef _LINUX_INTERRUPT_H_
 #define _LINUX_INTERRUPT_H_
 
+#include <sys/param.h>
+#include <sys/types.h>
+
 #include <sys/cpu.h>
 
 #include <linux/irqreturn.h>
