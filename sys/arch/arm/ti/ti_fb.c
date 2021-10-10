@@ -46,6 +46,8 @@ __KERNEL_RCSID(0, "$NetBSD: ti_fb.c,v 1.1 2019/11/03 22:59:06 jmcneill Exp $");
 static int	ti_fb_match(device_t, cfdata_t, void *);
 static void	ti_fb_attach(device_t, device_t, void *);
 
+static void	tilcdc_fb_init(struct tilcdc_drm_task *);
+
 static bool	ti_fb_shutdown(device_t, int);
 
 struct ti_fb_softc {
@@ -53,6 +55,7 @@ struct ti_fb_softc {
 	device_t		sc_dev;
 	struct tilcdc_framebuffer *sc_fb;
 	struct tilcdcfb_attach_args sc_tfa;
+	struct tilcdc_drm_task	sc_attach_task;
 };
 
 static paddr_t	ti_fb_mmapfb(struct drmfb_softc *, off_t, int);
@@ -78,7 +81,6 @@ ti_fb_attach(device_t parent, device_t self, void *aux)
 {
 	struct ti_fb_softc * const sc = device_private(self);
 	struct tilcdcfb_attach_args * const tfa = aux;
-	int error;
 
 	sc->sc_dev = self;
 	sc->sc_tfa = *tfa;
@@ -86,6 +88,18 @@ ti_fb_attach(device_t parent, device_t self, void *aux)
 
 	aprint_naive("\n");
 	aprint_normal("\n");
+
+	tilcdc_task_init(&sc->sc_attach_task, &tilcdc_fb_init);
+	tilcdc_task_schedule(parent, &sc->sc_attach_task);
+}
+
+static void
+tilcdc_fb_init(struct tilcdc_drm_task *task)
+{
+	struct ti_fb_softc *sc = container_of(task, struct ti_fb_softc,
+	    sc_attach_task);
+	device_t self = sc->sc_dev;
+	struct tilcdcfb_attach_args * const tfa = &sc->sc_tfa;
 
 #ifdef WSDISPLAY_MULTICONS
 	prop_dictionary_t dict = device_properties(self);
@@ -101,6 +115,7 @@ ti_fb_attach(device_t parent, device_t self, void *aux)
 		.da_fb_linebytes = tfa->tfa_fb_linebytes,
 		.da_params = &tifb_drmfb_params,
 	};
+	int error;
 
 	error = drmfb_attach(&sc->sc_drmfb, &da);
 	if (error) {
