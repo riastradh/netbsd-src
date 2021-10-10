@@ -101,8 +101,8 @@ struct rk_drm_task {
 	union {
 		SIMPLEQ_ENTRY(rk_drm_task)	queue;
 		struct work			work;
-	}		sdt_u;
-	void		(*sdt_fn)(struct rk_drm_task *);
+	}		rdt_u;
+	void		(*rdt_fn)(struct rk_drm_task *);
 };
 
 #define rk_drm_private(ddev)		(ddev)->dev_private
