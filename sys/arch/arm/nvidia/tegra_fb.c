@@ -33,7 +33,7 @@ __KERNEL_RCSID(0, "$NetBSD: tegra_fb.c,v 1.4 2017/12/26 14:54:52 jmcneill Exp $"
 #include <sys/bus.h>
 #include <sys/device.h>
 
-#include <drm/drmP.h>
+#include <drm/drm_drv.h>
 #include <drm/drmfb.h>
 
 #include <arm/nvidia/tegra_var.h>
@@ -60,7 +60,6 @@ static int	tegra_fb_ioctl(struct drmfb_softc *, u_long, void *, int,
 static const struct drmfb_params tegrafb_drmfb_params = {
 	.dp_mmapfb = tegra_fb_mmapfb,
 	.dp_ioctl = tegra_fb_ioctl,
-	
 };
 
 CFATTACH_DECL_NEW(tegra_fb, sizeof(struct tegra_fb_softc),
