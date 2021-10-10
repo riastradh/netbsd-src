@@ -1317,6 +1317,9 @@ struct drm_connector {
 	 */
 	struct drm_encoder *encoder;
 
+	/** @physical_address: HDMI physical address */
+	uint16_t physical_address;
+
 #define MAX_ELD_BYTES	128
 	/** @eld: EDID-like data, if present */
 	uint8_t eld[MAX_ELD_BYTES];
