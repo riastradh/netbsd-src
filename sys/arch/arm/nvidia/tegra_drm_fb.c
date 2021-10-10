@@ -29,10 +29,11 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: tegra_drm_fb.c,v 1.9 2021/08/07 16:18:44 thorpej Exp $");
 
-#include <drm/drmP.h>
 #include <drm/drm_crtc.h>
-#include <drm/drm_fb_helper.h>
 #include <drm/drm_crtc_helper.h>
+#include <drm/drm_drv.h>
+#include <drm/drm_fb_helper.h>
+#include <drm/drm_fourcc.h>
 
 #include <arm/nvidia/tegra_drm.h>
 
@@ -56,7 +57,7 @@ tegra_drm_fb_init(struct drm_device *ddev)
 
 	drm_fb_helper_prepare(ddev, &fbdev->helper, &tegra_fb_helper_funcs);
 
-	error = drm_fb_helper_init(ddev, &fbdev->helper, 2, 1);
+	error = drm_fb_helper_init(ddev, &fbdev->helper, 1);
 	if (error) {
 		kmem_free(fbdev, sizeof(*fbdev));
 		return error;
@@ -131,13 +132,14 @@ tegra_fb_init(struct drm_device *ddev, struct drm_framebuffer *fb,
 	if (tegra_fb->obj == NULL)
 		return -ENOMEM;
 
-        fb->pitches[0] = pitch;
-        fb->offsets[0] = 0;
-        fb->width = width;
-        fb->height = height;
-        fb->pixel_format = DRM_FORMAT_XRGB8888;
-        drm_fb_get_bpp_depth(fb->pixel_format, &fb->depth,
-            &fb->bits_per_pixel);
+	fb->pitches[0] = pitch;
+	fb->offsets[0] = 0;
+	fb->width = width;
+	fb->height = height;
+	fb->modifier = 0;
+	fb->flags = 0;
+	fb->format = drm_format_info(DRM_FORMAT_XRGB8888); /* XXX endian? */
+	fb->dev = ddev;
 	tegra_drm_framebuffer_init(ddev, tegra_fb);
 
 	return 0;
