@@ -45,7 +45,7 @@ __KERNEL_RCSID(0, "$NetBSD: rk_fb.c,v 1.2 2021/05/21 09:33:27 jmcneill Exp $");
 static int	rk_fb_match(device_t, cfdata_t, void *);
 static void	rk_fb_attach(device_t, device_t, void *);
 
-static void	rk_fb_init(struct rk_drm_task *task);
+static void	rk_fb_init(struct rk_drm_task *);
 
 static bool	rk_fb_shutdown(device_t, int);
 

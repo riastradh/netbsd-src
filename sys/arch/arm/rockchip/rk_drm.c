@@ -203,11 +203,10 @@ rk_drm_init(device_t dev)
 	 * to find that console without panicking.
 	 */
 	while (!SIMPLEQ_EMPTY(&sc->sc_tasks)) {
-		struct rk_drm_task *const task =
-		SIMPLEQ_FIRST(&sc->sc_tasks);
+		struct rk_drm_task *const task = SIMPLEQ_FIRST(&sc->sc_tasks);
 
-		SIMPLEQ_REMOVE_HEAD(&sc->sc_tasks, sdt_u.queue);
-		(*task->sdt_fn)(task);
+		SIMPLEQ_REMOVE_HEAD(&sc->sc_tasks, rdt_u.queue);
+		(*task->rdt_fn)(task);
 	}
 
 out:	/* Cause any subesquent tasks to be processed by the workqueue.  */
@@ -526,9 +525,9 @@ static void
 rk_drm_task_work(struct work *work, void *cookie)
 {
 	struct rk_drm_task *task = container_of(work, struct rk_drm_task,
-	    sdt_u.work);
+	    rdt_u.work);
 
-	(*task->sdt_fn)(task);
+	(*task->rdt_fn)(task);
 }
 
 void
@@ -536,7 +535,7 @@ rk_task_init(struct rk_drm_task *task,
     void (*fn)(struct rk_drm_task *))
 {
 
-	task->sdt_fn = fn;
+	task->rdt_fn = fn;
 }
 
 void
@@ -545,7 +544,7 @@ rk_task_schedule(device_t self, struct rk_drm_task *task)
 	struct rk_drm_softc *sc = device_private(self);
 
 	if (atomic_load_relaxed(&sc->sc_task_thread) == curlwp)
-		SIMPLEQ_INSERT_TAIL(&sc->sc_tasks, task, sdt_u.queue);
+		SIMPLEQ_INSERT_TAIL(&sc->sc_tasks, task, rdt_u.queue);
 	else
-		workqueue_enqueue(sc->sc_task_wq, &task->sdt_u.work, NULL);
+		workqueue_enqueue(sc->sc_task_wq, &task->rdt_u.work, NULL);
 }
