@@ -334,7 +334,6 @@ rk_drm_fb_probe(struct drm_fb_helper *helper, struct drm_fb_helper_surface_size 
 	fb->offsets[0] = 0;
 	fb->width = width;
 	fb->height = height;
-	fb->dev = ddev;
 	fb->modifier = 0;
 	fb->flags = 0;
 #ifdef __ARM_BIG_ENDIAN
