@@ -1,4 +1,4 @@
-/*	$NetBSD: atom-types.h,v 1.2 2018/08/27 04:58:35 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2008 Red Hat Inc.

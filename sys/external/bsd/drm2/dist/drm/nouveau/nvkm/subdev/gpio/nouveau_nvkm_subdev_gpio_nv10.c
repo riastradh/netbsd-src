@@ -1,4 +1,4 @@
-/*	$NetBSD: nouveau_nvkm_subdev_gpio_nv10.c,v 1.2 2018/08/27 04:58:34 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright (C) 2009 Francisco Jerez.
@@ -26,7 +26,7 @@
  *
  */
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_subdev_gpio_nv10.c,v 1.2 2018/08/27 04:58:34 riastradh Exp $");
+__KERNEL_RCSID(0, "$NetBSD$");
 
 #include "priv.h"
 

@@ -1,5 +1,6 @@
-/*	$NetBSD: nouveau_usif.h,v 1.3 2018/12/21 07:51:17 maya Exp $	*/
+/*	$NetBSD$	*/
 
+/* SPDX-License-Identifier: MIT */
 #ifndef __NOUVEAU_USIF_H__
 #define __NOUVEAU_USIF_H__
 

@@ -1,4 +1,4 @@
-/*	$NetBSD: smu_7_1_1_enum.h,v 1.2 2018/08/27 04:58:22 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * SMU_7_1_1 Register documentation

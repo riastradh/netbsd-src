@@ -1,4 +1,4 @@
-/*	$NetBSD: nouveau_nvkm_subdev_fb_sddr2.c,v 1.3 2018/08/27 07:41:41 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2014 Roy Spliet
@@ -25,10 +25,11 @@
  *          Ben Skeggs
  */
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_subdev_fb_sddr2.c,v 1.3 2018/08/27 07:41:41 riastradh Exp $");
+__KERNEL_RCSID(0, "$NetBSD$");
 
 #include "ram.h"
 #include "priv.h"
+#include "ram.h"
 
 struct ramxlat {
 	int id;

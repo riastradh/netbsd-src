@@ -1,4 +1,4 @@
-/*	$NetBSD: rv770_dpm.h,v 1.2 2018/08/27 04:58:36 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2011 Advanced Micro Devices, Inc.
@@ -25,6 +25,7 @@
 #ifndef __RV770_DPM_H__
 #define __RV770_DPM_H__
 
+#include "radeon.h"
 #include "rv770_smc.h"
 
 struct rv770_clock_registers {

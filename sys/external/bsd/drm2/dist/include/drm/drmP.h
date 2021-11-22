@@ -1,4 +1,4 @@
-/*	$NetBSD: drmP.h,v 1.41 2020/04/19 17:49:41 maya Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Internal Header for the Direct Rendering Manager
@@ -67,7 +67,6 @@
 #include <uapi/drm/drm_mode.h>
 
 #ifdef __NetBSD__
-#include <dev/sysmon/sysmonvar.h>
 #include <drm/drm_os_netbsd.h>
 #include <asm/barrier.h>
 #include <asm/bug.h>
@@ -82,28 +81,6 @@
 #include <linux/string.h>
 #include <linux/timer.h>
 #include <linux/uidgid.h>
-
-/*
- * NetBSD already has struct pipe, and according to C99 6.2.3 there's
- * only one namespace for struct, union, and enum tags, but the i915
- * driver wants a type called enum pipe.
- *
- * So rename it to avoid conflicts which confuse tools like ctfmerge --
- * but make sure we include <sys/file.h> first to avoid having two
- * different versions of struct file, one with a pointer to struct pipe
- * and another with a pointer to struct i915_pipe.
- *
- * This will cause trouble if we ever have an API that involves `pipe'
- * as a member which we need to reference from within drm code.  But
- * for now that is not the case.
- *
- * XXX Yes, this is disgusting.  Sorry.
- */
-#if defined(__i386__) || defined(__x86_64__)
-#include <sys/file.h>
-#define	pipe	pipe_drmhack
-#endif
-
 #else
 #include <drm/drm_os_linux.h>
 #endif
@@ -850,7 +827,7 @@ struct drm_device {
 	struct drm_minor *primary;		/**< Primary node */
 	struct drm_minor *render;		/**< Render node */
 	atomic_t unplugged;			/**< Flag whether dev is dead */
-	void *anon_inode;		/**< inode for private address-space */
+	struct inode *anon_inode;		/**< inode for private address-space */
 	char *unique;				/**< unique name of the device */
 	/*@} */
 
@@ -904,7 +881,6 @@ struct drm_device {
 	int irq;
 #ifdef __NetBSD__
 	struct drm_bus_irq_cookie *irq_cookie;
-	struct sysmon_pswitch sc_monitor_hotplug;
 #endif
 
 	/*

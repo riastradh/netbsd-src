@@ -1,4 +1,4 @@
-/*	$NetBSD: nouveau_nvkm_engine_gr_nv10.c,v 1.2 2018/08/27 04:58:32 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2007 Matthieu CASTET <castet.matthieu@free.fr>
@@ -24,7 +24,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_engine_gr_nv10.c,v 1.2 2018/08/27 04:58:32 riastradh Exp $");
+__KERNEL_RCSID(0, "$NetBSD$");
 
 #include "nv10.h"
 #include "regs.h"
@@ -1187,7 +1187,7 @@ nv10_gr_new_(const struct nvkm_gr_func *func, struct nvkm_device *device,
 	spin_lock_init(&gr->lock);
 	*pgr = &gr->base;
 
-	return nvkm_gr_ctor(func, device, index, 0x00001000, true, &gr->base);
+	return nvkm_gr_ctor(func, device, index, true, &gr->base);
 }
 
 static const struct nvkm_gr_func

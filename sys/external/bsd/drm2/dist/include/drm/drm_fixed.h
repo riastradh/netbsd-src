@@ -1,4 +1,4 @@
-/*	$NetBSD: drm_fixed.h,v 1.3 2019/10/16 01:44:48 msaitoh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2009 Red Hat Inc.

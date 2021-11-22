@@ -1,4 +1,4 @@
-/*	$NetBSD: si_dpm.h,v 1.2 2018/08/27 04:58:36 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2012 Advanced Micro Devices, Inc.

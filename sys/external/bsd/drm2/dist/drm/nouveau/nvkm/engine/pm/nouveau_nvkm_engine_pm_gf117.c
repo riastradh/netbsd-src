@@ -1,4 +1,4 @@
-/*	$NetBSD: nouveau_nvkm_engine_pm_gf117.c,v 1.2 2018/08/27 04:58:32 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2015 Samuel Pitoiset
@@ -24,7 +24,7 @@
  * Authors: Samuel Pitoiset
  */
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_engine_pm_gf117.c,v 1.2 2018/08/27 04:58:32 riastradh Exp $");
+__KERNEL_RCSID(0, "$NetBSD$");
 
 #include "gf100.h"
 

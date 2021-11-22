@@ -1,4 +1,4 @@
-/*	$NetBSD: iceland_ih.h,v 1.2 2018/08/27 04:58:20 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2014 Advanced Micro Devices, Inc.
@@ -26,6 +26,6 @@
 #ifndef __ICELAND_IH_H__
 #define __ICELAND_IH_H__
 
-extern const struct amd_ip_funcs iceland_ih_ip_funcs;
+extern const struct amdgpu_ip_block_version iceland_ih_ip_block;
 
 #endif /* __ICELAND_IH_H__ */

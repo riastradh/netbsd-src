@@ -1,5 +1,6 @@
-/*	$NetBSD: nv50.h,v 1.2 2018/08/27 04:58:33 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
+/* SPDX-License-Identifier: MIT */
 #ifndef __NV50_CLK_H__
 #define __NV50_CLK_H__
 #define nv50_clk(p) container_of((p), struct nv50_clk, base)

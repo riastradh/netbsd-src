@@ -1,4 +1,4 @@
-/*	$NetBSD: nouveau_nvkm_subdev_pci_agp.c,v 1.3 2018/08/27 07:40:50 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2015 Nouveau Project
@@ -22,7 +22,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 #include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_subdev_pci_agp.c,v 1.3 2018/08/27 07:40:50 riastradh Exp $");
+__KERNEL_RCSID(0, "$NetBSD$");
 
 #include "agp.h"
 #ifdef __NVKM_PCI_AGP_H__

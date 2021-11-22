@@ -1,5 +1,6 @@
-/*	$NetBSD: mxms.h,v 1.2 2018/08/27 04:58:34 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
+/* SPDX-License-Identifier: MIT */
 #ifndef __NVMXM_MXMS_H__
 #define __NVMXM_MXMS_H__
 #include "priv.h"
