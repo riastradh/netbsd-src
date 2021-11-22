@@ -196,7 +196,7 @@ filt_sync_file_event(struct knote *kn, long hint)
 }
 
 static const struct filterops sync_file_filtops = {
-	.f_isfd = 1,
+	.f_flags = FILTEROP_ISFD,
 	.f_attach = NULL,
 	.f_detach = filt_sync_file_detach,
 	.f_event = filt_sync_file_event,
