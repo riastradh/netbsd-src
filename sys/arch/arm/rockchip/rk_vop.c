@@ -181,10 +181,26 @@ struct rk_vop_softc {
 #define	to_rk_vop_crtc(x)	container_of(x, struct rk_vop_crtc, base)
 #define	to_rk_vop_plane(x)	container_of(x, struct rk_vop_plane, base)
 
+#if 1
+static uint32_t
+RD4(struct rk_vop_softc *sc, bus_size_t reg)
+{
+	uint32_t val = bus_space_read_4(sc->sc_bst, sc->sc_bsh, reg);
+	printf("%s %zx -> 0x%08x\n", __func__, reg, val);
+	return val;
+}
+static void
+WR4(struct rk_vop_softc *sc, bus_size_t reg, uint32_t val)
+{
+	printf("%s %zx := 0x%08x\n", __func__, reg, val);
+	bus_space_write_4(sc->sc_bst, sc->sc_bsh, reg, val);
+}
+#else
 #define	RD4(sc, reg)				\
 	bus_space_read_4((sc)->sc_bst, (sc)->sc_bsh, (reg))
 #define	WR4(sc, reg, val)			\
 	bus_space_write_4((sc)->sc_bst, (sc)->sc_bsh, (reg), (val))
+#endif
 
 static void
 WR4_MASK(struct rk_vop_softc *sc, bus_size_t reg, uint16_t mask, uint16_t val)
@@ -221,7 +237,7 @@ static const uint64_t rk_vop_layer_modifiers[] = {
 
 static void
 rk3399_vop_set_polarity(struct rk_vop_softc *sc, enum vop_ep_type ep_type, uint32_t pol)
-{
+{printf("%s\n", __func__);
 	uint32_t mask, val;
 
 	switch (ep_type) {
@@ -250,7 +266,7 @@ rk3399_vop_set_polarity(struct rk_vop_softc *sc, enum vop_ep_type ep_type, uint3
 
 static void
 rk3399_vop_init(struct rk_vop_softc *sc)
-{
+{printf("%s\n", __func__);
 	uint32_t val;
 
 	val = RD4(sc, VOP_SYS_CTRL);
@@ -284,7 +300,7 @@ static const struct device_compatible_entry compat_data[] = {
 static int
 rk_vop_plane_atomic_check(struct drm_plane *plane,
     struct drm_plane_state *state)
-{
+{printf("%s\n", __func__);
 	struct drm_crtc_state *crtc_state;
 
 	if (state->crtc == NULL)
@@ -302,7 +318,7 @@ rk_vop_plane_atomic_check(struct drm_plane *plane,
 static void
 rk_vop_plane_atomic_update(struct drm_plane *plane,
     struct drm_plane_state *old_state)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_plane *vop_plane = to_rk_vop_plane(plane);
 	struct rk_vop_softc * const sc = vop_plane->sc;
 	struct rk_drm_framebuffer *sfb =
@@ -379,7 +395,7 @@ rk_vop_plane_atomic_update(struct drm_plane *plane,
 
 static void
 rk_vop_plane_atomic_disable(struct drm_plane *plane, struct drm_plane_state *state)
-{
+{printf("%s\n", __func__);
 	DRM_DEBUG_KMS("[PLANE:%s] disable TODO\n", plane->name);
 }
 
@@ -396,7 +412,7 @@ static const struct drm_plane_helper_funcs rk_vop_plane_helper_funcs = {
 static bool
 rk_vop_plane_format_mod_supported(struct drm_plane *plane, uint32_t format,
     uint64_t modifier)
-{
+{printf("%s\n", __func__);
 	return modifier == DRM_FORMAT_MOD_LINEAR;
 }
 
@@ -412,7 +428,7 @@ static const struct drm_plane_funcs rk_vop_plane_funcs = {
 
 static void
 rk_vop_crtc_dpms(struct drm_crtc *crtc, int mode)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
 	struct rk_vop_softc * const sc = mixer_crtc->sc;
 	uint32_t val;
@@ -438,7 +454,7 @@ rk_vop_crtc_dpms(struct drm_crtc *crtc, int mode)
 
 static int
 rk_vop_crtc_atomic_check(struct drm_crtc *crtc, struct drm_crtc_state *state)
-{
+{printf("%s\n", __func__);
 	bool enabled = state->plane_mask & drm_plane_mask(crtc->primary);
 
 	if (enabled != state->enable)
@@ -449,7 +465,7 @@ rk_vop_crtc_atomic_check(struct drm_crtc *crtc, struct drm_crtc_state *state)
 
 static void
 rk_vop_crtc_atomic_enable(struct drm_crtc *crtc, struct drm_crtc_state *state)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
 	struct rk_vop_softc * const sc = mixer_crtc->sc;
 	struct drm_display_mode *adjusted_mode = &crtc->state->adjusted_mode;
@@ -549,7 +565,7 @@ rk_vop_crtc_atomic_enable(struct drm_crtc *crtc, struct drm_crtc_state *state)
 
 static void
 rk_vop_crtc_atomic_disable(struct drm_crtc *crtc, struct drm_crtc_state *state)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
 	struct rk_vop_softc * const sc = mixer_crtc->sc;
 	uint32_t val;
@@ -573,7 +589,7 @@ rk_vop_crtc_atomic_disable(struct drm_crtc *crtc, struct drm_crtc_state *state)
 
 static void
 rk_vop_crtc_atomic_flush(struct drm_crtc *crtc, struct drm_crtc_state *state)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
 	struct rk_vop_softc * const sc = mixer_crtc->sc;
 	int ret;
@@ -611,7 +627,7 @@ static const struct drm_crtc_helper_funcs rk_vop_crtc_helper_funcs = {
 
 static int
 rk_vop_crtc_enable_vblank(struct drm_crtc *crtc)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
 	struct rk_vop_softc * const sc = mixer_crtc->sc;
 
@@ -629,7 +645,7 @@ rk_vop_crtc_enable_vblank(struct drm_crtc *crtc)
 
 static void
 rk_vop_crtc_disable_vblank(struct drm_crtc *crtc)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
 	struct rk_vop_softc * const sc = mixer_crtc->sc;
 
@@ -655,7 +671,7 @@ static const struct drm_crtc_funcs rk_vop_crtc_funcs = {
 
 static int
 rk_vop_ep_activate(device_t dev, struct fdt_endpoint *ep, bool activate)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_softc * const sc = device_private(dev);
 	struct drm_device *ddev;
 	int error;
@@ -707,7 +723,7 @@ rk_vop_ep_activate(device_t dev, struct fdt_endpoint *ep, bool activate)
 
 static void *
 rk_vop_ep_get_data(device_t dev, struct fdt_endpoint *ep)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_softc * const sc = device_private(dev);
 
 	return &sc->sc_crtc.base;
@@ -757,7 +773,7 @@ rk_vop_intr(void *cookie)
 
 static int
 rk_vop_match(device_t parent, cfdata_t cf, void *aux)
-{
+{printf("%s\n", __func__);
 	struct fdt_attach_args * const faa = aux;
 
 	return of_compatible_match(faa->faa_phandle, compat_data);
@@ -765,7 +781,7 @@ rk_vop_match(device_t parent, cfdata_t cf, void *aux)
 
 static void
 rk_vop_attach(device_t parent, device_t self, void *aux)
-{
+{printf("%s\n", __func__);
 	struct rk_vop_softc * const sc = device_private(self);
 	struct fdt_attach_args * const faa = aux;
 	const int phandle = faa->faa_phandle;
