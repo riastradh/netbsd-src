@@ -1467,21 +1467,27 @@ drm_atomic_helper_wait_for_vblanks(struct drm_device *dev,
 
 #ifdef __NetBSD__
 		if (cold) {
-			bool done = false;
+			for (ret = 100; ret; DELAY(1000), ret--) {
+				bool done = false;
+				struct timespec ts;
 
-			ret = 100;
-			for (ret = 100; !done && ret; DELAY(1000), ret--) {
 				spin_lock(&dev->event_lock);
+				nanotime(&ts);
+				printf("%s: vblank=%"PRIu64" @ %ld.%09lu\n",
+				    __func__,
+				    drm_crtc_vblank_count(crtc),
+				    ts.tv_sec, ts.tv_nsec);
 				if (old_state->crtcs[i].last_vblank_count !=
 				    drm_crtc_vblank_count(crtc)) {
 					done = true;
 				}
 				spin_unlock(&dev->event_lock);
+				if (done)
+					break;
 			}
-			printf("%s: ret=%d done=%d\n", __func__, ret, done);
 		} else {
 			spin_lock(&dev->event_lock);
-			DRM_SPIN_WAIT_ON(ret, &dev->vblank[i].queue,
+			DRM_SPIN_TIMED_WAIT_UNTIL(ret, &dev->vblank[i].queue,
 			    &dev->event_lock,
 			    msecs_to_jiffies(100),
 			    (old_state->crtcs[i].last_vblank_count !=
@@ -1495,6 +1501,7 @@ drm_atomic_helper_wait_for_vblanks(struct drm_device *dev,
 				msecs_to_jiffies(100));
 #endif
 
+		printf("%s: ret=%d vblank=%"PRIu64"\n", __func__, ret, drm_crtc_vblank_count(crtc));
 		WARN(!ret, "[CRTC:%d:%s] vblank wait timed out\n",
 		     crtc->base.id, crtc->name);
 

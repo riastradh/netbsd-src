@@ -219,19 +219,19 @@ enum anxdp_dai_mixer_ctrl {
 
 static void
 anxdp_audio_init(struct anxdp_softc *sc)
-{
+{printf("%s\n", __func__);
 }
 #endif
 
 static inline const bool
 isrockchip(struct anxdp_softc * const sc)
-{
+{printf("%s\n", __func__);
 	return (sc->sc_flags & ANXDP_FLAG_ROCKCHIP) != 0;
 }
 
 static enum drm_connector_status
 anxdp_connector_detect(struct drm_connector *connector, bool force)
-{
+{printf("%s\n", __func__);
 #if 0
 	struct anxdp_connector *anxdp_connector = to_anxdp_connector(connector);
 	struct anxdp_softc * const sc = anxdp_connector->sc;
@@ -243,7 +243,7 @@ anxdp_connector_detect(struct drm_connector *connector, bool force)
 
 static void
 anxdp_connector_destroy(struct drm_connector *connector)
-{
+{printf("%s\n", __func__);
 	drm_connector_unregister(connector);
 	drm_connector_cleanup(connector);
 }
@@ -260,7 +260,7 @@ static const struct drm_connector_funcs anxdp_connector_funcs = {
 
 static void
 anxdp_analog_power_up_all(struct anxdp_softc * const sc)
-{
+{printf("%s\n", __func__);
 	const bus_size_t pd_reg = isrockchip(sc) ? RKANXDP_PD : ANXDP_PHY_PD;
 
 	bus_space_write_4(sc->sc_bst, sc->sc_bsh, pd_reg, DP_ALL_PD);
@@ -273,7 +273,7 @@ anxdp_analog_power_up_all(struct anxdp_softc * const sc)
 
 static int
 anxdp_await_pll_lock(struct anxdp_softc * const sc)
-{
+{printf("%s\n", __func__);
 	u_int timeout;
 
 	for (timeout = 0; timeout < 100; timeout++) {
@@ -288,7 +288,7 @@ anxdp_await_pll_lock(struct anxdp_softc * const sc)
 
 static void
 anxdp_init_hpd(struct anxdp_softc * const sc)
-{
+{printf("%s\n", __func__);
 	uint32_t sc3;
 
 	bus_space_write_4(sc->sc_bst, sc->sc_bsh, ANXDP_COMMON_INT_STA_4, 0x7);
@@ -305,7 +305,7 @@ anxdp_init_hpd(struct anxdp_softc * const sc)
 
 static void
 anxdp_init_aux(struct anxdp_softc * const sc)
-{
+{printf("%s\n", __func__);
 	uint32_t fe2, pd, hrc;
 	const bus_size_t pd_reg = isrockchip(sc) ? RKANXDP_PD : ANXDP_PHY_PD;
 	const uint32_t pd_mask = isrockchip(sc) ? RK_AUX_PD : AUX_PD;
@@ -342,7 +342,7 @@ anxdp_init_aux(struct anxdp_softc * const sc)
 
 static int
 anxdp_connector_get_modes(struct drm_connector *connector)
-{
+{printf("%s\n", __func__);
 	struct anxdp_connector *anxdp_connector = to_anxdp_connector(connector);
 	struct anxdp_softc * const sc = anxdp_connector->sc;
 	struct edid *pedid = NULL;
@@ -373,7 +373,7 @@ anxdp_connector_get_modes(struct drm_connector *connector)
 
 static struct drm_encoder *
 anxdp_connector_best_encoder(struct drm_connector *connector)
-{
+{printf("%s\n", __func__);
 	struct anxdp_connector *anxdp_connector = to_anxdp_connector(connector);
 
 	return anxdp_connector->encoder;
@@ -386,7 +386,7 @@ static const struct drm_connector_helper_funcs anxdp_connector_helper_funcs = {
 
 static int
 anxdp_bridge_attach(struct drm_bridge *bridge)
-{
+{printf("%s\n", __func__);
 	struct anxdp_softc * const sc = bridge->driver_private;
 	struct anxdp_connector *anxdp_connector = &sc->sc_connector;
 	struct drm_connector *connector = &anxdp_connector->base;
@@ -412,7 +412,7 @@ anxdp_bridge_attach(struct drm_bridge *bridge)
 
 static void
 anxdp_macro_reset(struct anxdp_softc * const sc)
-{
+{printf("%s\n", __func__);
 	uint32_t val;
 
 	val = bus_space_read_4(sc->sc_bst, sc->sc_bsh, ANXDP_PHY_TEST);
@@ -425,7 +425,7 @@ anxdp_macro_reset(struct anxdp_softc * const sc)
 
 static void
 anxdp_link_start(struct anxdp_softc * const sc, struct anxdp_link * const link)
-{
+{printf("%s\n", __func__);
 	uint8_t training[4];
 	uint8_t bw[2];
 	uint32_t val;
@@ -469,7 +469,7 @@ anxdp_link_start(struct anxdp_softc * const sc, struct anxdp_link * const link)
 static void
 anxdp_process_clock_recovery(struct anxdp_softc * const sc,
     struct anxdp_link * const link)
-{
+{printf("%s\n", __func__);
 	u_int i, tries;
 	uint8_t link_status[DP_LINK_STATUS_SIZE];
 	uint8_t training[4];
@@ -514,7 +514,7 @@ cr_fail:
 
 static void
 anxdp_process_eq(struct anxdp_softc * const sc, struct anxdp_link * const link)
-{
+{printf("%s\n", __func__);
 	u_int i, tries;
 	uint8_t link_status[DP_LINK_STATUS_SIZE];
 	uint8_t training[4];
@@ -559,7 +559,7 @@ eq_fail:
 
 static void
 anxdp_train_link(struct anxdp_softc * const sc)
-{
+{printf("%s\n", __func__);
 	struct anxdp_link link;
 	uint8_t values[3], power;
 	int ret;
@@ -605,7 +605,7 @@ anxdp_train_link(struct anxdp_softc * const sc)
 
 static void
 anxdp_bringup(struct anxdp_softc * const sc)
-{
+{printf("%s\n", __func__);
 	uint32_t val;
 
 	val = bus_space_read_4(sc->sc_bst, sc->sc_bsh, ANXDP_VIDEO_CTL_1);
@@ -687,7 +687,7 @@ anxdp_bringup(struct anxdp_softc * const sc)
 
 static void
 anxdp_bridge_enable(struct drm_bridge *bridge)
-{
+{printf("%s\n", __func__);
 	struct anxdp_softc * const sc = bridge->driver_private;
 	uint32_t val;
 
@@ -732,24 +732,24 @@ anxdp_bridge_enable(struct drm_bridge *bridge)
 
 static void
 anxdp_bridge_pre_enable(struct drm_bridge *bridge)
-{
+{printf("%s\n", __func__);
 }
 
 static void
 anxdp_bridge_disable(struct drm_bridge *bridge)
-{
+{printf("%s\n", __func__);
 }
 
 static void
 anxdp_bridge_post_disable(struct drm_bridge *bridge)
-{
+{printf("%s\n", __func__);
 }
 
 static void
 anxdp_bridge_mode_set(struct drm_bridge *bridge,
     const struct drm_display_mode *mode,
     const struct drm_display_mode *adjusted_mode)
-{
+{printf("%s\n", __func__);
 	struct anxdp_softc * const sc = bridge->driver_private;
 
 	sc->sc_curmode = *adjusted_mode;
@@ -758,7 +758,7 @@ anxdp_bridge_mode_set(struct drm_bridge *bridge,
 static bool
 anxdp_bridge_mode_fixup(struct drm_bridge *bridge,
     const struct drm_display_mode *mode, struct drm_display_mode *adjusted_mode)
-{
+{printf("%s\n", __func__);
 	return true;
 }
 
@@ -775,20 +775,20 @@ static const struct drm_bridge_funcs anxdp_bridge_funcs = {
 #if ANXDP_AUDIO
 static int
 anxdp_dai_set_format(audio_dai_tag_t dai, u_int format)
-{
+{printf("%s\n", __func__);
 	return 0;
 }
 
 static int
 anxdp_dai_add_device(audio_dai_tag_t dai, audio_dai_tag_t aux)
-{
+{printf("%s\n", __func__);
 	/* Not supported */
 	return 0;
 }
 
 static void
 anxdp_audio_swvol_codec(audio_filter_arg_t *arg)
-{
+{printf("%s\n", __func__);
 	struct anxdp_softc * const sc = arg->context;
 	const aint_t *src;
 	aint_t *dst;
@@ -809,7 +809,7 @@ static int
 anxdp_audio_set_format(void *priv, int setmode,
     const audio_params_t *play, const audio_params_t *rec,
     audio_filter_reg_t *pfil, audio_filter_reg_t *rfil)
-{
+{printf("%s\n", __func__);
 	struct anxdp_softc * const sc = priv;
 
 	pfil->codec = anxdp_audio_swvol_codec;
@@ -820,7 +820,7 @@ anxdp_audio_set_format(void *priv, int setmode,
 
 static int
 anxdp_audio_set_port(void *priv, mixer_ctrl_t *mc)
-{
+{printf("%s\n", __func__);
 	struct anxdp_softc * const sc = priv;
 
 	switch (mc->dev) {
@@ -835,7 +835,7 @@ anxdp_audio_set_port(void *priv, mixer_ctrl_t *mc)
 
 static int
 anxdp_audio_get_port(void *priv, mixer_ctrl_t *mc)
-{
+{printf("%s\n", __func__);
 	struct anxdp_softc * const sc = priv;
 
 	switch (mc->dev) {
@@ -851,7 +851,7 @@ anxdp_audio_get_port(void *priv, mixer_ctrl_t *mc)
 
 static int
 anxdp_audio_query_devinfo(void *priv, mixer_devinfo_t *di)
-{
+{printf("%s\n", __func__);
 	switch (di->index) {
 	case ANXDP_DAI_OUTPUT_CLASS:
 		di->mixer_class = di->index;
@@ -902,7 +902,7 @@ static const struct audio_hw_if anxdp_dai_hw_if = {
 
 static ssize_t
 anxdp_dp_aux_transfer(struct drm_dp_aux *dpaux, struct drm_dp_aux_msg *dpmsg)
-{
+{printf("%s req=0x%x\n", __func__, dpmsg->request); if (!(dpmsg->request & DP_AUX_I2C_READ)) hexdump(printf, "write", dpmsg->buffer, dpmsg->size);
 	struct anxdp_softc * const sc = container_of(dpaux, struct anxdp_softc,
 	    sc_dpaux);
 	size_t loop_timeout = 0;
@@ -999,7 +999,7 @@ anxdp_dp_aux_transfer(struct drm_dp_aux *dpaux, struct drm_dp_aux_msg *dpmsg)
 			    ANXDP_BUF_DATA(i));
 			((uint8_t *)(dpmsg->buffer))[i] = val & 0xffU;
 			ret++;
-		}
+		}hexdump(printf, "read", dpmsg->buffer, dpmsg->size);
 	}
 
 	val = bus_space_read_4(sc->sc_bst, sc->sc_bsh, ANXDP_AUX_RX_COMM);
@@ -1023,7 +1023,7 @@ out:
 
 int
 anxdp_attach(struct anxdp_softc *sc)
-{
+{printf("%s\n", __func__);
 #if ANXDP_AUDIO
 	sc->sc_swvol = 255;
 
@@ -1051,7 +1051,7 @@ anxdp_attach(struct anxdp_softc *sc)
 
 int
 anxdp_bind(struct anxdp_softc *sc, struct drm_encoder *encoder)
-{
+{printf("%s\n", __func__);
 	int error;
 
 	sc->sc_connector.encoder = encoder;
@@ -1075,7 +1075,7 @@ void anxdp0_dump(void);
 
 void
 anxdp0_dump(void)
-{
+{printf("%s\n", __func__);
 	extern struct cfdriver anxdp_cd;
 	struct anxdp_softc * const sc = device_lookup_private(&anxdp_cd, 0);
 	size_t i;
