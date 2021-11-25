@@ -77,9 +77,11 @@ static void	rk_drm_attach(device_t, device_t, void *);
 static void	rk_drm_init(device_t);
 static vmem_t	*rk_drm_alloc_cma_pool(struct drm_device *, size_t);
 
+#if 0
 static uint32_t	rk_drm_get_vblank_counter(struct drm_device *, unsigned int);
 static int	rk_drm_enable_vblank(struct drm_device *, unsigned int);
 static void	rk_drm_disable_vblank(struct drm_device *, unsigned int);
+#endif
 
 static int	rk_drm_load(struct drm_device *, unsigned long);
 static void	rk_drm_unload(struct drm_device *);
@@ -99,9 +101,11 @@ static struct drm_driver rk_drm_driver = {
 	.dumb_create = drm_gem_cma_dumb_create,
 	.dumb_destroy = drm_gem_dumb_destroy,
 
+#if 0
 	.get_vblank_counter = rk_drm_get_vblank_counter,
 	.enable_vblank = rk_drm_enable_vblank,
 	.disable_vblank = rk_drm_disable_vblank,
+#endif
 
 	.name = DRIVER_NAME,
 	.desc = DRIVER_DESC,
@@ -454,6 +458,7 @@ drmerr:
 	return error;
 }
 
+#if 0
 static uint32_t
 rk_drm_get_vblank_counter(struct drm_device *ddev, unsigned int crtc)
 {
@@ -497,6 +502,7 @@ rk_drm_disable_vblank(struct drm_device *ddev, unsigned int crtc)
 
 	sc->sc_vbl[crtc].disable_vblank(sc->sc_vbl[crtc].priv);
 }
+#endif
 
 static void
 rk_drm_unload(struct drm_device *ddev)

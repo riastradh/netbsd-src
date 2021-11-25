@@ -196,8 +196,6 @@ drmfb_genfb_ioctl(void *v, void *vs, unsigned long cmd, void *data, int flag,
 	struct genfb_softc *const genfb = v;
 	struct drmfb_softc *const sc = container_of(genfb, struct drmfb_softc,
 	    sc_genfb);
-	struct drm_connector_list_iter conn_iter;
-	struct drm_connector *connector;
 	int error;
 
 	if (sc->sc_da.da_params->dp_ioctl) {
@@ -227,17 +225,10 @@ drmfb_genfb_ioctl(void *v, void *vs, unsigned long cmd, void *data, int flag,
 		const int on = *(const int *)data;
 		const int dpms_mode = on? DRM_MODE_DPMS_ON : DRM_MODE_DPMS_OFF;
 		struct drm_fb_helper *const fb_helper = sc->sc_da.da_fb_helper;
-		struct drm_device *const dev = fb_helper->dev;
 
-		drm_modeset_lock_all(dev);
-		drm_connector_list_iter_begin(fb_helper->dev, &conn_iter);
-		drm_client_for_each_connector_iter(connector, &conn_iter) {
-			(*connector->funcs->dpms)(connector, dpms_mode);
-			drm_object_property_set_value(&connector->base,
-			    dev->mode_config.dpms_property, dpms_mode);
-		}
-		drm_connector_list_iter_end(&conn_iter);
-		drm_modeset_unlock_all(dev);
+		mutex_lock(&fb_helper->lock);
+		drm_client_modeset_dpms(&fb_helper->client, dpms_mode);
+		mutex_unlock(&fb_helper->lock);
 
 		return 0;
 	}
