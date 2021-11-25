@@ -249,6 +249,7 @@ anxdp_connector_destroy(struct drm_connector *connector)
 }
 
 static const struct drm_connector_funcs anxdp_connector_funcs = {
+	.dpms = drm_helper_connector_dpms,
 	.detect = anxdp_connector_detect,
 	.fill_modes = drm_helper_probe_single_connector_modes,
 	.destroy = anxdp_connector_destroy,
