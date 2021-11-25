@@ -1467,17 +1467,18 @@ drm_atomic_helper_wait_for_vblanks(struct drm_device *dev,
 
 #ifdef __NetBSD__
 		if (cold) {
-			unsigned timo = 100;
+			bool done = false;
 
-			ret = -ETIMEDOUT;
-			while (timo --> 0 && ret) {
+			ret = 100;
+			for (ret = 100; !done && ret; DELAY(1000), ret--) {
 				spin_lock(&dev->event_lock);
 				if (old_state->crtcs[i].last_vblank_count !=
 				    drm_crtc_vblank_count(crtc)) {
-					ret = 0;
+					done = true;
 				}
 				spin_unlock(&dev->event_lock);
 			}
+			printf("%s: ret=%d done=%d\n", __func__, ret, done);
 		} else {
 			spin_lock(&dev->event_lock);
 			DRM_SPIN_WAIT_ON(ret, &dev->vblank[i].queue,
@@ -1560,19 +1561,28 @@ void drm_atomic_helper_commit_tail(struct drm_atomic_state *old_state)
 {
 	struct drm_device *dev = old_state->dev;
 
+	printf("%s: A\n", __func__);
+
 	drm_atomic_helper_commit_modeset_disables(dev, old_state);
+	printf("%s: B\n", __func__);
 
 	drm_atomic_helper_commit_planes(dev, old_state, 0);
+	printf("%s: C\n", __func__);
 
 	drm_atomic_helper_commit_modeset_enables(dev, old_state);
+	printf("%s: D\n", __func__);
 
 	drm_atomic_helper_fake_vblank(old_state);
+	printf("%s: E\n", __func__);
 
 	drm_atomic_helper_commit_hw_done(old_state);
+	printf("%s: F\n", __func__);
 
 	drm_atomic_helper_wait_for_vblanks(dev, old_state);
+	printf("%s: G\n", __func__);
 
 	drm_atomic_helper_cleanup_planes(dev, old_state);
+	printf("%s: H\n", __func__);
 }
 EXPORT_SYMBOL(drm_atomic_helper_commit_tail);
 
@@ -1590,20 +1600,29 @@ void drm_atomic_helper_commit_tail_rpm(struct drm_atomic_state *old_state)
 {
 	struct drm_device *dev = old_state->dev;
 
+	printf("%s: A\n", __func__);
+
 	drm_atomic_helper_commit_modeset_disables(dev, old_state);
+	printf("%s: B\n", __func__);
 
 	drm_atomic_helper_commit_modeset_enables(dev, old_state);
+	printf("%s: C\n", __func__);
 
 	drm_atomic_helper_commit_planes(dev, old_state,
 					DRM_PLANE_COMMIT_ACTIVE_ONLY);
+	printf("%s: D\n", __func__);
 
 	drm_atomic_helper_fake_vblank(old_state);
+	printf("%s: E\n", __func__);
 
 	drm_atomic_helper_commit_hw_done(old_state);
+	printf("%s: F\n", __func__);
 
 	drm_atomic_helper_wait_for_vblanks(dev, old_state);
+	printf("%s: G\n", __func__);
 
 	drm_atomic_helper_cleanup_planes(dev, old_state);
+	printf("%s: H\n", __func__);
 }
 EXPORT_SYMBOL(drm_atomic_helper_commit_tail_rpm);
 
@@ -2482,6 +2501,8 @@ void drm_atomic_helper_commit_planes(struct drm_device *dev,
 	for_each_oldnew_crtc_in_state(old_state, crtc, old_crtc_state, new_crtc_state, i) {
 		const struct drm_crtc_helper_funcs *funcs;
 
+		DRM_ERROR("begin [CRTC:%d:%s]\n", crtc->base.id, crtc->name);
+
 		funcs = crtc->helper_private;
 
 		if (!funcs || !funcs->atomic_begin)
@@ -2496,6 +2517,8 @@ void drm_atomic_helper_commit_planes(struct drm_device *dev,
 	for_each_oldnew_plane_in_state(old_state, plane, old_plane_state, new_plane_state, i) {
 		const struct drm_plane_helper_funcs *funcs;
 		bool disabling;
+
+		DRM_ERROR("update [PLANE:%d:%s]\n", plane->base.id, plane->name);
 
 		funcs = plane->helper_private;
 
@@ -2540,6 +2563,8 @@ void drm_atomic_helper_commit_planes(struct drm_device *dev,
 	for_each_oldnew_crtc_in_state(old_state, crtc, old_crtc_state, new_crtc_state, i) {
 		const struct drm_crtc_helper_funcs *funcs;
 
+		DRM_ERROR("flush [CRTC:%d:%s]\n", crtc->base.id, crtc->name);
+
 		funcs = crtc->helper_private;
 
 		if (!funcs || !funcs->atomic_flush)
@@ -2550,6 +2575,8 @@ void drm_atomic_helper_commit_planes(struct drm_device *dev,
 
 		funcs->atomic_flush(crtc, old_crtc_state);
 	}
+
+	DRM_ERROR("done\n");
 }
 EXPORT_SYMBOL(drm_atomic_helper_commit_planes);
 
