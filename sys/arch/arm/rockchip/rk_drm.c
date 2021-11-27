@@ -167,6 +167,10 @@ rk_drm_attach(device_t parent, device_t self, void *aux)
 
 	fdt_remove_bycompat(fb_compatible);
 
+	/*
+	 * Wait until rk_vop is attached as a sibling to this device --
+	 * we need that to actually display our framebuffer.
+	 */
 	config_defer(self, rk_drm_init);
 }
 
