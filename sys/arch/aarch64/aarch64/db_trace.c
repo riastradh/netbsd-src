@@ -302,8 +302,21 @@ db_stack_trace_print(db_expr_t addr, bool have_addr, db_expr_t count,
 			lastfp = (uint64_t)tf;
 			lastlr = lr;
 			lr = fp = 0;
-			db_read_bytes((db_addr_t)&tf->tf_pc, sizeof(lr), (char *)&lr);
-			db_read_bytes((db_addr_t)&tf->tf_reg[29], sizeof(fp), (char *)&fp);
+			db_read_bytes((db_addr_t)&tf->tf_pc, sizeof(lr),
+			    (char *)&lr);
+			if (lr == 0) {
+				/*
+				 * The exception may have been from a
+				 * jump to null, so the null pc we
+				 * would return to is useless.  Try
+				 * x[30] instead -- that will be the
+				 * return address for the jump.
+				 */
+				db_read_bytes((db_addr_t)&tf->tf_reg[30],
+				    sizeof(lr), (char *)&lr);
+			}
+			db_read_bytes((db_addr_t)&tf->tf_reg[29], sizeof(fp),
+			    (char *)&fp);
 			lr = aarch64_strip_pac(lr);
 
 			/*
