@@ -59,6 +59,7 @@ static int crashme_sysctl_forwarder(SYSCTLFN_PROTO);
 
 static int crashme_panic(int);
 static int crashme_null_deref(int);
+static int crashme_null_jump(int);
 #ifdef DDB
 static int crashme_ddb(int);
 #endif
@@ -73,6 +74,7 @@ static int crashme_ddb(int);
 static crashme_node nodes[] = {
     CMNODE("panic", "plain old panic", crashme_panic),
     CMNODE("null_deref", "null dereference", crashme_null_deref),
+    CMNODE("null_jump", "jump to null", crashme_null_jump),
 #ifdef DDB
     CMNODE("ddb", "enter ddb directly", crashme_ddb),
 #endif
@@ -246,6 +248,16 @@ crashme_null_deref(int flags)
 {
 
 	*(volatile char *)0 = 0;
+	return -1;
+}
+
+static int
+crashme_null_jump(int flags)
+{
+	void (*volatile f)(int) = NULL;
+
+	(*f)(flags);
+	/* make sure to have a nontrivial return address here */
 	return -1;
 }
 
