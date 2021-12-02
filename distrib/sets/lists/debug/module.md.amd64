@@ -27,6 +27,8 @@
 ./usr/libdata/debug/@MODULEDIR@/acpiwmi/acpiwmi.kmod.debug		modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/aibs				modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/aibs/aibs.kmod.debug			modules-base-kernel	kmod,debug
+./usr/libdata/debug/@MODULEDIR@/amdgpu				modules-base-kernel	kmod,debug
+./usr/libdata/debug/@MODULEDIR@/amdgpu/amdgpu.kmod.debug		modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/amdsmn				modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/amdsmn/amdsmn.kmod.debug		modules-base-kernel	kmod,debug
 ./usr/libdata/debug/@MODULEDIR@/amdtemp				modules-base-kernel	kmod,debug
