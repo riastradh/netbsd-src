@@ -9,4 +9,8 @@ SUBDIR+=	ipw3945 iwl100 iwl105 iwl135 iwl1000 iwl2000 iwl2030 \
 		iwl7260 iwl7265 iwl8000 iwl8265
 .endif
 
+.if ${MKI915FIRMWARE} != "no"
+SUBDIR+=	i915
+.endif
+
 .include <bsd.subdir.mk>
