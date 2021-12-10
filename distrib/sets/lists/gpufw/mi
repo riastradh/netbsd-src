@@ -322,7 +322,7 @@
 ./libdata/firmware/amdgpu/verde_pfp.bin			base-gpufw	amdgpufirmware
 ./libdata/firmware/amdgpu/verde_rlc.bin			base-gpufw	amdgpufirmware
 ./libdata/firmware/amdgpu/verde_smc.bin			base-gpufw	amdgpufirmware
-./libdata/firmware/i915					base-gpufw	i915firmware
+./libdata/firmware/i915					base-gpufw
 ./libdata/firmware/i915/LICENSE.i915			base-gpufw	i915firmware
 ./libdata/firmware/i915/bxt_dmc_ver1_07.bin		base-gpufw	i915firmware
 ./libdata/firmware/i915/bxt_guc_33.0.0.bin		base-gpufw	i915firmware
