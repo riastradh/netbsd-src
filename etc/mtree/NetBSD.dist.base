@@ -118,10 +118,6 @@
 ./libdata/firmware/nouveau/nvidia/gv100/gr
 ./libdata/firmware/nouveau/nvidia/gv100/nvdec
 ./libdata/firmware/nouveau/nvidia/gv100/sec2
-./libdata/firmware/nouveau/nvidia/tegra124
-./libdata/firmware/nouveau/nvidia/tegra186
-./libdata/firmware/nouveau/nvidia/tegra194
-./libdata/firmware/nouveau/nvidia/tegra210
 ./libdata/firmware/nouveau/nvidia/tu102
 ./libdata/firmware/nouveau/nvidia/tu102/acr
 ./libdata/firmware/nouveau/nvidia/tu102/gr
