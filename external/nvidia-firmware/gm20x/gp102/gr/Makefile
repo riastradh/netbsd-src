@@ -1,0 +1,18 @@
+# $NetBSD$
+
+NOMAN=	# defined
+
+FILES+=		${.CURDIR}/../../dist/gp102/gr/fecs_data.bin
+FILES+=		${.CURDIR}/../../dist/gp102/gr/fecs_inst.bin
+FILES+=		${.CURDIR}/../../dist/gp102/gr/fecs_sig.bin
+FILES+=		${.CURDIR}/../../dist/gp102/gr/gpccs_data.bin
+FILES+=		${.CURDIR}/../../dist/gp102/gr/gpccs_inst.bin
+FILES+=		${.CURDIR}/../../dist/gp102/gr/gpccs_sig.bin
+FILES+=		${.CURDIR}/../../dist/gp102/gr/sw_bundle_init.bin
+FILES+=		${.CURDIR}/../../dist/gp102/gr/sw_ctx.bin
+FILES+=		${.CURDIR}/../../dist/gp102/gr/sw_method_init.bin
+FILES+=		${.CURDIR}/../../dist/gp102/gr/sw_nonctx.bin
+
+FILESDIR+=	${FIRMWAREDIR}/nouveau/nvidia/gp102/gr
+
+.include <bsd.files.mk>
