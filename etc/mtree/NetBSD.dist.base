@@ -66,6 +66,7 @@
 ./lib/npf
 ./libdata
 ./libdata/firmware
+./libdata/firmware/amdgpu
 ./libdata/firmware/i915
 ./libdata/firmware/if_athn
 ./libdata/firmware/if_bwfm
