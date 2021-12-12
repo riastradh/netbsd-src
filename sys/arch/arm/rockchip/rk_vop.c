@@ -680,6 +680,10 @@ rk_vop_crtc_enable_vblank(struct drm_crtc *crtc)
 {printf("%s[CRTC:%s]\n", __func__, crtc->name);
 	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
 	struct rk_vop_softc * const sc = mixer_crtc->sc;
+	struct drm_device *ddev __diagused;
+
+	ddev = rk_drm_port_device(&sc->sc_ports);
+	assert_spin_locked(&ddev->event_lock);
 
 	mutex_spin_enter(&sc->sc_intr_lock);
 	WR4_MASK(sc, VOP_INTR_CLEAR0, VOP_INTR0_FS_NEW, VOP_INTR0_FS_NEW);
@@ -696,6 +700,10 @@ rk_vop_crtc_disable_vblank(struct drm_crtc *crtc)
 {printf("%s[CRTC:%s]\n", __func__, crtc->name);
 	struct rk_vop_crtc *mixer_crtc = to_rk_vop_crtc(crtc);
 	struct rk_vop_softc * const sc = mixer_crtc->sc;
+	struct drm_device *ddev __diagused;
+
+	ddev = rk_drm_port_device(&sc->sc_ports);
+	assert_spin_locked(&ddev->event_lock);
 
 	mutex_spin_enter(&sc->sc_intr_lock);
 	WR4_MASK(sc, VOP_INTR_EN0, VOP_INTR0_FS_NEW, 0);
