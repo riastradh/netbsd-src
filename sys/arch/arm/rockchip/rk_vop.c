@@ -61,6 +61,7 @@ __KERNEL_RCSID(0, "$NetBSD: rk_vop.c,v 1.10 2021/01/27 03:10:19 thorpej Exp $");
 #define	 HDMI_OUT_EN			__BIT(13)
 #define	 RGB_OUT_EN			__BIT(12)
 #define	VOP_DSP_CTRL0			0x0010
+#define	 DSP_BLACK_EN			__BIT(19)
 #define	 DSP_OUT_MODE			__BITS(3,0)
 #define	  DSP_OUT_MODE_RGB888		0
 #define	  DSP_OUT_MODE_RGBaaa		15
@@ -270,8 +271,23 @@ rk3399_vop_init(struct rk_vop_softc *sc)
 	uint32_t val;
 
 	val = RD4(sc, VOP_SYS_CTRL);
+	val |= VOP_STANDBY_EN;
 	val |= RK3399_VOP_SYS_CTRL_ENABLE;
 	WR4(sc, VOP_SYS_CTRL, val);
+
+	val = RD4(sc, VOP_DSP_CTRL0);
+	val |= DSP_BLACK_EN;
+	WR4(sc, VOP_DSP_CTRL0, val);
+
+	val = RD4(sc, VOP_WIN0_CTRL);
+	val &= ~WIN0_EN;
+	WR4(sc, VOP_WIN0_CTRL, val);
+
+	/* Commit settings */
+	WR4(sc, VOP_REG_CFG_DONE, REG_LOAD_EN);
+
+	for (unsigned i = 10; i --> 0;)
+		DELAY(1000);
 }
 
 static const struct rk_vop_config rk3399_vop_lit_config = {
@@ -531,6 +547,7 @@ rk_vop_crtc_atomic_enable(struct drm_crtc *crtc, struct drm_crtc_state *state)
 	WR4(sc, VOP_SYS_CTRL, val);
 
 	val = RD4(sc, VOP_DSP_CTRL0);
+	val &= ~DSP_BLACK_EN;
 	val &= ~DSP_OUT_MODE;
 	val |= __SHIFTIN(sc->sc_conf->out_mode, DSP_OUT_MODE);
 	WR4(sc, VOP_DSP_CTRL0, val);
