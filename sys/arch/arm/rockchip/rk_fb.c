@@ -99,6 +99,25 @@ rk_fb_attach(device_t parent, device_t self, void *aux)
 }
 
 static void
+rk_fb_turnoffandbackonagain(device_t self)
+{
+	struct rk_fb_softc *sc = device_private(self);
+	struct rk_drmfb_attach_args * const sfa = &sc->sc_sfa;
+
+	/*
+	 * This is a grody kludge to turn the display off and back on
+	 * again at boot; otherwise the initial modeset doesn't take.
+	 * This is surely a bug somewhere in rk_vop.c or nearby, but I
+	 * haven't been able to find it, and this gives us almost the
+	 * same effect.
+	 */
+	mutex_lock(&sfa->sfa_fb_helper->lock);
+	drm_client_modeset_dpms(&sfa->sfa_fb_helper->client, DRM_MODE_DPMS_OFF);
+	drm_client_modeset_dpms(&sfa->sfa_fb_helper->client, DRM_MODE_DPMS_ON);
+	mutex_unlock(&sfa->sfa_fb_helper->lock);
+}
+
+static void
 rk_fb_init(struct rk_drm_task *task)
 {
 	struct rk_fb_softc * const sc =
@@ -123,6 +142,8 @@ rk_fb_init(struct rk_drm_task *task)
 	}
 
 	pmf_device_register1(self, NULL, NULL, rk_fb_shutdown);
+
+	config_interrupts(self, rk_fb_turnoffandbackonagain);
 }
 
 static bool
