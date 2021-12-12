@@ -905,6 +905,18 @@ rk_vop_attach(device_t parent, device_t self, void *aux)
 	if (sc->sc_conf->init != NULL)
 		sc->sc_conf->init(sc);
 
+#if 0
+	/* reset dclk again to commit config */
+	rst = fdtbus_reset_get(phandle, "dclk");
+	if (rst == NULL || fdtbus_reset_assert(rst) != 0)
+		aprint_error_dev(self, "couldn't assert reset %s\n", "dclk");
+	DELAY(10);
+	if (rst == NULL || fdtbus_reset_deassert(rst) != 0) {
+		aprint_error_dev(self, "couldn't de-assert reset %s\n",
+		    "dclk");
+	}
+#endif
+
 	sc->sc_ports.dp_ep_activate = rk_vop_ep_activate;
 	sc->sc_ports.dp_ep_get_data = rk_vop_ep_get_data;
 	fdt_ports_register(&sc->sc_ports, self, phandle, EP_DRM_CRTC);
