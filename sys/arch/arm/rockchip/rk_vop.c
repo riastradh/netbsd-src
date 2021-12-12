@@ -615,6 +615,22 @@ rk_vop_crtc_atomic_flush(struct drm_crtc *crtc, struct drm_crtc_state *state)
 	WR4(sc, VOP_REG_CFG_DONE, REG_LOAD_EN);
 	printf("%s: committed\n", __func__);
 
+	/* Wait for vblank interrupt.  */
+	if (RD4(sc, VOP_INTR_STATUS0) & VOP_INTR0_FS_NEW) {
+		int timo;
+		for (timo = 10; timo > 0; timo--, DELAY(1000)) {
+			if ((RD4(sc, VOP_INTR_STATUS0) & VOP_INTR0_FS_NEW)
+			    == 0) {
+				printf("%s: vblank acked\n", __func__);
+				break;
+			}
+		}
+		if (timo == 0) {
+			printf("%s: failed to ack vblank after 10ms\n",
+			    __func__);
+		}
+	}
+
 	/*
 	 * If caller wants a vblank event, tell the vblank interrupt
 	 * handler to send it on the next interrupt.
@@ -632,6 +648,23 @@ rk_vop_crtc_atomic_flush(struct drm_crtc *crtc, struct drm_crtc_state *state)
 		printf("%s: vblank event registered\n", __func__);
 	}
 	spin_unlock(&crtc->dev->event_lock);
+
+	if (cold) {
+		/* Wait 17 ms > 1/60 sec.  */
+		int timo;
+		for (timo = 17; timo > 0; timo--, DELAY(1000)) {
+			if (RD4(sc, VOP_INTR_STATUS0) & VOP_INTR0_FS_NEW) {
+				WR4_MASK(sc, VOP_INTR_CLEAR0, VOP_INTR0_FS_NEW,
+				    VOP_INTR0_FS_NEW);
+				printf("%s: vblank done\n", __func__);
+				break;
+			}
+		}
+		if (timo == 0) {
+			printf("%s: vblank not acked after >1/60 sec\n",
+			    __func__);
+		}
+	}
 }
 
 static const struct drm_crtc_helper_funcs rk_vop_crtc_helper_funcs = {
