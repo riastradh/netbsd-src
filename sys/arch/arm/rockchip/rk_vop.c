@@ -412,7 +412,10 @@ rk_vop_plane_atomic_update(struct drm_plane *plane,
 static void
 rk_vop_plane_atomic_disable(struct drm_plane *plane, struct drm_plane_state *state)
 {printf("%s[PLANE:%s]\n", __func__, plane->name);
-	DRM_DEBUG_KMS("[PLANE:%s] disable TODO\n", plane->name);
+	struct rk_vop_plane *vop_plane = to_rk_vop_plane(plane);
+	struct rk_vop_softc * const sc = vop_plane->sc;
+
+	WR4(sc, VOP_WIN0_CTRL, 0);	/* clear WIN0_EN */
 }
 
 static const struct drm_plane_helper_funcs rk_vop_plane_helper_funcs = {
