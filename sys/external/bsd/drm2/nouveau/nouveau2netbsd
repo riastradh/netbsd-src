@@ -32,9 +32,13 @@ filemap="$(mktemp -t ${0##*/})"
 
 cat Kbuild								\
 | sed -e 's,^include \(.*\)$,.include "\1",'				\
-| sed -e 's,^ifdef \(.*\)$,.if !empty(\1:M[yY][eE][sS]),'		\
+| sed -e 's,^ifdef \(.*\)$,.if !empty(\1:M[yY]),'			\
 | sed -e 's,^endif$,.endif,'						\
-| make -f /dev/stdin -V '$(nouveau-y)' src=.				\
+| env									\
+	env CONFIG_ACPI=y						\
+	env CONFIG_X86=y						\
+	env src=.							\
+	make -f /dev/stdin -V '$(nouveau-y)'				\
 | tr ' ' '\n'								\
 | sed -e 's,^$,,'							\
 | sort -u								\
