@@ -40,6 +40,7 @@
  *      - implemented limited ABI16/NVIF interop
  */
 
+#include <linux/acpi.h>
 #include <linux/notifier.h>
 
 #include <nvif/client.h>

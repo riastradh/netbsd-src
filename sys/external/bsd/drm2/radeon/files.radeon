@@ -48,7 +48,7 @@ file	external/bsd/drm2/radeon/radeon_pci.c			radeon
 file	external/bsd/drm2/radeon/radeondrmkmsfb.c		radeondrmkmsfb
 
 # Generated from radeon2netbsd.
-#file	external/bsd/drm2/dist/drm/radeon/radeon_acpi.c	radeon
+file	external/bsd/drm2/dist/drm/radeon/radeon_acpi.c	radeon
 file	external/bsd/drm2/dist/drm/radeon/radeon_agp.c	radeon
 file	external/bsd/drm2/dist/drm/radeon/radeon_asic.c	radeon
 file	external/bsd/drm2/dist/drm/radeon/radeon_atom.c	radeon

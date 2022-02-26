@@ -29,10 +29,18 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_subdev_bios_shadowacpi.c,v 1.3 2021/12/
 
 #if defined(CONFIG_ACPI) && defined(CONFIG_X86)
 int nouveau_acpi_get_bios_chunk(uint8_t *bios, int offset, int len);
+#ifdef __NetBSD__
+bool nouveau_acpi_rom_supported(struct acpi_devnode *);
+#else
 bool nouveau_acpi_rom_supported(struct device *);
+#endif
 #else
 static inline bool
+#ifdef __NetBSD__
+nouveau_acpi_rom_supported(struct acpi_devnode *dev)
+#else
 nouveau_acpi_rom_supported(struct device *dev)
+#endif
 {
 	return false;
 }
@@ -93,7 +101,7 @@ acpi_read_slow(void *data, u32 offset, u32 length, struct nvkm_bios *bios)
 static void *
 acpi_init(struct nvkm_bios *bios, const char *name)
 {
-	if (!nouveau_acpi_rom_supported(bios->subdev.device->dev))
+	if (!nouveau_acpi_rom_supported(bios->subdev.device->acpidev))
 		return ERR_PTR(-ENODEV);
 	return NULL;
 }

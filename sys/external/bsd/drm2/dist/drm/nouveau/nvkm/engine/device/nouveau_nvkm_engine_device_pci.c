@@ -1721,7 +1721,11 @@ nvkm_device_pci_new(struct pci_dev *pci_dev, const char *cfg, const char *dbg,
 			       (u64)pci_domain_nr(pci_dev->bus) << 32 |
 				    pci_dev->bus->number << 16 |
 				    PCI_SLOT(pci_dev->devfn) << 8 |
-				    PCI_FUNC(pci_dev->devfn), name,
+				    PCI_FUNC(pci_dev->devfn),
+#ifdef __NetBSD__
+			       /*acpidev*/pci_dev->pd_ad,
+#endif
+			       name,
 			       cfg, dbg, detect, mmio, subdev_mask,
 			       &pdev->device);
 

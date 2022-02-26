@@ -41,8 +41,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_bios.c,v 1.13 2023/11/06 14:33:51 tnn Exp $")
 #include "radeon.h"
 #include "radeon_reg.h"
 
-#if defined(__NetBSD__) && NACPICA > 0
-#define CONFIG_ACPI
+#if defined(__NetBSD__) && defined(CONFIG_ACPI)
 #include <dev/acpi/acpireg.h>
 #define	_COMPONENT	ACPI_DISPLAY_COMPONENT
 ACPI_MODULE_NAME("radeon_acpi")

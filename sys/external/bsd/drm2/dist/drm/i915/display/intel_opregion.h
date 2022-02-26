@@ -29,6 +29,7 @@
 
 #include <linux/workqueue.h>
 #include <linux/pci.h>
+#include <linux/acpi.h>
 
 struct drm_i915_private;
 struct intel_encoder;

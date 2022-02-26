@@ -2961,6 +2961,9 @@ int
 nvkm_device_ctor(const struct nvkm_device_func *func,
 		 const struct nvkm_device_quirk *quirk,
 		 struct device *dev, enum nvkm_device_type type, u64 handle,
+#ifdef __NetBSD__		/* XXX nouveau acpi */
+		 struct acpi_devnode *acpidev,
+#endif
 		 const char *name, const char *cfg, const char *dbg,
 		 bool detect, bool mmio, u64 subdev_mask,
 		 struct nvkm_device *device)
@@ -2986,6 +2989,9 @@ nvkm_device_ctor(const struct nvkm_device_func *func,
 	device->dev = dev;
 	device->type = type;
 	device->handle = handle;
+#ifdef __NetBSD__		/* XXX nouveau acpi */
+	device->acpidev = acpidev;
+#endif
 	device->cfgopt = cfg;
 	device->dbgopt = dbg;
 	device->name = name;

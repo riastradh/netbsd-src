@@ -32,15 +32,6 @@
 #ifndef _I915_DRV_H_
 #define _I915_DRV_H_
 
-#if defined(__NetBSD__)
-#ifdef _KERNEL_OPT
-#include "acpica.h"
-#endif	/* _KERNEL_OPT */
-#if (NACPICA > 0)
-#define CONFIG_ACPI
-#endif	/* NACPICA > 0 */
-#endif	/* __NetBSD__ */
-
 #include <uapi/drm/i915_drm.h>
 #include <uapi/drm/drm_fourcc.h>
 
@@ -59,6 +50,7 @@
 #include <linux/stackdepot.h>
 #include <linux/xarray.h>
 #include <linux/uuid.h>
+#include <linux/acpi.h>
 
 #include <drm/intel-gtt.h>
 #include <drm/drm_legacy.h> /* for struct drm_dma_handle */
