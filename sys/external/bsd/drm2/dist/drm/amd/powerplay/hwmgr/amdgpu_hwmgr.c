@@ -32,6 +32,7 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_hwmgr.c,v 1.2 2021/12/18 23:45:26 riastradh E
 #include <linux/slab.h>
 #include <linux/types.h>
 #include <linux/pci.h>
+#include <linux/acpi.h>
 #include <drm/amdgpu_drm.h>
 #include "power_state.h"
 #include "hwmgr.h"

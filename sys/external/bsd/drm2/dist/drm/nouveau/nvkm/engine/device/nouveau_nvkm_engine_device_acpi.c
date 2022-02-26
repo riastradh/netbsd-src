@@ -30,6 +30,11 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_engine_device_acpi.c,v 1.3 2021/12/18 2
 
 #include <core/device.h>
 
+#ifdef __NetBSD__
+/* This should be a PMF hook, not an ACPI notifier.  */
+#undef	CONFIG_ACPI
+#endif
+
 #ifdef CONFIG_ACPI
 static int
 nvkm_acpi_ntfy(struct notifier_block *nb, unsigned long val, void *data)

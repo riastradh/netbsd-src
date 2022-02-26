@@ -32,6 +32,8 @@
 #ifndef _DRM2_COMPAT_ACPI_VIDEO_H_
 #define _DRM2_COMPAT_ACPI_VIDEO_H_
 
+#include <linux/acpi.h>
+
 static inline void
 acpi_video_register(void)
 {

@@ -40,6 +40,7 @@
 #define	value		Value
 
 #define	acpi_get_handle		AcpiGetHandle
+#define	acpi_get_name		AcpiGetName
 #define	acpi_get_table		AcpiGetTable
 #define	acpi_evaluate_object	AcpiEvaluateObject
 #define	acpi_format_exception	AcpiFormatException

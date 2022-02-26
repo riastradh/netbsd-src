@@ -33,6 +33,15 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_subdev_mxm_base.c,v 1.4 2022/02/27 14:2
 #include <subdev/bios/mxm.h>
 #include <subdev/i2c.h>
 
+#ifdef __NetBSD__
+#ifdef CONFIG_ACPI
+#include <dev/acpi/acpireg.h>
+#define	_COMPONENT	ACPI_DISPLAY_COMPONENT
+ACPI_MODULE_NAME("nouveau_nvkm_subdev_mxm_base")
+#include <linux/nbsd-namespace-acpi.h>
+#endif
+#endif
+
 static bool
 mxm_shadow_rom_fetch(struct nvkm_i2c_bus *bus, u8 addr,
 		     u8 offset, u8 size, u8 *data)
@@ -99,7 +108,11 @@ mxm_shadow_dsm(struct nvkm_mxm *mxm, u8 version)
 	acpi_handle handle;
 	int rev;
 
+#ifdef __NetBSD__
+	handle = (device->acpidev ? device->acpidev->ad_handle : NULL);
+#else
 	handle = ACPI_HANDLE(device->dev);
+#endif
 	if (!handle)
 		return false;
 

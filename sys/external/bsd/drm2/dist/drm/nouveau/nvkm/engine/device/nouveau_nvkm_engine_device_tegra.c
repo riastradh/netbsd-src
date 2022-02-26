@@ -364,7 +364,11 @@ nvkm_device_tegra_new(const struct nvkm_device_tegra_func *func,
 	tdev->gpu_speedo = tegra_sku_info.gpu_speedo_value;
 	tdev->gpu_speedo_id = tegra_sku_info.gpu_speedo_id;
 	ret = nvkm_device_ctor(&nvkm_device_tegra_func, NULL, &pdev->dev,
-			       NVKM_DEVICE_TEGRA, pdev->id, NULL,
+			       NVKM_DEVICE_TEGRA, pdev->id,
+#ifdef __NetBSD__
+			       /*acpidev*/NULL,
+#endif
+			       /*name*/NULL,
 			       cfg, dbg, detect, mmio, subdev_mask,
 			       &tdev->device);
 	if (ret)

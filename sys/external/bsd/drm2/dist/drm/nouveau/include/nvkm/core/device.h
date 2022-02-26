@@ -92,6 +92,9 @@ struct nvkm_device {
 	struct device *dev;
 	enum nvkm_device_type type;
 	u64 handle;
+#ifdef __NetBSD__
+	struct acpi_devnode *acpidev;
+#endif
 	const char *name;
 	const char *cfgopt;
 	const char *dbgopt;

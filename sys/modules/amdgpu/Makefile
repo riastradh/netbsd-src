@@ -15,6 +15,11 @@ COPTS.amdgpu_float+=	${${ACTIVE_CC} == "gcc" :? -mhard-float :} -msse -msse2
 COPTS.amdgpu_float+=	-march=armv8-a
 .endif
 
+.if ${MACHINE_ARCH} == "i386" || ${MACHINE_ARCH} == "x86_64" || \
+	${MACHINE_CPU} == "arm" || ${MACHINE_CPU} == "aarch64"
+CPPFLAGS+=	-DNACPICA=1
+.endif
+
 # sed -ne 's,^makeoptions	amdgpu	"\([^.]*\)\.amdgpu"+="\(.*\)",\1+=	\2,gp' <files.amdgpu | sed -e 's,\$S,${S},g'
 # Note: order of includes is significant.
 CPPFLAGS+=	-I${S}/external/bsd/drm2/dist/drm/amd/include/asic_reg
@@ -145,6 +150,7 @@ COPTS.amdgpu_rn_clk_mgr.c+=	${COPTS.amdgpu_float}
 # sed -ne 's,^file	external/bsd/drm2/.*/\([^/ 	]*\)	.*,SRCS+=	\1,gp' <files.amdgpu | sort -u
 SRCS+=	amdgpu_acp.c
 SRCS+=	amdgpu_acp_hw.c
+SRCS+=	amdgpu_acpi.c
 SRCS+=	amdgpu_afmt.c
 SRCS+=	amdgpu_amd_powerplay.c
 SRCS+=	amdgpu_amdkfd.c
