@@ -73,6 +73,7 @@ COMPATLIB_NO_LIB= yes # only the include files, not the library
 
 LIBDWARF_OBJDIR!= cd ${.CURDIR} && ${PRINTOBJDIR}
 
+CPPFLAGS+=	-DBUILTIN_ELF_HEADERS
 CPPFLAGS+=	-I${.CURDIR}/../../compat
 CPPFLAGS+=	-I${.CURDIR}/../../common
 CPPFLAGS+=	-I${LIBDWARF_OBJDIR}/../common
