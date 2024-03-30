@@ -59,7 +59,9 @@ TOOLCHAIN_BITS+= dbsym mdsetimage
 
 DTRACE_BITS=
 .if ${MKDTRACE} != "no" || ${MKCTF} != "no"
-DTRACE_BITS+= .WAIT elftoolchain
+DTRACE_BITS+= .WAIT elftoolchain/common
+DTRACE_BITS+= .WAIT elftoolchain/libelf
+DTRACE_BITS+= .WAIT elftoolchain/libdwarf
 DTRACE_BITS+= .WAIT libctf
 .endif
 .if ${MKCTF} != "no"
