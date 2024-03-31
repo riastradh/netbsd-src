@@ -118,7 +118,7 @@ ksymload(size_t *nsymp)
 		if (st == NULL) {
 			goto elffail;
 		}
-		if (ELF_ST_TYPE(st->st_info) != STT_FUNC) {
+		if (GELF_ST_TYPE(st->st_info) != STT_FUNC) {
 			continue;
 		}
 		sym = emalloc(sizeof(*sym));

@@ -63,6 +63,7 @@ CPPFLAGS+=	-D__SAVAGE_DRM_H__	# Dup ioctls
 #CPPFLAGS+=	-D__RADEON_DRM_H__	# Dup ioctls
 CPPFLAGS+=	-D__MACH64_DRM_H__	# Dup ioctls
 CPPFLAGS+=	-D__MGA_DRM_H__		# Dup ioctls
+CPPFLAGS+=	-D_SYS_ELFDEFINITIONS_H_	# collides with sys/exec_elf.h
 
 ${PROG}-ioctl.c: mkioctls Makefile ${DEPFILES} ${SETFILES}
 	${_MKTARGET_CREATE}

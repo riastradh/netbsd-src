@@ -54,7 +54,7 @@ CLEANFILES+=	${LIBELF_GENSRCS}
 CPPFLAGS+=	-I${.CURDIR}/../../compat
 CPPFLAGS+=	-I${LIBELF_DIR} -I${LIBELF_DIR}/../common
 CPPFLAGS+=	-I${LIBELF_OBJDIR}/../common
-CPPFLAGS+=	-I${TOOLDIR}/include -I${TOOLDIR}/include/nbinclude
+CPPFLAGS+=	-I${TOOLDIR}/include
 
 CPPFLAGS+=	-DLIBELF_TEST_HOOKS
 
