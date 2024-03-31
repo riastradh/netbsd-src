@@ -35,7 +35,11 @@
 # include <sys/types.h>
 #endif
 
-#include <sys/elfdefinitions.h>
+#ifdef _KERNEL
+# include <sys/exec_elf.h>
+#else
+# include <sys/elfdefinitions.h>
+#endif
 
 #define	EM_AMD64		EM_X86_64
 
