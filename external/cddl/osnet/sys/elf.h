@@ -35,6 +35,6 @@
 # include <sys/types.h>
 #endif
 
-#include <elfdefinitions.h>
+#include "elfdefinitions.h"
 
 #endif

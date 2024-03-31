@@ -24,6 +24,13 @@
  * Use is subject to license terms.
  */
 
+/*
+ * XXX Hack: Prevent <sys/elfdefinitions.h> from being included.  It is
+ * pulled in by <libelf.h>, but it conflicts with <sys/exec_elf.h>,
+ * which is pulled in by <link.h> via <link_elf.h>.
+ */
+#define	_SYS_ELFDEFINITIONS_H_
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <dlfcn.h>
