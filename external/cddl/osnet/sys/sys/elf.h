@@ -29,6 +29,12 @@
 #ifndef	_SYS__ELF_SOLARIS_H_
 #define	_SYS__ELF_SOLARIS_H_
 
+#if HAVE_NBTOOL_CONFIG_H
+# include "nbtool_config.h"
+#else
+# include <sys/types.h>
+#endif
+
 #include <sys/elfdefinitions.h>
 
 #define	EM_AMD64		EM_X86_64
