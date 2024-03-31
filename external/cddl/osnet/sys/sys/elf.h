@@ -30,12 +30,12 @@
 #define	_SYS__ELF_SOLARIS_H_
 
 #if HAVE_NBTOOL_CONFIG_H
-#include <nbinclude/sys/exec_elf.h>
+#include <sys/elfdefinitions.h>
 #else
 #include <sys/exec_elf.h>
+#define	SHT_SUNW_dof		0x6ffffff4
 #endif
 
-#define	SHT_SUNW_dof		0x6ffffff4
 #define	EM_AMD64		EM_X86_64
 
 #define __ELF_WORD_SIZE ELFSIZE

@@ -36,7 +36,7 @@ _dwarf_get_reloc_type(Dwarf_P_Debug dbg, int is64)
 {
 
 	assert(dbg != NULL);
-#ifdef BUILTIN_ELF_HEADERS
+
 	switch (dbg->dbgp_isa) {
 	case DW_ISA_AARCH64:
 		return (is64 ? R_AARCH64_ABS64 : R_AARCH64_ABS32);
@@ -59,7 +59,6 @@ _dwarf_get_reloc_type(Dwarf_P_Debug dbg, int is64)
 	default:
 		break;
 	}
-#endif
 	return (0);		/* NOT REACHED */
 }
 
@@ -67,7 +66,6 @@ int
 _dwarf_get_reloc_size(Dwarf_Debug dbg, Dwarf_Unsigned rel_type)
 {
 
-#ifdef BUILTIN_ELF_HEADERS
 	switch (dbg->dbg_machine) {
 	case EM_NONE:
 		break;
@@ -129,7 +127,6 @@ _dwarf_get_reloc_size(Dwarf_Debug dbg, Dwarf_Unsigned rel_type)
 	default:
 		break;
 	}
-#endif
 
 	/* unknown relocation. */
 	return (0);

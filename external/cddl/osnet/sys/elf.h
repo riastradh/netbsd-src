@@ -30,7 +30,7 @@
 #define _ELF_H_
 
 #if HAVE_NBTOOL_CONFIG_H
-#include <nbinclude/sys/exec_elf.h>
+#include <elfdefinitions.h>
 #else
 #include <sys/exec_elf.h>
 #endif

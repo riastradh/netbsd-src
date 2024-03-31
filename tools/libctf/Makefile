@@ -62,5 +62,4 @@ ${TOOLDIR}/lib/libctf.a:: libctf.a
 	mkdir -p ${TOOLDIR}/lib
 	${HOST_INSTALL_FILE} -m ${BINMODE} libctf.a ${.TARGET}
 
-.include "${.CURDIR}/../Makefile.nbincludes"
 .include <bsd.hostlib.mk>
