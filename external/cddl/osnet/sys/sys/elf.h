@@ -51,6 +51,4 @@
 
 #define	EM_AMD64		EM_X86_64
 
-#define __ELF_WORD_SIZE ELFSIZE
-
 #endif /* !_SYS__ELF_SOLARIS_H_ */
