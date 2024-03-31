@@ -33,6 +33,8 @@
 
 #if HAVE_NBTOOL_CONFIG_H
 # include "nbtool_config.h"
+#else
+# include <sys/types.h>
 #endif
 
 #include "elfdefinitions.h"
