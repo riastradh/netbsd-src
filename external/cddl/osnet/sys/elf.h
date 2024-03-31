@@ -29,10 +29,6 @@
 #ifndef _ELF_H_
 #define _ELF_H_
 
-#if HAVE_NBTOOL_CONFIG_H
 #include <elfdefinitions.h>
-#else
-#include <sys/exec_elf.h>
-#endif
 
 #endif

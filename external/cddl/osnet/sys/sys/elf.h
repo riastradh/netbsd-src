@@ -29,12 +29,7 @@
 #ifndef	_SYS__ELF_SOLARIS_H_
 #define	_SYS__ELF_SOLARIS_H_
 
-#if HAVE_NBTOOL_CONFIG_H
 #include <sys/elfdefinitions.h>
-#else
-#include <sys/exec_elf.h>
-#define	SHT_SUNW_dof		0x6ffffff4
-#endif
 
 #define	EM_AMD64		EM_X86_64
 
