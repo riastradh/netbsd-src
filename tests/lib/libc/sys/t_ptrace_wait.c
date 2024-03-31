@@ -27,9 +27,17 @@
  */
 
 /*
- * XXX Hack: We use both libelf.h, which pulls in elfdefinitions.h, and
- * sys/exec_elf.h, which conflicts with elfdefinitions.h.  Force the
- * use of sys/exec_elf.h instead.
+ * XXX Hack: Force the use of sys/exec_elf.h, not elfdefinitions.h.
+ * Why?
+ *
+ * - libelf.h and gelf.h are needed for parsing core files in
+ *   t_ptrace_core_wait.h.
+ *
+ * - sys/exec_elf.h is needed for struct netbsd_elfcore_procinfo also
+ *   in t_ptrace_core_wait.h.
+ *
+ * libelf.h and gelf.h pull in elfdefinitions.h, but that conflicts
+ * with sys/exec_elf.h on most basic ELF definitions.
  */
 #define	_SYS_ELFDEFINITIONS_H_
 
