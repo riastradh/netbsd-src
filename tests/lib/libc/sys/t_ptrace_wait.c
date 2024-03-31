@@ -26,6 +26,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * XXX Hack: We use both libelf.h, which pulls in elfdefinitions.h, and
+ * sys/exec_elf.h, which conflicts with elfdefinitions.h.  Force the
+ * use of sys/exec_elf.h instead.
+ */
+#define	_SYS_ELFDEFINITIONS_H_
+
 #include <sys/cdefs.h>
 __RCSID("$NetBSD: t_ptrace_wait.c,v 1.191 2020/05/05 02:06:08 kamil Exp $");
 
