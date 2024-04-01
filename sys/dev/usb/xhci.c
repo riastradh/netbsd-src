@@ -2496,8 +2496,7 @@ xhci_event_transfer(struct xhci_softc * const sc,
 			xfer->ux_frlengths[xx->xx_isoc_done] -=
 			    XHCI_TRB_2_REM_GET(trb_2);
 			xfer->ux_actlen += xfer->ux_frlengths[xx->xx_isoc_done];
-		} else
-		if ((trb_3 & XHCI_TRB_3_ED_BIT) == 0) {
+		} else if ((trb_3 & XHCI_TRB_3_ED_BIT) == 0) {
 			if (xfer->ux_actlen == 0)
 				xfer->ux_actlen = xfer->ux_length -
 				    XHCI_TRB_2_REM_GET(trb_2);
