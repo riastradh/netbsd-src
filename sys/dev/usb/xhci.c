@@ -4561,14 +4561,12 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 	uint64_t parameter;
 	uint32_t status;
 	uint32_t control;
-	uint32_t mfindex;
 	uint32_t offs;
 	int i, ival;
 	const bool polling = xhci_polling_p(sc);
 	const uint16_t MPS = UGETW(xfer->ux_pipe->up_endpoint->ue_edesc->wMaxPacketSize);
 	const uint16_t mps = UE_GET_SIZE(MPS);
 	const uint8_t maxb = xpipe->xp_maxb;
-	u_int tdpc, tbc, tlbpc;
 
 	XHCIHIST_FUNC();
 	XHCIHIST_CALLARGS("%#jx slot %ju dci %ju",
@@ -4594,7 +4592,8 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 		ival = 1; /* fake something up */
 
 	if (xpipe->xp_isoc_next == -1) {
-		mfindex = xhci_rt_read_4(sc, XHCI_MFINDEX);
+		uint32_t mfindex = xhci_rt_read_4(sc, XHCI_MFINDEX);
+
 		DPRINTF("mfindex %jx", (uintmax_t)mfindex, 0, 0, 0);
 		mfindex = XHCI_MFINDEX_GET(mfindex + 1);
 		mfindex /= USB_UFRAMES_PER_FRAME;
@@ -4616,11 +4615,10 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 	offs = 0;
 	for (i = 0; i < xfer->ux_nframes; i++) {
 		const uint32_t len = xfer->ux_frlengths[i];
-
-		tdpc = howmany(len, mps);
-		tbc = howmany(tdpc, maxb) - 1;
-		tlbpc = tdpc % maxb;
-		tlbpc = tlbpc ? tlbpc - 1 : maxb - 1;
+		const unsigned tdpc = howmany(len, mps);
+		const unsigned tbc = howmany(tdpc, maxb) - 1;
+		const unsigned tlbpc1 = tdpc % maxb;
+		const unsigned tlbpc = tlbpc1 ? tlbpc1 - 1 : maxb - 1;
 
 		KASSERTMSG(len <= 0x10000, "len %d", len);
 		parameter = DMAADDR(dma, offs);
