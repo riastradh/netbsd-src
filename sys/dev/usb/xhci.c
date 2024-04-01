@@ -4603,6 +4603,17 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 		xpipe->xp_isoc_next = roundup2(mfindex, ival);
 	}
 
+	/*
+	 * `An Isoch TD consists of one or more TRBs, where the first
+	 *  TRB of TD is always an Isoch TRB.  If the data associated
+	 *  with an Isoch TD is not contiguous or larger than 64K
+	 *  bytes, then additional Normal TRBs may be chained to the
+	 *  initial Isoch TRB, forming a multi-TRB Isoch TD.'
+	 *
+	 * https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/extensible-host-controler-interface-usb-xhci.pdf#page=216
+	 */
+	trb_type = XHCI_TRB_TYPE_ISOCH;
+
 	offs = 0;
 	for (i = 0; i < xfer->ux_nframes; i++) {
 		len = xfer->ux_frlengths[i];
