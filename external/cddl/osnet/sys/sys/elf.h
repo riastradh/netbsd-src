@@ -35,6 +35,14 @@
 # include <sys/types.h>
 #endif
 
+/*
+ * XXX In the kernel (e.g., zfs module build, or anything else using
+ * sys/dtrace.h -> sys/ctf_api.h -> sys/elf.h), sys/elfdefinitions.h
+ * isn't available -- it's a header file for the userland libelf.  We
+ * could maybe make it available, but sys/exec_elf.h -- which would
+ * collide with sys/elfdefinitions.h -- provides all the definitions
+ * users need, so we'll just use that for now.
+ */
 #ifdef _KERNEL
 # include <sys/exec_elf.h>
 #else
