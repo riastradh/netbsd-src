@@ -4547,6 +4547,52 @@ xhci_device_isoc_transfer(struct usbd_xfer *xfer)
 	return xhci_device_isoc_enter(xfer);
 }
 
+static void
+xhci_device_isoc_enter_frame(struct usbd_xfer *xfer, unsigned i,
+    uint32_t offs, uint16_t mps, uint8_t maxb)
+{
+	struct xhci_softc * const sc = XHCI_XFER2SC(xfer);
+	struct xhci_xfer * const xx = XHCI_XFER2XXFER(xfer);
+	struct xhci_pipe * const xpipe = container_of(xfer->ux_pipe,
+	    struct xhci_pipe, xp_pipe);
+	usb_dma_t * const dma = &xfer->ux_dmabuf;
+	const bool isread = usbd_xfer_isread(xfer);
+	const uint32_t len = xfer->ux_frlengths[i];
+	const unsigned tdpc = howmany(len, mps);
+	const unsigned tbc = howmany(tdpc, maxb) - 1;
+	const unsigned tlbpc1 = tdpc % maxb;
+	const unsigned tlbpc = tlbpc1 ? tlbpc1 - 1 : maxb - 1;
+	uint32_t parameter, status, control;
+
+	KASSERTMSG(len <= 0x10000, "len %d", len);
+
+	parameter = DMAADDR(dma, offs);
+	status = XHCI_TRB_2_IRQ_SET(0) |
+	    XHCI_TRB_2_TDSZ_SET(0) |
+	    XHCI_TRB_2_BYTES_SET(len);
+	control = XHCI_TRB_3_TYPE_SET(XHCI_TRB_TYPE_ISOCH) |
+	    (isread ? XHCI_TRB_3_ISP_BIT : 0) |
+	    XHCI_TRB_3_TBC_SET(tbc) |
+	    XHCI_TRB_3_TLBPC_SET(tlbpc) |
+	    XHCI_TRB_3_IOC_BIT;
+
+	if (XHCI_HCC_CFC(sc->sc_hcc)) {
+		control |= XHCI_TRB_3_FRID_SET(xpipe->xp_isoc_next);
+#if 0
+	} else if (xpipe->xp_isoc_next == -1) {
+		control |= XHCI_TRB_3_FRID_SET(xpipe->xp_isoc_next);
+#endif
+	} else {
+		control |= XHCI_TRB_3_ISO_SIA_BIT;
+	}
+#if 0
+	if (i != xfer->ux_nframes - 1)
+		control |= XHCI_TRB_3_BEI_BIT;
+#endif
+
+	xhci_xfer_put_trb(xx, i, parameter, status, control);
+}
+
 static usbd_status
 xhci_device_isoc_enter(struct usbd_xfer *xfer)
 {
@@ -4557,9 +4603,6 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 	struct xhci_xfer * const xx = XHCI_XFER2XXFER(xfer);
 	struct xhci_pipe * const xpipe = (struct xhci_pipe *)xfer->ux_pipe;
 	usb_dma_t * const dma = &xfer->ux_dmabuf;
-	uint64_t parameter;
-	uint32_t status;
-	uint32_t control;
 	uint32_t offs;
 	int i, ival;
 	const bool polling = xhci_polling_p(sc);
@@ -4602,39 +4645,9 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 
 	offs = 0;
 	for (i = 0; i < xfer->ux_nframes; i++) {
-		const uint32_t len = xfer->ux_frlengths[i];
-		const unsigned tdpc = howmany(len, mps);
-		const unsigned tbc = howmany(tdpc, maxb) - 1;
-		const unsigned tlbpc1 = tdpc % maxb;
-		const unsigned tlbpc = tlbpc1 ? tlbpc1 - 1 : maxb - 1;
-
-		KASSERTMSG(len <= 0x10000, "len %d", len);
-		parameter = DMAADDR(dma, offs);
-		status = XHCI_TRB_2_IRQ_SET(0) |
-		    XHCI_TRB_2_TDSZ_SET(0) |
-		    XHCI_TRB_2_BYTES_SET(len);
-		control = XHCI_TRB_3_TYPE_SET(XHCI_TRB_TYPE_ISOCH) |
-		    (isread ? XHCI_TRB_3_ISP_BIT : 0) |
-		    XHCI_TRB_3_TBC_SET(tbc) |
-		    XHCI_TRB_3_TLBPC_SET(tlbpc) |
-		    XHCI_TRB_3_IOC_BIT;
-		if (XHCI_HCC_CFC(sc->sc_hcc)) {
-			control |= XHCI_TRB_3_FRID_SET(xpipe->xp_isoc_next);
-#if 0
-		} else if (xpipe->xp_isoc_next == -1) {
-			control |= XHCI_TRB_3_FRID_SET(xpipe->xp_isoc_next);
-#endif
-		} else {
-			control |= XHCI_TRB_3_ISO_SIA_BIT;
-		}
-#if 0
-		if (i != xfer->ux_nframes - 1)
-			control |= XHCI_TRB_3_BEI_BIT;
-#endif
-		xhci_xfer_put_trb(xx, i, parameter, status, control);
-
+		xhci_device_isoc_enter_frame(xfer, i, offs, mps, maxb);
 		xpipe->xp_isoc_next += ival;
-		offs += len;
+		offs += xfer->ux_frlengths[i];
 	}
 
 	xx->xx_isoc_done = 0;
