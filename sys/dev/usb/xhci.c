@@ -4558,6 +4558,7 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 	struct xhci_pipe * const xpipe = (struct xhci_pipe *)xfer->ux_pipe;
 	uint32_t len = xfer->ux_length;
 	usb_dma_t * const dma = &xfer->ux_dmabuf;
+	uint32_t trb_type;
 	uint64_t parameter;
 	uint32_t status;
 	uint32_t control;
@@ -4616,7 +4617,7 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 		status = XHCI_TRB_2_IRQ_SET(0) |
 		    XHCI_TRB_2_TDSZ_SET(0) |
 		    XHCI_TRB_2_BYTES_SET(len);
-		control = XHCI_TRB_3_TYPE_SET(XHCI_TRB_TYPE_ISOCH) |
+		control = XHCI_TRB_3_TYPE_SET(trb_type) |
 		    (isread ? XHCI_TRB_3_ISP_BIT : 0) |
 		    XHCI_TRB_3_TBC_SET(tbc) |
 		    XHCI_TRB_3_TLBPC_SET(tlbpc) |
@@ -4638,6 +4639,8 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 
 		xpipe->xp_isoc_next += ival;
 		offs += len;
+
+		trb_type = XHCI_TRB_TYPE_NORMAL;
 	}
 
 	xx->xx_isoc_done = 0;
