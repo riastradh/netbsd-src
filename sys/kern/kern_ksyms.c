@@ -64,6 +64,9 @@
  * symbol table.
  */
 
+#define	DEBUG
+#define	KSYMS_DEBUG
+
 /*
  * TODO:
  *
@@ -335,6 +338,13 @@ addsymtab(const char *name, void *symstart, size_t symsize,
 	char *str;
 	int nsyms = symsize / sizeof(Elf_Sym);
 	int s;
+
+	printf("addsymtab %s symstart=%p symsize=0x%zx"
+	    " strstart=%p strsize=0x%zx tab=%p newstart=%p"
+	    " ctfstart=%p ctfsize=0x%zx nmap=%p\n",
+	    name, symstart, symsize,
+	    strstart, strsize, tab, newstart,
+	    ctfstart, ctfsize, nmap);
 
 	/* Sanity check for pre-allocated map table used during startup. */
 	if ((nmap == ksyms_nmap) && (nsyms >= KSYMS_MAX_ID)) {
