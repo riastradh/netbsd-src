@@ -4547,101 +4547,6 @@ xhci_device_isoc_transfer(struct usbd_xfer *xfer)
 	return xhci_device_isoc_enter(xfer);
 }
 
-static uint32_t
-xhci_isoc_tdsz(uint32_t frame_idx, uint32_t nframes,
-    uint32_t offs, uint32_t td_xfer_sz, uint32_t max_pkt_sz)
-{
-
-	/*
-	 * `TD Packet Count defines the number of packets that must be
-	 *  transferred to complete a TD.
-	 *
-	 *	TD Packet Count = ROUNDUP(TD Transfer Size / Max Packet Size)
-	 *
-	 *  where, ROUNDUP(x) rounds fractional x up, away from 0
-	 *  (zero), to the nearest integer value.'
-	 *
-	 * https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/extensible-host-controler-interface-usb-xhci.pdf#page=218
-	 */
-	const uint32_t td_pkt_cnt = howmany(td_xfer_sz, max_pkt_sz);
-
-	/*
-	 * `x is the number of Transfer TRBs in a TD.'
-	 */
-	const uint32_t x = nframes;
-
-	/*
-	 * `n is the index of a Transfer TRB in a TD, where n = 1 for
-	 *  the first transfer TRB of a TD.'
-	 */
-	const uint32_t n = frame_idx + 1;
-
-	/*
-	 * `TRB Transfer Length Sum (n) is the sum of the TRB Transfer
-	 *  Length fields in TRBs 1 through n.'
-	 */
-	const uint32_t trb_xferlensum_n = offs;
-
-	/*
-	 * `Packets Transferred (n) defines the number of Max Packet
-	 *  Sized packets that have been transferred for the TD, up to
-	 *  and including the data described by TRB (n).
-	 *
-	 *	Packets Transferred (n) =
-	 *	    ROUNDDOWN(TRB Transfer Length Sum (n) / Max Packet Size)'
-	 */
-	const uint32_t pkts_xferred_n = trb_xferlensum_n/max_pkt_sz;
-
-	/*
-	 * `TRB Residue (n) defines the number of bytes remaining in
-	 *  the TRB (n)'s buffer after processing all Max Packet Sized
-	 *  packets in the current TRB and all previous TRBs of a TD.
-	 *
-	 *	TRB Residue (n) = TRB Transfer Length Sum (n) -
-	 *	    (Max Packet Size * Packets Transferred (n))'
-	 */
-	const uint32_t trb_residue_n =
-	    trb_xferlensum_n - (max_pkt_sz * pkts_xferred_n);
-
-	/*
-	 * `Also note that the TRB Residue value is always less than
-	 *  the Max Packet Size.'
-	 */
-	KASSERTMSG(trb_residue_n < max_pkt_sz,
-	    "trb_residue_n=%"PRIu32" max_pkt_sz=%"PRIu32,
-	    trb_residue_n, max_pkt_sz);
-
-	/*
-	 * `TD Size (n).  For all Transfer TRBs except the last in a
-	 *  TD, TD Size identifies the number of packets that still
-	 *  need to be scheduled to complete this TD after sending TRB
-	 *  Residue (n) + the data for TRBs n + 1 through x.  The value
-	 *  of the TD Size in the last Transfer TRB shall be cleared to
-	 *  ``0'' to explicitly indicate that it is the last Transfer
-	 *  TRB of the TD.  Since the TD Size field is only 5 bits, its
-	 *  value shall be forced to 31 if the number of packets to be
-	 *  scheduled is greater than 31.
-	 *
-	 * `For all Transfer TRBs of a TD except the last (n = 1
-	 *  through x - 1):
-	 *
-	 *	TD Size (n) =
-	 *	    IF (TD Packet Count - Packets Transferred (n) > 31,
-	 *	        then 31,
-	 *	        else TD Packet Count - Packets Transferred (n))
-	 *
-	 * `For the last Transfer TRB of a TD:
-	 *
-	 *	TD Size (x) = 0.'
-	 */
-	if (x == n)
-		return 0;
-	else if (td_pkt_cnt - pkts_xferred_n > 31)
-		return 31;
-	else
-		return td_pkt_cnt - pkts_xferred_n;
-}
-
 static usbd_status
 xhci_device_isoc_enter(struct usbd_xfer *xfer)
 {
@@ -4702,19 +4607,11 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 		const unsigned tbc = howmany(tdpc, maxb) - 1;
 		const unsigned tlbpc1 = tdpc % maxb;
 		const unsigned tlbpc = tlbpc1 ? tlbpc1 - 1 : maxb - 1;
-		const unsigned tdsz =
-		    xhci_isoc_tdsz(i, xfer->ux_nframes, offs, xfer->ux_length,
-			MPS);
-
-		/*
-		 * Note: If we ever enable USBCMD.ETE=1, tdsz will
-		 * become TBC instead, which is calculated differently.
-		 */
 
 		KASSERTMSG(len <= 0x10000, "len %d", len);
 		parameter = DMAADDR(dma, offs);
 		status = XHCI_TRB_2_IRQ_SET(0) |
-		    XHCI_TRB_2_TDSZ_SET(tdsz) |
+		    XHCI_TRB_2_TDSZ_SET(0) |
 		    XHCI_TRB_2_BYTES_SET(len);
 		control = XHCI_TRB_3_TYPE_SET(XHCI_TRB_TYPE_ISOCH) |
 		    (isread ? XHCI_TRB_3_ISP_BIT : 0) |
