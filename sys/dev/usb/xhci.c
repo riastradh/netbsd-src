@@ -4556,7 +4556,6 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 	struct xhci_ring * const tr = xs->xs_xr[dci];
 	struct xhci_xfer * const xx = XHCI_XFER2XXFER(xfer);
 	struct xhci_pipe * const xpipe = (struct xhci_pipe *)xfer->ux_pipe;
-	uint32_t len = xfer->ux_length;
 	usb_dma_t * const dma = &xfer->ux_dmabuf;
 	uint32_t trb_type;
 	uint64_t parameter;
@@ -4616,7 +4615,7 @@ xhci_device_isoc_enter(struct usbd_xfer *xfer)
 
 	offs = 0;
 	for (i = 0; i < xfer->ux_nframes; i++) {
-		len = xfer->ux_frlengths[i];
+		const uint32_t len = xfer->ux_frlengths[i];
 
 		tdpc = howmany(len, mps);
 		tbc = howmany(tdpc, maxb) - 1;
