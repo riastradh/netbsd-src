@@ -86,8 +86,7 @@ nv31_mpeg_chan = {
 };
 
 int
-nv31_mpeg_chan_new(struct nvkm_fifo_chan *fifoch,
-		   const struct nvkm_oclass *oclass,
+nv31_mpeg_chan_new(struct nvkm_chan *fifoch, const struct nvkm_oclass *oclass,
 		   struct nvkm_object **pobject)
 {
 	struct nv31_mpeg *mpeg = nv31_mpeg(oclass->engine);
@@ -218,8 +217,8 @@ nv31_mpeg_intr(struct nvkm_engine *engine)
 
 	if (show) {
 		nvkm_error(subdev, "ch %d [%s] %08x %08x %08x %08x\n",
-			   mpeg->chan ? mpeg->chan->fifo->chid : -1,
-			   mpeg->chan ? mpeg->chan->object.client->name :
+			   mpeg->chan ? mpeg->chan->fifo->id : -1,
+			   mpeg->chan ? mpeg->chan->fifo->name :
 			   "unknown", stat, type, mthd, data);
 	}
 
@@ -279,7 +278,7 @@ nv31_mpeg_ = {
 
 int
 nv31_mpeg_new_(const struct nv31_mpeg_func *func, struct nvkm_device *device,
-	       int index, struct nvkm_engine **pmpeg)
+	       enum nvkm_subdev_type type, int inst, struct nvkm_engine **pmpeg)
 {
 	struct nv31_mpeg *mpeg;
 
@@ -288,8 +287,7 @@ nv31_mpeg_new_(const struct nv31_mpeg_func *func, struct nvkm_device *device,
 	mpeg->func = func;
 	*pmpeg = &mpeg->engine;
 
-	return nvkm_engine_ctor(&nv31_mpeg_, device, index,
-				true, &mpeg->engine);
+	return nvkm_engine_ctor(&nv31_mpeg_, device, type, inst, true, &mpeg->engine);
 }
 
 static const struct nv31_mpeg_func
@@ -298,7 +296,8 @@ nv31_mpeg = {
 };
 
 int
-nv31_mpeg_new(struct nvkm_device *device, int index, struct nvkm_engine **pmpeg)
+nv31_mpeg_new(struct nvkm_device *device, enum nvkm_subdev_type type, int inst,
+	      struct nvkm_engine **pmpeg)
 {
-	return nv31_mpeg_new_(&nv31_mpeg, device, index, pmpeg);
+	return nv31_mpeg_new_(&nv31_mpeg, device, type, inst, pmpeg);
 }

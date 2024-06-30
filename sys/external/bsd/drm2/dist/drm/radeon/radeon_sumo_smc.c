@@ -35,8 +35,6 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #define SUMO_SMU_SERVICE_ROUTINE_ALTVDDNB_NOTIFY  27
 #define SUMO_SMU_SERVICE_ROUTINE_GFX_SRV_ID_20  20
 
-struct sumo_power_info *sumo_get_pi(struct radeon_device *rdev);
-
 static void sumo_send_msg_to_smu(struct radeon_device *rdev, u32 id)
 {
 	u32 gfx_int_req;

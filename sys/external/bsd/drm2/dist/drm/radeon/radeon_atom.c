@@ -30,6 +30,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include <linux/module.h>
 #include <linux/sched.h>
 #include <linux/slab.h>
+#include <linux/string_helpers.h>
 
 #include <asm/unaligned.h>
 
@@ -72,8 +73,8 @@ typedef struct {
 } atom_exec_context;
 
 int atom_debug = 0;
-static int atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t * params);
-int atom_execute_table(struct atom_context *ctx, int index, uint32_t * params);
+static int atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t *params);
+int atom_execute_table(struct atom_context *ctx, int index, uint32_t *params);
 
 static uint32_t atom_arg_mask[8] = {
 	0xFFFFFFFF, 0x0000FFFF, 0x00FFFF00, 0xFFFF0000,
@@ -167,13 +168,9 @@ static uint32_t atom_iio_execute(struct atom_context *ctx, int base,
 			    ~((0xFFFFFFFF >> (32 - CU8(base + 1))) <<
 			      CU8(base + 3));
 			temp |=
-			    ((ctx->
-			      io_attr >> CU8(base + 2)) & (0xFFFFFFFF >> (32 -
-									  CU8
-									  (base
-									   +
-									   1))))
-			    << CU8(base + 3);
+			    ((ctx->io_attr >> CU8(base + 2)) &
+			     (0xFFFFFFFF >> (32 - CU8(base + 1)))) <<
+			     CU8(base + 3);
 			base += 4;
 			break;
 		case ATOM_IIO_END:
@@ -727,7 +724,7 @@ static void atom_op_jump(atom_exec_context *ctx, int *ptr, int arg)
 		break;
 	}
 	if (arg != ATOM_COND_ALWAYS)
-		SDEBUG("   taken: %s\n", execute ? "yes" : "no");
+		SDEBUG("   taken: %s\n", str_yes_no(execute));
 	SDEBUG("   target: 0x%04X\n", target);
 	if (execute) {
 		if (ctx->last_jump == (ctx->start + target)) {
@@ -1160,7 +1157,7 @@ static struct {
 	atom_op_shr, ATOM_ARG_MC}, {
 atom_op_debug, 0},};
 
-static int atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t * params)
+static int atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t *params)
 {
 	int base = CU16(ctx->cmd_table + 4 + 2 * index);
 	int len, ws, ps, ptr;
@@ -1216,12 +1213,11 @@ static int atom_execute_table_locked(struct atom_context *ctx, int index, uint32
 	SDEBUG("<<\n");
 
 free:
-	if (ws)
-		kfree(ectx.ws);
+	kfree(ectx.ws);
 	return ret;
 }
 
-int atom_execute_table_scratch_unlocked(struct atom_context *ctx, int index, uint32_t * params)
+int atom_execute_table_scratch_unlocked(struct atom_context *ctx, int index, uint32_t *params)
 {
 	int r;
 
@@ -1242,7 +1238,7 @@ int atom_execute_table_scratch_unlocked(struct atom_context *ctx, int index, uin
 	return r;
 }
 
-int atom_execute_table(struct atom_context *ctx, int index, uint32_t * params)
+int atom_execute_table(struct atom_context *ctx, int index, uint32_t *params)
 {
 	int r;
 	mutex_lock(&ctx->scratch_mutex);
@@ -1364,8 +1360,8 @@ void atom_destroy(struct atom_context *ctx)
 }
 
 bool atom_parse_data_header(struct atom_context *ctx, int index,
-			    uint16_t * size, uint8_t * frev, uint8_t * crev,
-			    uint16_t * data_start)
+			    uint16_t *size, uint8_t *frev, uint8_t *crev,
+			    uint16_t *data_start)
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->data_table + offset);
@@ -1384,8 +1380,8 @@ bool atom_parse_data_header(struct atom_context *ctx, int index,
 	return true;
 }
 
-bool atom_parse_cmd_header(struct atom_context *ctx, int index, uint8_t * frev,
-			   uint8_t * crev)
+bool atom_parse_cmd_header(struct atom_context *ctx, int index, uint8_t *frev,
+			   uint8_t *crev)
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->cmd_table + offset);

@@ -1,6 +1,6 @@
 /*	$NetBSD$	*/
 
-/**
+/*
  * \file amdgpu_ioc32.c
  *
  * 32-bit ioctl compatibility routines for the AMDGPU DRM.
@@ -42,12 +42,9 @@ __KERNEL_RCSID(0, "$NetBSD$");
 long amdgpu_kms_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	unsigned int nr = DRM_IOCTL_NR(cmd);
-	int ret;
 
 	if (nr < DRM_COMMAND_BASE)
 		return drm_compat_ioctl(filp, cmd, arg);
 
-	ret = amdgpu_drm_ioctl(filp, cmd, arg);
-
-	return ret;
+	return amdgpu_drm_ioctl(filp, cmd, arg);
 }

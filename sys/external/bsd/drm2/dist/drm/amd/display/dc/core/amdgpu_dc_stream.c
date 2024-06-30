@@ -28,9 +28,6 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
-#include <linux/delay.h>
-#include <linux/slab.h>
-
 #include "dm_services.h"
 #include "basics/dc_common.h"
 #include "dc.h"
@@ -38,6 +35,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "resource.h"
 #include "ipp.h"
 #include "timing_generator.h"
+#include "dc_dmub_srv.h"
 
 #define DC_LOGGER dc->ctx->logger
 
@@ -61,7 +59,7 @@ void update_stream_signal(struct dc_stream_state *stream, struct dc_sink *sink)
 	}
 }
 
-static void dc_stream_construct(struct dc_stream_state *stream,
+static bool dc_stream_construct(struct dc_stream_state *stream,
 	struct dc_sink *dc_sink_data)
 {
 	uint32_t i = 0;
@@ -78,8 +76,7 @@ static void dc_stream_construct(struct dc_stream_state *stream,
 
 	/* Copy audio modes */
 	/* TODO - Remove this translation */
-	for (i = 0; i < (dc_sink_data->edid_caps.audio_mode_count); i++)
-	{
+	for (i = 0; i < (dc_sink_data->edid_caps.audio_mode_count); i++) {
 		stream->audio_info.modes[i].channel_count = dc_sink_data->edid_caps.audio_modes[i].channel_count;
 		stream->audio_info.modes[i].format_code = dc_sink_data->edid_caps.audio_modes[i].format_code;
 		stream->audio_info.modes[i].sample_rates.all = dc_sink_data->edid_caps.audio_modes[i].sample_rate;
@@ -123,11 +120,16 @@ static void dc_stream_construct(struct dc_stream_state *stream,
 	update_stream_signal(stream, dc_sink_data);
 
 	stream->out_transfer_func = dc_create_transfer_func();
+	if (stream->out_transfer_func == NULL) {
+		dc_sink_release(dc_sink_data);
+		return false;
+	}
 	stream->out_transfer_func->type = TF_TYPE_BYPASS;
-	stream->out_transfer_func->ctx = stream->ctx;
 
 	stream->stream_id = stream->ctx->dc_stream_id_count;
 	stream->ctx->dc_stream_id_count++;
+
+	return true;
 }
 
 static void dc_stream_destruct(struct dc_stream_state *stream)
@@ -169,13 +171,20 @@ struct dc_stream_state *dc_create_stream_for_sink(
 
 	stream = kzalloc(sizeof(struct dc_stream_state), GFP_KERNEL);
 	if (stream == NULL)
-		return NULL;
+		goto alloc_fail;
 
-	dc_stream_construct(stream, sink);
+	if (dc_stream_construct(stream, sink) == false)
+		goto construct_fail;
 
 	kref_init(&stream->refcount);
 
 	return stream;
+
+construct_fail:
+	kfree(stream);
+
+alloc_fail:
+	return NULL;
 }
 
 struct dc_stream_state *dc_copy_stream(const struct dc_stream_state *stream)
@@ -195,6 +204,10 @@ struct dc_stream_state *dc_copy_stream(const struct dc_stream_state *stream)
 	new_stream->stream_id = new_stream->ctx->dc_stream_id_count;
 	new_stream->ctx->dc_stream_id_count++;
 
+	/* If using dynamic encoder assignment, wait till stream committed to assign encoder. */
+	if (new_stream->ctx->dc->res_pool->funcs->link_encs_assign)
+		new_stream->link_enc = NULL;
+
 	kref_init(&new_stream->refcount);
 
 	return new_stream;
@@ -213,6 +226,9 @@ struct dc_stream_status *dc_stream_get_status_from_state(
 	struct dc_stream_state *stream)
 {
 	uint8_t i;
+
+	if (state == NULL)
+		return NULL;
 
 	for (i = 0; i < state->stream_count; i++) {
 		if (stream == state->streams[i])
@@ -236,46 +252,99 @@ struct dc_stream_status *dc_stream_get_status(
 	return dc_stream_get_status_from_state(dc->current_state, stream);
 }
 
-static void delay_cursor_until_vupdate(struct pipe_ctx *pipe_ctx, struct dc *dc)
+static void program_cursor_attributes(
+	struct dc *dc,
+	struct dc_stream_state *stream,
+	const struct dc_cursor_attributes *attributes)
 {
-#if defined(CONFIG_DRM_AMD_DC_DCN)
-	unsigned int vupdate_line;
-	unsigned int lines_to_vupdate, us_to_vupdate, vpos, nvpos;
-	struct dc_stream_state *stream = pipe_ctx->stream;
-	unsigned int us_per_line;
+	int i;
+	struct resource_context *res_ctx;
+	struct pipe_ctx *pipe_to_program = NULL;
 
-	if (stream->ctx->asic_id.chip_family == FAMILY_RV &&
-			ASICREV_IS_RAVEN(stream->ctx->asic_id.hw_internal_rev)) {
+	if (!stream)
+		return;
 
-		vupdate_line = dc->hwss.get_vupdate_offset_from_vsync(pipe_ctx);
-		if (!dc_stream_get_crtc_position(dc, &stream, 1, &vpos, &nvpos))
-			return;
+	res_ctx = &dc->current_state->res_ctx;
 
-		if (vpos >= vupdate_line)
-			return;
+	for (i = 0; i < MAX_PIPES; i++) {
+		struct pipe_ctx *pipe_ctx = &res_ctx->pipe_ctx[i];
 
-		us_per_line = stream->timing.h_total * 10000 / stream->timing.pix_clk_100hz;
-		lines_to_vupdate = vupdate_line - vpos;
-		us_to_vupdate = lines_to_vupdate * us_per_line;
+		if (pipe_ctx->stream != stream)
+			continue;
 
-		/* 70 us is a conservative estimate of cursor update time*/
-		if (us_to_vupdate < 70)
-			udelay(us_to_vupdate);
+		if (!pipe_to_program) {
+			pipe_to_program = pipe_ctx;
+			dc->hwss.cursor_lock(dc, pipe_to_program, true);
+			if (pipe_to_program->next_odm_pipe)
+				dc->hwss.cursor_lock(dc, pipe_to_program->next_odm_pipe, true);
+		}
+
+		dc->hwss.set_cursor_attribute(pipe_ctx);
+		if (dc->ctx->dmub_srv)
+			dc_send_update_cursor_info_to_dmu(pipe_ctx, i);
+		if (dc->hwss.set_cursor_sdr_white_level)
+			dc->hwss.set_cursor_sdr_white_level(pipe_ctx);
 	}
-#endif
+
+	if (pipe_to_program) {
+		dc->hwss.cursor_lock(dc, pipe_to_program, false);
+		if (pipe_to_program->next_odm_pipe)
+			dc->hwss.cursor_lock(dc, pipe_to_program->next_odm_pipe, false);
+	}
 }
 
-/**
+#ifndef TRIM_FSFT
+/*
+ * dc_optimize_timing_for_fsft() - dc to optimize timing
+ */
+bool dc_optimize_timing_for_fsft(
+	struct dc_stream_state *pStream,
+	unsigned int max_input_rate_in_khz)
+{
+	struct dc  *dc;
+
+	dc = pStream->ctx->dc;
+
+	return (dc->hwss.optimize_timing_for_fsft &&
+		dc->hwss.optimize_timing_for_fsft(dc, &pStream->timing, max_input_rate_in_khz));
+}
+#endif
+
+static bool is_subvp_high_refresh_candidate(struct dc_stream_state *stream)
+{
+	uint32_t refresh_rate;
+	struct dc *dc = stream->ctx->dc;
+
+	refresh_rate = (stream->timing.pix_clk_100hz * (uint64_t)100 +
+		stream->timing.v_total * stream->timing.h_total - (uint64_t)1);
+	refresh_rate = div_u64(refresh_rate, stream->timing.v_total);
+	refresh_rate = div_u64(refresh_rate, stream->timing.h_total);
+
+	/* If there's any stream that fits the SubVP high refresh criteria,
+	 * we must return true. This is because cursor updates are asynchronous
+	 * with full updates, so we could transition into a SubVP config and
+	 * remain in HW cursor mode if there's no cursor update which will
+	 * then cause corruption.
+	 */
+	if ((refresh_rate >= 120 && refresh_rate <= 175 &&
+			stream->timing.v_addressable >= 1440 &&
+			stream->timing.v_addressable <= 2160) &&
+			(dc->current_state->stream_count > 1 ||
+			(dc->current_state->stream_count == 1 && !stream->allow_freesync)))
+		return true;
+
+	return false;
+}
+
+/*
  * dc_stream_set_cursor_attributes() - Update cursor attributes and set cursor surface address
  */
 bool dc_stream_set_cursor_attributes(
 	struct dc_stream_state *stream,
 	const struct dc_cursor_attributes *attributes)
 {
-	int i;
 	struct dc  *dc;
-	struct resource_context *res_ctx;
-	struct pipe_ctx *pipe_to_program = NULL;
+	bool reset_idle_optimizations = false;
 
 	if (NULL == stream) {
 		dm_error("DC: dc_stream is NULL!\n");
@@ -292,55 +361,55 @@ bool dc_stream_set_cursor_attributes(
 	}
 
 	dc = stream->ctx->dc;
-	res_ctx = &dc->current_state->res_ctx;
-	stream->cursor_attributes = *attributes;
 
-	for (i = 0; i < MAX_PIPES; i++) {
-		struct pipe_ctx *pipe_ctx = &res_ctx->pipe_ctx[i];
-
-		if (pipe_ctx->stream != stream)
-			continue;
-
-		if (!pipe_to_program) {
-			pipe_to_program = pipe_ctx;
-
-			delay_cursor_until_vupdate(pipe_ctx, dc);
-			dc->hwss.pipe_control_lock(dc, pipe_to_program, true);
-		}
-
-		dc->hwss.set_cursor_attribute(pipe_ctx);
-		if (dc->hwss.set_cursor_sdr_white_level)
-			dc->hwss.set_cursor_sdr_white_level(pipe_ctx);
+	/* SubVP is not compatible with HW cursor larger than 64 x 64 x 4.
+	 * Therefore, if cursor is greater than 64 x 64 x 4, fallback to SW cursor in the following case:
+	 * 1. If the config is a candidate for SubVP high refresh (both single an dual display configs)
+	 * 2. If not subvp high refresh, for single display cases, if resolution is >= 5K and refresh rate < 120hz
+	 * 3. If not subvp high refresh, for multi display cases, if resolution is >= 4K and refresh rate < 120hz
+	 */
+	if (dc->debug.allow_sw_cursor_fallback && attributes->height * attributes->width * 4 > 16384) {
+		if (!dc->debug.disable_subvp_high_refresh && is_subvp_high_refresh_candidate(stream))
+			return false;
+		if (dc->current_state->stream_count == 1 && stream->timing.v_addressable >= 2880 &&
+				((stream->timing.pix_clk_100hz * 100) / stream->timing.v_total / stream->timing.h_total) < 120)
+			return false;
+		else if (dc->current_state->stream_count > 1 && stream->timing.v_addressable >= 2160 &&
+				((stream->timing.pix_clk_100hz * 100) / stream->timing.v_total / stream->timing.h_total) < 120)
+			return false;
 	}
 
-	if (pipe_to_program)
-		dc->hwss.pipe_control_lock(dc, pipe_to_program, false);
+	stream->cursor_attributes = *attributes;
+
+	dc_z10_restore(dc);
+	/* disable idle optimizations while updating cursor */
+	if (dc->idle_optimizations_allowed) {
+		dc_allow_idle_optimizations(dc, false);
+		reset_idle_optimizations = true;
+	}
+
+	program_cursor_attributes(dc, stream, attributes);
+
+	/* re-enable idle optimizations if necessary */
+	if (reset_idle_optimizations)
+		dc_allow_idle_optimizations(dc, true);
 
 	return true;
 }
 
-bool dc_stream_set_cursor_position(
+static void program_cursor_position(
+	struct dc *dc,
 	struct dc_stream_state *stream,
 	const struct dc_cursor_position *position)
 {
 	int i;
-	struct dc  *dc;
 	struct resource_context *res_ctx;
 	struct pipe_ctx *pipe_to_program = NULL;
 
-	if (NULL == stream) {
-		dm_error("DC: dc_stream is NULL!\n");
-		return false;
-	}
+	if (!stream)
+		return;
 
-	if (NULL == position) {
-		dm_error("DC: cursor position is NULL!\n");
-		return false;
-	}
-
-	dc = stream->ctx->dc;
 	res_ctx = &dc->current_state->res_ctx;
-	stream->cursor_position = *position;
 
 	for (i = 0; i < MAX_PIPES; i++) {
 		struct pipe_ctx *pipe_ctx = &res_ctx->pipe_ctx[i];
@@ -354,16 +423,51 @@ bool dc_stream_set_cursor_position(
 
 		if (!pipe_to_program) {
 			pipe_to_program = pipe_ctx;
-
-			delay_cursor_until_vupdate(pipe_ctx, dc);
-			dc->hwss.pipe_control_lock(dc, pipe_to_program, true);
+			dc->hwss.cursor_lock(dc, pipe_to_program, true);
 		}
 
 		dc->hwss.set_cursor_position(pipe_ctx);
+		if (dc->ctx->dmub_srv)
+			dc_send_update_cursor_info_to_dmu(pipe_ctx, i);
 	}
 
 	if (pipe_to_program)
-		dc->hwss.pipe_control_lock(dc, pipe_to_program, false);
+		dc->hwss.cursor_lock(dc, pipe_to_program, false);
+}
+
+bool dc_stream_set_cursor_position(
+	struct dc_stream_state *stream,
+	const struct dc_cursor_position *position)
+{
+	struct dc *dc;
+	bool reset_idle_optimizations = false;
+
+	if (NULL == stream) {
+		dm_error("DC: dc_stream is NULL!\n");
+		return false;
+	}
+
+	if (NULL == position) {
+		dm_error("DC: cursor position is NULL!\n");
+		return false;
+	}
+
+	dc = stream->ctx->dc;
+	dc_z10_restore(dc);
+
+	/* disable idle optimizations if enabling cursor */
+	if (dc->idle_optimizations_allowed && (!stream->cursor_position.enable || dc->debug.exit_idle_opt_for_cursor_updates)
+			&& position->enable) {
+		dc_allow_idle_optimizations(dc, false);
+		reset_idle_optimizations = true;
+	}
+
+	stream->cursor_position = *position;
+
+	program_cursor_position(dc, stream, position);
+	/* re-enable idle optimizations if necessary */
+	if (reset_idle_optimizations)
+		dc_allow_idle_optimizations(dc, true);
 
 	return true;
 }
@@ -408,6 +512,7 @@ bool dc_stream_add_writeback(struct dc *dc,
 	}
 
 	if (!isDrc) {
+		ASSERT(stream->num_wb_info + 1 <= MAX_DWB_PIPES);
 		stream->writeback_info[stream->num_wb_info++] = *wb_info;
 	}
 
@@ -415,25 +520,6 @@ bool dc_stream_add_writeback(struct dc *dc,
 		struct dc_stream_status *stream_status = dc_stream_get_status(stream);
 		struct dwbc *dwb = dc->res_pool->dwbc[wb_info->dwb_pipe_inst];
 		dwb->otg_inst = stream_status->primary_otg_inst;
-	}
-	if (IS_DIAG_DC(dc->ctx->dce_environment)) {
-		if (!dc->hwss.update_bandwidth(dc, dc->current_state)) {
-			dm_error("DC: update_bandwidth failed!\n");
-			return false;
-		}
-
-		/* enable writeback */
-		if (dc->hwss.enable_writeback) {
-			struct dwbc *dwb = dc->res_pool->dwbc[wb_info->dwb_pipe_inst];
-
-			if (dwb->funcs->is_enabled(dwb)) {
-				/* writeback pipe already enabled, only need to update */
-				dc->hwss.update_writeback(dc, wb_info, dc->current_state);
-			} else {
-				/* Enable writeback pipe from scratch*/
-				dc->hwss.enable_writeback(dc, wb_info, dc->current_state);
-			}
-		}
 	}
 	return true;
 }
@@ -453,6 +539,11 @@ bool dc_stream_remove_writeback(struct dc *dc,
 		return false;
 	}
 
+	if (stream->num_wb_info > MAX_DWB_PIPES) {
+		dm_error("DC: num_wb_info is invalid!\n");
+		return false;
+	}
+
 //	stream->writeback_info[dwb_pipe_inst].wb_enabled = false;
 	for (i = 0; i < stream->num_wb_info; i++) {
 		/*dynamic update*/
@@ -465,25 +556,15 @@ bool dc_stream_remove_writeback(struct dc *dc,
 	/* remove writeback info for disabled writeback pipes from stream */
 	for (i = 0, j = 0; i < stream->num_wb_info; i++) {
 		if (stream->writeback_info[i].wb_enabled) {
-			if (i != j)
+			if (j < i)
 				/* trim the array */
-				stream->writeback_info[j] = stream->writeback_info[i];
+				memcpy(&stream->writeback_info[j], &stream->writeback_info[i],
+						sizeof(struct dc_writeback_info));
 			j++;
 		}
 	}
 	stream->num_wb_info = j;
 
-	if (IS_DIAG_DC(dc->ctx->dce_environment)) {
-		/* recalculate and apply DML parameters */
-		if (!dc->hwss.update_bandwidth(dc, dc->current_state)) {
-			dm_error("DC: update_bandwidth failed!\n");
-			return false;
-		}
-
-		/* disable writeback */
-		if (dc->hwss.disable_writeback)
-			dc->hwss.disable_writeback(dc, dwb_pipe_inst);
-	}
 	return true;
 }
 
@@ -506,7 +587,7 @@ uint32_t dc_stream_get_vblank_counter(const struct dc_stream_state *stream)
 	for (i = 0; i < MAX_PIPES; i++) {
 		struct timing_generator *tg = res_ctx->pipe_ctx[i].stream_res.tg;
 
-		if (res_ctx->pipe_ctx[i].stream != stream)
+		if (res_ctx->pipe_ctx[i].stream != stream || !tg)
 			continue;
 
 		return tg->funcs->get_frame_count(tg);
@@ -565,7 +646,7 @@ bool dc_stream_get_scanoutpos(const struct dc_stream_state *stream,
 	for (i = 0; i < MAX_PIPES; i++) {
 		struct timing_generator *tg = res_ctx->pipe_ctx[i].stream_res.tg;
 
-		if (res_ctx->pipe_ctx[i].stream != stream)
+		if (res_ctx->pipe_ctx[i].stream != stream || !tg)
 			continue;
 
 		tg->funcs->get_scanoutpos(tg,
@@ -642,6 +723,31 @@ bool dc_stream_set_dynamic_metadata(struct dc *dc,
 	return true;
 }
 
+enum dc_status dc_stream_add_dsc_to_resource(struct dc *dc,
+		struct dc_state *state,
+		struct dc_stream_state *stream)
+{
+	if (dc->res_pool->funcs->add_dsc_to_stream_resource) {
+		return dc->res_pool->funcs->add_dsc_to_stream_resource(dc, state, stream);
+	} else {
+		return DC_NO_DSC_RESOURCE;
+	}
+}
+
+struct pipe_ctx *dc_stream_get_pipe_ctx(struct dc_stream_state *stream)
+{
+	int i = 0;
+
+	for (i = 0; i < MAX_PIPES; i++) {
+		struct pipe_ctx *pipe = &stream->ctx->dc->current_state->res_ctx.pipe_ctx[i];
+
+		if (pipe->stream == stream)
+			return pipe;
+	}
+
+	return NULL;
+}
+
 void dc_stream_log(const struct dc *dc, const struct dc_stream_state *stream)
 {
 	DC_LOG_DC(
@@ -666,4 +772,21 @@ void dc_stream_log(const struct dc *dc, const struct dc_stream_state *stream)
 	DC_LOG_DC(
 			"\tlink: %d\n",
 			stream->link->link_index);
+
+	DC_LOG_DC(
+			"\tdsc: %d, mst_pbn: %d\n",
+			stream->timing.flags.DSC,
+			stream->timing.dsc_cfg.mst_pbn);
+
+	if (stream->sink) {
+		if (stream->sink->sink_signal != SIGNAL_TYPE_VIRTUAL &&
+			stream->sink->sink_signal != SIGNAL_TYPE_NONE) {
+
+			DC_LOG_DC(
+					"\tdispname: %s signal: %x\n",
+					stream->sink->edid_caps.display_name,
+					stream->signal);
+		}
+	}
 }
+

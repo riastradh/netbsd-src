@@ -1,5 +1,0 @@
-/*	$NetBSD$	*/
-
-/*
- * Intentionally empty file.
- */

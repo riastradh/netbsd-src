@@ -180,9 +180,9 @@ nvkm_xtensa = {
 };
 
 int
-nvkm_xtensa_new_(const struct nvkm_xtensa_func *func,
-		 struct nvkm_device *device, int index, bool enable,
-		 u32 addr, struct nvkm_engine **pengine)
+nvkm_xtensa_new_(const struct nvkm_xtensa_func *func, struct nvkm_device *device,
+		 enum nvkm_subdev_type type, int inst, bool enable, u32 addr,
+		 struct nvkm_engine **pengine)
 {
 	struct nvkm_xtensa *xtensa;
 
@@ -192,6 +192,5 @@ nvkm_xtensa_new_(const struct nvkm_xtensa_func *func,
 	xtensa->addr = addr;
 	*pengine = &xtensa->engine;
 
-	return nvkm_engine_ctor(&nvkm_xtensa, device, index,
-				enable, &xtensa->engine);
+	return nvkm_engine_ctor(&nvkm_xtensa, device, type, inst, enable, &xtensa->engine);
 }

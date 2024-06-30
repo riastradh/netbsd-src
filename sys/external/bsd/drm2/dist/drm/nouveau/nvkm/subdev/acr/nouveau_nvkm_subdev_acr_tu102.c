@@ -34,14 +34,14 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include <nvfw/acr.h>
 
-static int
+int
 tu102_acr_init(struct nvkm_acr *acr)
 {
-	int ret = nvkm_acr_hsf_boot(acr, "AHESASC");
+	int ret = nvkm_acr_hsfw_boot(acr, "AHESASC");
 	if (ret)
 		return ret;
 
-	return nvkm_acr_hsf_boot(acr, "ASB");
+	return nvkm_acr_hsfw_boot(acr, "ASB");
 }
 
 static int
@@ -90,12 +90,6 @@ tu102_acr_wpr_build(struct nvkm_acr *acr, struct nvkm_acr_lsf *rtos)
 }
 
 static int
-tu102_acr_hsfw_boot(struct nvkm_acr *acr, struct nvkm_acr_hsf *hsf)
-{
-	return gm200_acr_hsfw_boot(acr, hsf, 0, 0);
-}
-
-static int
 tu102_acr_hsfw_nofw(struct nvkm_acr *acr, const char *bl, const char *fw,
 		    const char *name, int version,
 		    const struct nvkm_acr_hsf_fwif *fwif)
@@ -120,22 +114,9 @@ MODULE_FIRMWARE("nvidia/tu117/acr/ucode_unload.bin");
 
 static const struct nvkm_acr_hsf_fwif
 tu102_acr_unload_fwif[] = {
-	{  0, nvkm_acr_hsfw_load, &gp108_acr_unload_0 },
+	{  0, gm200_acr_hsfw_ctor, &gp108_acr_hsfw_0, NVKM_ACR_HSF_PMU, 0, 0x00000000 },
 	{ -1, tu102_acr_hsfw_nofw },
 	{}
-};
-
-static int
-tu102_acr_asb_load(struct nvkm_acr *acr, struct nvkm_acr_hsfw *hsfw)
-{
-	return gm200_acr_hsfw_load(acr, hsfw, &acr->subdev.device->gsp->falcon);
-}
-
-static const struct nvkm_acr_hsf_func
-tu102_acr_asb_0 = {
-	.load = tu102_acr_asb_load,
-	.boot = tu102_acr_hsfw_boot,
-	.bld = gp108_acr_hsfw_bld,
 };
 
 MODULE_FIRMWARE("nvidia/tu102/acr/ucode_asb.bin");
@@ -146,16 +127,9 @@ MODULE_FIRMWARE("nvidia/tu117/acr/ucode_asb.bin");
 
 static const struct nvkm_acr_hsf_fwif
 tu102_acr_asb_fwif[] = {
-	{  0, nvkm_acr_hsfw_load, &tu102_acr_asb_0 },
+	{  0, gm200_acr_hsfw_ctor, &gp108_acr_hsfw_0, NVKM_ACR_HSF_GSP, 0, 0x00000000 },
 	{ -1, tu102_acr_hsfw_nofw },
 	{}
-};
-
-static const struct nvkm_acr_hsf_func
-tu102_acr_ahesasc_0 = {
-	.load = gp102_acr_load_load,
-	.boot = tu102_acr_hsfw_boot,
-	.bld = gp108_acr_hsfw_bld,
 };
 
 MODULE_FIRMWARE("nvidia/tu102/acr/bl.bin");
@@ -175,7 +149,7 @@ MODULE_FIRMWARE("nvidia/tu117/acr/ucode_ahesasc.bin");
 
 static const struct nvkm_acr_hsf_fwif
 tu102_acr_ahesasc_fwif[] = {
-	{  0, nvkm_acr_hsfw_load, &tu102_acr_ahesasc_0 },
+	{  0, gm200_acr_hsfw_ctor, &gp108_acr_load_0, NVKM_ACR_HSF_SEC2, 0, 0x00000000 },
 	{ -1, tu102_acr_hsfw_nofw },
 	{}
 };
@@ -224,11 +198,13 @@ tu102_acr_load(struct nvkm_acr *acr, int version,
 static const struct nvkm_acr_fwif
 tu102_acr_fwif[] = {
 	{  0, tu102_acr_load, &tu102_acr },
+	{ -1, gm200_acr_nofw, &gm200_acr },
 	{}
 };
 
 int
-tu102_acr_new(struct nvkm_device *device, int index, struct nvkm_acr **pacr)
+tu102_acr_new(struct nvkm_device *device, enum nvkm_subdev_type type, int inst,
+	      struct nvkm_acr **pacr)
 {
-	return nvkm_acr_new_(tu102_acr_fwif, device, index, pacr);
+	return nvkm_acr_new_(tu102_acr_fwif, device, type, inst, pacr);
 }

@@ -35,6 +35,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "radeon.h"
 #include "radeon_asic.h"
 #include "cikd.h"
+#include "vce.h"
 
 #define VCE_V2_0_FW_SIZE	(256 * 1024)
 #define VCE_V2_0_STACK_SIZE	(64 * 1024)
