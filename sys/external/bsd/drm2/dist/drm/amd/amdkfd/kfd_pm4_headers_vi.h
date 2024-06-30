@@ -1,7 +1,8 @@
 /*	$NetBSD$	*/
 
+/* SPDX-License-Identifier: GPL-2.0 OR MIT */
 /*
- * Copyright 2014 Advanced Micro Devices, Inc.
+ * Copyright 2014-2022 Advanced Micro Devices, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -103,8 +104,8 @@ struct pm4_mes_set_resources {
 
 struct pm4_mes_runlist {
 	union {
-	    union PM4_MES_TYPE_3_HEADER   header;            /* header */
-	    uint32_t            ordinal1;
+		union PM4_MES_TYPE_3_HEADER   header;            /* header */
+		uint32_t            ordinal1;
 	};
 
 	union {

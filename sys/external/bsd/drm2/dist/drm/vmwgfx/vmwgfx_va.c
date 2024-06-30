@@ -30,6 +30,7 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
+#include "vmwgfx_bo.h"
 #include "vmwgfx_drv.h"
 #include "vmwgfx_resource_priv.h"
 
@@ -85,10 +86,11 @@ static void vmw_stream_set_arg_handle(void *data, u32 handle)
 static const struct vmw_simple_resource_func va_stream_func = {
 	.res_func = {
 		.res_type = vmw_res_stream,
-		.needs_backup = false,
+		.needs_guest_memory = false,
 		.may_evict = false,
 		.type_name = "overlay stream",
-		.backup_placement = NULL,
+		.domain = VMW_BO_DOMAIN_SYS,
+		.busy_domain = VMW_BO_DOMAIN_SYS,
 		.create = NULL,
 		.destroy = NULL,
 		.bind = NULL,
@@ -122,7 +124,7 @@ int vmw_stream_unref_ioctl(struct drm_device *dev, void *data,
 	struct drm_vmw_stream_arg *arg = (struct drm_vmw_stream_arg *)data;
 
 	return ttm_ref_object_base_unref(vmw_fpriv(file_priv)->tfile,
-					 arg->stream_id, TTM_REF_USAGE);
+					 arg->stream_id);
 }
 
 /**

@@ -46,7 +46,7 @@ nvkm_umem_search(struct nvkm_client *client, u64 handle)
 
 	object = nvkm_object_search(client, handle, &nvkm_umem);
 	if (IS_ERR(object)) {
-		if (client->super && client != master) {
+		if (client != master) {
 			spin_lock(&master->lock);
 			list_for_each_entry(umem, &master->umem, head) {
 				if (umem->object.object == handle) {
@@ -58,8 +58,7 @@ nvkm_umem_search(struct nvkm_client *client, u64 handle)
 		}
 	} else {
 		umem = nvkm_umem(object);
-		if (!umem->priv || client->super)
-			memory = nvkm_memory_ref(umem->memory);
+		memory = nvkm_memory_ref(umem->memory);
 	}
 
 	return memory ? memory : ERR_PTR(-ENOENT);
@@ -172,7 +171,6 @@ nvkm_umem_new(const struct nvkm_oclass *oclass, void *argv, u32 argc,
 	nvkm_object_ctor(&nvkm_umem, oclass, &umem->object);
 	umem->mmu = mmu;
 	umem->type = mmu->type[type].type;
-	umem->priv = oclass->client->super;
 	INIT_LIST_HEAD(&umem->head);
 	*pobject = &umem->object;
 

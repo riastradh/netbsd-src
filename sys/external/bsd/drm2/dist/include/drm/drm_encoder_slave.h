@@ -29,6 +29,8 @@
 #ifndef __DRM_ENCODER_SLAVE_H__
 #define __DRM_ENCODER_SLAVE_H__
 
+#include <linux/i2c.h>
+
 #include <drm/drm_crtc.h>
 #include <drm/drm_encoder.h>
 

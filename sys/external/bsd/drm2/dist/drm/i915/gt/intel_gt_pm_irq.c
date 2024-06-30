@@ -1,8 +1,7 @@
 /*	$NetBSD$	*/
 
+// SPDX-License-Identifier: MIT
 /*
- * SPDX-License-Identifier: MIT
- *
  * Copyright © 2019 Intel Corporation
  */
 
@@ -14,6 +13,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_gt.h"
 #include "intel_gt_irq.h"
 #include "intel_gt_pm_irq.h"
+#include "intel_gt_regs.h"
 
 static void write_pm_imr(struct intel_gt *gt)
 {
@@ -22,10 +22,10 @@ static void write_pm_imr(struct intel_gt *gt)
 	u32 mask = gt->pm_imr;
 	i915_reg_t reg;
 
-	if (INTEL_GEN(i915) >= 11) {
+	if (GRAPHICS_VER(i915) >= 11) {
 		reg = GEN11_GPM_WGBOXPERF_INTR_MASK;
 		mask <<= 16; /* pm is in upper half */
-	} else if (INTEL_GEN(i915) >= 8) {
+	} else if (GRAPHICS_VER(i915) >= 8) {
 		reg = GEN8_GT_IMR(2);
 	} else {
 		reg = GEN6_PMIMR;
@@ -42,7 +42,7 @@ static void gen6_gt_pm_update_irq(struct intel_gt *gt,
 
 	WARN_ON(enabled_irq_mask & ~interrupt_mask);
 
-	lockdep_assert_held(&gt->irq_lock);
+	lockdep_assert_held(gt->irq_lock);
 
 	new_val = gt->pm_imr;
 	new_val &= ~interrupt_mask;
@@ -67,9 +67,9 @@ void gen6_gt_pm_mask_irq(struct intel_gt *gt, u32 mask)
 void gen6_gt_pm_reset_iir(struct intel_gt *gt, u32 reset_mask)
 {
 	struct intel_uncore *uncore = gt->uncore;
-	i915_reg_t reg = INTEL_GEN(gt->i915) >= 8 ? GEN8_GT_IIR(2) : GEN6_PMIIR;
+	i915_reg_t reg = GRAPHICS_VER(gt->i915) >= 8 ? GEN8_GT_IIR(2) : GEN6_PMIIR;
 
-	lockdep_assert_held(&gt->irq_lock);
+	lockdep_assert_held(gt->irq_lock);
 
 	intel_uncore_write(uncore, reg, reset_mask);
 	intel_uncore_write(uncore, reg, reset_mask);
@@ -83,10 +83,10 @@ static void write_pm_ier(struct intel_gt *gt)
 	u32 mask = gt->pm_ier;
 	i915_reg_t reg;
 
-	if (INTEL_GEN(i915) >= 11) {
+	if (GRAPHICS_VER(i915) >= 11) {
 		reg = GEN11_GPM_WGBOXPERF_INTR_ENABLE;
 		mask <<= 16; /* pm is in upper half */
-	} else if (INTEL_GEN(i915) >= 8) {
+	} else if (GRAPHICS_VER(i915) >= 8) {
 		reg = GEN8_GT_IER(2);
 	} else {
 		reg = GEN6_PMIER;
@@ -97,7 +97,7 @@ static void write_pm_ier(struct intel_gt *gt)
 
 void gen6_gt_pm_enable_irq(struct intel_gt *gt, u32 enable_mask)
 {
-	lockdep_assert_held(&gt->irq_lock);
+	lockdep_assert_held(gt->irq_lock);
 
 	gt->pm_ier |= enable_mask;
 	write_pm_ier(gt);
@@ -106,7 +106,7 @@ void gen6_gt_pm_enable_irq(struct intel_gt *gt, u32 enable_mask)
 
 void gen6_gt_pm_disable_irq(struct intel_gt *gt, u32 disable_mask)
 {
-	lockdep_assert_held(&gt->irq_lock);
+	lockdep_assert_held(gt->irq_lock);
 
 	gt->pm_ier &= ~disable_mask;
 	gen6_gt_pm_mask_irq(gt, disable_mask);

@@ -29,9 +29,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 
 #include "radeon.h"
 #include "radeon_asic.h"
+#include "evergreen.h"
 #include "evergreend.h"
-
-u32 evergreen_gpu_check_soft_reset(struct radeon_device *rdev);
 
 /**
  * evergreen_dma_fence_ring_emit - emit a fence on the DMA ring
@@ -103,7 +102,7 @@ void evergreen_dma_ring_ib_execute(struct radeon_device *rdev,
  * @src_offset: src GPU address
  * @dst_offset: dst GPU address
  * @num_gpu_pages: number of GPU pages to xfer
- * @fence: radeon fence object
+ * @resv: reservation object with embedded fence
  *
  * Copy GPU paging using the DMA engine (evergreen-cayman).
  * Used by the radeon ttm implementation to move pages if

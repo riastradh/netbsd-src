@@ -23,8 +23,11 @@
  *
  * Authors: Ben Skeggs
  */
+
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
+
+#include <linux/string_helpers.h>
 
 #include "aux.h"
 #include "pad.h"
@@ -99,7 +102,7 @@ void
 nvkm_i2c_aux_monitor(struct nvkm_i2c_aux *aux, bool monitor)
 {
 	struct nvkm_i2c_pad *pad = aux->pad;
-	AUX_TRACE(aux, "monitor: %s", monitor ? "yes" : "no");
+	AUX_TRACE(aux, "monitor: %s", str_yes_no(monitor));
 	if (monitor)
 		nvkm_i2c_pad_mode(pad, NVKM_I2C_PAD_AUX);
 	else

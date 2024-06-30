@@ -27,7 +27,7 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "base.h"
 #include "atom.h"
 
-const u32
+static const u32
 base917c_format[] = {
 	DRM_FORMAT_C8,
 	DRM_FORMAT_XRGB8888,

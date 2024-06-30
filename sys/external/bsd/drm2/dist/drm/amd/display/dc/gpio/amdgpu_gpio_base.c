@@ -32,8 +32,6 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD$");
 
-#include <linux/slab.h>
-
 #include "dm_services.h"
 
 #include "include/gpio_interface.h"
@@ -68,13 +66,13 @@ enum gpio_result dal_gpio_open_ex(
 	enum gpio_mode mode)
 {
 	if (gpio->pin) {
-		ASSERT_CRITICAL(false);
+		BREAK_TO_DEBUGGER();
 		return GPIO_RESULT_ALREADY_OPENED;
 	}
 
 	// No action if allocation failed during gpio construct
 	if (!gpio->hw_container.ddc) {
-		ASSERT_CRITICAL(false);
+		BREAK_TO_DEBUGGER();
 		return GPIO_RESULT_NON_SPECIFIC_ERROR;
 	}
 	gpio->mode = mode;

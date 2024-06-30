@@ -28,7 +28,7 @@
 
 #include "dsc.h"
 #include "dsc/dscc_types.h"
-#include <drm/drm_dsc.h>
+#include <drm/display/drm_dsc.h>
 
 #define TO_DCN20_DSC(dsc)\
 	container_of(dsc, struct dcn20_dsc, base)
@@ -80,7 +80,6 @@
 	SRI(DSCC_RATE_CONTROL_BUFFER1_MAX_FULLNESS_LEVEL, DSCC, id),\
 	SRI(DSCC_RATE_CONTROL_BUFFER2_MAX_FULLNESS_LEVEL, DSCC, id),\
 	SRI(DSCC_RATE_CONTROL_BUFFER3_MAX_FULLNESS_LEVEL, DSCC, id),\
-	SRI(DSCC_TEST_DEBUG_BUS_ROTATE, DSCC, id),\
 	SRI(DSCCIF_CONFIG0, DSCCIF, id),\
 	SRI(DSCCIF_CONFIG1, DSCCIF, id),\
 	SRI(DSCRM_DSC_FORWARD_CONFIG, DSCRM, id)
@@ -98,7 +97,6 @@
 	DSC_SF(DSC_TOP0_DSC_TOP_CONTROL, DSC_DISPCLK_R_GATE_DIS, mask_sh), \
 	DSC_SF(DSC_TOP0_DSC_TOP_CONTROL, DSC_DSCCLK_R_GATE_DIS, mask_sh), \
 	DSC_SF(DSC_TOP0_DSC_DEBUG_CONTROL, DSC_DBG_EN, mask_sh), \
-	DSC_SF(DSC_TOP0_DSC_DEBUG_CONTROL, DSC_TEST_CLOCK_MUX_SEL, mask_sh), \
 	DSC_SF(DSCC0_DSCC_CONFIG0, ICH_RESET_AT_END_OF_LINE, mask_sh), \
 	DSC_SF(DSCC0_DSCC_CONFIG0, NUMBER_OF_SLICES_PER_LINE, mask_sh), \
 	DSC_SF(DSCC0_DSCC_CONFIG0, ALTERNATE_ICH_ENCODING_EN, mask_sh), \
@@ -251,10 +249,6 @@
 	DSC_SF(DSCC0_DSCC_RATE_CONTROL_BUFFER1_MAX_FULLNESS_LEVEL, DSCC_RATE_CONTROL_BUFFER1_MAX_FULLNESS_LEVEL, mask_sh), \
 	DSC_SF(DSCC0_DSCC_RATE_CONTROL_BUFFER2_MAX_FULLNESS_LEVEL, DSCC_RATE_CONTROL_BUFFER2_MAX_FULLNESS_LEVEL, mask_sh), \
 	DSC_SF(DSCC0_DSCC_RATE_CONTROL_BUFFER3_MAX_FULLNESS_LEVEL, DSCC_RATE_CONTROL_BUFFER3_MAX_FULLNESS_LEVEL, mask_sh), \
-	DSC_SF(DSCC0_DSCC_TEST_DEBUG_BUS_ROTATE, DSCC_TEST_DEBUG_BUS0_ROTATE, mask_sh), \
-	DSC_SF(DSCC0_DSCC_TEST_DEBUG_BUS_ROTATE, DSCC_TEST_DEBUG_BUS1_ROTATE, mask_sh), \
-	DSC_SF(DSCC0_DSCC_TEST_DEBUG_BUS_ROTATE, DSCC_TEST_DEBUG_BUS2_ROTATE, mask_sh), \
-	DSC_SF(DSCC0_DSCC_TEST_DEBUG_BUS_ROTATE, DSCC_TEST_DEBUG_BUS3_ROTATE, mask_sh), \
 	DSC_SF(DSCCIF0_DSCCIF_CONFIG0, INPUT_INTERFACE_UNDERFLOW_RECOVERY_EN, mask_sh), \
 	DSC_SF(DSCCIF0_DSCCIF_CONFIG0, INPUT_INTERFACE_UNDERFLOW_OCCURRED_INT_EN, mask_sh), \
 	DSC_SF(DSCCIF0_DSCCIF_CONFIG0, INPUT_INTERFACE_UNDERFLOW_OCCURRED_STATUS, mask_sh), \
@@ -429,10 +423,6 @@
 	type DSCC_UPDATE_PENDING_STATUS; \
 	type DSCC_UPDATE_TAKEN_STATUS; \
 	type DSCC_UPDATE_TAKEN_ACK; \
-	type DSCC_TEST_DEBUG_BUS0_ROTATE; \
-	type DSCC_TEST_DEBUG_BUS1_ROTATE; \
-	type DSCC_TEST_DEBUG_BUS2_ROTATE; \
-	type DSCC_TEST_DEBUG_BUS3_ROTATE; \
 	type DSCC_RATE_BUFFER0_FULLNESS_LEVEL; \
 	type DSCC_RATE_BUFFER1_FULLNESS_LEVEL; \
 	type DSCC_RATE_BUFFER2_FULLNESS_LEVEL; \
@@ -456,7 +446,6 @@
 	type DSCCIF_UPDATE_TAKEN_ACK; \
 	type DSCRM_DSC_FORWARD_EN; \
 	type DSCRM_DSC_OPP_PIPE_SOURCE
-
 
 struct dcn20_dsc_registers {
 	uint32_t DSC_TOP_CONTROL;
@@ -505,7 +494,6 @@ struct dcn20_dsc_registers {
 	uint32_t DSCC_RATE_CONTROL_BUFFER1_MAX_FULLNESS_LEVEL;
 	uint32_t DSCC_RATE_CONTROL_BUFFER2_MAX_FULLNESS_LEVEL;
 	uint32_t DSCC_RATE_CONTROL_BUFFER3_MAX_FULLNESS_LEVEL;
-	uint32_t DSCC_TEST_DEBUG_BUS_ROTATE;
 	uint32_t DSCCIF_CONFIG0;
 	uint32_t DSCCIF_CONFIG1;
 	uint32_t DSCRM_DSC_FORWARD_CONFIG;
@@ -563,6 +551,27 @@ struct dcn20_dsc {
 	int max_image_width;
 };
 
+void dsc_config_log(struct display_stream_compressor *dsc,
+		const struct dsc_config *config);
+
+void dsc_log_pps(struct display_stream_compressor *dsc,
+		struct drm_dsc_config *pps);
+
+void dsc_override_rc_params(struct rc_params *rc,
+		const struct dc_dsc_rc_params_override *override);
+
+bool dsc_prepare_config(const struct dsc_config *dsc_cfg,
+		struct dsc_reg_values *dsc_reg_vals,
+		struct dsc_optc_config *dsc_optc_cfg);
+
+enum dsc_pixel_format dsc_dc_pixel_encoding_to_dsc_pixel_format(enum dc_pixel_encoding dc_pix_enc,
+		bool is_ycbcr422_simple);
+
+enum dsc_bits_per_comp dsc_dc_color_depth_to_dsc_bits_per_comp(enum dc_color_depth dc_color_depth);
+
+void dsc_init_reg_values(struct dsc_reg_values *reg_vals);
+
+void dsc_update_from_dsc_parameters(struct dsc_reg_values *reg_vals, const struct dsc_parameters *dsc_params);
 
 void dsc2_construct(struct dcn20_dsc *dsc,
 		struct dc_context *ctx,
@@ -570,6 +579,13 @@ void dsc2_construct(struct dcn20_dsc *dsc,
 		const struct dcn20_dsc_registers *dsc_regs,
 		const struct dcn20_dsc_shift *dsc_shift,
 		const struct dcn20_dsc_mask *dsc_mask);
+
+void dsc2_get_enc_caps(struct dsc_enc_caps *dsc_enc_caps,
+		int pixel_clock_100Hz);
+
+bool dsc2_get_packed_pps(struct display_stream_compressor *dsc,
+		const struct dsc_config *dsc_cfg,
+		uint8_t *dsc_packed_pps);
 
 #endif
 

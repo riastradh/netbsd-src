@@ -313,7 +313,10 @@ bool cm_helper_convert_to_custom_float(
 #define NUMBER_REGIONS     32
 #define NUMBER_SW_SEGMENTS 16
 
-bool cm_helper_translate_curve_to_hw_format(
+#define DC_LOGGER \
+		ctx->logger
+
+bool cm_helper_translate_curve_to_hw_format(struct dc_context *ctx,
 				const struct dc_transfer_func *output_tf,
 				struct pwl_params *lut_params, bool fixpoint)
 {
@@ -321,6 +324,7 @@ bool cm_helper_translate_curve_to_hw_format(
 	struct pwl_result_data *rgb_resulted;
 	struct pwl_result_data *rgb;
 	struct pwl_result_data *rgb_plus_1;
+	struct pwl_result_data *rgb_minus_1;
 
 	int32_t region_start, region_end;
 	int32_t i;
@@ -328,8 +332,6 @@ bool cm_helper_translate_curve_to_hw_format(
 
 	if (output_tf == NULL || lut_params == NULL || output_tf->type == TF_TYPE_BYPASS)
 		return false;
-
-	PERF_TRACE_CTX(output_tf->ctx);
 
 	corner_points = lut_params->corner_points;
 	rgb_resulted = lut_params->rgb_resulted;
@@ -385,6 +387,11 @@ bool cm_helper_translate_curve_to_hw_format(
 				i += increment) {
 			if (j == hw_points - 1)
 				break;
+			if (i >= TRANSFER_FUNC_POINTS) {
+				DC_LOG_ERROR("Index out of bounds: i=%d, TRANSFER_FUNC_POINTS=%d\n",
+					     i, TRANSFER_FUNC_POINTS);
+				return false;
+			}
 			rgb_resulted[j].red = output_tf->tf_pts.red[i];
 			rgb_resulted[j].green = output_tf->tf_pts.green[i];
 			rgb_resulted[j].blue = output_tf->tf_pts.blue[i];
@@ -470,23 +477,43 @@ bool cm_helper_translate_curve_to_hw_format(
 
 	rgb = rgb_resulted;
 	rgb_plus_1 = rgb_resulted + 1;
+	rgb_minus_1 = rgb;
 
 	i = 1;
 	while (i != hw_points + 1) {
+
+		if (i >= hw_points - 1) {
+			if (dc_fixpt_lt(rgb_plus_1->red, rgb->red))
+				rgb_plus_1->red = dc_fixpt_add(rgb->red, rgb_minus_1->delta_red);
+			if (dc_fixpt_lt(rgb_plus_1->green, rgb->green))
+				rgb_plus_1->green = dc_fixpt_add(rgb->green, rgb_minus_1->delta_green);
+			if (dc_fixpt_lt(rgb_plus_1->blue, rgb->blue))
+				rgb_plus_1->blue = dc_fixpt_add(rgb->blue, rgb_minus_1->delta_blue);
+		}
+
 		rgb->delta_red   = dc_fixpt_sub(rgb_plus_1->red,   rgb->red);
 		rgb->delta_green = dc_fixpt_sub(rgb_plus_1->green, rgb->green);
 		rgb->delta_blue  = dc_fixpt_sub(rgb_plus_1->blue,  rgb->blue);
 
+
 		if (fixpoint == true) {
-			rgb->delta_red_reg   = dc_fixpt_clamp_u0d10(rgb->delta_red);
-			rgb->delta_green_reg = dc_fixpt_clamp_u0d10(rgb->delta_green);
-			rgb->delta_blue_reg  = dc_fixpt_clamp_u0d10(rgb->delta_blue);
+			uint32_t red_clamp = dc_fixpt_clamp_u0d14(rgb->delta_red);
+			uint32_t green_clamp = dc_fixpt_clamp_u0d14(rgb->delta_green);
+			uint32_t blue_clamp = dc_fixpt_clamp_u0d14(rgb->delta_blue);
+
+			if (red_clamp >> 10 || green_clamp >> 10 || blue_clamp >> 10)
+				DC_LOG_WARNING("Losing delta precision while programming shaper LUT.");
+
+			rgb->delta_red_reg   = red_clamp & 0x3ff;
+			rgb->delta_green_reg = green_clamp & 0x3ff;
+			rgb->delta_blue_reg  = blue_clamp & 0x3ff;
 			rgb->red_reg         = dc_fixpt_clamp_u0d14(rgb->red);
 			rgb->green_reg       = dc_fixpt_clamp_u0d14(rgb->green);
 			rgb->blue_reg        = dc_fixpt_clamp_u0d14(rgb->blue);
 		}
 
 		++rgb_plus_1;
+		rgb_minus_1 = rgb;
 		++rgb;
 		++i;
 	}
@@ -515,8 +542,6 @@ bool cm_helper_translate_curve_to_degamma_hw_format(
 
 	if (output_tf == NULL || lut_params == NULL || output_tf->type == TF_TYPE_BYPASS)
 		return false;
-
-	PERF_TRACE_CTX(output_tf->ctx);
 
 	corner_points = lut_params->corner_points;
 	rgb_resulted = lut_params->rgb_resulted;
