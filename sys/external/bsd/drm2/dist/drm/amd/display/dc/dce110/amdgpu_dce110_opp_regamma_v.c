@@ -28,8 +28,6 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: amdgpu_dce110_opp_regamma_v.c,v 1.2 2021/12/18 23:45:02 riastradh Exp $");
 
-#include <linux/delay.h>
-
 #include "dm_services.h"
 
 /* include DCE11 register header files */

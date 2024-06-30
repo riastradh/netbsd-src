@@ -1,8 +1,7 @@
 /*	$NetBSD: intel_llc_types.h,v 1.3 2021/12/19 11:46:38 riastradh Exp $	*/
 
+/* SPDX-License-Identifier: MIT */
 /*
- * SPDX-License-Identifier: MIT
- *
  * Copyright © 2019 Intel Corporation
  */
 

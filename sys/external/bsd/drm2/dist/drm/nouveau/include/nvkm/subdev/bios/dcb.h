@@ -57,6 +57,7 @@ struct dcb_output {
 		} tmdsconf;
 	};
 	bool i2c_upper_default;
+	int id;
 };
 
 u16 dcb_table(struct nvkm_bios *, u8 *ver, u8 *hdr, u8 *ent, u8 *len);

@@ -1,7 +1,8 @@
 /*	$NetBSD: kfd_pm4_headers.h,v 1.3 2021/12/18 23:44:59 riastradh Exp $	*/
 
+/* SPDX-License-Identifier: GPL-2.0 OR MIT */
 /*
- * Copyright 2014 Advanced Micro Devices, Inc.
+ * Copyright 2014-2022 Advanced Micro Devices, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),

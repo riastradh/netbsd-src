@@ -17,10 +17,13 @@
 #include <linux/rcupdate.h>
 #include <linux/workqueue.h>
 
+<<<<<<< HEAD
 #include <drm/drm_wait_netbsd.h> /* XXX */
 
 #include "i915_utils.h"
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 struct i915_active_fence {
 	struct dma_fence __rcu *fence;
 	struct dma_fence_cb cb;
@@ -28,11 +31,6 @@ struct i915_active_fence {
 };
 
 struct active_node;
-
-#define I915_ACTIVE_MAY_SLEEP BIT(0)
-
-#define __i915_active_call __aligned(4)
-#define i915_active_may_sleep(fn) ptr_pack_bits(&(fn), I915_ACTIVE_MAY_SLEEP, 2)
 
 struct i915_active {
 	atomic_t count;

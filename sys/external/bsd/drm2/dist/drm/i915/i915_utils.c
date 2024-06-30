@@ -8,11 +8,14 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: i915_utils.c,v 1.4 2021/12/19 11:37:41 riastradh Exp $");
 
+#include <linux/device.h>
+
 #include <drm/drm_drv.h>
 
 #include "i915_drv.h"
 #include "i915_utils.h"
 
+<<<<<<< HEAD
 #ifdef __NetBSD__
 #define	NBSD_BUG_URL "https://gnats.NetBSD.org/"
 #define	NBSD_BUG_MSG							      \
@@ -21,6 +24,8 @@ __KERNEL_RCSID(0, "$NetBSD: i915_utils.c,v 1.4 2021/12/19 11:37:41 riastradh Exp
 	" as in `boot -vx'."
 #else
 #define FDO_BUG_URL "https://gitlab.freedesktop.org/drm/intel/-/wikis/How-to-file-i915-bugs"
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 #define FDO_BUG_MSG "Please file a bug on drm/i915; see " FDO_BUG_URL " for details."
 #endif
 
@@ -77,6 +82,16 @@ __i915_printk(struct drm_i915_private *dev_priv, const char *level,
 #endif
 }
 
+void add_taint_for_CI(struct drm_i915_private *i915, unsigned int taint)
+{
+	__i915_printk(i915, KERN_NOTICE, "CI tainted:%#x by %pS\n",
+		      taint, (void *)_RET_IP_);
+
+	/* Failures that occur during fault injection testing are expected */
+	if (!i915_error_injected())
+		__add_taint_for_CI(taint);
+}
+
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG)
 static unsigned int i915_probe_fail_count;
 
@@ -105,8 +120,12 @@ bool i915_error_injected(void)
 
 void cancel_timer(struct timer_list *t)
 {
+<<<<<<< HEAD
 #ifndef __NetBSD__
 	if (!READ_ONCE(t->expires))
+=======
+	if (!timer_active(t))
+>>>>>>> vendor/linux-drm-v6.6.35
 		return;
 #endif
 
@@ -123,7 +142,7 @@ void set_timer_ms(struct timer_list *t, unsigned long timeout)
 		return;
 	}
 
-	timeout = msecs_to_jiffies_timeout(timeout);
+	timeout = msecs_to_jiffies(timeout);
 
 	/*
 	 * Paranoia to make sure the compiler computes the timeout before
@@ -133,5 +152,15 @@ void set_timer_ms(struct timer_list *t, unsigned long timeout)
 	 */
 	barrier();
 
-	mod_timer(t, jiffies + timeout);
+	/* Keep t->expires = 0 reserved to indicate a canceled timer. */
+	mod_timer(t, jiffies + timeout ?: 1);
+}
+
+bool i915_vtd_active(struct drm_i915_private *i915)
+{
+	if (device_iommu_mapped(i915->drm.dev))
+		return true;
+
+	/* Running as a guest, we assume the host is enforcing VT'd */
+	return i915_run_as_guest();
 }

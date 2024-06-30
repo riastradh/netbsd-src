@@ -46,6 +46,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_mn.c,v 1.3 2021/12/18 23:45:43 riastradh Exp 
  *
  * @mn: our notifier
  * @range: the VMA under invalidation
+ * @cur_seq: Value to pass to mmu_interval_set_seq()
  *
  * We block for all BOs between start and end to be idle and
  * unmap them by move them into system domain again.
@@ -58,7 +59,7 @@ static bool radeon_mn_invalidate(struct mmu_interval_notifier *mn,
 	struct ttm_operation_ctx ctx = { false, false };
 	long r;
 
-	if (!bo->tbo.ttm || bo->tbo.ttm->state != tt_bound)
+	if (!bo->tbo.ttm || !radeon_ttm_tt_is_bound(bo->tbo.bdev, bo->tbo.ttm))
 		return true;
 
 	if (!mmu_notifier_range_blockable(range))
@@ -70,8 +71,8 @@ static bool radeon_mn_invalidate(struct mmu_interval_notifier *mn,
 		return true;
 	}
 
-	r = dma_resv_wait_timeout_rcu(bo->tbo.base.resv, true, false,
-				      MAX_SCHEDULE_TIMEOUT);
+	r = dma_resv_wait_timeout(bo->tbo.base.resv, DMA_RESV_USAGE_BOOKKEEP,
+				  false, MAX_SCHEDULE_TIMEOUT);
 	if (r <= 0)
 		DRM_ERROR("(%ld) failed to wait for user bo\n", r);
 

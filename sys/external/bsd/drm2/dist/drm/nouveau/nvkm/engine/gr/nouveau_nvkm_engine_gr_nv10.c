@@ -1004,7 +1004,7 @@ nv10_gr_chan = {
 	} while (0)
 
 int
-nv10_gr_chan_new(struct nvkm_gr *base, struct nvkm_fifo_chan *fifoch,
+nv10_gr_chan_new(struct nvkm_gr *base, struct nvkm_chan *fifoch,
 		 const struct nvkm_oclass *oclass, struct nvkm_object **pobject)
 {
 	struct nv10_gr *gr = nv10_gr(base);
@@ -1016,7 +1016,7 @@ nv10_gr_chan_new(struct nvkm_gr *base, struct nvkm_fifo_chan *fifoch,
 		return -ENOMEM;
 	nvkm_object_ctor(&nv10_gr_chan, oclass, &chan->object);
 	chan->gr = gr;
-	chan->chid = fifoch->chid;
+	chan->chid = fifoch->id;
 	*pobject = &chan->object;
 
 	NV_WRITE_CTX(0x00400e88, 0x08000000);
@@ -1178,7 +1178,7 @@ nv10_gr_init(struct nvkm_gr *base)
 
 int
 nv10_gr_new_(const struct nvkm_gr_func *func, struct nvkm_device *device,
-	     int index, struct nvkm_gr **pgr)
+	     enum nvkm_subdev_type type, int inst, struct nvkm_gr **pgr)
 {
 	struct nv10_gr *gr;
 
@@ -1187,7 +1187,7 @@ nv10_gr_new_(const struct nvkm_gr_func *func, struct nvkm_device *device,
 	spin_lock_init(&gr->lock);
 	*pgr = &gr->base;
 
-	return nvkm_gr_ctor(func, device, index, true, &gr->base);
+	return nvkm_gr_ctor(func, device, type, inst, true, &gr->base);
 }
 
 static void *
@@ -1228,7 +1228,7 @@ nv10_gr = {
 };
 
 int
-nv10_gr_new(struct nvkm_device *device, int index, struct nvkm_gr **pgr)
+nv10_gr_new(struct nvkm_device *device, enum nvkm_subdev_type type, int inst, struct nvkm_gr **pgr)
 {
-	return nv10_gr_new_(&nv10_gr, device, index, pgr);
+	return nv10_gr_new_(&nv10_gr, device, type, inst, pgr);
 }

@@ -97,15 +97,13 @@ bus_dmamem_kunmap(bus_dma_tag_t t, void *kva, size_t size)
 #include <linux/shmem_fs.h>
 #include <linux/swap.h>
 
-#include <drm/drm.h> /* for drm_legacy.h! */
 #include <drm/drm_cache.h>
-#include <drm/drm_legacy.h> /* for drm_pci.h! */
-#include <drm/drm_pci.h>
 
 #include "gt/intel_gt.h"
 #include "i915_drv.h"
 #include "i915_gem_object.h"
 #include "i915_gem_region.h"
+#include "i915_gem_tiling.h"
 #include "i915_scatterlist.h"
 
 #include <linux/nbsd-namespace.h>
@@ -116,7 +114,11 @@ static int i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 	struct uvm_object *mapping = obj->base.filp;
 #else
 	struct address_space *mapping = obj->base.filp->f_mapping;
+<<<<<<< HEAD
 #endif
+=======
+	struct drm_i915_private *i915 = to_i915(obj->base.dev);
+>>>>>>> vendor/linux-drm-v6.6.35
 	struct scatterlist *sg;
 	struct sg_table *st;
 	dma_addr_t dma;
@@ -124,7 +126,11 @@ static int i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 	void *dst;
 	int i;
 
-	if (WARN_ON(i915_gem_object_needs_bit17_swizzle(obj)))
+	/* Contiguous chunk, with a single scatterlist element */
+	if (overflows_type(obj->base.size, sg->length))
+		return -E2BIG;
+
+	if (GEM_WARN_ON(i915_gem_object_needs_bit17_swizzle(obj)))
 		return -EINVAL;
 
 
@@ -133,6 +139,7 @@ static int i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 	 * to handle all possible callers, and given typical object sizes,
 	 * the alignment of the buddy allocation will naturally match.
 	 */
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	__USE(dma);
 	bus_dma_tag_t dmat = obj->base.dev->dmat;
@@ -157,6 +164,9 @@ static int i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 	obj->mm.u.phys.kva = vaddr;
 #else
 	vaddr = dma_alloc_coherent(&obj->base.dev->pdev->dev,
+=======
+	vaddr = dma_alloc_coherent(obj->base.dev->dev,
+>>>>>>> vendor/linux-drm-v6.6.35
 				   roundup_pow_of_two(obj->base.size),
 				   &dma, GFP_KERNEL);
 	if (!vaddr)
@@ -223,9 +233,15 @@ static int i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 		dst += PAGE_SIZE;
 	}
 
-	intel_gt_chipset_flush(&to_i915(obj->base.dev)->gt);
+	intel_gt_chipset_flush(to_gt(i915));
 
+<<<<<<< HEAD
 	__i915_gem_object_set_pages(obj, st, obj->base.size);
+=======
+	/* We're no longer struct page backed */
+	obj->mem_flags &= ~I915_BO_FLAG_STRUCT_PAGE;
+	__i915_gem_object_set_pages(obj, st);
+>>>>>>> vendor/linux-drm-v6.6.35
 
 	return 0;
 
@@ -238,6 +254,7 @@ err_st1:
 err_st:
 	kfree(st);
 err_pci:
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	if (vaddr) {
 		bus_dmamem_kunmap(dmat, vaddr,
@@ -248,13 +265,16 @@ err_pci:
 		bus_dmamem_free(dmat, &obj->mm.u.phys.seg, rsegs);
 #else
 	dma_free_coherent(&obj->base.dev->pdev->dev,
+=======
+	dma_free_coherent(obj->base.dev->dev,
+>>>>>>> vendor/linux-drm-v6.6.35
 			  roundup_pow_of_two(obj->base.size),
 			  vaddr, dma);
 #endif
 	return -ENOMEM;
 }
 
-static void
+void
 i915_gem_object_put_pages_phys(struct drm_i915_gem_object *obj,
 			       struct sg_table *pages)
 {
@@ -313,6 +333,7 @@ i915_gem_object_put_pages_phys(struct drm_i915_gem_object *obj,
 	sg_free_table(pages);
 	kfree(pages);
 
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	bus_dmamem_kunmap(dmat, obj->mm.u.phys.kva,
 	    roundup_pow_of_two(obj->base.size));
@@ -320,91 +341,135 @@ i915_gem_object_put_pages_phys(struct drm_i915_gem_object *obj,
 	bus_dmamem_free(dmat, &obj->mm.u.phys.seg, 1);
 #else
 	dma_free_coherent(&obj->base.dev->pdev->dev,
+=======
+	dma_free_coherent(obj->base.dev->dev,
+>>>>>>> vendor/linux-drm-v6.6.35
 			  roundup_pow_of_two(obj->base.size),
 			  vaddr, dma);
 #endif
 }
 
-static void phys_release(struct drm_i915_gem_object *obj)
+int i915_gem_object_pwrite_phys(struct drm_i915_gem_object *obj,
+				const struct drm_i915_gem_pwrite *args)
 {
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	/* XXX Who acquires the reference?  */
 	uao_detach(obj->base.filp);
 #else
 	fput(obj->base.filp);
 #endif
+=======
+	void *vaddr = sg_page(obj->mm.pages->sgl) + args->offset;
+	char __user *user_data = u64_to_user_ptr(args->data_ptr);
+	struct drm_i915_private *i915 = to_i915(obj->base.dev);
+	int err;
+
+	err = i915_gem_object_wait(obj,
+				   I915_WAIT_INTERRUPTIBLE |
+				   I915_WAIT_ALL,
+				   MAX_SCHEDULE_TIMEOUT);
+	if (err)
+		return err;
+
+	/*
+	 * We manually control the domain here and pretend that it
+	 * remains coherent i.e. in the GTT domain, like shmem_pwrite.
+	 */
+	i915_gem_object_invalidate_frontbuffer(obj, ORIGIN_CPU);
+
+	if (copy_from_user(vaddr, user_data, args->size))
+		return -EFAULT;
+
+	drm_clflush_virt_range(vaddr, args->size);
+	intel_gt_chipset_flush(to_gt(i915));
+
+	i915_gem_object_flush_frontbuffer(obj, ORIGIN_CPU);
+	return 0;
+>>>>>>> vendor/linux-drm-v6.6.35
 }
 
-static const struct drm_i915_gem_object_ops i915_gem_phys_ops = {
-	.get_pages = i915_gem_object_get_pages_phys,
-	.put_pages = i915_gem_object_put_pages_phys,
+int i915_gem_object_pread_phys(struct drm_i915_gem_object *obj,
+			       const struct drm_i915_gem_pread *args)
+{
+	void *vaddr = sg_page(obj->mm.pages->sgl) + args->offset;
+	char __user *user_data = u64_to_user_ptr(args->data_ptr);
+	int err;
 
-	.release = phys_release,
-};
+	err = i915_gem_object_wait(obj,
+				   I915_WAIT_INTERRUPTIBLE,
+				   MAX_SCHEDULE_TIMEOUT);
+	if (err)
+		return err;
 
-int i915_gem_object_attach_phys(struct drm_i915_gem_object *obj, int align)
+	drm_clflush_virt_range(vaddr, args->size);
+	if (copy_to_user(user_data, vaddr, args->size))
+		return -EFAULT;
+
+	return 0;
+}
+
+static int i915_gem_object_shmem_to_phys(struct drm_i915_gem_object *obj)
 {
 	struct sg_table *pages;
 	int err;
 
-	if (align > obj->base.size)
-		return -EINVAL;
-
-	if (obj->ops == &i915_gem_phys_ops)
-		return 0;
-
-	if (obj->ops != &i915_gem_shmem_ops)
-		return -EINVAL;
-
-	err = i915_gem_object_unbind(obj, I915_GEM_OBJECT_UNBIND_ACTIVE);
-	if (err)
-		return err;
-
-	mutex_lock_nested(&obj->mm.lock, I915_MM_GET_PAGES);
-
-	if (obj->mm.madv != I915_MADV_WILLNEED) {
-		err = -EFAULT;
-		goto err_unlock;
-	}
-
-	if (obj->mm.quirked) {
-		err = -EFAULT;
-		goto err_unlock;
-	}
-
-	if (obj->mm.mapping) {
-		err = -EBUSY;
-		goto err_unlock;
-	}
-
 	pages = __i915_gem_object_unset_pages(obj);
 
-	obj->ops = &i915_gem_phys_ops;
-
-	err = ____i915_gem_object_get_pages(obj);
+	err = i915_gem_object_get_pages_phys(obj);
 	if (err)
 		goto err_xfer;
 
 	/* Perma-pin (until release) the physical set of pages */
 	__i915_gem_object_pin_pages(obj);
 
-	if (!IS_ERR_OR_NULL(pages)) {
-		i915_gem_shmem_ops.put_pages(obj, pages);
-		i915_gem_object_release_memory_region(obj);
-	}
-	mutex_unlock(&obj->mm.lock);
+	if (!IS_ERR_OR_NULL(pages))
+		i915_gem_object_put_pages_shmem(obj, pages);
+
+	i915_gem_object_release_memory_region(obj);
 	return 0;
 
 err_xfer:
-	obj->ops = &i915_gem_shmem_ops;
-	if (!IS_ERR_OR_NULL(pages)) {
-		unsigned int sg_page_sizes = i915_sg_page_sizes(pages->sgl);
-
-		__i915_gem_object_set_pages(obj, pages, sg_page_sizes);
-	}
-err_unlock:
-	mutex_unlock(&obj->mm.lock);
+	if (!IS_ERR_OR_NULL(pages))
+		__i915_gem_object_set_pages(obj, pages);
 	return err;
+}
+
+int i915_gem_object_attach_phys(struct drm_i915_gem_object *obj, int align)
+{
+	int err;
+
+	assert_object_held(obj);
+
+	if (align > obj->base.size)
+		return -EINVAL;
+
+	if (!i915_gem_object_is_shmem(obj))
+		return -EINVAL;
+
+	if (!i915_gem_object_has_struct_page(obj))
+		return 0;
+
+	err = i915_gem_object_unbind(obj, I915_GEM_OBJECT_UNBIND_ACTIVE);
+	if (err)
+		return err;
+
+	if (obj->mm.madv != I915_MADV_WILLNEED)
+		return -EFAULT;
+
+	if (i915_gem_object_has_tiling_quirk(obj))
+		return -EFAULT;
+
+	if (obj->mm.mapping || i915_gem_object_has_pinned_pages(obj))
+		return -EBUSY;
+
+	if (unlikely(obj->mm.madv != I915_MADV_WILLNEED)) {
+		drm_dbg(obj->base.dev,
+			"Attempting to obtain a purgeable object\n");
+		return -EFAULT;
+	}
+
+	return i915_gem_object_shmem_to_phys(obj);
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_SELFTEST)

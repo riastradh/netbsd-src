@@ -163,7 +163,7 @@ radeon_dp_aux_transfer_native(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg
 	} while (retry_count++ < 1000);
 
 	if (retry_count >= 1000) {
-		DRM_ERROR("auxch hw never signalled completion, error %08x\n", tmp);
+		dev_err(rdev->dev, "auxch hw never signalled completion, error %08x\n", tmp);
 		ret = -EIO;
 		goto done;
 	}
@@ -173,8 +173,7 @@ radeon_dp_aux_transfer_native(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg
 		goto done;
 	}
 	if (tmp & AUX_RX_ERROR_FLAGS) {
-		DRM_DEBUG_KMS_RATELIMITED("dp_aux_ch flags not zero: %08x\n",
-					  tmp);
+		drm_dbg_kms_ratelimited(dev, "dp_aux_ch flags not zero: %08x\n", tmp);
 		ret = -EIO;
 		goto done;
 	}

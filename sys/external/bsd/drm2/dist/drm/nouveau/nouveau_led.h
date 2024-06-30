@@ -29,7 +29,7 @@
 
 #include "nouveau_drv.h"
 
-struct led_classdev;
+#include <linux/leds.h>
 
 struct nouveau_led {
 	struct drm_device *dev;

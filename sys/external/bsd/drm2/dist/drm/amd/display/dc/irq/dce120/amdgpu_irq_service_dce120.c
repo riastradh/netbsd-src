@@ -28,8 +28,6 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: amdgpu_irq_service_dce120.c,v 1.2 2021/12/18 23:45:06 riastradh Exp $");
 
-#include <linux/slab.h>
-
 #include "dm_services.h"
 
 #include "include/logger_interface.h"

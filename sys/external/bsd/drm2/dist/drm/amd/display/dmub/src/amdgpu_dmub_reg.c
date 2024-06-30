@@ -29,7 +29,7 @@
 __KERNEL_RCSID(0, "$NetBSD: amdgpu_dmub_reg.c,v 1.2 2021/12/18 23:45:07 riastradh Exp $");
 
 #include "dmub_reg.h"
-#include "../inc/dmub_srv.h"
+#include "../dmub_srv.h"
 
 struct dmub_reg_value_masks {
 	uint32_t value;

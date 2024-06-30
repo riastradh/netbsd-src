@@ -35,13 +35,18 @@ nvkm_object_search(struct nvkm_client *client, u64 handle,
 		   const struct nvkm_object_func *func)
 {
 	struct nvkm_object *object;
+	unsigned long flags;
 
 	if (handle) {
+<<<<<<< HEAD
 #ifdef __NetBSD__
 		object = rb_tree_find_node(&client->objtree, &handle);
 		if (object)
 			goto done;
 #else
+=======
+		spin_lock_irqsave(&client->obj_lock, flags);
+>>>>>>> vendor/linux-drm-v6.6.35
 		struct rb_node *node = client->objroot.rb_node;
 		while (node) {
 			object = rb_entry(node, typeof(*object), node);
@@ -50,10 +55,16 @@ nvkm_object_search(struct nvkm_client *client, u64 handle,
 			else
 			if (handle > object->object)
 				node = node->rb_right;
-			else
+			else {
+				spin_unlock_irqrestore(&client->obj_lock, flags);
 				goto done;
+			}
 		}
+<<<<<<< HEAD
 #endif
+=======
+		spin_unlock_irqrestore(&client->obj_lock, flags);
+>>>>>>> vendor/linux-drm-v6.6.35
 		return ERR_PTR(-ENOENT);
 	} else {
 		object = &client->object;
@@ -68,6 +79,7 @@ done:
 void
 nvkm_object_remove(struct nvkm_object *object)
 {
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	if (object->on_tree) {
 		rb_tree_remove_node(&object->client->objtree, object);
@@ -77,11 +89,20 @@ nvkm_object_remove(struct nvkm_object *object)
 	if (!RB_EMPTY_NODE(&object->node))
 		rb_erase(&object->node, &object->client->objroot);
 #endif
+=======
+	unsigned long flags;
+
+	spin_lock_irqsave(&object->client->obj_lock, flags);
+	if (!RB_EMPTY_NODE(&object->node))
+		rb_erase(&object->node, &object->client->objroot);
+	spin_unlock_irqrestore(&object->client->obj_lock, flags);
+>>>>>>> vendor/linux-drm-v6.6.35
 }
 
 bool
 nvkm_object_insert(struct nvkm_object *object)
 {
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	struct nvkm_object *collision =
 	    rb_tree_insert_node(&object->client->objtree, object);
@@ -93,22 +114,30 @@ nvkm_object_insert(struct nvkm_object *object)
 	return true;
 #else
 	struct rb_node **ptr = &object->client->objroot.rb_node;
+=======
+	struct rb_node **ptr;
+>>>>>>> vendor/linux-drm-v6.6.35
 	struct rb_node *parent = NULL;
+	unsigned long flags;
 
+	spin_lock_irqsave(&object->client->obj_lock, flags);
+	ptr = &object->client->objroot.rb_node;
 	while (*ptr) {
 		struct nvkm_object *this = rb_entry(*ptr, typeof(*this), node);
 		parent = *ptr;
-		if (object->object < this->object)
+		if (object->object < this->object) {
 			ptr = &parent->rb_left;
-		else
-		if (object->object > this->object)
+		} else if (object->object > this->object) {
 			ptr = &parent->rb_right;
-		else
+		} else {
+			spin_unlock_irqrestore(&object->client->obj_lock, flags);
 			return false;
+		}
 	}
 
 	rb_link_node(&object->node, parent, ptr);
 	rb_insert_color(&object->node, &object->client->objroot);
+	spin_unlock_irqrestore(&object->client->obj_lock, flags);
 	return true;
 #endif
 }
@@ -226,7 +255,7 @@ nvkm_object_fini(struct nvkm_object *object, bool suspend)
 
 	nvif_debug(object, "%s children...\n", action);
 	time = ktime_to_us(ktime_get());
-	list_for_each_entry(child, &object->tree, head) {
+	list_for_each_entry_reverse(child, &object->tree, head) {
 		ret = nvkm_object_fini(child, suspend);
 		if (ret && suspend)
 			goto fail_child;

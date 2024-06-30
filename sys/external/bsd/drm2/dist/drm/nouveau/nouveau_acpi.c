@@ -61,7 +61,6 @@ static struct nouveau_dsm_priv {
 	bool optimus_flags_detected;
 	bool optimus_skip_dsm;
 	acpi_handle dhandle;
-	acpi_handle rom_handle;
 } nouveau_dsm_priv;
 
 bool nouveau_is_optimus(void) {
@@ -224,37 +223,6 @@ static const struct vga_switcheroo_handler nouveau_dsm_handler = {
 	.get_client_id = nouveau_dsm_get_client_id,
 };
 
-/*
- * Firmware supporting Windows 8 or later do not use _DSM to put the device into
- * D3cold, they instead rely on disabling power resources on the parent.
- */
-static bool nouveau_pr3_present(struct pci_dev *pdev)
-{
-	struct pci_dev *parent_pdev = pci_upstream_bridge(pdev);
-	struct acpi_device *parent_adev;
-
-	if (!parent_pdev)
-		return false;
-
-	if (!parent_pdev->bridge_d3) {
-		/*
-		 * Parent PCI bridge is currently not power managed.
-		 * Since userspace can change these afterwards to be on
-		 * the safe side we stick with _DSM and prevent usage of
-		 * _PR3 from the bridge.
-		 */
-		pci_d3cold_disable(pdev);
-		return false;
-	}
-
-	parent_adev = ACPI_COMPANION(&parent_pdev->dev);
-	if (!parent_adev)
-		return false;
-
-	return parent_adev->power.flags.power_resources &&
-		acpi_has_method(parent_adev->handle, "_PR3");
-}
-
 static void nouveau_dsm_pci_probe(struct pci_dev *pdev, acpi_handle *dhandle_out,
 				  bool *has_mux, bool *has_opt,
 				  bool *has_opt_flags, bool *has_pr3)
@@ -262,6 +230,19 @@ static void nouveau_dsm_pci_probe(struct pci_dev *pdev, acpi_handle *dhandle_out
 	acpi_handle dhandle;
 	bool supports_mux;
 	int optimus_funcs;
+	struct pci_dev *parent_pdev;
+
+	if (pdev->vendor != PCI_VENDOR_ID_NVIDIA)
+		return;
+
+	*has_pr3 = false;
+	parent_pdev = pci_upstream_bridge(pdev);
+	if (parent_pdev) {
+		if (parent_pdev->bridge_d3)
+			*has_pr3 = pci_pr3_present(parent_pdev);
+		else
+			pci_d3cold_disable(pdev);
+	}
 
 #ifdef __NetBSD__
 	dhandle = pdev->pd_ad->ad_handle;
@@ -286,7 +267,6 @@ static void nouveau_dsm_pci_probe(struct pci_dev *pdev, acpi_handle *dhandle_out
 	*has_mux = supports_mux;
 	*has_opt = !!optimus_funcs;
 	*has_opt_flags = optimus_funcs & (1 << NOUVEAU_DSM_OPTIMUS_FLAGS);
-	*has_pr3 = false;
 
 	if (optimus_funcs) {
 		uint32_t result;
@@ -296,8 +276,6 @@ static void nouveau_dsm_pci_probe(struct pci_dev *pdev, acpi_handle *dhandle_out
 			 (result & OPTIMUS_ENABLED) ? "enabled" : "disabled",
 			 (result & OPTIMUS_DYNAMIC_PWR_CAP) ? "dynamic power, " : "",
 			 (result & OPTIMUS_HDA_CODEC_MASK) ? "hda bios codec supported" : "");
-
-		*has_pr3 = nouveau_pr3_present(pdev);
 	}
 }
 
@@ -401,6 +379,7 @@ void nouveau_unregister_dsm_handler(void) {}
 void nouveau_switcheroo_optimus_dsm(void) {}
 #endif
 
+<<<<<<< HEAD
 /* retrieve the ROM in 4k blocks */
 static int nouveau_rom_call(acpi_handle rom_handle, uint8_t *bios,
 			    int offset, int len)
@@ -462,6 +441,8 @@ int nouveau_acpi_get_bios_chunk(uint8_t *bios, int offset, int len)
 	return nouveau_rom_call(nouveau_dsm_priv.rom_handle, bios, offset, len);
 }
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 void *
 nouveau_acpi_edid(struct drm_device *dev, struct drm_connector *connector)
 {
@@ -469,7 +450,6 @@ nouveau_acpi_edid(struct drm_device *dev, struct drm_connector *connector)
 	return NULL;
 #else
 	struct acpi_device *acpidev;
-	acpi_handle handle;
 	int type, ret;
 	void *edid;
 
@@ -482,6 +462,7 @@ nouveau_acpi_edid(struct drm_device *dev, struct drm_connector *connector)
 		return NULL;
 	}
 
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	handle = (dev->pdev->pd_ad ? dev->pdev->pd_ad->ad_handle : NULL);
 #else
@@ -492,6 +473,10 @@ nouveau_acpi_edid(struct drm_device *dev, struct drm_connector *connector)
 
 	ret = acpi_bus_get_device(handle, &acpidev);
 	if (ret)
+=======
+	acpidev = ACPI_COMPANION(dev->dev);
+	if (!acpidev)
+>>>>>>> vendor/linux-drm-v6.6.35
 		return NULL;
 
 	ret = acpi_video_get_edid(acpidev, type, -1, &edid);
@@ -500,4 +485,14 @@ nouveau_acpi_edid(struct drm_device *dev, struct drm_connector *connector)
 
 	return kmemdup(edid, EDID_LENGTH, GFP_KERNEL);
 #endif
+}
+
+bool nouveau_acpi_video_backlight_use_native(void)
+{
+	return acpi_video_backlight_use_native();
+}
+
+void nouveau_acpi_video_register_backlight(void)
+{
+	acpi_video_register_backlight();
 }

@@ -49,15 +49,14 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_sa.c,v 1.4 2021/12/18 23:45:43 riastradh Exp 
 
 #include "radeon.h"
 
-static void radeon_sa_bo_remove_locked(struct radeon_sa_bo *sa_bo);
-static void radeon_sa_bo_try_free(struct radeon_sa_manager *sa_manager);
-
 int radeon_sa_bo_manager_init(struct radeon_device *rdev,
 			      struct radeon_sa_manager *sa_manager,
-			      unsigned size, u32 align, u32 domain, u32 flags)
+			      unsigned int size, u32 sa_align, u32 domain,
+			      u32 flags)
 {
-	int i, r;
+	int r;
 
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	spin_lock_init(&sa_manager->wq_lock);
 	DRM_INIT_WAITQUEUE(&sa_manager->wq, "radsabom");
@@ -75,11 +74,18 @@ int radeon_sa_bo_manager_init(struct radeon_device *rdev,
 	}
 
 	r = radeon_bo_create(rdev, size, align, true,
+=======
+	r = radeon_bo_create(rdev, size, RADEON_GPU_PAGE_SIZE, true,
+>>>>>>> vendor/linux-drm-v6.6.35
 			     domain, flags, NULL, NULL, &sa_manager->bo);
 	if (r) {
 		dev_err(rdev->dev, "(%d) failed to allocate bo for manager\n", r);
 		return r;
 	}
+
+	sa_manager->domain = domain;
+
+	drm_suballoc_manager_init(&sa_manager->base, size, sa_align);
 
 	return r;
 }
@@ -87,24 +93,16 @@ int radeon_sa_bo_manager_init(struct radeon_device *rdev,
 void radeon_sa_bo_manager_fini(struct radeon_device *rdev,
 			       struct radeon_sa_manager *sa_manager)
 {
-	struct radeon_sa_bo *sa_bo, *tmp;
-
-	if (!list_empty(&sa_manager->olist)) {
-		sa_manager->hole = &sa_manager->olist,
-		radeon_sa_bo_try_free(sa_manager);
-		if (!list_empty(&sa_manager->olist)) {
-			dev_err(rdev->dev, "sa_manager is not empty, clearing anyway\n");
-		}
-	}
-	list_for_each_entry_safe(sa_bo, tmp, &sa_manager->olist, olist) {
-		radeon_sa_bo_remove_locked(sa_bo);
-	}
+	drm_suballoc_manager_fini(&sa_manager->base);
 	radeon_bo_unref(&sa_manager->bo);
+<<<<<<< HEAD
 	sa_manager->size = 0;
 #ifdef __NetBSD__
 	DRM_DESTROY_WAITQUEUE(&sa_manager->wq);
 	spin_lock_destroy(&sa_manager->wq_lock);
 #endif
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 }
 
 int radeon_sa_bo_manager_start(struct radeon_device *rdev,
@@ -153,44 +151,23 @@ int radeon_sa_bo_manager_suspend(struct radeon_device *rdev,
 	return r;
 }
 
-static void radeon_sa_bo_remove_locked(struct radeon_sa_bo *sa_bo)
+int radeon_sa_bo_new(struct radeon_sa_manager *sa_manager,
+		     struct drm_suballoc **sa_bo,
+		     unsigned int size, unsigned int align)
 {
-	struct radeon_sa_manager *sa_manager = sa_bo->manager;
-	if (sa_manager->hole == &sa_bo->olist) {
-		sa_manager->hole = sa_bo->olist.prev;
+	struct drm_suballoc *sa = drm_suballoc_new(&sa_manager->base, size,
+						   GFP_KERNEL, false, align);
+
+	if (IS_ERR(sa)) {
+		*sa_bo = NULL;
+		return PTR_ERR(sa);
 	}
-	list_del_init(&sa_bo->olist);
-	list_del_init(&sa_bo->flist);
-	radeon_fence_unref(&sa_bo->fence);
-	kfree(sa_bo);
-}
 
-static void radeon_sa_bo_try_free(struct radeon_sa_manager *sa_manager)
-{
-	struct radeon_sa_bo *sa_bo, *tmp;
-
-	if (sa_manager->hole->next == &sa_manager->olist)
-		return;
-
-	sa_bo = list_entry(sa_manager->hole->next, struct radeon_sa_bo, olist);
-	list_for_each_entry_safe_from(sa_bo, tmp, &sa_manager->olist, olist) {
-		if (sa_bo->fence == NULL || !radeon_fence_signaled(sa_bo->fence)) {
-			return;
-		}
-		radeon_sa_bo_remove_locked(sa_bo);
-	}
-}
-
-static inline unsigned radeon_sa_bo_hole_soffset(struct radeon_sa_manager *sa_manager)
-{
-	struct list_head *hole = sa_manager->hole;
-
-	if (hole != &sa_manager->olist) {
-		return list_entry(hole, struct radeon_sa_bo, olist)->eoffset;
-	}
+	*sa_bo = sa;
 	return 0;
 }
 
+<<<<<<< HEAD
 static inline unsigned radeon_sa_bo_hole_eoffset(struct radeon_sa_manager *sa_manager)
 {
 	struct list_head *hole = sa_manager->hole;
@@ -413,14 +390,16 @@ int radeon_sa_bo_new(struct radeon_device *rdev,
 }
 
 void radeon_sa_bo_free(struct radeon_device *rdev, struct radeon_sa_bo **sa_bo,
+=======
+void radeon_sa_bo_free(struct drm_suballoc **sa_bo,
+>>>>>>> vendor/linux-drm-v6.6.35
 		       struct radeon_fence *fence)
 {
-	struct radeon_sa_manager *sa_manager;
-
 	if (sa_bo == NULL || *sa_bo == NULL) {
 		return;
 	}
 
+<<<<<<< HEAD
 	sa_manager = (*sa_bo)->manager;
 #ifdef __NetBSD__
 	spin_lock(&sa_manager->wq_lock);
@@ -441,6 +420,13 @@ void radeon_sa_bo_free(struct radeon_device *rdev, struct radeon_sa_bo **sa_bo,
 	wake_up_all_locked(&sa_manager->wq);
 	spin_unlock(&sa_manager->wq.lock);
 #endif
+=======
+	if (fence)
+		drm_suballoc_free(*sa_bo, &fence->base);
+	else
+		drm_suballoc_free(*sa_bo, NULL);
+
+>>>>>>> vendor/linux-drm-v6.6.35
 	*sa_bo = NULL;
 }
 
@@ -448,25 +434,8 @@ void radeon_sa_bo_free(struct radeon_device *rdev, struct radeon_sa_bo **sa_bo,
 void radeon_sa_bo_dump_debug_info(struct radeon_sa_manager *sa_manager,
 				  struct seq_file *m)
 {
-	struct radeon_sa_bo *i;
+	struct drm_printer p = drm_seq_file_printer(m);
 
-	spin_lock(&sa_manager->wq.lock);
-	list_for_each_entry(i, &sa_manager->olist, olist) {
-		uint64_t soffset = i->soffset + sa_manager->gpu_addr;
-		uint64_t eoffset = i->eoffset + sa_manager->gpu_addr;
-		if (&i->olist == sa_manager->hole) {
-			seq_printf(m, ">");
-		} else {
-			seq_printf(m, " ");
-		}
-		seq_printf(m, "[0x%010llx 0x%010llx] size %8lld",
-			   soffset, eoffset, eoffset - soffset);
-		if (i->fence) {
-			seq_printf(m, " protected by 0x%016llx on ring %d",
-				   i->fence->seq, i->fence->ring);
-		}
-		seq_printf(m, "\n");
-	}
-	spin_unlock(&sa_manager->wq.lock);
+	drm_suballoc_dump_debug_info(&sa_manager->base, &p, sa_manager->gpu_addr);
 }
 #endif

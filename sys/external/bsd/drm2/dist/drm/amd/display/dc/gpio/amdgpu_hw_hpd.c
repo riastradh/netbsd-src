@@ -28,8 +28,6 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: amdgpu_hw_hpd.c,v 1.3 2021/12/19 12:02:39 riastradh Exp $");
 
-#include <linux/slab.h>
-
 #include "dm_services.h"
 
 #include "include/gpio_interface.h"

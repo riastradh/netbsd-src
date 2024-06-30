@@ -27,6 +27,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_dce6_afmt.c,v 1.2 2021/12/18 23:45:43 riastra
 
 #include <linux/hdmi.h>
 
+#include "dce6_afmt.h"
 #include "radeon.h"
 #include "radeon_audio.h"
 #include "sid.h"

@@ -571,7 +571,8 @@ out:
 		u32 offset = (r->offset + i) << imem->iommu_pgshift;
 
 		ret = iommu_map(imem->domain, offset, node->dma_addrs[i],
-				PAGE_SIZE, IOMMU_READ | IOMMU_WRITE);
+				PAGE_SIZE, IOMMU_READ | IOMMU_WRITE,
+				GFP_KERNEL);
 		if (ret < 0) {
 			nvkm_error(subdev, "IOMMU mapping failure: %d\n", ret);
 
@@ -676,7 +677,7 @@ gk20a_instmem = {
 };
 
 int
-gk20a_instmem_new(struct nvkm_device *device, int index,
+gk20a_instmem_new(struct nvkm_device *device, enum nvkm_subdev_type type, int inst,
 		  struct nvkm_instmem **pimem)
 {
 #ifndef __NetBSD__
@@ -686,7 +687,7 @@ gk20a_instmem_new(struct nvkm_device *device, int index,
 
 	if (!(imem = kzalloc(sizeof(*imem), GFP_KERNEL)))
 		return -ENOMEM;
-	nvkm_instmem_ctor(&gk20a_instmem, device, index, &imem->base);
+	nvkm_instmem_ctor(&gk20a_instmem, device, type, inst, &imem->base);
 	mutex_init(&imem->lock);
 	*pimem = &imem->base;
 
@@ -708,8 +709,7 @@ gk20a_instmem_new(struct nvkm_device *device, int index,
 
 		nvkm_info(&imem->base.subdev, "using IOMMU\n");
 	} else {
-		imem->attrs = DMA_ATTR_NON_CONSISTENT |
-			      DMA_ATTR_WEAK_ORDERING |
+		imem->attrs = DMA_ATTR_WEAK_ORDERING |
 			      DMA_ATTR_WRITE_COMBINE;
 
 		nvkm_info(&imem->base.subdev, "using DMA API\n");

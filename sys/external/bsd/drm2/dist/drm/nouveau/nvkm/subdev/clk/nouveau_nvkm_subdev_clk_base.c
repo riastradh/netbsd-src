@@ -95,7 +95,7 @@ nvkm_cstate_valid(struct nvkm_clk *clk, struct nvkm_cstate *cstate,
 			case NVKM_CLK_BOOST_NONE:
 				if (clk->base_khz && freq > clk->base_khz)
 					return false;
-				/* fall through */
+				fallthrough;
 			case NVKM_CLK_BOOST_BIOS:
 				if (clk->boost_khz && freq > clk->boost_khz)
 					return false;
@@ -140,10 +140,10 @@ nvkm_cstate_find_best(struct nvkm_clk *clk, struct nvkm_pstate *pstate,
 
 	list_for_each_entry_from_reverse(cstate, &pstate->list, head) {
 		if (nvkm_cstate_valid(clk, cstate, max_volt, clk->temp))
-			break;
+			return cstate;
 	}
 
-	return cstate;
+	return NULL;
 }
 
 static struct nvkm_cstate *
@@ -174,6 +174,8 @@ nvkm_cstate_prog(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int cstatei)
 	if (!list_empty(&pstate->list)) {
 		cstate = nvkm_cstate_get(clk, pstate, cstatei);
 		cstate = nvkm_cstate_find_best(clk, pstate, cstate);
+		if (!cstate)
+			return -EINVAL;
 	} else {
 		cstate = &pstate->base;
 	}
@@ -340,9 +342,12 @@ nvkm_pstate_work(struct work_struct *work)
 	DRM_SPIN_WAKEUP_ALL(&clk->wait, &clk->lock);
 #else
 	wake_up_all(&clk->wait);
+<<<<<<< HEAD
 #endif
 	spin_unlock(&clk->lock);
 	nvkm_notify_get(&clk->pwrsrc_ntfy);
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static int
@@ -449,7 +454,6 @@ nvkm_pstate_new(struct nvkm_clk *clk, int idx)
 		return 0;
 
 	pstate = kzalloc(sizeof(*pstate), GFP_KERNEL);
-	cstate = &pstate->base;
 	if (!pstate)
 		return -ENOMEM;
 
@@ -459,6 +463,7 @@ nvkm_pstate_new(struct nvkm_clk *clk, int idx)
 	pstate->fanspeed = perfE.fanspeed;
 	pstate->pcie_speed = perfE.pcie_speed;
 	pstate->pcie_width = perfE.pcie_width;
+	cstate = &pstate->base;
 	cstate->voltage = perfE.voltage;
 	cstate->domain[nv_clk_src_core] = perfE.core;
 	cstate->domain[nv_clk_src_shader] = perfE.shader;
@@ -589,13 +594,12 @@ nvkm_clk_dstate(struct nvkm_clk *clk, int req, int rel)
 	return nvkm_pstate_calc(clk, true);
 }
 
-static int
-nvkm_clk_pwrsrc(struct nvkm_notify *notify)
+int
+nvkm_clk_pwrsrc(struct nvkm_device *device)
 {
-	struct nvkm_clk *clk =
-		container_of(notify, typeof(*clk), pwrsrc_ntfy);
-	nvkm_pstate_calc(clk, false);
-	return NVKM_NOTIFY_DROP;
+	if (device->clk)
+		return nvkm_pstate_calc(device->clk, false);
+	return 0;
 }
 
 /******************************************************************************
@@ -612,7 +616,6 @@ static int
 nvkm_clk_fini(struct nvkm_subdev *subdev, bool suspend)
 {
 	struct nvkm_clk *clk = nvkm_clk(subdev);
-	nvkm_notify_put(&clk->pwrsrc_ntfy);
 	flush_work(&clk->work);
 	if (clk->func->fini)
 		clk->func->fini(clk);
@@ -659,8 +662,6 @@ nvkm_clk_dtor(struct nvkm_subdev *subdev)
 	struct nvkm_clk *clk = nvkm_clk(subdev);
 	struct nvkm_pstate *pstate, *temp;
 
-	nvkm_notify_fini(&clk->pwrsrc_ntfy);
-
 	/* Early return if the pstates have been provided statically */
 	if (clk->func->pstates)
 		return clk;
@@ -686,7 +687,7 @@ nvkm_clk = {
 
 int
 nvkm_clk_ctor(const struct nvkm_clk_func *func, struct nvkm_device *device,
-	      int index, bool allow_reclock, struct nvkm_clk *clk)
+	      enum nvkm_subdev_type type, int inst, bool allow_reclock, struct nvkm_clk *clk)
 {
 	struct nvkm_subdev *subdev = &clk->subdev;
 	struct nvkm_bios *bios = device->bios;
@@ -694,7 +695,7 @@ nvkm_clk_ctor(const struct nvkm_clk_func *func, struct nvkm_device *device,
 	const char *mode;
 	struct nvbios_vpstate_header h;
 
-	nvkm_subdev_ctor(&nvkm_clk, device, index, subdev);
+	nvkm_subdev_ctor(&nvkm_clk, device, type, inst, subdev);
 
 	if (bios && !nvbios_vpstate_parse(bios, &h)) {
 		struct nvbios_vpstate_entry base, boost;
@@ -732,11 +733,6 @@ nvkm_clk_ctor(const struct nvkm_clk_func *func, struct nvkm_device *device,
 		clk->state_nr = func->nr_pstates;
 	}
 
-	ret = nvkm_notify_init(NULL, &device->event, nvkm_clk_pwrsrc, true,
-			       NULL, 0, 0, &clk->pwrsrc_ntfy);
-	if (ret)
-		return ret;
-
 	mode = nvkm_stropt(device->cfgopt, "NvClkMode", &arglen);
 	if (mode) {
 		clk->ustate_ac = nvkm_clk_nstate(clk, mode, arglen);
@@ -758,9 +754,9 @@ nvkm_clk_ctor(const struct nvkm_clk_func *func, struct nvkm_device *device,
 
 int
 nvkm_clk_new_(const struct nvkm_clk_func *func, struct nvkm_device *device,
-	      int index, bool allow_reclock, struct nvkm_clk **pclk)
+	      enum nvkm_subdev_type type, int inst, bool allow_reclock, struct nvkm_clk **pclk)
 {
 	if (!(*pclk = kzalloc(sizeof(**pclk), GFP_KERNEL)))
 		return -ENOMEM;
-	return nvkm_clk_ctor(func, device, index, allow_reclock, *pclk);
+	return nvkm_clk_ctor(func, device, type, inst, allow_reclock, *pclk);
 }

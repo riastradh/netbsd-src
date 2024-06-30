@@ -32,6 +32,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_evergreen_hdmi.c,v 1.2 2021/12/18 23:45:43 ri
 #include <linux/hdmi.h>
 
 #include <drm/radeon_drm.h>
+#include "evergreen_hdmi.h"
 #include "radeon.h"
 #include "radeon_asic.h"
 #include "radeon_audio.h"

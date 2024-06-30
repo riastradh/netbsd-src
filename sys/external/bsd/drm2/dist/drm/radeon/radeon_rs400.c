@@ -34,7 +34,6 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_rs400.c,v 1.2 2021/12/18 23:45:43 riastradh E
 #include <linux/seq_file.h>
 #include <linux/slab.h>
 
-#include <drm/drm_debugfs.h>
 #include <drm/drm_device.h>
 #include <drm/drm_file.h>
 
@@ -43,7 +42,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_rs400.c,v 1.2 2021/12/18 23:45:43 riastradh E
 #include "rs400d.h"
 
 /* This files gather functions specifics to : rs400,rs480 */
-static int rs400_debugfs_pcie_gart_info_init(struct radeon_device *rdev);
+static void rs400_debugfs_pcie_gart_info_init(struct radeon_device *rdev);
 
 void rs400_gart_adjust_size(struct radeon_device *rdev)
 {
@@ -108,8 +107,7 @@ int rs400_gart_init(struct radeon_device *rdev)
 	r = radeon_gart_init(rdev);
 	if (r)
 		return r;
-	if (rs400_debugfs_pcie_gart_info_init(rdev))
-		DRM_ERROR("Failed to register debugfs file for RS400 GART !\n");
+	rs400_debugfs_pcie_gart_info_init(rdev);
 	rdev->gart.table_size = rdev->gart.num_gpu_pages * 4;
 	return radeon_gart_table_ram_alloc(rdev);
 }
@@ -312,11 +310,9 @@ void rs400_mc_wreg(struct radeon_device *rdev, uint32_t reg, uint32_t v)
 }
 
 #if defined(CONFIG_DEBUG_FS)
-static int rs400_debugfs_gart_info(struct seq_file *m, void *data)
+static int rs400_debugfs_gart_info_show(struct seq_file *m, void *unused)
 {
-	struct drm_info_node *node = (struct drm_info_node *) m->private;
-	struct drm_device *dev = node->minor->dev;
-	struct radeon_device *rdev = dev->dev_private;
+	struct radeon_device *rdev = m->private;
 	uint32_t tmp;
 
 	tmp = RREG32(RADEON_HOST_PATH_CNTL);
@@ -381,17 +377,16 @@ static int rs400_debugfs_gart_info(struct seq_file *m, void *data)
 	return 0;
 }
 
-static struct drm_info_list rs400_gart_info_list[] = {
-	{"rs400_gart_info", rs400_debugfs_gart_info, 0, NULL},
-};
+DEFINE_SHOW_ATTRIBUTE(rs400_debugfs_gart_info);
 #endif
 
-static int rs400_debugfs_pcie_gart_info_init(struct radeon_device *rdev)
+static void rs400_debugfs_pcie_gart_info_init(struct radeon_device *rdev)
 {
 #if defined(CONFIG_DEBUG_FS)
-	return radeon_debugfs_add_files(rdev, rs400_gart_info_list, 1);
-#else
-	return 0;
+	struct dentry *root = rdev->ddev->primary->debugfs_root;
+
+	debugfs_create_file("rs400_gart_info", 0444, root, rdev,
+			    &rs400_debugfs_gart_info_fops);
 #endif
 }
 
@@ -565,9 +560,7 @@ int rs400_init(struct radeon_device *rdev)
 	/* initialize memory controller */
 	rs400_mc_init(rdev);
 	/* Fence driver */
-	r = radeon_fence_driver_init(rdev);
-	if (r)
-		return r;
+	radeon_fence_driver_init(rdev);
 	/* Memory manager */
 	r = radeon_bo_init(rdev);
 	if (r)

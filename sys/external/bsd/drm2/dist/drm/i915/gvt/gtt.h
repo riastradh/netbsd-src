@@ -36,9 +36,18 @@
 #ifndef _GVT_GTT_H_
 #define _GVT_GTT_H_
 
-#define I915_GTT_PAGE_SHIFT         12
+#include <linux/kernel.h>
+#include <linux/kref.h>
+#include <linux/mutex.h>
+#include <linux/radix-tree.h>
 
+#include "gt/intel_gtt.h"
+
+struct intel_gvt;
+struct intel_vgpu;
 struct intel_vgpu_mm;
+
+#define I915_GTT_PAGE_SHIFT         12
 
 #define INTEL_GVT_INVALID_ADDR (~0UL)
 
@@ -84,8 +93,8 @@ struct intel_gvt_gtt_gma_ops {
 };
 
 struct intel_gvt_gtt {
-	struct intel_gvt_gtt_pte_ops *pte_ops;
-	struct intel_gvt_gtt_gma_ops *gma_ops;
+	const struct intel_gvt_gtt_pte_ops *pte_ops;
+	const struct intel_gvt_gtt_gma_ops *gma_ops;
 	int (*mm_alloc_page_table)(struct intel_vgpu_mm *mm);
 	void (*mm_free_page_table)(struct intel_vgpu_mm *mm);
 	struct list_head oos_page_use_list_head;
@@ -162,9 +171,13 @@ struct intel_vgpu_mm {
 
 			struct list_head list;
 			struct list_head lru_list;
+			struct list_head link; /* possible LRI shadow mm list */
 		} ppgtt_mm;
 		struct {
 			void *virtual_ggtt;
+			/* Save/restore for PM */
+			u64 *host_ggtt_aperture;
+			u64 *host_ggtt_hidden;
 			struct list_head partial_pte_list;
 		} ggtt_mm;
 	};
@@ -213,7 +226,6 @@ void intel_vgpu_reset_ggtt(struct intel_vgpu *vgpu, bool invalidate_old);
 void intel_vgpu_invalidate_ppgtt(struct intel_vgpu *vgpu);
 
 int intel_gvt_init_gtt(struct intel_gvt *gvt);
-void intel_vgpu_reset_gtt(struct intel_vgpu *vgpu);
 void intel_gvt_clean_gtt(struct intel_gvt *gvt);
 
 struct intel_vgpu_mm *intel_gvt_find_ppgtt_mm(struct intel_vgpu *vgpu,
@@ -279,5 +291,8 @@ int intel_vgpu_emulate_ggtt_mmio_read(struct intel_vgpu *vgpu,
 
 int intel_vgpu_emulate_ggtt_mmio_write(struct intel_vgpu *vgpu,
 	unsigned int off, void *p_data, unsigned int bytes);
+
+void intel_vgpu_destroy_all_ppgtt_mm(struct intel_vgpu *vgpu);
+void intel_gvt_restore_ggtt(struct intel_gvt *gvt);
 
 #endif /* _GVT_GTT_H_ */

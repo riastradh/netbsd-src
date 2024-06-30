@@ -28,9 +28,6 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: amdgpu_dce110_compressor.c,v 1.3 2021/12/19 10:59:02 riastradh Exp $");
 
-#include <linux/delay.h>
-#include <linux/slab.h>
-
 #include "dm_services.h"
 
 #include "dce/dce_11_0_d.h"
@@ -417,6 +414,7 @@ void dce110_compressor_destroy(struct compressor **compressor)
 	*compressor = NULL;
 }
 
+<<<<<<< HEAD
 static __unused
 bool dce110_get_required_compressed_surfacesize(struct fbc_input_info fbc_input_info,
 						struct fbc_requested_compressed_size size)
@@ -448,6 +446,8 @@ bool dce110_get_required_compressed_surfacesize(struct fbc_input_info fbc_input_
 }
 
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 void get_max_support_fbc_buffersize(unsigned int *max_x, unsigned int *max_y)
 {
 	*max_x = FBC_MAX_X;
@@ -461,6 +461,7 @@ void get_max_support_fbc_buffersize(unsigned int *max_x, unsigned int *max_y)
 	 */
 }
 
+<<<<<<< HEAD
 
 static __unused
 unsigned int controller_id_to_index(enum controller_id controller_id)
@@ -487,6 +488,8 @@ unsigned int controller_id_to_index(enum controller_id controller_id)
 }
 
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 static const struct compressor_funcs dce110_compressor_funcs = {
 	.power_up_fbc = dce110_compressor_power_up_fbc,
 	.enable_fbc = dce110_compressor_enable_fbc,

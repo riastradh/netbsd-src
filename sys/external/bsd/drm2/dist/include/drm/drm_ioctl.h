@@ -76,6 +76,7 @@ typedef int drm_ioctl_compat_t(struct file *filp, unsigned int cmd,
 #define	DRM_MAJOR	cdevsw_lookup_major(&drm_cdevsw)
 #else
 #define DRM_IOCTL_NR(n)                _IOC_NR(n)
+#define DRM_IOCTL_TYPE(n)              _IOC_TYPE(n)
 #define DRM_MAJOR       226
 #endif
 
@@ -175,12 +176,15 @@ struct drm_ioctl_desc {
 		.name = #ioctl						\
 	}
 
+<<<<<<< HEAD
 int drm_ioctl_permit(u32 flags, struct drm_file *file_priv);
 #ifdef __NetBSD__
 int drm_ioctl(struct file *, unsigned long, void *);
 void drm_suspend_ioctl(struct drm_device *);
 void drm_resume_ioctl(struct drm_device *);
 #else
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 long drm_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
 #endif
 long drm_ioctl_kernel(struct file *, drm_ioctl_t, void *, u32);

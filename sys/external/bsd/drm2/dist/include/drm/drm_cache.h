@@ -37,7 +37,11 @@
 
 #include <linux/scatterlist.h>
 
+<<<<<<< HEAD
 struct page;
+=======
+struct iosys_map;
+>>>>>>> vendor/linux-drm-v6.6.35
 
 void drm_clflush_pages(struct page *pages[], unsigned long num_pages);
 void drm_clflush_sg(struct sg_table *st);
@@ -69,9 +73,22 @@ static inline bool drm_arch_can_wc_memory(void)
 	 * optimization entirely for ARM and arm64.
 	 */
 	return false;
+#elif defined(CONFIG_LOONGARCH)
+	/*
+	 * LoongArch maintains cache coherency in hardware, but its WUC attribute
+	 * (Weak-ordered UnCached, which is similar to WC) is out of the scope of
+	 * cache coherency machanism. This means WUC can only used for write-only
+	 * memory regions.
+	 */
+	return false;
 #else
 	return true;
 #endif
 }
 
+void drm_memcpy_init_early(void);
+
+void drm_memcpy_from_wc(struct iosys_map *dst,
+			const struct iosys_map *src,
+			unsigned long len);
 #endif

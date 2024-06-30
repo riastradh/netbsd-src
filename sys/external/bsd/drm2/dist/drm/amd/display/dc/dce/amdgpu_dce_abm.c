@@ -60,7 +60,7 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_dce_abm.c,v 1.3 2021/12/19 11:23:26 riastradh
 
 #define MCP_DISABLE_ABM_IMMEDIATELY 255
 
-static bool dce_abm_set_pipe(struct abm *abm, uint32_t controller_id)
+static bool dce_abm_set_pipe(struct abm *abm, uint32_t controller_id, uint32_t panel_inst)
 {
 	struct dce_abm *abm_dce = TO_DCE_ABM(abm);
 	uint32_t rampingBoundary = 0xFFFF;
@@ -88,6 +88,7 @@ static bool dce_abm_set_pipe(struct abm *abm, uint32_t controller_id)
 	return true;
 }
 
+<<<<<<< HEAD
 static unsigned int calculate_16_bit_backlight_from_pwm(struct dce_abm *abm_dce)
 {
 	uint64_t current_backlight;
@@ -202,11 +203,14 @@ static void driver_set_backlight_level(struct dce_abm *abm_dce,
 			1, 10000);
 }
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 static void dmcu_set_backlight_level(
 	struct dce_abm *abm_dce,
 	uint32_t backlight_pwm_u16_16,
 	uint32_t frame_ramp,
-	uint32_t controller_id)
+	uint32_t controller_id,
+	uint32_t panel_id)
 {
 	unsigned int backlight_8_bit = 0;
 	uint32_t s2;
@@ -218,7 +222,7 @@ static void dmcu_set_backlight_level(
 		// Take MSB of fractional part since backlight is not max
 		backlight_8_bit = (backlight_pwm_u16_16 >> 8) & 0xFF;
 
-	dce_abm_set_pipe(&abm_dce->base, controller_id);
+	dce_abm_set_pipe(&abm_dce->base, controller_id, panel_id);
 
 	/* waitDMCUReadyForCmd */
 	REG_WAIT(MASTER_COMM_CNTL_REG, MASTER_COMM_INTERRUPT,
@@ -253,10 +257,9 @@ static void dmcu_set_backlight_level(
 			0, 1, 80000);
 }
 
-static void dce_abm_init(struct abm *abm)
+static void dce_abm_init(struct abm *abm, uint32_t backlight)
 {
 	struct dce_abm *abm_dce = TO_DCE_ABM(abm);
-	unsigned int backlight = calculate_16_bit_backlight_from_pwm(abm_dce);
 
 	REG_WRITE(DC_ABM1_HG_SAMPLE_RATE, 0x103);
 	REG_WRITE(DC_ABM1_HG_SAMPLE_RATE, 0x101);
@@ -336,86 +339,12 @@ static bool dce_abm_set_level(struct abm *abm, uint32_t level)
 	return true;
 }
 
-static bool dce_abm_immediate_disable(struct abm *abm)
+static bool dce_abm_immediate_disable(struct abm *abm, uint32_t panel_inst)
 {
-	struct dce_abm *abm_dce = TO_DCE_ABM(abm);
-
 	if (abm->dmcu_is_running == false)
 		return true;
 
-	dce_abm_set_pipe(abm, MCP_DISABLE_ABM_IMMEDIATELY);
-
-	abm->stored_backlight_registers.BL_PWM_CNTL =
-		REG_READ(BL_PWM_CNTL);
-	abm->stored_backlight_registers.BL_PWM_CNTL2 =
-		REG_READ(BL_PWM_CNTL2);
-	abm->stored_backlight_registers.BL_PWM_PERIOD_CNTL =
-		REG_READ(BL_PWM_PERIOD_CNTL);
-
-	REG_GET(LVTMA_PWRSEQ_REF_DIV, BL_PWM_REF_DIV,
-		&abm->stored_backlight_registers.LVTMA_PWRSEQ_REF_DIV_BL_PWM_REF_DIV);
-	return true;
-}
-
-static bool dce_abm_init_backlight(struct abm *abm)
-{
-	struct dce_abm *abm_dce = TO_DCE_ABM(abm);
-	uint32_t value;
-
-	/* It must not be 0, so we have to restore them
-	 * Bios bug w/a - period resets to zero,
-	 * restoring to cache values which is always correct
-	 */
-	REG_GET(BL_PWM_CNTL, BL_ACTIVE_INT_FRAC_CNT, &value);
-	if (value == 0 || value == 1) {
-		if (abm->stored_backlight_registers.BL_PWM_CNTL != 0) {
-			REG_WRITE(BL_PWM_CNTL,
-				abm->stored_backlight_registers.BL_PWM_CNTL);
-			REG_WRITE(BL_PWM_CNTL2,
-				abm->stored_backlight_registers.BL_PWM_CNTL2);
-			REG_WRITE(BL_PWM_PERIOD_CNTL,
-				abm->stored_backlight_registers.BL_PWM_PERIOD_CNTL);
-			REG_UPDATE(LVTMA_PWRSEQ_REF_DIV,
-				BL_PWM_REF_DIV,
-				abm->stored_backlight_registers.
-				LVTMA_PWRSEQ_REF_DIV_BL_PWM_REF_DIV);
-		} else {
-			/* TODO: Note: This should not really happen since VBIOS
-			 * should have initialized PWM registers on boot.
-			 */
-			REG_WRITE(BL_PWM_CNTL, 0xC000FA00);
-			REG_WRITE(BL_PWM_PERIOD_CNTL, 0x000C0FA0);
-		}
-	} else {
-		abm->stored_backlight_registers.BL_PWM_CNTL =
-				REG_READ(BL_PWM_CNTL);
-		abm->stored_backlight_registers.BL_PWM_CNTL2 =
-				REG_READ(BL_PWM_CNTL2);
-		abm->stored_backlight_registers.BL_PWM_PERIOD_CNTL =
-				REG_READ(BL_PWM_PERIOD_CNTL);
-
-		REG_GET(LVTMA_PWRSEQ_REF_DIV, BL_PWM_REF_DIV,
-				&abm->stored_backlight_registers.
-				LVTMA_PWRSEQ_REF_DIV_BL_PWM_REF_DIV);
-	}
-
-	/* Have driver take backlight control
-	 * TakeBacklightControl(true)
-	 */
-	value = REG_READ(BIOS_SCRATCH_2);
-	value |= ATOM_S2_VRI_BRIGHT_ENABLE;
-	REG_WRITE(BIOS_SCRATCH_2, value);
-
-	/* Enable the backlight output */
-	REG_UPDATE(BL_PWM_CNTL, BL_PWM_EN, 1);
-
-	/* Disable fractional pwm if configured */
-	REG_UPDATE(BL_PWM_CNTL, BL_PWM_FRACTIONAL_EN,
-		   abm->ctx->dc->config.disable_fractional_pwm ? 0 : 1);
-
-	/* Unlock group 2 backlight registers */
-	REG_UPDATE(BL_PWM_GRP1_REG_LOCK,
-			BL_PWM_GRP1_REG_LOCK, 0);
+	dce_abm_set_pipe(abm, MCP_DISABLE_ABM_IMMEDIATELY, panel_inst);
 
 	return true;
 }
@@ -425,21 +354,18 @@ static bool dce_abm_set_backlight_level_pwm(
 		unsigned int backlight_pwm_u16_16,
 		unsigned int frame_ramp,
 		unsigned int controller_id,
-		bool use_smooth_brightness)
+		unsigned int panel_inst)
 {
 	struct dce_abm *abm_dce = TO_DCE_ABM(abm);
 
 	DC_LOG_BACKLIGHT("New Backlight level: %d (0x%X)\n",
 			backlight_pwm_u16_16, backlight_pwm_u16_16);
 
-	/* If DMCU is in reset state, DMCU is uninitialized */
-	if (use_smooth_brightness)
-		dmcu_set_backlight_level(abm_dce,
-				backlight_pwm_u16_16,
-				frame_ramp,
-				controller_id);
-	else
-		driver_set_backlight_level(abm_dce, backlight_pwm_u16_16);
+	dmcu_set_backlight_level(abm_dce,
+			backlight_pwm_u16_16,
+			frame_ramp,
+			controller_id,
+			panel_inst);
 
 	return true;
 }
@@ -447,12 +373,12 @@ static bool dce_abm_set_backlight_level_pwm(
 static const struct abm_funcs dce_funcs = {
 	.abm_init = dce_abm_init,
 	.set_abm_level = dce_abm_set_level,
-	.init_backlight = dce_abm_init_backlight,
 	.set_pipe = dce_abm_set_pipe,
 	.set_backlight_level_pwm = dce_abm_set_backlight_level_pwm,
 	.get_current_backlight = dce_abm_get_current_backlight,
 	.get_target_backlight = dce_abm_get_target_backlight,
-	.set_abm_immediate_disable = dce_abm_immediate_disable
+	.init_abm_config = NULL,
+	.set_abm_immediate_disable = dce_abm_immediate_disable,
 };
 
 static void dce_abm_construct(
@@ -466,10 +392,6 @@ static void dce_abm_construct(
 
 	base->ctx = ctx;
 	base->funcs = &dce_funcs;
-	base->stored_backlight_registers.BL_PWM_CNTL = 0;
-	base->stored_backlight_registers.BL_PWM_CNTL2 = 0;
-	base->stored_backlight_registers.BL_PWM_PERIOD_CNTL = 0;
-	base->stored_backlight_registers.LVTMA_PWRSEQ_REF_DIV_BL_PWM_REF_DIV = 0;
 	base->dmcu_is_running = false;
 
 	abm_dce->regs = regs;
@@ -483,7 +405,7 @@ struct abm *dce_abm_create(
 	const struct dce_abm_shift *abm_shift,
 	const struct dce_abm_mask *abm_mask)
 {
-	struct dce_abm *abm_dce = kzalloc(sizeof(*abm_dce), GFP_KERNEL);
+	struct dce_abm *abm_dce = kzalloc(sizeof(*abm_dce), GFP_ATOMIC);
 
 	if (abm_dce == NULL) {
 		BREAK_TO_DEBUGGER();

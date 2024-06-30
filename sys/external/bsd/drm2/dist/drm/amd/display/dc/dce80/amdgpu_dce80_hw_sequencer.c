@@ -41,6 +41,7 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_dce80_hw_sequencer.c,v 1.3 2021/12/19 11:23:0
 #include "dce/dce_8_0_d.h"
 #include "dce/dce_8_0_sh_mask.h"
 
+<<<<<<< HEAD
 struct dce80_hw_seq_reg_offsets {
 	uint32_t crtc;
 };
@@ -69,6 +70,8 @@ static const struct dce80_hw_seq_reg_offsets reg_offsets[] __unused = {
 #define HW_REG_CRTC(reg, id)\
 	(reg + reg_offsets[id].crtc)
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 /*******************************************************************************
  * Private definitions
  ******************************************************************************/

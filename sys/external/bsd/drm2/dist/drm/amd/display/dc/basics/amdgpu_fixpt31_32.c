@@ -31,6 +31,10 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_fixpt31_32.c,v 1.3 2021/12/19 12:02:39 riastr
 #include "dm_services.h"
 #include "include/fixed31_32.h"
 
+static const struct fixed31_32 dc_fixpt_two_pi = { 26986075409LL };
+static const struct fixed31_32 dc_fixpt_ln2 = { 2977044471LL };
+static const struct fixed31_32 dc_fixpt_ln2_div_2 = { 1488522236LL };
+
 static inline unsigned long long abs_i64(
 	long long arg)
 {

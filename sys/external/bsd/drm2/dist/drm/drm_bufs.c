@@ -38,17 +38,16 @@ __KERNEL_RCSID(0, "$NetBSD: drm_bufs.c,v 1.16 2021/12/19 12:30:04 riastradh Exp 
 #include <linux/mm.h>
 #include <linux/mman.h>
 #include <linux/nospec.h>
+#include <linux/pci.h>
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/vmalloc.h>
 
 #include <asm/shmparam.h>
 
-#include <drm/drm_agpsupport.h>
 #include <drm/drm_device.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_file.h>
-#include <drm/drm_pci.h>
 #include <drm/drm_print.h>
 
 #include "drm_legacy.h"
@@ -58,6 +57,7 @@ static struct drm_map_list *drm_find_matching_map(struct drm_device *dev,
 						  struct drm_local_map *map)
 {
 	struct drm_map_list *entry;
+
 	list_for_each_entry(entry, &dev->maplist, head) {
 		/*
 		 * Because the kernel-userspace ABI is fixed at a 32-bit offset
@@ -81,8 +81,9 @@ static struct drm_map_list *drm_find_matching_map(struct drm_device *dev,
 			if ((entry->map->offset & 0xffffffff) ==
 			    (map->offset & 0xffffffff))
 				return entry;
+			break;
 		default: /* Make gcc happy */
-			;
+			break;
 		}
 		if (entry->map->offset == map->offset)
 			return entry;
@@ -100,6 +101,7 @@ static int drm_map_handle(struct drm_device *dev, struct drm_hash_item *hash,
 	use_hashed_handle = (user_token &~ 0xffffffffUL) || hashed_handle;
 	if (!use_hashed_handle) {
 		int ret;
+
 		hash->key = user_token >> PAGE_SHIFT;
 		ret = drm_ht_insert_item(&dev->map_hash, hash);
 		if (ret != -EINVAL)
@@ -132,7 +134,7 @@ static int drm_map_handle(struct drm_device *dev, struct drm_hash_item *hash,
 					 shift, add);
 }
 
-/**
+/*
  * Core function to create a range of memory available for mapping by a
  * non-root process.
  *
@@ -147,7 +149,6 @@ static int drm_addmap_core(struct drm_device *dev, resource_size_t offset,
 {
 	struct drm_local_map *map;
 	struct drm_map_list *list;
-	drm_dma_handle_t *dmah;
 	unsigned long user_token;
 	int ret;
 
@@ -338,12 +339,17 @@ static int drm_addmap_core(struct drm_device *dev, resource_size_t offset,
 		/* dma_addr_t is 64bit on i386 with CONFIG_HIGHMEM64G,
 		 * As we're limiting the address to 2^32-1 (or less),
 		 * casting it down to 32 bits is no problem, but we
-		 * need to point to a 64bit variable first. */
-		dmah = drm_pci_alloc(dev, map->size, map->size);
-		if (!dmah) {
+		 * need to point to a 64bit variable first.
+		 */
+		map->handle = dma_alloc_coherent(dev->dev,
+						 map->size,
+						 &map->offset,
+						 GFP_KERNEL);
+		if (!map->handle) {
 			kfree(map);
 			return -ENOMEM;
 		}
+<<<<<<< HEAD
 		map->handle = dmah->vaddr;
 		map->offset = (unsigned long)dmah->busaddr;
 #ifdef __NetBSD__
@@ -351,6 +357,8 @@ static int drm_addmap_core(struct drm_device *dev, resource_size_t offset,
 #else
 		kfree(dmah);
 #endif
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 		break;
 	default:
 		kfree(map);
@@ -419,6 +427,7 @@ struct drm_local_map *drm_legacy_findmap(struct drm_device *dev,
 					 unsigned int token)
 {
 	struct drm_map_list *_entry;
+
 	list_for_each_entry(_entry, &dev->maplist, head)
 		if (_entry->user_token == token)
 			return _entry->map;
@@ -426,7 +435,7 @@ struct drm_local_map *drm_legacy_findmap(struct drm_device *dev,
 }
 EXPORT_SYMBOL(drm_legacy_findmap);
 
-/**
+/*
  * Ioctl to specify a range of memory that is available for mapping by a
  * non-root process.
  *
@@ -447,8 +456,7 @@ int drm_legacy_addmap_ioctl(struct drm_device *dev, void *data,
 	if (!(capable(CAP_SYS_ADMIN) || map->type == _DRM_AGP || map->type == _DRM_SHM))
 		return -EPERM;
 
-	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
-	    !drm_core_check_feature(dev, DRIVER_LEGACY))
+	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
 		return -EOPNOTSUPP;
 
 	err = drm_addmap_core(dev, map->offset, map->size, map->type,
@@ -493,8 +501,7 @@ int drm_legacy_getmap_ioctl(struct drm_device *dev, void *data,
 	int idx;
 	int i;
 
-	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
-	    !drm_core_check_feature(dev, DRIVER_LEGACY))
+	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
 		return -EOPNOTSUPP;
 
 	idx = map->offset;
@@ -527,7 +534,7 @@ int drm_legacy_getmap_ioctl(struct drm_device *dev, void *data,
 	return 0;
 }
 
-/**
+/*
  * Remove a map private from list and deallocate resources if the mapping
  * isn't in use.
  *
@@ -540,9 +547,12 @@ int drm_legacy_getmap_ioctl(struct drm_device *dev, void *data,
 int drm_legacy_rmmap_locked(struct drm_device *dev, struct drm_local_map *map)
 {
 	struct drm_map_list *r_list = NULL, *list_t;
+<<<<<<< HEAD
 #ifndef __NetBSD__
 	drm_dma_handle_t dmah;
 #endif
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 	int found = 0;
 	struct drm_master *master;
 
@@ -568,8 +578,12 @@ int drm_legacy_rmmap_locked(struct drm_device *dev, struct drm_local_map *map)
 		drm_legacy_ioremapfree(map, dev);
 #else
 		iounmap(map->handle);
+<<<<<<< HEAD
 #endif
 		/* FALLTHROUGH */
+=======
+		fallthrough;
+>>>>>>> vendor/linux-drm-v6.6.35
 	case _DRM_FRAME_BUFFER:
 		arch_phys_wc_del(map->mtrr);
 		break;
@@ -609,6 +623,7 @@ int drm_legacy_rmmap_locked(struct drm_device *dev, struct drm_local_map *map)
 	case _DRM_SCATTER_GATHER:
 		break;
 	case _DRM_CONSISTENT:
+<<<<<<< HEAD
 #ifdef __NetBSD__
 		drm_pci_free(dev, map->lm_data.dmah);
 #else
@@ -617,6 +632,12 @@ int drm_legacy_rmmap_locked(struct drm_device *dev, struct drm_local_map *map)
 		dmah.size = map->size;
 		__drm_legacy_pci_free(dev, &dmah);
 #endif
+=======
+		dma_free_coherent(dev->dev,
+				  map->size,
+				  map->handle,
+				  map->offset);
+>>>>>>> vendor/linux-drm-v6.6.35
 		break;
 	}
 	kfree(map);
@@ -627,8 +648,7 @@ EXPORT_SYMBOL(drm_legacy_rmmap_locked);
 
 void drm_legacy_rmmap(struct drm_device *dev, struct drm_local_map *map)
 {
-	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
-	    !drm_core_check_feature(dev, DRIVER_LEGACY))
+	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
 		return;
 
 	mutex_lock(&dev->struct_mutex);
@@ -685,8 +705,7 @@ int drm_legacy_rmmap_ioctl(struct drm_device *dev, void *data,
 	struct drm_map_list *r_list;
 	int ret;
 
-	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
-	    !drm_core_check_feature(dev, DRIVER_LEGACY))
+	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
 		return -EOPNOTSUPP;
 
 	mutex_lock(&dev->struct_mutex);
@@ -720,7 +739,7 @@ int drm_legacy_rmmap_ioctl(struct drm_device *dev, void *data,
 	return ret;
 }
 
-/**
+/*
  * Cleanup after an error on one of the addbufs() functions.
  *
  * \param dev DRM device.
@@ -731,12 +750,18 @@ int drm_legacy_rmmap_ioctl(struct drm_device *dev, void *data,
 static void drm_cleanup_buf_error(struct drm_device *dev,
 				  struct drm_buf_entry *entry)
 {
+	drm_dma_handle_t *dmah;
 	int i;
 
 	if (entry->seg_count) {
 		for (i = 0; i < entry->seg_count; i++) {
 			if (entry->seglist[i]) {
-				drm_pci_free(dev, entry->seglist[i]);
+				dmah = entry->seglist[i];
+				dma_free_coherent(dev->dev,
+						  dmah->size,
+						  dmah->vaddr,
+						  dmah->busaddr);
+				kfree(dmah);
 			}
 		}
 		kfree(entry->seglist);
@@ -755,7 +780,7 @@ static void drm_cleanup_buf_error(struct drm_device *dev,
 }
 
 #if IS_ENABLED(CONFIG_AGP)
-/**
+/*
  * Add AGP buffers for DMA transfers.
  *
  * \param dev struct drm_device to which the buffers are to be added.
@@ -1035,10 +1060,26 @@ int drm_legacy_addbufs_pci(struct drm_device *dev,
 	page_count = 0;
 
 	while (entry->buf_count < count) {
-
-		dmah = drm_pci_alloc(dev, PAGE_SIZE << page_order, 0x1000);
-
+		dmah = kmalloc(sizeof(drm_dma_handle_t), GFP_KERNEL);
 		if (!dmah) {
+			/* Set count correctly so we free the proper amount. */
+			entry->buf_count = count;
+			entry->seg_count = count;
+			drm_cleanup_buf_error(dev, entry);
+			kfree(temp_pagelist);
+			mutex_unlock(&dev->struct_mutex);
+			atomic_dec(&dev->buf_alloc);
+			return -ENOMEM;
+		}
+
+		dmah->size = total;
+		dmah->vaddr = dma_alloc_coherent(dev->dev,
+						 dmah->size,
+						 &dmah->busaddr,
+						 GFP_KERNEL);
+		if (!dmah->vaddr) {
+			kfree(dmah);
+
 			/* Set count correctly so we free the proper amount. */
 			entry->buf_count = count;
 			entry->seg_count = count;
@@ -1291,7 +1332,7 @@ static int drm_legacy_addbufs_sg(struct drm_device *dev,
 	return 0;
 }
 
-/**
+/*
  * Add buffers for DMA transfers (ioctl).
  *
  * \param inode device inode.
@@ -1332,7 +1373,7 @@ int drm_legacy_addbufs(struct drm_device *dev, void *data,
 	return ret;
 }
 
-/**
+/*
  * Get information about the buffer mappings.
  *
  * This was originally mean for debugging purposes, or by a sophisticated
@@ -1384,6 +1425,7 @@ int __drm_legacy_infobufs(struct drm_device *dev,
 	if (*p >= count) {
 		for (i = 0, count = 0; i < DRM_MAX_ORDER + 1; i++) {
 			struct drm_buf_entry *from = &dma->bufs[i];
+
 			if (from->buf_count) {
 				if (f(data, count, from) < 0)
 					return -EFAULT;
@@ -1420,10 +1462,11 @@ int drm_legacy_infobufs(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {
 	struct drm_buf_info *request = data;
+
 	return __drm_legacy_infobufs(dev, data, &request->count, copy_one_buf);
 }
 
-/**
+/*
  * Specifies a low and high water mark for buffer allocation
  *
  * \param inode device inode.
@@ -1472,7 +1515,7 @@ int drm_legacy_markbufs(struct drm_device *dev, void *data,
 	return 0;
 }
 
-/**
+/*
  * Unreserve the buffers in list, previously reserved using drmDMA.
  *
  * \param inode device inode.
@@ -1529,7 +1572,7 @@ int drm_legacy_freebufs(struct drm_device *dev, void *data,
 	return 0;
 }
 
-/**
+/*
  * Maps all of the DMA buffers into client-virtual space (ioctl).
  *
  * \param inode device inode.
@@ -1540,7 +1583,7 @@ int drm_legacy_freebufs(struct drm_device *dev, void *data,
  *
  * Maps the AGP, SG or PCI buffer region with vm_mmap(), and copies information
  * about each buffer into user space. For PCI buffers, it calls vm_mmap() with
- * offset equal to 0, which drm_mmap() interpretes as PCI buffers and calls
+ * offset equal to 0, which drm_mmap() interprets as PCI buffers and calls
  * drm_mmap_dma().
  */
 int __drm_legacy_mapbufs(struct drm_device *dev, void *data, int *p,
@@ -1636,6 +1679,7 @@ int drm_legacy_mapbufs(struct drm_device *dev, void *data,
 		       struct drm_file *file_priv)
 {
 	struct drm_buf_map *request = data;
+
 	return __drm_legacy_mapbufs(dev, data, &request->count,
 				    &request->virtual, map_one_buf,
 				    file_priv);

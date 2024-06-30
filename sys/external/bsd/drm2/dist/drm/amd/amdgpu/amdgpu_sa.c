@@ -49,15 +49,13 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_sa.c,v 1.5 2022/10/08 19:06:30 riastradh Exp 
 
 #include "amdgpu.h"
 
-static void amdgpu_sa_bo_remove_locked(struct amdgpu_sa_bo *sa_bo);
-static void amdgpu_sa_bo_try_free(struct amdgpu_sa_manager *sa_manager);
-
 int amdgpu_sa_bo_manager_init(struct amdgpu_device *adev,
 			      struct amdgpu_sa_manager *sa_manager,
-			      unsigned size, u32 align, u32 domain)
+			      unsigned int size, u32 suballoc_align, u32 domain)
 {
-	int i, r;
+	int r;
 
+<<<<<<< HEAD
 	spin_lock_init(&sa_manager->wq_lock);
 	DRM_INIT_WAITQUEUE(&sa_manager->wq, "amdsabom");
 	sa_manager->bo = NULL;
@@ -71,37 +69,33 @@ int amdgpu_sa_bo_manager_init(struct amdgpu_device *adev,
 
 	r = amdgpu_bo_create_kernel(adev, size, align, domain, &sa_manager->bo,
 				&sa_manager->gpu_addr, &sa_manager->cpu_ptr);
+=======
+	r = amdgpu_bo_create_kernel(adev, size, AMDGPU_GPU_PAGE_SIZE, domain,
+				    &sa_manager->bo, &sa_manager->gpu_addr,
+				    &sa_manager->cpu_ptr);
+>>>>>>> vendor/linux-drm-v6.6.35
 	if (r) {
 		dev_err(adev->dev, "(%d) failed to allocate bo for manager\n", r);
 		return r;
 	}
 
-	memset(sa_manager->cpu_ptr, 0, sa_manager->size);
+	memset(sa_manager->cpu_ptr, 0, size);
+	drm_suballoc_manager_init(&sa_manager->base, size, suballoc_align);
 	return r;
 }
 
 void amdgpu_sa_bo_manager_fini(struct amdgpu_device *adev,
-                              struct amdgpu_sa_manager *sa_manager)
+			       struct amdgpu_sa_manager *sa_manager)
 {
-	struct amdgpu_sa_bo *sa_bo, *tmp;
-
 	if (sa_manager->bo == NULL) {
 		dev_err(adev->dev, "no bo for sa manager\n");
 		return;
 	}
 
-	if (!list_empty(&sa_manager->olist)) {
-		sa_manager->hole = &sa_manager->olist,
-		amdgpu_sa_bo_try_free(sa_manager);
-		if (!list_empty(&sa_manager->olist)) {
-			dev_err(adev->dev, "sa_manager is not empty, clearing anyway\n");
-		}
-	}
-	list_for_each_entry_safe(sa_bo, tmp, &sa_manager->olist, olist) {
-		amdgpu_sa_bo_remove_locked(sa_bo);
-	}
+	drm_suballoc_manager_fini(&sa_manager->base);
 
 	amdgpu_bo_free_kernel(&sa_manager->bo, &sa_manager->gpu_addr, &sa_manager->cpu_ptr);
+<<<<<<< HEAD
 	sa_manager->size = 0;
 	DRM_DESTROY_WAITQUEUE(&sa_manager->wq);
 	spin_lock_destroy(&sa_manager->wq_lock);
@@ -278,24 +272,24 @@ static bool amdgpu_sa_bo_next_hole(struct amdgpu_sa_manager *sa_manager,
 		return true;
 	}
 	return false;
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 }
 
 int amdgpu_sa_bo_new(struct amdgpu_sa_manager *sa_manager,
-		     struct amdgpu_sa_bo **sa_bo,
-		     unsigned size, unsigned align)
+		     struct drm_suballoc **sa_bo,
+		     unsigned int size)
 {
-	struct dma_fence *fences[AMDGPU_SA_NUM_FENCE_LISTS];
-	unsigned tries[AMDGPU_SA_NUM_FENCE_LISTS];
-	unsigned count;
-	int i, r;
-	signed long t;
+	struct drm_suballoc *sa = drm_suballoc_new(&sa_manager->base, size,
+						   GFP_KERNEL, false, 0);
 
-	if (WARN_ON_ONCE(align > sa_manager->align))
-		return -EINVAL;
+	if (IS_ERR(sa)) {
+		*sa_bo = NULL;
 
-	if (WARN_ON_ONCE(size > sa_manager->size))
-		return -EINVAL;
+		return PTR_ERR(sa);
+	}
 
+<<<<<<< HEAD
 	*sa_bo = kmalloc(sizeof(struct amdgpu_sa_bo), GFP_KERNEL);
 	if (!(*sa_bo))
 		return -ENOMEM;
@@ -348,17 +342,20 @@ int amdgpu_sa_bo_new(struct amdgpu_sa_manager *sa_manager,
 	kfree(*sa_bo);
 	*sa_bo = NULL;
 	return r;
+=======
+	*sa_bo = sa;
+	return 0;
+>>>>>>> vendor/linux-drm-v6.6.35
 }
 
-void amdgpu_sa_bo_free(struct amdgpu_device *adev, struct amdgpu_sa_bo **sa_bo,
+void amdgpu_sa_bo_free(struct amdgpu_device *adev, struct drm_suballoc **sa_bo,
 		       struct dma_fence *fence)
 {
-	struct amdgpu_sa_manager *sa_manager;
-
 	if (sa_bo == NULL || *sa_bo == NULL) {
 		return;
 	}
 
+<<<<<<< HEAD
 	sa_manager = (*sa_bo)->manager;
 	spin_lock(&sa_manager->wq_lock);
 	if (fence && !dma_fence_is_signaled(fence)) {
@@ -372,6 +369,9 @@ void amdgpu_sa_bo_free(struct amdgpu_device *adev, struct amdgpu_sa_bo **sa_bo,
 	}
 	DRM_SPIN_WAKEUP_ALL(&sa_manager->wq, &sa_manager->wq_lock);
 	spin_unlock(&sa_manager->wq_lock);
+=======
+	drm_suballoc_free(*sa_bo, fence);
+>>>>>>> vendor/linux-drm-v6.6.35
 	*sa_bo = NULL;
 }
 
@@ -380,26 +380,8 @@ void amdgpu_sa_bo_free(struct amdgpu_device *adev, struct amdgpu_sa_bo **sa_bo,
 void amdgpu_sa_bo_dump_debug_info(struct amdgpu_sa_manager *sa_manager,
 				  struct seq_file *m)
 {
-	struct amdgpu_sa_bo *i;
+	struct drm_printer p = drm_seq_file_printer(m);
 
-	spin_lock(&sa_manager->wq.lock);
-	list_for_each_entry(i, &sa_manager->olist, olist) {
-		uint64_t soffset = i->soffset + sa_manager->gpu_addr;
-		uint64_t eoffset = i->eoffset + sa_manager->gpu_addr;
-		if (&i->olist == sa_manager->hole) {
-			seq_printf(m, ">");
-		} else {
-			seq_printf(m, " ");
-		}
-		seq_printf(m, "[0x%010llx 0x%010llx] size %8lld",
-			   soffset, eoffset, eoffset - soffset);
-
-		if (i->fence)
-			seq_printf(m, " protected by 0x%016llx on context %llu",
-				   i->fence->seqno, i->fence->context);
-
-		seq_printf(m, "\n");
-	}
-	spin_unlock(&sa_manager->wq.lock);
+	drm_suballoc_dump_debug_info(&sa_manager->base, &p, sa_manager->gpu_addr);
 }
 #endif

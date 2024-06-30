@@ -40,15 +40,23 @@ nvkm_engine_chsw_load(struct nvkm_engine *engine)
 	return false;
 }
 
+int
+nvkm_engine_reset(struct nvkm_engine *engine)
+{
+	if (engine->func->reset)
+		return engine->func->reset(engine);
+
+	nvkm_subdev_fini(&engine->subdev, false);
+	return nvkm_subdev_init(&engine->subdev);
+}
+
 void
 nvkm_engine_unref(struct nvkm_engine **pengine)
 {
 	struct nvkm_engine *engine = *pengine;
+
 	if (engine) {
-		mutex_lock(&engine->subdev.mutex);
-		if (--engine->usecount == 0)
-			nvkm_subdev_fini(&engine->subdev, false);
-		mutex_unlock(&engine->subdev.mutex);
+		nvkm_subdev_unref(&engine->subdev);
 		*pengine = NULL;
 	}
 }
@@ -56,18 +64,14 @@ nvkm_engine_unref(struct nvkm_engine **pengine)
 struct nvkm_engine *
 nvkm_engine_ref(struct nvkm_engine *engine)
 {
+	int ret;
+
 	if (engine) {
-		mutex_lock(&engine->subdev.mutex);
-		if (++engine->usecount == 1) {
-			int ret = nvkm_subdev_init(&engine->subdev);
-			if (ret) {
-				engine->usecount--;
-				mutex_unlock(&engine->subdev.mutex);
-				return ERR_PTR(ret);
-			}
-		}
-		mutex_unlock(&engine->subdev.mutex);
+		ret = nvkm_subdev_ref(&engine->subdev);
+		if (ret)
+			return ERR_PTR(ret);
 	}
+
 	return engine;
 }
 
@@ -91,14 +95,10 @@ static int
 nvkm_engine_info(struct nvkm_subdev *subdev, u64 mthd, u64 *data)
 {
 	struct nvkm_engine *engine = nvkm_engine(subdev);
-	if (engine->func->info) {
-		if (!IS_ERR((engine = nvkm_engine_ref(engine)))) {
-			int ret = engine->func->info(engine, mthd, data);
-			nvkm_engine_unref(&engine);
-			return ret;
-		}
-		return PTR_ERR(engine);
-	}
+
+	if (engine->func->info)
+		return engine->func->info(engine, mthd, data);
+
 	return -ENOSYS;
 }
 
@@ -117,6 +117,7 @@ nvkm_engine_init(struct nvkm_subdev *subdev)
 	struct nvkm_engine *engine = nvkm_engine(subdev);
 	struct nvkm_fb *fb = subdev->device->fb;
 	int ret = 0, i;
+<<<<<<< HEAD
 	s64 time;
 
 	if (!engine->usecount) {
@@ -137,6 +138,8 @@ nvkm_engine_init(struct nvkm_subdev *subdev)
 		time = ktime_to_us(ktime_get()) - time;
 		nvkm_trace(subdev, "one-time init completed in %"PRId64"us\n", time);
 	}
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 
 	if (engine->func->init)
 		ret = engine->func->init(engine);
@@ -144,6 +147,17 @@ nvkm_engine_init(struct nvkm_subdev *subdev)
 	for (i = 0; fb && i < fb->tile.regions; i++)
 		nvkm_engine_tile(engine, i);
 	return ret;
+}
+
+static int
+nvkm_engine_oneinit(struct nvkm_subdev *subdev)
+{
+	struct nvkm_engine *engine = nvkm_engine(subdev);
+
+	if (engine->func->oneinit)
+		return engine->func->oneinit(engine);
+
+	return 0;
 }
 
 static int
@@ -165,10 +179,11 @@ nvkm_engine_dtor(struct nvkm_subdev *subdev)
 	return engine;
 }
 
-static const struct nvkm_subdev_func
-nvkm_engine_func = {
+const struct nvkm_subdev_func
+nvkm_engine = {
 	.dtor = nvkm_engine_dtor,
 	.preinit = nvkm_engine_preinit,
+	.oneinit = nvkm_engine_oneinit,
 	.init = nvkm_engine_init,
 	.fini = nvkm_engine_fini,
 	.info = nvkm_engine_info,
@@ -176,14 +191,14 @@ nvkm_engine_func = {
 };
 
 int
-nvkm_engine_ctor(const struct nvkm_engine_func *func,
-		 struct nvkm_device *device, int index, bool enable,
-		 struct nvkm_engine *engine)
+nvkm_engine_ctor(const struct nvkm_engine_func *func, struct nvkm_device *device,
+		 enum nvkm_subdev_type type, int inst, bool enable, struct nvkm_engine *engine)
 {
-	nvkm_subdev_ctor(&nvkm_engine_func, device, index, &engine->subdev);
 	engine->func = func;
+	nvkm_subdev_ctor(&nvkm_engine, device, type, inst, &engine->subdev);
+	refcount_set(&engine->subdev.use.refcount, 0);
 
-	if (!nvkm_boolopt(device->cfgopt, nvkm_subdev_name[index], enable)) {
+	if (!nvkm_boolopt(device->cfgopt, engine->subdev.name, enable)) {
 		nvkm_debug(&engine->subdev, "disabled\n");
 		return -ENODEV;
 	}
@@ -193,11 +208,11 @@ nvkm_engine_ctor(const struct nvkm_engine_func *func,
 }
 
 int
-nvkm_engine_new_(const struct nvkm_engine_func *func,
-		 struct nvkm_device *device, int index, bool enable,
+nvkm_engine_new_(const struct nvkm_engine_func *func, struct nvkm_device *device,
+		 enum nvkm_subdev_type type, int inst, bool enable,
 		 struct nvkm_engine **pengine)
 {
 	if (!(*pengine = kzalloc(sizeof(**pengine), GFP_KERNEL)))
 		return -ENOMEM;
-	return nvkm_engine_ctor(func, device, index, enable, *pengine);
+	return nvkm_engine_ctor(func, device, type, inst, enable, *pengine);
 }

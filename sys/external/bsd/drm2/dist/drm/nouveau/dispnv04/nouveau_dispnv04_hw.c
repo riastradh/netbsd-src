@@ -31,6 +31,7 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_dispnv04_hw.c,v 1.4 2021/12/18 23:45:32 rias
 #include "hw.h"
 
 #include <subdev/bios/pll.h>
+#include <nvif/timer.h>
 
 #define CHIPSET_NFORCE 0x01a0
 #define CHIPSET_NFORCE2 0x01f0
@@ -218,14 +219,15 @@ nouveau_hw_pllvals_to_clk(struct nvkm_pll_vals *pv)
 int
 nouveau_hw_get_clock(struct drm_device *dev, enum nvbios_pll_type plltype)
 {
+	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	struct nvkm_pll_vals pllvals;
 	int ret;
 	int domain;
 
-	domain = pci_domain_nr(dev->pdev->bus);
+	domain = pci_domain_nr(pdev->bus);
 
 	if (plltype == PLL_MEMORY &&
-	    (dev->pdev->device & 0x0ff0) == CHIPSET_NFORCE) {
+	    (pdev->device & 0x0ff0) == CHIPSET_NFORCE) {
 		uint32_t mpllP;
 		pci_read_config_dword(pci_get_domain_bus_and_slot(domain, 0, 3),
 				      0x6c, &mpllP);
@@ -236,7 +238,7 @@ nouveau_hw_get_clock(struct drm_device *dev, enum nvbios_pll_type plltype)
 		return 400000 / mpllP;
 	} else
 	if (plltype == PLL_MEMORY &&
-	    (dev->pdev->device & 0xff0) == CHIPSET_NFORCE2) {
+	    (pdev->device & 0xff0) == CHIPSET_NFORCE2) {
 		uint32_t clock;
 
 		pci_read_config_dword(pci_get_domain_bus_and_slot(domain, 0, 5),
@@ -328,6 +330,7 @@ void
 nouveau_hw_save_vga_fonts(struct drm_device *dev, bool save)
 {
 	struct nouveau_drm *drm = nouveau_drm(dev);
+	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	uint8_t misc, gr4, gr5, gr6, seq2, seq4;
 	bool graphicsmode;
 	unsigned plane;
@@ -352,6 +355,7 @@ nouveau_hw_save_vga_fonts(struct drm_device *dev, bool save)
 	NV_INFO(drm, "%sing VGA fonts\n", save ? "Sav" : "Restor");
 
 	/* map first 64KiB of VRAM, holds VGA fonts etc */
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	if (pci_mapreg_map(&dev->pdev->pd_pa, PCI_BAR(1),
 		pci_mapreg_type(dev->pdev->pd_pa.pa_pc,
@@ -363,6 +367,9 @@ nouveau_hw_save_vga_fonts(struct drm_device *dev, bool save)
 	}
 #else
 	iovram = ioremap(pci_resource_start(dev->pdev, 1), 65536);
+=======
+	iovram = ioremap(pci_resource_start(pdev, 1), 65536);
+>>>>>>> vendor/linux-drm-v6.6.35
 	if (!iovram) {
 		NV_ERROR(drm, "Failed to map VRAM, "
 					"cannot save/restore VGA fonts.\n");

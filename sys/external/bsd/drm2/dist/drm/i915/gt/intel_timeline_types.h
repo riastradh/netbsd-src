@@ -1,8 +1,7 @@
 /*	$NetBSD: intel_timeline_types.h,v 1.2 2021/12/18 23:45:30 riastradh Exp $	*/
 
+/* SPDX-License-Identifier: MIT */
 /*
- * SPDX-License-Identifier: MIT
- *
  * Copyright © 2016 Intel Corporation
  */
 
@@ -20,7 +19,6 @@
 struct i915_vma;
 struct i915_syncmap;
 struct intel_gt;
-struct intel_timeline_hwsp;
 
 struct intel_timeline {
 	u64 fence_context;
@@ -47,11 +45,10 @@ struct intel_timeline {
 	atomic_t pin_count;
 	atomic_t active_count;
 
+	void *hwsp_map;
 	const u32 *hwsp_seqno;
 	struct i915_vma *hwsp_ggtt;
 	u32 hwsp_offset;
-
-	struct intel_timeline_cacheline *hwsp_cacheline;
 
 	bool has_initial_breadcrumb;
 
@@ -68,6 +65,8 @@ struct intel_timeline {
 	 * protection themselves (cf the i915_active_fence API).
 	 */
 	struct i915_active_fence last_request;
+
+	struct i915_active active;
 
 	/** A chain of completed timelines ready for early retirement. */
 	struct intel_timeline *retire;
@@ -86,16 +85,9 @@ struct intel_timeline {
 	struct list_head link;
 	struct intel_gt *gt;
 
+	struct list_head engine_link;
+
 	struct kref kref;
-	struct rcu_head rcu;
-};
-
-struct intel_timeline_cacheline {
-	struct i915_active active;
-
-	struct intel_timeline_hwsp *hwsp;
-	void *vaddr;
-
 	struct rcu_head rcu;
 };
 
