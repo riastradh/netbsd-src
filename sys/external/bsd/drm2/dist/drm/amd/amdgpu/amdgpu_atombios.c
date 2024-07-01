@@ -154,13 +154,8 @@ void amdgpu_atombios_i2c_init(struct amdgpu_device *adev)
 			i2c = amdgpu_atombios_get_bus_rec_for_i2c_gpio(gpio);
 
 			if (i2c.valid) {
-<<<<<<< HEAD
 				snprintf(stmp, sizeof stmp, "0x%x", i2c.i2c_id);
-				adev->i2c_bus[i] = amdgpu_i2c_create(adev->ddev, &i2c, stmp);
-=======
-				sprintf(stmp, "0x%x", i2c.i2c_id);
 				adev->i2c_bus[i] = amdgpu_i2c_create(adev_to_drm(adev), &i2c, stmp);
->>>>>>> vendor/linux-drm-v6.6.35
 			}
 			gpio = (ATOM_GPIO_I2C_ASSIGMENT *)
 				((u8 *)gpio + sizeof(ATOM_GPIO_I2C_ASSIGMENT));
@@ -1780,44 +1775,7 @@ static uint32_t cail_reg_read(struct card_info *info, uint32_t reg)
 	return r;
 }
 
-<<<<<<< HEAD
-/**
- * cail_ioreg_write - write IO register
- *
- * @info: atom card_info pointer
- * @reg: IO register offset
- * @val: value to write to the pll register
- *
- * Provides a IO register accessor for the atom interpreter (r4xx+).
- */
-static void cail_ioreg_write(struct card_info *info, uint32_t reg, uint32_t val)
-{
-	struct amdgpu_device *adev = info->dev->dev_private;
-
-	WREG32_IO(reg, val);
-}
-
-/**
- * cail_ioreg_read - read IO register
- *
- * @info: atom card_info pointer
- * @reg: IO register offset
- *
- * Provides an IO register accessor for the atom interpreter (r4xx+).
- * Returns the value of the IO register.
- */
-static uint32_t cail_ioreg_read(struct card_info *info, uint32_t reg)
-{
-	struct amdgpu_device *adev = info->dev->dev_private;
-	uint32_t r;
-
-	r = RREG32_IO(reg);
-	return r;
-}
-
 #ifdef CONFIG_SYSFS
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static ssize_t amdgpu_atombios_get_vbios_version(struct device *dev,
 						 struct device_attribute *attr,
 						 char *buf)
@@ -1831,7 +1789,6 @@ static ssize_t amdgpu_atombios_get_vbios_version(struct device *dev,
 
 static DEVICE_ATTR(vbios_version, 0444, amdgpu_atombios_get_vbios_version,
 		   NULL);
-#endif
 
 static struct attribute *amdgpu_vbios_version_attrs[] = {
 	&dev_attr_vbios_version.attr,
@@ -1841,12 +1798,15 @@ static struct attribute *amdgpu_vbios_version_attrs[] = {
 const struct attribute_group amdgpu_vbios_version_attr_group = {
 	.attrs = amdgpu_vbios_version_attrs
 };
+#endif	/* CONFIG_SYSFS */
 
 int amdgpu_atombios_sysfs_init(struct amdgpu_device *adev)
 {
+#ifdef CONFIG_SYSFS
 	if (adev->mode_info.atom_context)
 		return devm_device_add_group(adev->dev,
 					     &amdgpu_vbios_version_attr_group);
+#endif	/* CONFIG_SYSFS */
 
 	return 0;
 }
@@ -1871,12 +1831,6 @@ void amdgpu_atombios_fini(struct amdgpu_device *adev)
 	adev->mode_info.atom_context = NULL;
 	kfree(adev->mode_info.atom_card_info);
 	adev->mode_info.atom_card_info = NULL;
-<<<<<<< HEAD
-#ifdef CONFIG_SYSFS
-	device_remove_file(adev->dev, &dev_attr_vbios_version);
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**
@@ -1901,23 +1855,6 @@ int amdgpu_atombios_init(struct amdgpu_device *adev)
 	atom_card_info->dev = adev_to_drm(adev);
 	atom_card_info->reg_read = cail_reg_read;
 	atom_card_info->reg_write = cail_reg_write;
-<<<<<<< HEAD
-	/* needed for iio ops */
-#ifdef __NetBSD__
-	if (adev->rio_mem_size)
-#else
-	if (adev->rio_mem)
-#endif
-	{
-		atom_card_info->ioreg_read = cail_ioreg_read;
-		atom_card_info->ioreg_write = cail_ioreg_write;
-	} else {
-		DRM_DEBUG("PCI I/O BAR is not found. Using MMIO to access ATOM BIOS\n");
-		atom_card_info->ioreg_read = cail_reg_read;
-		atom_card_info->ioreg_write = cail_reg_write;
-	}
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	atom_card_info->mc_read = cail_mc_read;
 	atom_card_info->mc_write = cail_mc_write;
 	atom_card_info->pll_read = cail_pll_read;
@@ -1941,17 +1878,6 @@ int amdgpu_atombios_init(struct amdgpu_device *adev)
 		amdgpu_atombios_allocate_fb_scratch(adev);
 	}
 
-<<<<<<< HEAD
-#ifdef CONFIG_SYSFS
-	ret = device_create_file(adev->dev, &dev_attr_vbios_version);
-	if (ret) {
-		DRM_ERROR("Failed to create device file for VBIOS version\n");
-		return ret;
-	}
-#endif
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	return 0;
 }
 

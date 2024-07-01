@@ -44,7 +44,6 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_acpi.c,v 1.6 2024/04/16 14:34:01 riastradh Ex
 #include "amd_acpi.h"
 #include "atom.h"
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 #include <dev/acpi/acpi_pci.h>
 #include <dev/acpi/acpireg.h>
@@ -52,7 +51,7 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_acpi.c,v 1.6 2024/04/16 14:34:01 riastradh Ex
 ACPI_MODULE_NAME("radeon_acpi")
 #include <linux/nbsd-namespace-acpi.h>
 #endif
-=======
+
 /* Declare GUID for AMD _DSM method for XCCs */
 static const guid_t amd_xcc_dsm_guid = GUID_INIT(0x8267f5d5, 0xa556, 0x44f2,
 						 0xb8, 0xb4, 0x45, 0x56, 0x2e,
@@ -91,7 +90,6 @@ struct amdgpu_acpi_dev_info {
 };
 
 struct list_head amdgpu_acpi_dev_list;
->>>>>>> vendor/linux-drm-v6.6.35
 
 struct amdgpu_atif_notification_cfg {
 	bool enabled;
@@ -681,26 +679,7 @@ bool amdgpu_acpi_is_power_shift_control_supported(void)
 int amdgpu_acpi_pcie_notify_device_ready(struct amdgpu_device *adev)
 {
 	union acpi_object *info;
-<<<<<<< HEAD
-	struct amdgpu_atcs *atcs = &adev->atcs;
-
-	/* Get the device handle */
-#ifdef __NetBSD__
-	const struct pci_attach_args *pa = &adev->pdev->pd_pa;
-	struct acpi_devnode *const d =
-	    acpi_pcidev_find(pci_get_segment(pa->pa_pc),
-		pa->pa_bus, pa->pa_device, pa->pa_function);
-	if (d == NULL)
-		return -EINVAL;
-	handle = d->ad_handle;
-#else
-	handle = ACPI_HANDLE(&adev->pdev->dev);
-#endif
-	if (!handle)
-		return -EINVAL;
-=======
 	struct amdgpu_atcs *atcs = &amdgpu_acpi_priv.atcs;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (!atcs->functions.pcie_dev_rdy)
 		return -EINVAL;
@@ -739,24 +718,6 @@ int amdgpu_acpi_pcie_performance_request(struct amdgpu_device *adev,
 	if (amdgpu_acpi_pcie_notify_device_ready(adev))
 		return -EINVAL;
 
-<<<<<<< HEAD
-	/* Get the device handle */
-#ifdef __NetBSD__
-	const struct pci_attach_args *pa = &adev->pdev->pd_pa;
-	struct acpi_devnode *const d =
-	    acpi_pcidev_find(pci_get_segment(pa->pa_pc),
-		pa->pa_bus, pa->pa_device, pa->pa_function);
-	if (d == NULL)
-		return -EINVAL;
-	handle = d->ad_handle;
-#else
-	handle = ACPI_HANDLE(&adev->pdev->dev);
-#endif
-	if (!handle)
-		return -EINVAL;
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	if (!atcs->functions.pcie_perf_req)
 		return -EINVAL;
 
@@ -1279,57 +1240,7 @@ static int amdgpu_acpi_event(struct notifier_block *nb,
  */
 int amdgpu_acpi_init(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
-	acpi_handle handle, atif_handle;
-	struct amdgpu_atif *atif;
-	struct amdgpu_atcs *atcs = &adev->atcs;
-	int ret;
-
-	/* Get the device handle */
-#ifdef __NetBSD__
-	const struct pci_attach_args *pa = &adev->pdev->pd_pa;
-	struct acpi_devnode *const d =
-	    acpi_pcidev_find(pci_get_segment(pa->pa_pc),
-		pa->pa_bus, pa->pa_device, pa->pa_function);
-	if (d == NULL)
-		return -EINVAL;
-	handle = d->ad_handle;
-#else
-	handle = ACPI_HANDLE(&adev->pdev->dev);
-#endif
-
-	if (!adev->bios || !handle)
-		return 0;
-
-	/* Call the ATCS method */
-	ret = amdgpu_atcs_verify_interface(handle, atcs);
-	if (ret) {
-		DRM_DEBUG_DRIVER("Call to ATCS verify_interface failed: %d\n", ret);
-	}
-
-	/* Probe for ATIF, and initialize it if found */
-	atif_handle = amdgpu_atif_probe_handle(handle);
-	if (!atif_handle)
-		goto out;
-
-	atif = kzalloc(sizeof(*atif), GFP_KERNEL);
-	if (!atif) {
-		DRM_WARN("Not enough memory to initialize ATIF\n");
-		goto out;
-	}
-	atif->handle = atif_handle;
-
-	/* Call the ATIF method */
-	ret = amdgpu_atif_verify_interface(atif);
-	if (ret) {
-		DRM_DEBUG_DRIVER("Call to ATIF verify_interface failed: %d\n", ret);
-		kfree(atif);
-		goto out;
-	}
-	adev->atif = atif;
-=======
 	struct amdgpu_atif *atif = &amdgpu_acpi_priv.atif;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (atif->notifications.brightness_change) {
 		if (adev->dc_enabled) {
@@ -1540,17 +1451,7 @@ void amdgpu_acpi_detect(void)
 		atif->backlight_caps.caps_valid = false;
 	}
 
-<<<<<<< HEAD
-out:
-#ifndef __NetBSD__		/* XXX amdgpu acpi */
-	adev->acpi_nb.notifier_call = amdgpu_acpi_event;
-	register_acpi_notifier(&adev->acpi_nb);
-#endif
-
-	return ret;
-=======
 	amdgpu_acpi_enumerate_xcc();
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 void amdgpu_acpi_release(void)
@@ -1604,12 +1505,6 @@ bool amdgpu_acpi_is_s3_active(struct amdgpu_device *adev)
  */
 bool amdgpu_acpi_is_s0ix_active(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
-#ifndef __NetBSD__		/* XXX radeon acpi */
-	unregister_acpi_notifier(&adev->acpi_nb);
-#endif
-	kfree(adev->atif);
-=======
 	if (!(adev->flags & AMD_IS_APU) ||
 	    (pm_suspend_target_state != PM_SUSPEND_TO_IDLE))
 		return false;
@@ -1637,7 +1532,6 @@ bool amdgpu_acpi_is_s0ix_active(struct amdgpu_device *adev)
 #else
 	return true;
 #endif /* CONFIG_AMD_PMC */
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 #endif /* CONFIG_SUSPEND */

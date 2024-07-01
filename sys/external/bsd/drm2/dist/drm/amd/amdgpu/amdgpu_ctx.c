@@ -428,16 +428,12 @@ static void amdgpu_ctx_fini(struct kref *ref)
 		}
 	}
 
-<<<<<<< HEAD
-	mutex_destroy(&ctx->lock);
-	spin_lock_destroy(&ctx->ring_lock);
-=======
 	if (drm_dev_enter(adev_to_drm(adev), &idx)) {
 		amdgpu_ctx_set_stable_pstate(ctx, ctx->stable_pstate);
 		drm_dev_exit(idx);
 	}
 
->>>>>>> vendor/linux-drm-v6.6.35
+	spin_lock_destroy(&ctx->ring_lock);
 	kfree(ctx);
 }
 

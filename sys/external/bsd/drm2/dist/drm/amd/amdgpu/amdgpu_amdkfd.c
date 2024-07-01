@@ -426,18 +426,6 @@ void amdgpu_amdkfd_get_local_mem_info(struct amdgpu_device *adev,
 				      struct kfd_local_mem_info *mem_info,
 				      struct amdgpu_xcp *xcp)
 {
-<<<<<<< HEAD
-	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
-#ifdef __NetBSD__
-	uint64_t address_mask = ~(uint64_t)0; /* XXX */
-#else
-	uint64_t address_mask = adev->dev->dma_mask ? ~*adev->dev->dma_mask :
-					     ~((1ULL << 32) - 1);
-#endif
-	resource_size_t aper_limit = adev->gmc.aper_base + adev->gmc.aper_size;
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	memset(mem_info, 0, sizeof(*mem_info));
 
 	if (xcp) {
@@ -454,13 +442,8 @@ void amdgpu_amdkfd_get_local_mem_info(struct amdgpu_device *adev,
 	}
 	mem_info->vram_width = adev->gmc.vram_width;
 
-<<<<<<< HEAD
-	pr_debug("Address base: %pap limit %pap public 0x%"PRIx64" private 0x%"PRIx64"\n",
-			&adev->gmc.aper_base, &aper_limit,
-=======
-	pr_debug("Address base: %pap public 0x%llx private 0x%llx\n",
+	pr_debug("Address base: %p public 0x%"PRIx64" private 0x%"PRIx64"\n",
 			&adev->gmc.aper_base,
->>>>>>> vendor/linux-drm-v6.6.35
 			mem_info->local_mem_size_public,
 			mem_info->local_mem_size_private);
 

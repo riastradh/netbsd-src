@@ -237,17 +237,12 @@ static bool amdgpu_read_bios_from_rom(struct amdgpu_device *adev)
 
 static bool amdgpu_read_platform_bios(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
 #ifdef __NetBSD__		/* XXX amdgpu platform bios */
 	return false;
 #else
-	uint8_t __iomem *bios;
-	size_t size;
-=======
 	phys_addr_t rom = adev->pdev->rom;
 	size_t romlen = adev->pdev->romlen;
 	void __iomem *bios;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	adev->bios = NULL;
 
@@ -271,13 +266,10 @@ static bool amdgpu_read_platform_bios(struct amdgpu_device *adev)
 	adev->bios_size = romlen;
 
 	return true;
-<<<<<<< HEAD
-#endif	/* __NetBSD__ */
-=======
 free_bios:
 	kfree(adev->bios);
 	return false;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif	/* __NetBSD__ */
 }
 
 /* XXX amdgpu acpi */

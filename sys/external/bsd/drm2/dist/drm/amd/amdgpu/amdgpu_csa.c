@@ -44,10 +44,6 @@ uint64_t amdgpu_csa_vaddr(struct amdgpu_device *adev)
 int amdgpu_allocate_static_csa(struct amdgpu_device *adev, struct amdgpu_bo **bo,
 				u32 domain, uint32_t size)
 {
-<<<<<<< HEAD
-	int r __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	void *ptr;
 
 	amdgpu_bo_create_kernel(adev, size, PAGE_SIZE,

@@ -96,12 +96,8 @@ static int atom_dst_to_src[8][4] = {
 };
 static int atom_def_dst[8] = { 0, 0, 1, 2, 0, 1, 2, 3 };
 
-<<<<<<< HEAD
-static int debug_depth = 0;
-#undef DEBUG			/* XXX NetBSD kludge */
-=======
 static int debug_depth;
->>>>>>> vendor/linux-drm-v6.6.35
+#undef DEBUG			/* XXX NetBSD kludge */
 #ifdef ATOM_DEBUG
 static void debug_print_spaces(int n)
 {

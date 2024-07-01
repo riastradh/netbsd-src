@@ -35,16 +35,12 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_device.c,v 1.20 2023/09/30 10:46:45 mrg Exp $
 #include <linux/module.h>
 #include <linux/console.h>
 #include <linux/slab.h>
-<<<<<<< HEAD
-#include <linux/reboot.h>
-=======
 #include <linux/iommu.h>
 #include <linux/pci.h>
 #include <linux/devcoredump.h>
 #include <generated/utsrelease.h>
 #include <linux/pci-p2pdma.h>
 #include <linux/apple-gmux.h>
->>>>>>> vendor/linux-drm-v6.6.35
 
 #include <drm/drm_aperture.h>
 #include <drm/drm_atomic_helper.h>
@@ -87,9 +83,6 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_device.c,v 1.20 2023/09/30 10:46:45 mrg Exp $
 
 #include <linux/suspend.h>
 #include <drm/task_barrier.h>
-<<<<<<< HEAD
-#include <linux/nbsd-namespace.h>
-=======
 #include <linux/pm_runtime.h>
 
 #include <drm/drm_drv.h>
@@ -97,7 +90,8 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_device.c,v 1.20 2023/09/30 10:46:45 mrg Exp $
 #if IS_ENABLED(CONFIG_X86)
 #include <asm/intel-family.h>
 #endif
->>>>>>> vendor/linux-drm-v6.6.35
+
+#include <linux/nbsd-namespace.h>
 
 MODULE_FIRMWARE("amdgpu/vega10_gpu_info.bin");
 MODULE_FIRMWARE("amdgpu/vega12_gpu_info.bin");
@@ -419,28 +413,6 @@ uint32_t amdgpu_device_rreg(struct amdgpu_device *adev,
 	if (amdgpu_device_skip_hw_access(adev))
 		return 0;
 
-<<<<<<< HEAD
-	if ((reg * 4) < adev->rmmio_size && !(acc_flags & AMDGPU_REGS_IDX))
-#ifdef __NetBSD__
-		return bus_space_read_4(adev->rmmiot, adev->rmmioh, 4*reg);
-#else
-		ret = readl(((void __iomem *)adev->rmmio) + (reg * 4));
-#endif
-	else {
-		unsigned long flags;
-
-		spin_lock_irqsave(&adev->mmio_idx_lock, flags);
-#ifdef __NetBSD__
-		bus_space_write_4(adev->rmmiot, adev->rmmioh, 4*mmMM_INDEX,
-		    4*reg);
-		ret = bus_space_read_4(adev->rmmiot, adev->rmmioh,
-		    4*mmMM_DATA);
-#else
-		writel((reg * 4), ((void __iomem *)adev->rmmio) + (mmMM_INDEX * 4));
-		ret = readl(((void __iomem *)adev->rmmio) + (mmMM_DATA * 4));
-#endif
-		spin_unlock_irqrestore(&adev->mmio_idx_lock, flags);
-=======
 	if ((reg * 4) < adev->rmmio_size) {
 		if (!(acc_flags & AMDGPU_REGS_NO_KIQ) &&
 		    amdgpu_sriov_runtime(adev) &&
@@ -448,11 +420,15 @@ uint32_t amdgpu_device_rreg(struct amdgpu_device *adev,
 			ret = amdgpu_kiq_rreg(adev, reg);
 			up_read(&adev->reset_domain->sem);
 		} else {
+#ifdef __NetBSD__
+			return bus_space_read_4(adev->rmmiot, adev->rmmioh,
+			    4*reg);
+#else
 			ret = readl(((void __iomem *)adev->rmmio) + (reg * 4));
+#endif
 		}
 	} else {
 		ret = adev->pcie_rreg(adev, reg * 4);
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 
 	trace_amdgpu_device_rreg(adev->pdev->device, reg, ret);
@@ -541,7 +517,12 @@ void amdgpu_device_wreg(struct amdgpu_device *adev,
 			amdgpu_kiq_wreg(adev, reg, v);
 			up_read(&adev->reset_domain->sem);
 		} else {
+#ifdef __NetBSD__
+			bus_space_write_4(adev->rmmiot, adev->rmmioh, 4*reg,
+			    v);
+#else
 			writel(v, ((void __iomem *)adev->rmmio) + (reg * 4));
+#endif
 		}
 	} else {
 		adev->pcie_wreg(adev, reg * 4, v);
@@ -550,31 +531,6 @@ void amdgpu_device_wreg(struct amdgpu_device *adev,
 	trace_amdgpu_device_wreg(adev->pdev->device, reg, v);
 }
 
-<<<<<<< HEAD
-	if ((reg * 4) < adev->rmmio_size && !(acc_flags & AMDGPU_REGS_IDX))
-#ifdef __NetBSD__
-		bus_space_write_4(adev->rmmiot, adev->rmmioh, 4*reg, v);
-#else
-		writel(v, ((void __iomem *)adev->rmmio) + (reg * 4));
-#endif
-	else {
-		unsigned long flags;
-
-		spin_lock_irqsave(&adev->mmio_idx_lock, flags);
-#ifdef __NetBSD__
-		bus_space_write_4(adev->rmmiot, adev->rmmioh, 4*mmMM_INDEX,
-		    reg*4);
-		bus_space_write_4(adev->rmmiot, adev->rmmioh, 4*mmMM_DATA, v);
-#else
-		writel((reg * 4), ((void __iomem *)adev->rmmio) + (mmMM_INDEX * 4));
-		writel(v, ((void __iomem *)adev->rmmio) + (mmMM_DATA * 4));
-#endif
-		spin_unlock_irqrestore(&adev->mmio_idx_lock, flags);
-	}
-
-	if (adev->asic_type >= CHIP_VEGA10 && reg == 1 && adev->last_mm_index == 0x5702C) {
-		udelay(500);
-=======
 /**
  * amdgpu_mm_wreg_mmio_rlc -  write register either with direct/indirect mmio or with RLC path if in range
  *
@@ -599,8 +555,11 @@ void amdgpu_mm_wreg_mmio_rlc(struct amdgpu_device *adev,
 	} else if ((reg * 4) >= adev->rmmio_size) {
 		adev->pcie_wreg(adev, reg * 4, v);
 	} else {
+#ifdef __NetBSD__
+		bus_space_write_4(adev->rmmiot, adev->rmmioh, 4*reg, v);
+#else
 		writel(v, ((void __iomem *)adev->rmmio) + (reg * 4));
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	}
 }
 
@@ -615,24 +574,6 @@ void amdgpu_mm_wreg_mmio_rlc(struct amdgpu_device *adev,
 u32 amdgpu_device_indirect_rreg(struct amdgpu_device *adev,
 				u32 reg_addr)
 {
-<<<<<<< HEAD
-	if ((reg * 4) < adev->rio_mem_size)
-#ifdef __NetBSD__
-		return bus_space_read_4(adev->rio_memt, adev->rio_memh, 4*reg);
-#else
-		return ioread32(adev->rio_mem + (reg * 4));
-#endif
-	else {
-#ifdef __NetBSD__
-		bus_space_write_4(adev->rio_memt, adev->rio_memh, 4*mmMM_INDEX,
-		    4*reg);
-		return bus_space_read_4(adev->rio_memt, adev->rio_memh,
-		    4*mmMM_DATA);
-#else
-		iowrite32((reg * 4), adev->rio_mem + (mmMM_INDEX * 4));
-		return ioread32(adev->rio_mem + (mmMM_DATA * 4));
-#endif
-=======
 	unsigned long flags, pcie_index, pcie_data;
 	void __iomem *pcie_index_offset;
 	void __iomem *pcie_data_offset;
@@ -642,12 +583,21 @@ u32 amdgpu_device_indirect_rreg(struct amdgpu_device *adev,
 	pcie_data = adev->nbio.funcs->get_pcie_data_offset(adev);
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
+#ifdef __NetBSD__
+	__USE(pcie_index_offset);
+	__USE(pcie_data_offset);
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_index * 4,
+	    reg_addr);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_index * 4);
+	r = bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_data * 4);
+#else
 	pcie_index_offset = (void __iomem *)adev->rmmio + pcie_index * 4;
 	pcie_data_offset = (void __iomem *)adev->rmmio + pcie_data * 4;
 
 	writel(reg_addr, pcie_index_offset);
 	readl(pcie_index_offset);
 	r = readl(pcie_data_offset);
+#endif
 	spin_unlock_irqrestore(&adev->pcie_idx_lock, flags);
 
 	return r;
@@ -670,25 +620,54 @@ u32 amdgpu_device_indirect_rreg_ext(struct amdgpu_device *adev,
 		pcie_index_hi = 0;
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
+#ifdef __NetBSD__
+	__USE(pcie_index_offset);
+	__USE(pcie_data_offset);
+	__USE(pcie_index_hi_offset);
+#else
 	pcie_index_offset = (void __iomem *)adev->rmmio + pcie_index * 4;
 	pcie_data_offset = (void __iomem *)adev->rmmio + pcie_data * 4;
 	if (pcie_index_hi != 0)
 		pcie_index_hi_offset = (void __iomem *)adev->rmmio +
 				pcie_index_hi * 4;
+#endif
 
+#ifdef __NetBSD__
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_index * 4,
+	    reg_addr);
+	bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_index * 4);
+#else
 	writel(reg_addr, pcie_index_offset);
 	readl(pcie_index_offset);
+#endif
 	if (pcie_index_hi != 0) {
+#ifdef __NetBSD__
+		bus_space_write_4(adev->rmmiot, adev->rmmioh,
+		    pcie_index_hi * 4, (reg_addr >> 32) & 0xff);
+		(void)bus_space_read_4(adev->rmmiot, adev->rmmioh,
+		    pcie_index_hi * 4);
+#else
 		writel((reg_addr >> 32) & 0xff, pcie_index_hi_offset);
 		readl(pcie_index_hi_offset);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	}
+#ifdef __NetBSD__
+	r = bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_data * 4);
+#else
 	r = readl(pcie_data_offset);
+#endif
 
 	/* clear the high bits */
 	if (pcie_index_hi != 0) {
+#ifdef __NetBSD__
+		bus_space_write_4(adev->rmmiot, adev->rmmioh,
+		    pcie_index_hi * 4, 0);
+		(void)bus_space_read_4(adev->rmmiot, adev->rmmioh,
+		    pcie_index_hi * 4);
+#else
 		writel(0, pcie_index_hi_offset);
 		readl(pcie_index_hi_offset);
+#endif
 	}
 
 	spin_unlock_irqrestore(&adev->pcie_idx_lock, flags);
@@ -712,41 +691,41 @@ u64 amdgpu_device_indirect_rreg64(struct amdgpu_device *adev,
 	void __iomem *pcie_data_offset;
 	u64 r;
 
-<<<<<<< HEAD
-	if ((reg * 4) < adev->rio_mem_size)
-#ifdef __NetBSD__
-		bus_space_write_4(adev->rio_memt, adev->rio_memh, 4*reg, v);
-#else
-		iowrite32(v, adev->rio_mem + (reg * 4));
-#endif
-	else {
-#ifdef __NetBSD__
-		bus_space_write_4(adev->rio_memt, adev->rio_memh, 4*mmMM_INDEX,
-		    4*reg);
-		bus_space_write_4(adev->rio_memt, adev->rio_memh, 4*mmMM_DATA,
-		    v);
-#else
-		iowrite32((reg * 4), adev->rio_mem + (mmMM_INDEX * 4));
-		iowrite32(v, adev->rio_mem + (mmMM_DATA * 4));
-#endif
-	}
-=======
 	pcie_index = adev->nbio.funcs->get_pcie_index_offset(adev);
 	pcie_data = adev->nbio.funcs->get_pcie_data_offset(adev);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
+#ifdef __NetBSD__
+	__USE(pcie_index_offset);
+	__USE(pcie_data_offset);
+#else
 	pcie_index_offset = (void __iomem *)adev->rmmio + pcie_index * 4;
 	pcie_data_offset = (void __iomem *)adev->rmmio + pcie_data * 4;
+#endif
 
 	/* read low 32 bits */
+#ifdef __NetBSD__
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_index * 4,
+	    reg_addr);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_index * 4);
+	r = bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_data * 4);
+#else
 	writel(reg_addr, pcie_index_offset);
 	readl(pcie_index_offset);
 	r = readl(pcie_data_offset);
+#endif
 	/* read high 32 bits */
+#ifdef __NetBSD__
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_index * 4,
+	    reg_addr + 4);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_index * 4);
+	r = (uint64_t)bus_space_read_4(adev->rmmiot, adev->rmmioh,
+	    pcie_data * 4) << 32;
+#else
 	writel(reg_addr + 4, pcie_index_offset);
 	readl(pcie_index_offset);
 	r |= ((u64)readl(pcie_data_offset) << 32);
+#endif
 	spin_unlock_irqrestore(&adev->pcie_idx_lock, flags);
 
 	return r;
@@ -763,18 +742,6 @@ u64 amdgpu_device_indirect_rreg64(struct amdgpu_device *adev,
 void amdgpu_device_indirect_wreg(struct amdgpu_device *adev,
 				 u32 reg_addr, u32 reg_data)
 {
-<<<<<<< HEAD
-	if (index < adev->doorbell.num_doorbells) {
-#ifdef __NetBSD__
-		return bus_space_read_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index);
-#else
-		return readl(adev->doorbell.ptr + index);
-#endif
-	} else {
-		DRM_ERROR("reading beyond doorbell aperture: 0x%08x!\n", index);
-		return 0;
-=======
 	unsigned long flags, pcie_index, pcie_data;
 	void __iomem *pcie_index_offset;
 	void __iomem *pcie_data_offset;
@@ -783,6 +750,15 @@ void amdgpu_device_indirect_wreg(struct amdgpu_device *adev,
 	pcie_data = adev->nbio.funcs->get_pcie_data_offset(adev);
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
+#ifdef __NetBSD__
+	__USE(pcie_index_offset);
+	__USE(pcie_data_offset);
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_index * 4,
+	    reg_addr);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_index * 4);
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_data * 4, reg_data);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_data * 4);
+#else
 	pcie_index_offset = (void __iomem *)adev->rmmio + pcie_index * 4;
 	pcie_data_offset = (void __iomem *)adev->rmmio + pcie_data * 4;
 
@@ -790,6 +766,7 @@ void amdgpu_device_indirect_wreg(struct amdgpu_device *adev,
 	readl(pcie_index_offset);
 	writel(reg_data, pcie_data_offset);
 	readl(pcie_data_offset);
+#endif
 	spin_unlock_irqrestore(&adev->pcie_idx_lock, flags);
 }
 
@@ -809,26 +786,56 @@ void amdgpu_device_indirect_wreg_ext(struct amdgpu_device *adev,
 		pcie_index_hi = 0;
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
+#ifdef __NetBSD__
+	__USE(pcie_index_offset);
+	__USE(pcie_data_offset);
+	__USE(pcie_index_hi_offset);
+#else
 	pcie_index_offset = (void __iomem *)adev->rmmio + pcie_index * 4;
 	pcie_data_offset = (void __iomem *)adev->rmmio + pcie_data * 4;
 	if (pcie_index_hi != 0)
 		pcie_index_hi_offset = (void __iomem *)adev->rmmio +
 				pcie_index_hi * 4;
+#endif
 
+#ifdef __NetBSD__
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_index * 4,
+	    reg_addr);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_index * 4);
+#else
 	writel(reg_addr, pcie_index_offset);
 	readl(pcie_index_offset);
+#endif
 	if (pcie_index_hi != 0) {
+#ifdef __NetBSD__
+		bus_space_write_4(adev->rmmiot, adev->rmmioh,
+		    pcie_index_hi * 4, (reg_addr >> 32) & 0xff);
+		(void)bus_space_read_4(adev->rmmiot, adev->rmmioh,
+		    pcie_index_hi * 4);
+#else
 		writel((reg_addr >> 32) & 0xff, pcie_index_hi_offset);
 		readl(pcie_index_hi_offset);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	}
+#ifdef __NetBSD__
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_data * 4, reg_data);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_data * 4);
+#else
 	writel(reg_data, pcie_data_offset);
 	readl(pcie_data_offset);
+#endif
 
 	/* clear the high bits */
 	if (pcie_index_hi != 0) {
+#ifdef __NetBSD__
+		bus_space_write_4(adev->rmmiot, adev->rmmioh,
+		    pcie_index_hi * 4, 0);
+		(void)bus_space_read_4(adev->rmmiot, adev->rmmioh,
+		    pcie_index_hi * 4);
+#else
 		writel(0, pcie_index_hi_offset);
 		readl(pcie_index_hi_offset);
+#endif
 	}
 
 	spin_unlock_irqrestore(&adev->pcie_idx_lock, flags);
@@ -845,18 +852,6 @@ void amdgpu_device_indirect_wreg_ext(struct amdgpu_device *adev,
 void amdgpu_device_indirect_wreg64(struct amdgpu_device *adev,
 				   u32 reg_addr, u64 reg_data)
 {
-<<<<<<< HEAD
-	if (index < adev->doorbell.num_doorbells) {
-#ifdef __NetBSD__
-		bus_space_write_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index, v);
-#else
-		writel(v, adev->doorbell.ptr + index);
-#endif
-	} else {
-		DRM_ERROR("writing beyond doorbell aperture: 0x%08x!\n", index);
-	}
-=======
 	unsigned long flags, pcie_index, pcie_data;
 	void __iomem *pcie_index_offset;
 	void __iomem *pcie_data_offset;
@@ -865,21 +860,43 @@ void amdgpu_device_indirect_wreg64(struct amdgpu_device *adev,
 	pcie_data = adev->nbio.funcs->get_pcie_data_offset(adev);
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
+#ifdef __NetBSD__
+	__USE(pcie_index_offset);
+	__USE(pcie_data_offset);
+#else
 	pcie_index_offset = (void __iomem *)adev->rmmio + pcie_index * 4;
 	pcie_data_offset = (void __iomem *)adev->rmmio + pcie_data * 4;
+#endif
 
 	/* write low 32 bits */
+#ifdef __NetBSD__
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_index * 4,
+	    reg_addr);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_index * 4);
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_data * 4,
+	    reg_data & 0xffffffff);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_data * 4);
+#else
 	writel(reg_addr, pcie_index_offset);
 	readl(pcie_index_offset);
 	writel((u32)(reg_data & 0xffffffffULL), pcie_data_offset);
 	readl(pcie_data_offset);
+#endif
 	/* write high 32 bits */
+#ifdef __NetBSD__
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_index * 4,
+	    reg_addr + 4);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_index * 4);
+	bus_space_write_4(adev->rmmiot, adev->rmmioh, pcie_data * 4,
+	    reg_data >> 32);
+	(void)bus_space_read_4(adev->rmmiot, adev->rmmioh, pcie_data * 4);
+#else
 	writel(reg_addr + 4, pcie_index_offset);
 	readl(pcie_index_offset);
 	writel((u32)(reg_data >> 32), pcie_data_offset);
 	readl(pcie_data_offset);
+#endif
 	spin_unlock_irqrestore(&adev->pcie_idx_lock, flags);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**
@@ -891,78 +908,7 @@ void amdgpu_device_indirect_wreg64(struct amdgpu_device *adev,
  */
 u32 amdgpu_device_get_rev_id(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
-	if (index < adev->doorbell.num_doorbells) {
-#ifdef __NetBSD__
-#ifdef _LP64
-		return bus_space_read_8(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index);
-#else
-		uint64_t lo, hi;
-#if _BYTE_ORDER == _LITTLE_ENDIAN
-		lo = bus_space_read_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index);
-		hi = bus_space_read_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index + 4);
-#else
-		hi = bus_space_read_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index);
-		lo = bus_space_read_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index + 4);
-#endif
-		return lo | (hi << 32);
-#endif
-#else
-		return atomic64_read((atomic64_t *)(adev->doorbell.ptr + index));
-#endif
-	} else {
-		DRM_ERROR("reading beyond doorbell aperture: 0x%08x!\n", index);
-		return 0;
-	}
-}
-
-/**
- * amdgpu_mm_wdoorbell64 - write a doorbell Qword
- *
- * @adev: amdgpu_device pointer
- * @index: doorbell index
- * @v: value to write
- *
- * Writes @v to the doorbell aperture at the
- * requested doorbell index (VEGA10+).
- */
-void amdgpu_mm_wdoorbell64(struct amdgpu_device *adev, u32 index, u64 v)
-{
-	if (index < adev->doorbell.num_doorbells) {
-#ifdef __NetBSD__
-#ifdef _LP64
-		bus_space_write_8(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index, v);
-#else
-		/*
-		 * XXX This might not be as atomic as one might hope...
-		 */
-#if _BYTE_ORDER == _LITTLE_ENDIAN
-		bus_space_write_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index, v & 0xffffffffU);
-		bus_space_write_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index + 4, v >> 32);
-#else
-		bus_space_write_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index, v >> 32);
-		bus_space_write_4(adev->doorbell.bst, adev->doorbell.bsh,
-		    4*index + 4, v & 0xffffffffU);
-#endif
-#endif
-#else
-		atomic64_set((atomic64_t *)(adev->doorbell.ptr + index), v);
-#endif
-	} else {
-		DRM_ERROR("writing beyond doorbell aperture: 0x%08x!\n", index);
-	}
-=======
 	return adev->nbio.funcs->get_rev_id(adev);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**
@@ -1122,20 +1068,12 @@ static int amdgpu_device_asic_init(struct amdgpu_device *adev)
  */
 static int amdgpu_device_mem_scratch_init(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
-	return amdgpu_bo_create_kernel(adev, AMDGPU_GPU_PAGE_SIZE,
-				       PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM,
-				       &adev->vram_scratch.robj,
-				       &adev->vram_scratch.gpu_addr,
-				       (void **)__UNVOLATILE(&adev->vram_scratch.ptr));
-=======
 	return amdgpu_bo_create_kernel(adev, AMDGPU_GPU_PAGE_SIZE, PAGE_SIZE,
 				       AMDGPU_GEM_DOMAIN_VRAM |
 				       AMDGPU_GEM_DOMAIN_GTT,
 				       &adev->mem_scratch.robj,
 				       &adev->mem_scratch.gpu_addr,
-				       (void **)&adev->mem_scratch.ptr);
->>>>>>> vendor/linux-drm-v6.6.35
+				       (void **)__UNVOLATILE(&adev->mem_scratch.ptr));
 }
 
 /**
@@ -1211,90 +1149,9 @@ void amdgpu_device_pci_config_reset(struct amdgpu_device *adev)
  */
 int amdgpu_device_pci_reset(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
-
-	/* No doorbell on SI hardware generation */
-	if (adev->asic_type < CHIP_BONAIRE) {
-		adev->doorbell.base = 0;
-		adev->doorbell.size = 0;
-		adev->doorbell.num_doorbells = 0;
-#ifndef __NetBSD__
-		adev->doorbell.ptr = NULL;
-#endif
-		return 0;
-	}
-
-	if (pci_resource_flags(adev->pdev, 2) & IORESOURCE_UNSET)
-		return -EINVAL;
-
-	amdgpu_asic_init_doorbell_index(adev);
-
-	/* doorbell bar mapping */
-	adev->doorbell.base = pci_resource_start(adev->pdev, 2);
-	adev->doorbell.size = pci_resource_len(adev->pdev, 2);
-
-	adev->doorbell.num_doorbells = min_t(u32, adev->doorbell.size / sizeof(u32),
-					     adev->doorbell_index.max_assignment+1);
-	if (adev->doorbell.num_doorbells == 0)
-		return -EINVAL;
-
-	/* For Vega, reserve and map two pages on doorbell BAR since SDMA
-	 * paging queue doorbell use the second page. The
-	 * AMDGPU_DOORBELL64_MAX_ASSIGNMENT definition assumes all the
-	 * doorbells are in the first page. So with paging queue enabled,
-	 * the max num_doorbells should + 1 page (0x400 in dword)
-	 */
-	if (adev->asic_type >= CHIP_VEGA10)
-		adev->doorbell.num_doorbells += 0x400;
-
-#ifdef __NetBSD__
-	int r;
-	adev->doorbell.bst = adev->pdev->pd_pa.pa_memt;
-	/* XXX errno NetBSD->Linux */
-	r = -bus_space_map(adev->doorbell.bst, adev->doorbell.base,
-	    adev->doorbell.num_doorbells * sizeof(u32), 0,
-	    &adev->doorbell.bsh);
-	if (r)
-		return r;
-#else
-	adev->doorbell.ptr = ioremap(adev->doorbell.base,
-				     adev->doorbell.num_doorbells *
-				     sizeof(u32));
-	if (adev->doorbell.ptr == NULL)
-		return -ENOMEM;
-#endif
-
-	return 0;
-}
-
-/**
- * amdgpu_device_doorbell_fini - Tear down doorbell driver information.
- *
- * @adev: amdgpu_device pointer
- *
- * Tear down doorbell driver information (CIK)
- */
-static void amdgpu_device_doorbell_fini(struct amdgpu_device *adev)
-{
-#ifdef __NetBSD__
-	if (adev->doorbell.num_doorbells) {
-		bus_space_unmap(adev->doorbell.bst, adev->doorbell.bsh,
-		    adev->doorbell.num_doorbells * sizeof(u32));
-		adev->doorbell.num_doorbells = 0;
-	}
-#else
-	iounmap(adev->doorbell.ptr);
-	adev->doorbell.ptr = NULL;
-#endif
-}
-
-
-
-=======
 	return pci_reset_function(adev->pdev);
 }
 
->>>>>>> vendor/linux-drm-v6.6.35
 /*
  * amdgpu_device_wb_*()
  * Writeback is the method by which the GPU updates special pages in memory
@@ -1415,7 +1272,6 @@ int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 	if (amdgpu_sriov_vf(adev))
 		return 0;
 
-<<<<<<< HEAD
 #ifdef __NetBSD__		/* XXX amdgpu fb resize */
 	__USE(space_needed);
 	__USE(rbar_size);
@@ -1425,12 +1281,10 @@ int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 	__USE(cmd);
 	__USE(r);
 #else
-=======
 	/* skip if the bios has already enabled large BAR */
 	if (adev->gmc.real_vram_size &&
 	    (pci_resource_len(adev->pdev, 0) >= adev->gmc.real_vram_size))
 		return 0;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* Check if the root BUS has 64bit memory resources */
 	root = adev->pdev->bus;
@@ -1479,8 +1333,7 @@ int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 		return -ENODEV;
 
 	pci_write_config_word(adev->pdev, PCI_COMMAND, cmd);
-
-#endif
+#endif	/* __NetBSD__ */
 
 	return 0;
 }
@@ -1559,9 +1412,6 @@ bool amdgpu_device_need_post(struct amdgpu_device *adev)
 	return true;
 }
 
-<<<<<<< HEAD
-#ifndef __NetBSD__		/* XXX amdgpu vga */
-=======
 /*
  * Intel hosts such as Raptor Lake and Sapphire Rapids don't support dynamic
  * speed switching. Until we have confirmation from Intel that a specific host
@@ -1617,7 +1467,7 @@ bool amdgpu_device_aspm_support_quirk(void)
 #endif
 }
 
->>>>>>> vendor/linux-drm-v6.6.35
+#ifndef __NetBSD__		/* XXX amdgpu vga */
 /* if we get transitioned to only one device, take VGA back */
 /**
  * amdgpu_device_vga_set_decode - enable/disable vga decode
@@ -1857,16 +1707,10 @@ static void amdgpu_switcheroo_set_state(struct pci_dev *pdev,
 		/* don't suspend or resume card normally */
 		dev->switch_power_state = DRM_SWITCH_POWER_CHANGING;
 
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* pmf handles this for us.  */
-		pci_set_power_state(dev->pdev, PCI_D0);
-		pci_restore_state(dev->pdev);
-		r = pci_enable_device(dev->pdev);
-=======
 		pci_set_power_state(pdev, PCI_D0);
 		amdgpu_device_load_pci_state(pdev);
 		r = pci_enable_device(pdev);
->>>>>>> vendor/linux-drm-v6.6.35
 		if (r)
 			DRM_WARN("pci_enable_device failed (%d)\n", r);
 #endif
@@ -1878,12 +1722,8 @@ static void amdgpu_switcheroo_set_state(struct pci_dev *pdev,
 		dev->switch_power_state = DRM_SWITCH_POWER_CHANGING;
 		amdgpu_device_prepare(dev);
 		amdgpu_device_suspend(dev, true);
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* pmf handles this for us.  */
-		pci_save_state(dev->pdev);
-=======
 		amdgpu_device_cache_pci_state(pdev);
->>>>>>> vendor/linux-drm-v6.6.35
 		/* Shut down the device */
 		pci_disable_device(pdev);
 		pci_set_power_state(pdev, PCI_D3cold);
@@ -3836,12 +3676,6 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	int tmp;
 
 	adev->shutdown = false;
-<<<<<<< HEAD
-	adev->dev = pci_dev_dev(pdev);
-	adev->ddev = ddev;
-	adev->pdev = pdev;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	adev->flags = flags;
 
 	if (amdgpu_force_asic_type >= 0 && amdgpu_force_asic_type < CHIP_LAST)
@@ -3963,11 +3797,14 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 		adev->rmmio_size = pci_resource_len(adev->pdev, 2);
 	}
 
-<<<<<<< HEAD
+	for (i = 0; i < AMD_IP_BLOCK_TYPE_NUM; i++)
+		atomic_set(&adev->pm.pwr_state[i], POWER_STATE_UNKNOWN);
+
 #ifdef __NetBSD__
-	if (pci_mapreg_map(&adev->pdev->pd_pa, PCI_BAR(5),
+	const int bar = (adev->asic_type >= CHIP_BONAIRE ? 5 : 2);
+	if (pci_mapreg_map(&adev->pdev->pd_pa, PCI_BAR(bar),
 		pci_mapreg_type(adev->pdev->pd_pa.pa_pc,
-		    adev->pdev->pd_pa.pa_tag, PCI_BAR(5)),
+		    adev->pdev->pd_pa.pa_tag, PCI_BAR(bar)),
 		0,
 		&adev->rmmiot, &adev->rmmioh,
 		&adev->rmmio_base, &adev->rmmio_size))
@@ -3977,44 +3814,13 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	DRM_INFO("register mmio size: %"PRIuMAX"\n",
 	    (uintmax_t)adev->rmmio_size);
 #else
-=======
-	for (i = 0; i < AMD_IP_BLOCK_TYPE_NUM; i++)
-		atomic_set(&adev->pm.pwr_state[i], POWER_STATE_UNKNOWN);
-
->>>>>>> vendor/linux-drm-v6.6.35
 	adev->rmmio = ioremap(adev->rmmio_base, adev->rmmio_size);
 	if (!adev->rmmio)
 		return -ENOMEM;
 
 	DRM_INFO("register mmio base: 0x%08X\n", (uint32_t)adev->rmmio_base);
-<<<<<<< HEAD
-	DRM_INFO("register mmio size: %u\n", (unsigned)adev->rmmio_size);
-#endif
-
-	/* io port mapping */
-	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
-#ifdef __NetBSD__
-		if (pci_mapreg_map(&adev->pdev->pd_pa, PCI_BAR(i),
-			PCI_MAPREG_TYPE_IO, 0,
-			&adev->rio_memt, &adev->rio_memh,
-			NULL, &adev->rio_mem_size) == 0)
-			break;
-#else
-		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
-			adev->rio_mem_size = pci_resource_len(adev->pdev, i);
-			adev->rio_mem = pci_iomap(adev->pdev, i, adev->rio_mem_size);
-			break;
-		}
-#endif
-	}
-#ifdef __NetBSD__
-	if (i == DEVICE_COUNT_RESOURCE)
-#else
-	if (adev->rio_mem == NULL)
-#endif
-		DRM_INFO("PCI I/O BAR is not found.\n");
-=======
 	DRM_INFO("register mmio size: %u\n", (unsigned int)adev->rmmio_size);
+#endif
 
 	/*
 	 * Reset domain needs to be present early, before XGMI hive discovered
@@ -4024,7 +3830,6 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	adev->reset_domain = amdgpu_reset_create_reset_domain(SINGLE_DEVICE, "amdgpu-reset-dev");
 	if (!adev->reset_domain)
 		return -ENOMEM;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* detect hw virtualization here */
 	amdgpu_detect_virtualization(adev);
@@ -4083,29 +3888,7 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 		dev_info(adev->dev, "PCIE atomic ops is not supported\n");
 
 	/* doorbell bar mapping and doorbell index init*/
-<<<<<<< HEAD
-	amdgpu_device_doorbell_init(adev);
-
-#ifndef __NetBSD__		/* XXX amdgpu vga */
-	/* if we have > 1 VGA cards, then disable the amdgpu VGA resources */
-	/* this will fail for cards that aren't VGA class devices, just
-	 * ignore it */
-	vga_client_register(adev->pdev, adev, NULL, amdgpu_device_vga_set_decode);
-
-	if (amdgpu_device_supports_boco(ddev))
-		boco = true;
-	if (amdgpu_has_atpx() &&
-	    (amdgpu_is_atpx_hybrid() ||
-	     amdgpu_has_atpx_dgpu_power_cntl()) &&
-	    !pci_is_thunderbolt_attached(adev->pdev))
-		vga_switcheroo_register_client(adev->pdev,
-					       &amdgpu_switcheroo_ops, boco);
-	if (boco)
-		vga_switcheroo_init_domain_pm_ops(adev->dev, &adev->vga_pm_domain);
-#endif
-=======
 	amdgpu_doorbell_init(adev);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (amdgpu_emu_mode == 1) {
 		/* post the asic on emulation mode */
@@ -4271,31 +4054,18 @@ fence_driver_init:
 				   msecs_to_jiffies(AMDGPU_RESUME_MS));
 	}
 
-<<<<<<< HEAD
-	/* must succeed. */
-	amdgpu_ras_resume(adev);
-
-	queue_delayed_work(system_wq, &adev->delayed_init_work,
-			   msecs_to_jiffies(AMDGPU_RESUME_MS));
-
-#ifndef __NetBSD__		/* XXX amdgpu sysfs */
-	r = device_create_file(adev->dev, &dev_attr_pcie_replay_count);
-	if (r) {
-		dev_err(adev->dev, "Could not create pcie_replay_count");
-		return r;
-=======
 	if (amdgpu_sriov_vf(adev)) {
 		amdgpu_virt_release_full_gpu(adev, true);
 		flush_delayed_work(&adev->delayed_init_work);
->>>>>>> vendor/linux-drm-v6.6.35
 	}
-#endif
 
+#ifndef __NetBSD__		/* XXX amdgpu sysfs */
 	r = sysfs_create_files(&adev->dev->kobj, amdgpu_dev_attributes);
 	if (r)
 		dev_err(adev->dev, "Could not create amdgpu device attr\n");
 
 	amdgpu_fru_sysfs_init(adev);
+#endif	/* __NetBSD__ */
 
 	if (IS_ENABLED(CONFIG_PERF_EVENTS))
 		r = amdgpu_pmu_init(adev);
@@ -4306,6 +4076,7 @@ fence_driver_init:
 	if (amdgpu_device_cache_pci_state(adev->pdev))
 		pci_restore_state(pdev);
 
+#ifndef __NetBSD__		/* XXX amdgpu vga */
 	/* if we have > 1 VGA cards, then disable the amdgpu VGA resources */
 	/* this will fail for cards that aren't VGA class devices, just
 	 * ignore it
@@ -4322,6 +4093,7 @@ fence_driver_init:
 
 	if (px)
 		vga_switcheroo_init_domain_pm_ops(adev->dev, &adev->vga_pm_domain);
+#endif	/* __NetBSD__ */
 
 	if (adev->gmc.xgmi.pending_reset)
 		queue_delayed_work(system_wq, &mgpu_info.delayed_reset_work,
@@ -4386,13 +4158,7 @@ static void amdgpu_device_unmap_mmio(struct amdgpu_device *adev)
  */
 void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
-	int r __unused;
-
-	DRM_INFO("amdgpu: finishing device.\n");
-=======
 	dev_info(adev->dev, "amdgpu: finishing device.\n");
->>>>>>> vendor/linux-drm-v6.6.35
 	flush_delayed_work(&adev->delayed_init_work);
 	adev->shutdown = true;
 
@@ -4463,40 +4229,8 @@ void amdgpu_device_fini_sw(struct amdgpu_device *adev)
 
 	kfree(adev->bios);
 	adev->bios = NULL;
-<<<<<<< HEAD
+
 #ifndef __NetBSD__		/* XXX amdgpu vga */
-	if (amdgpu_has_atpx() &&
-	    (amdgpu_is_atpx_hybrid() ||
-	     amdgpu_has_atpx_dgpu_power_cntl()) &&
-	    !pci_is_thunderbolt_attached(adev->pdev))
-		vga_switcheroo_unregister_client(adev->pdev);
-	if (amdgpu_device_supports_boco(adev->ddev))
-		vga_switcheroo_fini_domain_pm_ops(adev->dev);
-	vga_client_register(adev->pdev, NULL, NULL, NULL);
-#endif
-#ifdef __NetBSD__
-	if (adev->rio_mem_size)
-		bus_space_unmap(adev->rio_memt, adev->rio_memh,
-		    adev->rio_mem_size);
-	adev->rio_mem_size = 0;
-	bus_space_unmap(adev->rmmiot, adev->rmmioh, adev->rmmio_size);
-#else
-	if (adev->rio_mem)
-		pci_iounmap(adev->pdev, adev->rio_mem);
-	adev->rio_mem = NULL;
-	iounmap(adev->rmmio);
-	adev->rmmio = NULL;
-#endif
-	amdgpu_device_doorbell_fini(adev);
-
-	amdgpu_debugfs_regs_cleanup(adev);
-#ifndef __NetBSD__		/* XXX amdgpu sysfs */
-	device_remove_file(adev->dev, &dev_attr_pcie_replay_count);
-#endif
-	if (adev->ucode_sysfs_en)
-		amdgpu_ucode_sysfs_fini(adev);
-=======
-
 	px = amdgpu_device_supports_px(adev_to_drm(adev));
 
 	if (px || (!dev_is_removable(&adev->pdev->dev) &&
@@ -4508,21 +4242,30 @@ void amdgpu_device_fini_sw(struct amdgpu_device *adev)
 
 	if ((adev->pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA)
 		vga_client_unregister(adev->pdev);
+#endif
 
 	if (drm_dev_enter(adev_to_drm(adev), &idx)) {
-
+#ifdef __NetBSD__
+		bus_space_unmap(adev->rmmiot, adev->rmmioh, adev->rmmio_size);
+#else
 		iounmap(adev->rmmio);
 		adev->rmmio = NULL;
+#endif
 		amdgpu_doorbell_fini(adev);
 		drm_dev_exit(idx);
 	}
 
->>>>>>> vendor/linux-drm-v6.6.35
 	if (IS_ENABLED(CONFIG_PERF_EVENTS))
 		amdgpu_pmu_fini(adev);
 	if (adev->mman.discovery_bin)
 		amdgpu_discovery_fini(adev);
-<<<<<<< HEAD
+
+	amdgpu_reset_put_reset_domain(adev->reset_domain);
+	adev->reset_domain = NULL;
+
+	kfree(adev->pci_state);
+
+	/* XXXMERGE amdgpu lock destroy */
 	spin_lock_destroy(&adev->ring_lru_list_lock);
 	mutex_destroy(&adev->shadow_list_lock);
 	spin_lock_destroy(&adev->mm_stats.lock);
@@ -4547,14 +4290,6 @@ void amdgpu_device_fini_sw(struct amdgpu_device *adev)
 	mutex_destroy(&adev->gfx.gpu_clock_mutex);
 	mutex_destroy(&adev->pm.mutex);
 	mutex_destroy(&adev->firmware.mutex);
-=======
-
-	amdgpu_reset_put_reset_domain(adev->reset_domain);
-	adev->reset_domain = NULL;
-
-	kfree(adev->pci_state);
-
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**
@@ -5706,35 +5441,6 @@ int amdgpu_device_gpu_recover(struct amdgpu_device *adev,
 	dev_info(adev->dev, "GPU %s begin!\n",
 		need_emergency_restart ? "jobs stop":"reset");
 
-<<<<<<< HEAD
-	cancel_delayed_work_sync(&adev->delayed_init_work);
-
-	hive = amdgpu_get_xgmi_hive(adev, false);
-
-	/*
-	 * Here we trylock to avoid chain of resets executing from
-	 * either trigger by jobs on different adevs in XGMI hive or jobs on
-	 * different schedulers for same device while this TO handler is running.
-	 * We always reset all schedulers for device and all devices for XGMI
-	 * hive so that should take care of them too.
-	 */
-
-	if (hive && !mutex_trylock(&hive->reset_lock)) {
-		DRM_INFO("Bailing on TDR for s_job:%"PRIx64", hive: %"PRIx64" as another already in progress",
-			  job ? job->base.id : -1, hive->hive_id);
-		return 0;
-	}
-
-	/* Start with adev pre asic reset first for soft reset check.*/
-	if (!amdgpu_device_lock_adev(adev, !hive)) {
-		DRM_INFO("Bailing on TDR for s_job:%"PRIx64", as another already in progress",
-			  job ? job->base.id : -1);
-		return 0;
-	}
-
-	/* Block kfd: SRIOV would do it separately */
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	if (!amdgpu_sriov_vf(adev))
 		hive = amdgpu_get_xgmi_hive(adev);
 	if (hive)

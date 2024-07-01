@@ -180,9 +180,6 @@ static int acp_genpd_add_device(struct device *dev, void *data)
 	return ret;
 }
 
-<<<<<<< HEAD
-#endif
-=======
 static int acp_genpd_remove_device(struct device *dev, void *data)
 {
 	int ret;
@@ -225,7 +222,9 @@ static const struct dmi_system_id acp_quirk_table[] = {
 	},
 	{}
 };
->>>>>>> vendor/linux-drm-v6.6.35
+
+#endif	/* __NetBSD__ */
+
 
 /**
  * acp_hw_init - start and test ACP block
@@ -263,12 +262,7 @@ static int acp_hw_init(void *handle)
 		return -EINVAL;
 
 	acp_base = adev->rmmio_base;
-<<<<<<< HEAD
-
-
 #ifndef __NetBSD__		/* XXX amdgpu pm */
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	adev->acp.acp_genpd = kzalloc(sizeof(struct acp_pm_domain), GFP_KERNEL);
 	if (!adev->acp.acp_genpd)
 		return -ENOMEM;
@@ -279,155 +273,19 @@ static int acp_hw_init(void *handle)
 	adev->acp.acp_genpd->adev = adev;
 
 	pm_genpd_init(&adev->acp.acp_genpd->gpd, NULL, false);
-<<<<<<< HEAD
 #endif
-
-#ifndef __NetBSD__		/* XXX amdgpu cell */
-	adev->acp.acp_cell = kcalloc(ACP_DEVS, sizeof(struct mfd_cell),
-							GFP_KERNEL);
-
-	if (adev->acp.acp_cell == NULL) {
-		r = -ENOMEM;
-		goto failure;
-	}
-#endif
-
-	adev->acp.acp_res = kcalloc(5, sizeof(struct resource), GFP_KERNEL);
-	if (adev->acp.acp_res == NULL) {
-		r = -ENOMEM;
-		goto failure;
-	}
-
-#ifdef __NetBSD__		/* XXX amdgpu sound */
-	__USE(i2s_pdata);
-#else
-	i2s_pdata = kcalloc(3, sizeof(struct i2s_platform_data), GFP_KERNEL);
-	if (i2s_pdata == NULL) {
-		r = -ENOMEM;
-		goto failure;
-	}
-
-	switch (adev->asic_type) {
-	case CHIP_STONEY:
-		i2s_pdata[0].quirks = DW_I2S_QUIRK_COMP_REG_OFFSET |
-			DW_I2S_QUIRK_16BIT_IDX_OVERRIDE;
-		break;
-	default:
-		i2s_pdata[0].quirks = DW_I2S_QUIRK_COMP_REG_OFFSET;
-	}
-	i2s_pdata[0].cap = DWC_I2S_PLAY;
-	i2s_pdata[0].snd_rates = SNDRV_PCM_RATE_8000_96000;
-	i2s_pdata[0].i2s_reg_comp1 = ACP_I2S_COMP1_PLAY_REG_OFFSET;
-	i2s_pdata[0].i2s_reg_comp2 = ACP_I2S_COMP2_PLAY_REG_OFFSET;
-	switch (adev->asic_type) {
-	case CHIP_STONEY:
-		i2s_pdata[1].quirks = DW_I2S_QUIRK_COMP_REG_OFFSET |
-			DW_I2S_QUIRK_COMP_PARAM1 |
-			DW_I2S_QUIRK_16BIT_IDX_OVERRIDE;
-		break;
-	default:
-		i2s_pdata[1].quirks = DW_I2S_QUIRK_COMP_REG_OFFSET |
-			DW_I2S_QUIRK_COMP_PARAM1;
-	}
-
-	i2s_pdata[1].cap = DWC_I2S_RECORD;
-	i2s_pdata[1].snd_rates = SNDRV_PCM_RATE_8000_96000;
-	i2s_pdata[1].i2s_reg_comp1 = ACP_I2S_COMP1_CAP_REG_OFFSET;
-	i2s_pdata[1].i2s_reg_comp2 = ACP_I2S_COMP2_CAP_REG_OFFSET;
-
-	i2s_pdata[2].quirks = DW_I2S_QUIRK_COMP_REG_OFFSET;
-	switch (adev->asic_type) {
-	case CHIP_STONEY:
-		i2s_pdata[2].quirks |= DW_I2S_QUIRK_16BIT_IDX_OVERRIDE;
-		break;
-	default:
-		break;
-	}
-
-	i2s_pdata[2].cap = DWC_I2S_PLAY | DWC_I2S_RECORD;
-	i2s_pdata[2].snd_rates = SNDRV_PCM_RATE_8000_96000;
-	i2s_pdata[2].i2s_reg_comp1 = ACP_BT_COMP1_REG_OFFSET;
-	i2s_pdata[2].i2s_reg_comp2 = ACP_BT_COMP2_REG_OFFSET;
-#endif
-
-	adev->acp.acp_res[0].name = "acp2x_dma";
-	adev->acp.acp_res[0].flags = IORESOURCE_MEM;
-	adev->acp.acp_res[0].start = acp_base;
-	adev->acp.acp_res[0].end = acp_base + ACP_DMA_REGS_END;
-
-	adev->acp.acp_res[1].name = "acp2x_dw_i2s_play";
-	adev->acp.acp_res[1].flags = IORESOURCE_MEM;
-	adev->acp.acp_res[1].start = acp_base + ACP_I2S_PLAY_REGS_START;
-	adev->acp.acp_res[1].end = acp_base + ACP_I2S_PLAY_REGS_END;
-
-	adev->acp.acp_res[2].name = "acp2x_dw_i2s_cap";
-	adev->acp.acp_res[2].flags = IORESOURCE_MEM;
-	adev->acp.acp_res[2].start = acp_base + ACP_I2S_CAP_REGS_START;
-	adev->acp.acp_res[2].end = acp_base + ACP_I2S_CAP_REGS_END;
-
-	adev->acp.acp_res[3].name = "acp2x_dw_bt_i2s_play_cap";
-	adev->acp.acp_res[3].flags = IORESOURCE_MEM;
-	adev->acp.acp_res[3].start = acp_base + ACP_BT_PLAY_REGS_START;
-	adev->acp.acp_res[3].end = acp_base + ACP_BT_PLAY_REGS_END;
-
-	adev->acp.acp_res[4].name = "acp2x_dma_irq";
-	adev->acp.acp_res[4].flags = IORESOURCE_IRQ;
-	adev->acp.acp_res[4].start = amdgpu_irq_create_mapping(adev, 162);
-	adev->acp.acp_res[4].end = adev->acp.acp_res[4].start;
-
-#ifdef __NetBSD__		/* XXX amdgpu cell */
-	__USE(dev);
-	__USE(i);
-#else
-	adev->acp.acp_cell[0].name = "acp_audio_dma";
-	adev->acp.acp_cell[0].num_resources = 5;
-	adev->acp.acp_cell[0].resources = &adev->acp.acp_res[0];
-	adev->acp.acp_cell[0].platform_data = &adev->asic_type;
-	adev->acp.acp_cell[0].pdata_size = sizeof(adev->asic_type);
-
-	adev->acp.acp_cell[1].name = "designware-i2s";
-	adev->acp.acp_cell[1].num_resources = 1;
-	adev->acp.acp_cell[1].resources = &adev->acp.acp_res[1];
-	adev->acp.acp_cell[1].platform_data = &i2s_pdata[0];
-	adev->acp.acp_cell[1].pdata_size = sizeof(struct i2s_platform_data);
-
-	adev->acp.acp_cell[2].name = "designware-i2s";
-	adev->acp.acp_cell[2].num_resources = 1;
-	adev->acp.acp_cell[2].resources = &adev->acp.acp_res[2];
-	adev->acp.acp_cell[2].platform_data = &i2s_pdata[1];
-	adev->acp.acp_cell[2].pdata_size = sizeof(struct i2s_platform_data);
-
-	adev->acp.acp_cell[3].name = "designware-i2s";
-	adev->acp.acp_cell[3].num_resources = 1;
-	adev->acp.acp_cell[3].resources = &adev->acp.acp_res[3];
-	adev->acp.acp_cell[3].platform_data = &i2s_pdata[2];
-	adev->acp.acp_cell[3].pdata_size = sizeof(struct i2s_platform_data);
-
-	r = mfd_add_hotplug_devices(adev->acp.parent, adev->acp.acp_cell,
-								ACP_DEVS);
-	if (r)
-		goto failure;
-
-	for (i = 0; i < ACP_DEVS ; i++) {
-		dev = get_mfd_cell_dev(adev->acp.acp_cell[i].name, i);
-		r = pm_genpd_add_device(&adev->acp.acp_genpd->gpd, dev);
-		if (r) {
-			dev_err(dev, "Failed to add dev to genpd\n");
-			goto failure;
-		}
-	}
-#endif
-=======
 	dmi_check_system(acp_quirk_table);
 	switch (acp_machine_id) {
 	case ST_JADEITE:
 	{
+#ifndef __NetBSD__		/* XXX amdgpu cell */
 		adev->acp.acp_cell = kcalloc(2, sizeof(struct mfd_cell),
 					     GFP_KERNEL);
 		if (!adev->acp.acp_cell) {
 			r = -ENOMEM;
 			goto failure;
 		}
+#endif
 
 		adev->acp.acp_res = kcalloc(3, sizeof(struct resource), GFP_KERNEL);
 		if (!adev->acp.acp_res) {
@@ -435,6 +293,9 @@ static int acp_hw_init(void *handle)
 			goto failure;
 		}
 
+#ifdef __NetBSD__		/* XXX amdgpu sound */
+		__USE(i2s_pdata);
+#else
 		i2s_pdata = kcalloc(1, sizeof(struct i2s_platform_data), GFP_KERNEL);
 		if (!i2s_pdata) {
 			r = -ENOMEM;
@@ -447,6 +308,7 @@ static int acp_hw_init(void *handle)
 		i2s_pdata[0].snd_rates = SNDRV_PCM_RATE_8000_96000;
 		i2s_pdata[0].i2s_reg_comp1 = ACP_I2S_COMP1_CAP_REG_OFFSET;
 		i2s_pdata[0].i2s_reg_comp2 = ACP_I2S_COMP2_CAP_REG_OFFSET;
+#endif	/* __NetBSD__ */
 
 		adev->acp.acp_res[0].name = "acp2x_dma";
 		adev->acp.acp_res[0].flags = IORESOURCE_MEM;
@@ -463,6 +325,7 @@ static int acp_hw_init(void *handle)
 		adev->acp.acp_res[2].start = amdgpu_irq_create_mapping(adev, 162);
 		adev->acp.acp_res[2].end = adev->acp.acp_res[2].start;
 
+#ifndef __NetBSD__		/* XXX amdgpu cell */
 		adev->acp.acp_cell[0].name = "acp_audio_dma";
 		adev->acp.acp_cell[0].num_resources = 3;
 		adev->acp.acp_cell[0].resources = &adev->acp.acp_res[0];
@@ -481,9 +344,11 @@ static int acp_hw_init(void *handle)
 					  acp_genpd_add_device);
 		if (r)
 			goto failure;
+#endif	/* __NetBSD__ */
 		break;
 	}
 	default:
+#ifndef __NetBSD__		/* XXX amdgpu cell */
 		adev->acp.acp_cell = kcalloc(ACP_DEVS, sizeof(struct mfd_cell),
 					     GFP_KERNEL);
 
@@ -491,6 +356,7 @@ static int acp_hw_init(void *handle)
 			r = -ENOMEM;
 			goto failure;
 		}
+#endif
 
 		adev->acp.acp_res = kcalloc(5, sizeof(struct resource), GFP_KERNEL);
 		if (!adev->acp.acp_res) {
@@ -498,6 +364,9 @@ static int acp_hw_init(void *handle)
 			goto failure;
 		}
 
+#ifdef __NetBSD__		/* XXX amdgpu sound */
+		__USE(i2s_pdata);
+#else
 		i2s_pdata = kcalloc(3, sizeof(struct i2s_platform_data), GFP_KERNEL);
 		if (!i2s_pdata) {
 			r = -ENOMEM;
@@ -545,6 +414,7 @@ static int acp_hw_init(void *handle)
 		i2s_pdata[2].snd_rates = SNDRV_PCM_RATE_8000_96000;
 		i2s_pdata[2].i2s_reg_comp1 = ACP_BT_COMP1_REG_OFFSET;
 		i2s_pdata[2].i2s_reg_comp2 = ACP_BT_COMP2_REG_OFFSET;
+#endif
 
 		adev->acp.acp_res[0].name = "acp2x_dma";
 		adev->acp.acp_res[0].flags = IORESOURCE_MEM;
@@ -571,6 +441,7 @@ static int acp_hw_init(void *handle)
 		adev->acp.acp_res[4].start = amdgpu_irq_create_mapping(adev, 162);
 		adev->acp.acp_res[4].end = adev->acp.acp_res[4].start;
 
+#infdef __NetBSD__		/* XXX amdgpu cell */
 		adev->acp.acp_cell[0].name = "acp_audio_dma";
 		adev->acp.acp_cell[0].num_resources = 5;
 		adev->acp.acp_cell[0].resources = &adev->acp.acp_res[0];
@@ -603,8 +474,8 @@ static int acp_hw_init(void *handle)
 					  acp_genpd_add_device);
 		if (r)
 			goto failure;
+#endif
 	}
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* Assert Soft reset of ACP */
 	val = cgs_read_register(adev->acp.cgs_device, mmACP_SOFT_RESET);
@@ -711,26 +582,12 @@ static int acp_hw_fini(void *handle)
 		udelay(100);
 	}
 
-<<<<<<< HEAD
-#ifdef __NetBSD__		/* XXX amdgpu pm */
-	__USE(dev);
-	__USE(i);
-	__USE(ret);
-#else
-	for (i = 0; i < ACP_DEVS ; i++) {
-		dev = get_mfd_cell_dev(adev->acp.acp_cell[i].name, i);
-		ret = pm_genpd_remove_device(dev);
-		/* If removal fails, dont giveup and try rest */
-		if (ret)
-			dev_err(dev, "remove dev from genpd failed\n");
-	}
-=======
+#ifndef __NetBSD__		/* XXX amdgpu pm */
 	device_for_each_child(adev->acp.parent, NULL,
 			      acp_genpd_remove_device);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	mfd_remove_devices(adev->acp.parent);
-#endif
+#endif	/* __NetBSD__ */
 	kfree(adev->acp.acp_res);
 	kfree(adev->acp.acp_genpd);
 	kfree(adev->acp.acp_cell);
