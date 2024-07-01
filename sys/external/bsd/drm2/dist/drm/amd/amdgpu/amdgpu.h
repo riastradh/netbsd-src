@@ -30,7 +30,6 @@
 #ifndef __AMDGPU_H__
 #define __AMDGPU_H__
 
-<<<<<<< HEAD
 #ifdef _KERNEL_OPT
 #include "opt_amdgpu_cik.h"
 #endif
@@ -38,7 +37,7 @@
 #ifdef AMDGPU_CIK
 #define	CONFIG_DRM_AMDGPU_CIK	1
 #endif
-=======
+
 #ifdef pr_fmt
 #undef pr_fmt
 #endif
@@ -51,7 +50,6 @@
 
 #define dev_fmt(fmt) "amdgpu: " fmt
 
->>>>>>> vendor/linux-drm-v6.6.35
 #include "amdgpu_ctx.h"
 
 #include <linux/atomic.h>
