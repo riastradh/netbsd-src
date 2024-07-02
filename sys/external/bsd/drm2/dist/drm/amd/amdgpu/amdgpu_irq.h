@@ -82,7 +82,11 @@ struct amdgpu_irq_src_funcs {
 
 struct amdgpu_irq {
 	bool				installed;
+#ifdef __NetBSD__
+	pci_intr_handle_t		*irq;
+#else
 	unsigned int			irq;
+#endif
 	spinlock_t			lock;
 	/* interrupt sources */
 	struct amdgpu_irq_client	client[AMDGPU_IRQ_CLIENTID_MAX];
@@ -123,10 +127,6 @@ enum interrupt_node_id_per_aid {
 extern const int node_id_to_phys_map[NODEID_MAX];
 
 void amdgpu_irq_disable_all(struct amdgpu_device *adev);
-<<<<<<< HEAD
-irqreturn_t amdgpu_irq_handler(DRM_IRQ_ARGS);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 int amdgpu_irq_init(struct amdgpu_device *adev);
 void amdgpu_irq_fini_sw(struct amdgpu_device *adev);

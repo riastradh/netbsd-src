@@ -31,14 +31,7 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_drv.c,v 1.8 2021/12/19 12:23:42 riastradh Exp
 #include <drm/drm_drv.h>
 #include <drm/drm_fbdev_generic.h>
 #include <drm/drm_gem.h>
-<<<<<<< HEAD
-#include <drm/drm_vblank.h>
-#include "amdgpu_drv.h"
-
-#include <drm/drm_pci.h>
-=======
 #include <drm/drm_managed.h>
->>>>>>> vendor/linux-drm-v6.6.35
 #include <drm/drm_pciids.h>
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_vblank.h>
@@ -224,13 +217,10 @@ DECLARE_DYNDBG_CLASSMAP(drm_debug_classes, DD_CLASS_TYPE_DISJOINT_BITS, 0,
 struct amdgpu_mgpu_info mgpu_info = {
 #ifndef __NetBSD__
 	.mutex = __MUTEX_INITIALIZER(mgpu_info.mutex),
-<<<<<<< HEAD
 #endif
-=======
 	.delayed_reset_work = __DELAYED_WORK_INITIALIZER(
 			mgpu_info.delayed_reset_work,
 			amdgpu_drv_delayed_reset_work_handler, 0),
->>>>>>> vendor/linux-drm-v6.6.35
 };
 int amdgpu_ras_enable = -1;
 uint amdgpu_ras_mask = 0xffffffff;
@@ -2794,7 +2784,6 @@ int amdgpu_file_to_fpriv(struct file *filp, struct amdgpu_fpriv **fpriv)
 	if (!filp)
 		return -EINVAL;
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	if (filp->f_ops != &drm_fileops)
 		return -EINVAL;
@@ -2802,10 +2791,7 @@ int amdgpu_file_to_fpriv(struct file *filp, struct amdgpu_fpriv **fpriv)
 	if (file->minor->dev->driver != &kms_driver)
 		return -EINVAL;
 #else
-	if (filp->f_op != &amdgpu_driver_kms_fops) {
-=======
 	if (filp->f_op != &amdgpu_driver_kms_fops)
->>>>>>> vendor/linux-drm-v6.6.35
 		return -EINVAL;
 
 	file = filp->private_data;
@@ -2843,20 +2829,10 @@ static const struct drm_driver amdgpu_kms_driver = {
 	.open = amdgpu_driver_open_kms,
 	.postclose = amdgpu_driver_postclose_kms,
 	.lastclose = amdgpu_driver_lastclose_kms,
-<<<<<<< HEAD
-	.unload = amdgpu_driver_unload_kms,
-	.get_vblank_counter = amdgpu_get_vblank_counter_kms,
-	.enable_vblank = amdgpu_enable_vblank_kms,
-	.disable_vblank = amdgpu_disable_vblank_kms,
-	.get_vblank_timestamp = drm_calc_vbltimestamp_from_scanoutpos,
-	.get_scanout_position = amdgpu_get_crtc_scanout_position,
-	.irq_handler = amdgpu_irq_handler,
 #ifdef __NetBSD__
 	.request_irq = drm_pci_request_irq,
 	.free_irq = drm_pci_free_irq,
 #endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	.ioctls = amdgpu_ioctls_kms,
 	.num_ioctls = ARRAY_SIZE(amdgpu_ioctls_kms),
 	.dumb_create = amdgpu_mode_dumb_create,
@@ -2867,12 +2843,10 @@ static const struct drm_driver amdgpu_kms_driver = {
 	.gem_uvm_ops = &amdgpu_gem_uvm_ops,
 #else
 	.fops = &amdgpu_driver_kms_fops,
-<<<<<<< HEAD
-=======
+#endif
 	.release = &amdgpu_driver_release_kms,
 #ifdef CONFIG_PROC_FS
 	.show_fdinfo = amdgpu_show_fdinfo,
->>>>>>> vendor/linux-drm-v6.6.35
 #endif
 
 	.gem_prime_import = amdgpu_gem_prime_import,
@@ -2885,15 +2859,6 @@ static const struct drm_driver amdgpu_kms_driver = {
 	.patchlevel = KMS_DRIVER_PATCHLEVEL,
 };
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-
-struct drm_driver *const amdgpu_drm_driver = &kms_driver;
-const struct pci_device_id *const amdgpu_device_ids = pciidlist;
-const size_t amdgpu_n_device_ids = __arraycount(pciidlist);
-
-#else  /* __NetBSD__ */
-=======
 const struct drm_driver amdgpu_partition_driver = {
 	.driver_features =
 	    DRIVER_GEM | DRIVER_RENDER | DRIVER_SYNCOBJ |
@@ -2918,6 +2883,13 @@ const struct drm_driver amdgpu_partition_driver = {
 	.patchlevel = KMS_DRIVER_PATCHLEVEL,
 };
 
+#ifdef __NetBSD__
+
+const struct pci_device_id *const amdgpu_device_ids = pciidlist;
+const size_t amdgpu_n_device_ids = __arraycount(pciidlist);
+
+#else  /* __NetBSD__ */
+
 static struct pci_error_handlers amdgpu_pci_err_handler = {
 	.error_detected	= amdgpu_pci_error_detected,
 	.mmio_enabled	= amdgpu_pci_mmio_enabled,
@@ -2931,7 +2903,6 @@ static const struct attribute_group *amdgpu_sysfs_groups[] = {
 	&amdgpu_flash_attr_group,
 	NULL,
 };
->>>>>>> vendor/linux-drm-v6.6.35
 
 static struct pci_driver amdgpu_kms_pci_driver = {
 	.name = DRIVER_NAME,

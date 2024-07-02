@@ -62,57 +62,11 @@ static int psp_v10_0_init_microcode(struct psp_context *psp)
 	if (err)
 		return err;
 
-<<<<<<< HEAD
-	err = amdgpu_ucode_validate(adev->psp.asd_fw);
-	if (err)
-		goto out;
-
-	hdr = (const struct psp_firmware_header_v1_0 *)adev->psp.asd_fw->data;
-	adev->psp.asd_fw_version = le32_to_cpu(hdr->header.ucode_version);
-	adev->psp.asd_feature_version = le32_to_cpu(hdr->ucode_feature_version);
-	adev->psp.asd_ucode_size = le32_to_cpu(hdr->header.ucode_size_bytes);
-	adev->psp.asd_start_addr = (const uint8_t *)hdr +
-				le32_to_cpu(hdr->header.ucode_array_offset_bytes);
-
-	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_ta.bin", chip_name);
-	err = request_firmware(&adev->psp.ta_fw, fw_name, adev->dev);
-	if (err) {
-		release_firmware(adev->psp.ta_fw);
-		adev->psp.ta_fw = NULL;
-		dev_info(adev->dev,
-			 "psp v10.0: Failed to load firmware \"%s\"\n",
-			 fw_name);
-	} else {
-		err = amdgpu_ucode_validate(adev->psp.ta_fw);
-		if (err)
-			goto out2;
-
-		ta_hdr = (const struct ta_firmware_header_v1_0 *)
-				 adev->psp.ta_fw->data;
-		adev->psp.ta_hdcp_ucode_version =
-			le32_to_cpu(ta_hdr->ta_hdcp_ucode_version);
-		adev->psp.ta_hdcp_ucode_size =
-			le32_to_cpu(ta_hdr->ta_hdcp_size_bytes);
-		adev->psp.ta_hdcp_start_addr =
-			(const uint8_t *)ta_hdr +
-			le32_to_cpu(ta_hdr->header.ucode_array_offset_bytes);
-
-		adev->psp.ta_fw_version = le32_to_cpu(ta_hdr->header.ucode_version);
-
-		adev->psp.ta_dtm_ucode_version =
-			le32_to_cpu(ta_hdr->ta_dtm_ucode_version);
-		adev->psp.ta_dtm_ucode_size =
-			le32_to_cpu(ta_hdr->ta_dtm_size_bytes);
-		adev->psp.ta_dtm_start_addr =
-			(const uint8_t *)adev->psp.ta_hdcp_start_addr +
-			le32_to_cpu(ta_hdr->ta_dtm_offset_bytes);
-=======
 	err = psp_init_ta_microcode(psp, ucode_prefix);
 	if ((adev->ip_versions[GC_HWIP][0] == IP_VERSION(9, 1, 0)) &&
 		(adev->pdev->revision == 0xa1) &&
 		(psp->securedisplay_context.context.bin_desc.fw_version >= 0x27000008)) {
 		adev->psp.securedisplay_context.context.bin_desc.size_bytes = 0;
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 	return err;
 }

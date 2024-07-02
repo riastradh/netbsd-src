@@ -417,44 +417,6 @@ static const uint32_t ecc_umc_mcumc_ctrl_mask_addrs[] = {
 	(0x001d43e0 + 0x00001800),
 };
 
-<<<<<<< HEAD
-static const uint32_t ecc_umc_mcumc_status_addrs[] __unused = {
-	(0x000143c2 + 0x00000000),
-	(0x000143c2 + 0x00000800),
-	(0x000143c2 + 0x00001000),
-	(0x000143c2 + 0x00001800),
-	(0x000543c2 + 0x00000000),
-	(0x000543c2 + 0x00000800),
-	(0x000543c2 + 0x00001000),
-	(0x000543c2 + 0x00001800),
-	(0x000943c2 + 0x00000000),
-	(0x000943c2 + 0x00000800),
-	(0x000943c2 + 0x00001000),
-	(0x000943c2 + 0x00001800),
-	(0x000d43c2 + 0x00000000),
-	(0x000d43c2 + 0x00000800),
-	(0x000d43c2 + 0x00001000),
-	(0x000d43c2 + 0x00001800),
-	(0x001143c2 + 0x00000000),
-	(0x001143c2 + 0x00000800),
-	(0x001143c2 + 0x00001000),
-	(0x001143c2 + 0x00001800),
-	(0x001543c2 + 0x00000000),
-	(0x001543c2 + 0x00000800),
-	(0x001543c2 + 0x00001000),
-	(0x001543c2 + 0x00001800),
-	(0x001943c2 + 0x00000000),
-	(0x001943c2 + 0x00000800),
-	(0x001943c2 + 0x00001000),
-	(0x001943c2 + 0x00001800),
-	(0x001d43c2 + 0x00000000),
-	(0x001d43c2 + 0x00000800),
-	(0x001d43c2 + 0x00001000),
-	(0x001d43c2 + 0x00001800),
-};
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static int gmc_v9_0_ecc_interrupt_state(struct amdgpu_device *adev,
 		struct amdgpu_irq_src *src,
 		unsigned int type,
@@ -648,42 +610,6 @@ static int gmc_v9_0_process_interrupt(struct amdgpu_device *adev,
 					     entry->timestamp))
 				return 1;
 
-<<<<<<< HEAD
-	if (printk_ratelimit()) {
-		struct amdgpu_task_info task_info;
-
-		memset(&task_info, 0, sizeof(struct amdgpu_task_info));
-		amdgpu_vm_get_task_info(adev, entry->pasid, &task_info);
-
-		dev_err(adev->dev,
-			"[%s] %s page fault (src_id:%u ring:%u vmid:%u "
-			"pasid:%u, for process %s pid %d thread %s pid %d)\n",
-			hub_name, retry_fault ? "retry" : "no-retry",
-			entry->src_id, entry->ring_id, entry->vmid,
-			entry->pasid, task_info.process_name, task_info.tgid,
-			task_info.task_name, task_info.pid);
-		dev_err(adev->dev, "  in page starting at address 0x%016"PRIx64" from client %d\n",
-			addr, entry->client_id);
-		if (!amdgpu_sriov_vf(adev)) {
-			dev_err(adev->dev,
-				"VM_L2_PROTECTION_FAULT_STATUS:0x%08X\n",
-				status);
-			dev_err(adev->dev, "\t MORE_FAULTS: 0x%lx\n",
-				REG_GET_FIELD(status,
-				VM_L2_PROTECTION_FAULT_STATUS, MORE_FAULTS));
-			dev_err(adev->dev, "\t WALKER_ERROR: 0x%lx\n",
-				REG_GET_FIELD(status,
-				VM_L2_PROTECTION_FAULT_STATUS, WALKER_ERROR));
-			dev_err(adev->dev, "\t PERMISSION_FAULTS: 0x%lx\n",
-				REG_GET_FIELD(status,
-				VM_L2_PROTECTION_FAULT_STATUS, PERMISSION_FAULTS));
-			dev_err(adev->dev, "\t MAPPING_ERROR: 0x%lx\n",
-				REG_GET_FIELD(status,
-				VM_L2_PROTECTION_FAULT_STATUS, MAPPING_ERROR));
-			dev_err(adev->dev, "\t RW: 0x%lx\n",
-				REG_GET_FIELD(status,
-				VM_L2_PROTECTION_FAULT_STATUS, RW));
-=======
 			/* Delegate it to a different ring if the hardware hasn't
 			 * already done it.
 			 */
@@ -691,7 +617,6 @@ static int gmc_v9_0_process_interrupt(struct amdgpu_device *adev,
 				amdgpu_irq_delegate(adev, entry, 8);
 				return 1;
 			}
->>>>>>> vendor/linux-drm-v6.6.35
 
 			/* Try to handle the recoverable page faults by filling page
 			 * tables
@@ -2240,16 +2165,12 @@ static int gmc_v9_0_sw_init(void *handle)
 	 */
 	adev->gmc.mc_mask = 0xffffffffffffULL; /* 48 bit MC */
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	r = drm_limit_dma_space(adev->ddev, 0, DMA_BIT_MASK(44));
-#else
-	r = dma_set_mask_and_coherent(adev->dev, DMA_BIT_MASK(44));
-#endif
-=======
 	dma_addr_bits = adev->ip_versions[GC_HWIP][0] >= IP_VERSION(9, 4, 2) ? 48:44;
+#ifdef __NetBSD__
+	r = drm_limit_dma_space(adev->ddev, 0, DMA_BIT_MASK(dma_addr_bits));
+#else
 	r = dma_set_mask_and_coherent(adev->dev, DMA_BIT_MASK(dma_addr_bits));
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	if (r) {
 		dev_warn(adev->dev, "amdgpu: No suitable DMA available.\n");
 		return r;

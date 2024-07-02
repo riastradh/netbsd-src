@@ -83,83 +83,6 @@ static DEVICE_ATTR(mem_info_gtt_total, S_IRUGO,
 static DEVICE_ATTR(mem_info_gtt_used, S_IRUGO,
 	           amdgpu_mem_info_gtt_used_show, NULL);
 
-<<<<<<< HEAD
-#endif
-
-/**
- * amdgpu_gtt_mgr_init - init GTT manager and DRM MM
- *
- * @man: TTM memory type manager
- * @p_size: maximum size of GTT
- *
- * Allocate and initialize the GTT manager.
- */
-static int amdgpu_gtt_mgr_init(struct ttm_mem_type_manager *man,
-			       unsigned long p_size)
-{
-	struct amdgpu_device *adev = amdgpu_ttm_adev(man->bdev);
-	struct amdgpu_gtt_mgr *mgr;
-	uint64_t start, size;
-	int ret;
-
-	mgr = kzalloc(sizeof(*mgr), GFP_KERNEL);
-	if (!mgr)
-		return -ENOMEM;
-
-	start = AMDGPU_GTT_MAX_TRANSFER_SIZE * AMDGPU_GTT_NUM_TRANSFER_WINDOWS;
-	size = (adev->gmc.gart_size >> PAGE_SHIFT) - start;
-	drm_mm_init(&mgr->mm, start, size);
-	spin_lock_init(&mgr->lock);
-	atomic64_set(&mgr->available, p_size);
-	man->priv = mgr;
-
-#ifdef __NetBSD__		/* XXX amdgpu sysfs */
-	__USE(ret);
-#else
-	ret = device_create_file(adev->dev, &dev_attr_mem_info_gtt_total);
-	if (ret) {
-		DRM_ERROR("Failed to create device file mem_info_gtt_total\n");
-		return ret;
-	}
-	ret = device_create_file(adev->dev, &dev_attr_mem_info_gtt_used);
-	if (ret) {
-		DRM_ERROR("Failed to create device file mem_info_gtt_used\n");
-		return ret;
-	}
-#endif
-
-	return 0;
-}
-
-/**
- * amdgpu_gtt_mgr_fini - free and destroy GTT manager
- *
- * @man: TTM memory type manager
- *
- * Destroy and free the GTT manager, returns -EBUSY if ranges are still
- * allocated inside it.
- */
-static int amdgpu_gtt_mgr_fini(struct ttm_mem_type_manager *man)
-{
-	struct amdgpu_device *adev = amdgpu_ttm_adev(man->bdev);
-	struct amdgpu_gtt_mgr *mgr = man->priv;
-	spin_lock(&mgr->lock);
-	drm_mm_takedown(&mgr->mm);
-	spin_unlock(&mgr->lock);
-	spin_lock_destroy(&mgr->lock);
-	kfree(mgr);
-	man->priv = NULL;
-
-#ifdef __NetBSD__		/* XXX amdgpu sysfs */
-	__USE(adev);
-#else
-	device_remove_file(adev->dev, &dev_attr_mem_info_gtt_total);
-	device_remove_file(adev->dev, &dev_attr_mem_info_gtt_used);
-#endif
-
-	return 0;
-}
-=======
 static struct attribute *amdgpu_gtt_mgr_attributes[] = {
 	&dev_attr_mem_info_gtt_total.attr,
 	&dev_attr_mem_info_gtt_used.attr,
@@ -169,7 +92,8 @@ static struct attribute *amdgpu_gtt_mgr_attributes[] = {
 const struct attribute_group amdgpu_gtt_mgr_attr_group = {
 	.attrs = amdgpu_gtt_mgr_attributes
 };
->>>>>>> vendor/linux-drm-v6.6.35
+
+#endif	/* __NetBSD__ */
 
 /**
  * amdgpu_gtt_mgr_has_gart_addr - Check if mem has address space
@@ -341,13 +265,6 @@ static void amdgpu_gtt_mgr_debug(struct ttm_resource_manager *man,
 	spin_lock(&mgr->lock);
 	drm_mm_print(&mgr->mm, printer);
 	spin_unlock(&mgr->lock);
-<<<<<<< HEAD
-
-	drm_printf(printer, "man size:%"PRIu64" pages, gtt available:%"PRId64" pages, usage:%"PRIu64"MB\n",
-		   man->size, (u64)atomic64_read(&mgr->available),
-		   amdgpu_gtt_mgr_usage(man) >> 20);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static const struct ttm_resource_manager_func amdgpu_gtt_mgr_func = {

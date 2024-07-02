@@ -163,52 +163,19 @@ static int gmc_v10_0_process_interrupt(struct amdgpu_device *adev,
 	memset(&task_info, 0, sizeof(struct amdgpu_task_info));
 	amdgpu_vm_get_task_info(adev, entry->pasid, &task_info);
 
-<<<<<<< HEAD
-		dev_err(adev->dev,
-			"[%s] page fault (src_id:%u ring:%u vmid:%u pasid:%u, "
-			"for process %s pid %d thread %s pid %d)\n",
-			entry->vmid_src ? "mmhub" : "gfxhub",
-			entry->src_id, entry->ring_id, entry->vmid,
-			entry->pasid, task_info.process_name, task_info.tgid,
-			task_info.task_name, task_info.pid);
-		dev_err(adev->dev, "  in page starting at address 0x%016"PRIx64" from client %d\n",
-			addr, entry->client_id);
-		if (!amdgpu_sriov_vf(adev)) {
-			dev_err(adev->dev,
-				"GCVM_L2_PROTECTION_FAULT_STATUS:0x%08X\n",
-				status);
-			dev_err(adev->dev, "\t MORE_FAULTS: 0x%lx\n",
-				REG_GET_FIELD(status,
-				GCVM_L2_PROTECTION_FAULT_STATUS, MORE_FAULTS));
-			dev_err(adev->dev, "\t WALKER_ERROR: 0x%lx\n",
-				REG_GET_FIELD(status,
-				GCVM_L2_PROTECTION_FAULT_STATUS, WALKER_ERROR));
-			dev_err(adev->dev, "\t PERMISSION_FAULTS: 0x%lx\n",
-				REG_GET_FIELD(status,
-				GCVM_L2_PROTECTION_FAULT_STATUS, PERMISSION_FAULTS));
-			dev_err(adev->dev, "\t MAPPING_ERROR: 0x%lx\n",
-				REG_GET_FIELD(status,
-				GCVM_L2_PROTECTION_FAULT_STATUS, MAPPING_ERROR));
-			dev_err(adev->dev, "\t RW: 0x%lx\n",
-				REG_GET_FIELD(status,
-				GCVM_L2_PROTECTION_FAULT_STATUS, RW));
-		}
-	}
-=======
 	dev_err(adev->dev,
 		"[%s] page fault (src_id:%u ring:%u vmid:%u pasid:%u, for process %s pid %d thread %s pid %d)\n",
 		entry->vmid_src ? "mmhub" : "gfxhub",
 		entry->src_id, entry->ring_id, entry->vmid,
 		entry->pasid, task_info.process_name, task_info.tgid,
 		task_info.task_name, task_info.pid);
-	dev_err(adev->dev, "  in page starting at address 0x%016llx from client 0x%x (%s)\n",
+	dev_err(adev->dev, "  in page starting at address 0x%016"PRIx64" from client 0x%x (%s)\n",
 		addr, entry->client_id,
 		soc15_ih_clientid_name[entry->client_id]);
 
 	if (!amdgpu_sriov_vf(adev))
 		hub->vmhub_funcs->print_l2_protection_fault_status(adev,
 								   status);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	return 0;
 }

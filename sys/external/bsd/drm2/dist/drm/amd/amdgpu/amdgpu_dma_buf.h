@@ -31,20 +31,8 @@ struct dma_buf *amdgpu_gem_prime_export(struct drm_gem_object *gobj,
 					int flags);
 struct drm_gem_object *amdgpu_gem_prime_import(struct drm_device *dev,
 					    struct dma_buf *dma_buf);
-<<<<<<< HEAD
-void *amdgpu_gem_prime_vmap(struct drm_gem_object *obj);
-void amdgpu_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr);
-#ifdef __NetBSD__
-int amdgpu_gem_prime_mmap(struct drm_gem_object *, off_t *, size_t, int,
-    int *, int *, struct uvm_object **, int *);
-#else
-int amdgpu_gem_prime_mmap(struct drm_gem_object *obj,
-			  struct vm_area_struct *vma);
-#endif
-=======
 bool amdgpu_dmabuf_is_xgmi_accessible(struct amdgpu_device *adev,
 				      struct amdgpu_bo *bo);
->>>>>>> vendor/linux-drm-v6.6.35
 
 extern const struct dma_buf_ops amdgpu_dmabuf_ops;
 

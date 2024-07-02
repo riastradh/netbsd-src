@@ -166,11 +166,7 @@ void amdgpu_irq_disable_all(struct amdgpu_device *adev)
  * Returns:
  * result of handling the IRQ, as defined by &irqreturn_t
  */
-<<<<<<< HEAD
-irqreturn_t amdgpu_irq_handler(DRM_IRQ_ARGS)
-=======
-static irqreturn_t amdgpu_irq_handler(int irq, void *arg)
->>>>>>> vendor/linux-drm-v6.6.35
+static irqreturn_t amdgpu_irq_handler(DRM_IRQ_ARGS)
 {
 	struct drm_device *dev = (struct drm_device *) arg;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -280,22 +276,56 @@ static void amdgpu_restore_msix(struct amdgpu_device *adev)
 int amdgpu_irq_init(struct amdgpu_device *adev)
 {
 	int r = 0;
+#ifdef __NetBSD__
+	pci_intr_handle_t *irq = NULL;
+#else
 	unsigned int irq;
+#endif
 
 	spin_lock_init(&adev->irq.lock);
 
 	/* Enable MSI if not disabled by module parameter */
 	adev->irq.msi_enabled = false;
 
+#ifdef __NetBSD__
+	const struct pci_attach_args *const pa = &adev->pdev->pd_pa;
+	char intrbuf[PCI_INTRSTR_LEN];
+
+	/* XXX errno NetBSD->Linux */
+	r = -ENXIO;
 	if (amdgpu_msi_ok(adev)) {
-#ifdef __NetBSD__		/* XXX amdgpu msix */
-		if (pci_enable_msi(adev->pdev) == 0) {
-			adev->irq.msi_enabled = true;
-			dev_dbg(adev->dev, "amdgpu: using MSI/MSI-X.\n");
-		} else {
-			dev_err(adev->dev, "amdgpu: failed to enable MSI\n");
-		}
+		if (r)
+			r = -pci_msix_alloc_exact(pa, &irq, 1);
+		if (r)
+			r = -pci_msi_alloc_exact(pa, &irq, 1);
+	}
+	if (r)
+		r = -pci_intx_alloc(pa, &irq);
+	if (r) {
+		dev_err(adev->dev, "failed to allocate interrupt: %d\n", r);
+		return r;
+	}
+	dev_info(adev->dev, "interrupting at %s\n",
+	    pci_intr_string(pa->pa_pc, *irq, intrbuf, sizeof(intrbuf)));
+	switch (pci_intr_type(pa->pa_pc, *irq)) {
+	case PCI_INTR_TYPE_MSIX:
+		adev->irq.msi_enabled = true;
+		dev_dbg(adev->dev, "using MSI-X\n");
+		break;
+	case PCI_INTR_TYPE_MSI:
+		adev->irq.msi_enabled = true;
+		dev_dbg(adev->dev, "using MSI\n");
+		break;
+	case PCI_INTR_TYPE_INTX:
+		dev_dbg(adev->dev, "using INTx\n");
+		break;
+	default:
+		dev_dbg(adev->dev, "using interrupt type %d\n",
+		    (int)pci_intr_type(pa->pa_pc, *irq));
+		break;
+	}
 #else
+	if (amdgpu_msi_ok(adev)) {
 		int nvec = pci_msix_vec_count(adev->pdev);
 		unsigned int flags;
 
@@ -310,30 +340,26 @@ int amdgpu_irq_init(struct amdgpu_device *adev)
 			adev->irq.msi_enabled = true;
 			dev_dbg(adev->dev, "using MSI/MSI-X.\n");
 		}
-#endif
 	}
+#endif	/* __NetBSD__ */
 
 	INIT_WORK(&adev->irq.ih1_work, amdgpu_irq_handle_ih1);
 	INIT_WORK(&adev->irq.ih2_work, amdgpu_irq_handle_ih2);
 	INIT_WORK(&adev->irq.ih_soft_work, amdgpu_irq_handle_ih_soft);
 
-<<<<<<< HEAD
-	adev->irq.installed = true;
-#ifdef __NetBSD__	/* XXX post-merge address comment below */
-	r = drm_irq_install(adev->ddev);
-#else
-	/* Use vector 0 for MSI-X */
-	r = drm_irq_install(adev->ddev, pci_irq_vector(adev->pdev, 0));
-#endif
+#ifdef __NetBSD__
+	/* XXX errno NetBSD->Linux */
+	r = -pci_intr_establish_xname(pa->pa_pc, *irq,
+	    amdgpu_irq_handler, adev_to_drm(adev), device_xname(adev->dev));
 	if (r) {
-		adev->irq.installed = false;
-		if (!amdgpu_device_has_dc_support(adev))
-			flush_work(&adev->hotplug_work);
-=======
+		pci_intr_release(pa->pa_pc, irq, 1);
+		adev->irq.irq = NULL;
+		return r;
+	}
+#else
 	/* Use vector 0 for MSI-X. */
 	r = pci_irq_vector(adev->pdev, 0);
 	if (r < 0)
->>>>>>> vendor/linux-drm-v6.6.35
 		return r;
 	irq = r;
 
@@ -342,6 +368,7 @@ int amdgpu_irq_init(struct amdgpu_device *adev)
 			adev_to_drm(adev));
 	if (r)
 		return r;
+#endif	/* __NetBSD__ */
 	adev->irq.installed = true;
 	adev->irq.irq = irq;
 	adev_to_drm(adev)->max_vblank_count = 0x00ffffff;
@@ -354,10 +381,19 @@ int amdgpu_irq_init(struct amdgpu_device *adev)
 void amdgpu_irq_fini_hw(struct amdgpu_device *adev)
 {
 	if (adev->irq.installed) {
+#ifdef __NetBSD__
+		pci_intr_disestablish(adev->pdev->pd_pa.pa_pc, *adev->irq.irq);
+#else
 		free_irq(adev->irq.irq, adev_to_drm(adev));
+#endif
 		adev->irq.installed = false;
+#ifdef __NetBSD__
+		pci_intr_release(adev->pdev->pd_pa.p_pc, adev->irq.irq, 1);
+		adev->irq.irq = NULL;
+#else
 		if (adev->irq.msi_enabled)
 			pci_free_irq_vectors(adev->pdev);
+#endif
 	}
 
 	amdgpu_ih_ring_fini(adev, &adev->irq.ih_soft);
@@ -377,22 +413,7 @@ void amdgpu_irq_fini_hw(struct amdgpu_device *adev)
  */
 void amdgpu_irq_fini_sw(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
-	unsigned i, j;
-
-	if (adev->irq.installed) {
-		drm_irq_uninstall(adev->ddev);
-		adev->irq.installed = false;
-#ifndef __NetBSD__		/* XXX amdgpu msix */
-		if (adev->irq.msi_enabled)
-			pci_free_irq_vectors(adev->pdev);
-#endif
-		if (!amdgpu_device_has_dc_support(adev))
-			flush_work(&adev->hotplug_work);
-	}
-=======
 	unsigned int i, j;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	for (i = 0; i < AMDGPU_IRQ_CLIENTID_MAX; ++i) {
 		if (!adev->irq.client[i].sources)
@@ -485,12 +506,8 @@ void amdgpu_irq_dispatch(struct amdgpu_device *adev,
 	bool handled = false;
 	int r;
 
-<<<<<<< HEAD
-	entry.iv_entry = (const uint32_t *)__UNVOLATILE(&ih->ring[ring_index]);
-=======
 	entry.ih = ih;
-	entry.iv_entry = (const uint32_t *)&ih->ring[ring_index];
->>>>>>> vendor/linux-drm-v6.6.35
+	entry.iv_entry = (const uint32_t *)__UNVOLATILE(&ih->ring[ring_index]);
 	amdgpu_ih_decode_iv(adev, &entry);
 
 	trace_amdgpu_iv(ih - &adev->irq.ih, &entry);
@@ -504,16 +521,11 @@ void amdgpu_irq_dispatch(struct amdgpu_device *adev,
 	} else	if (src_id >= AMDGPU_MAX_IRQ_SRC_ID) {
 		DRM_DEBUG("Invalid src_id in IV: %d\n", src_id);
 
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX amdgpu irq */
-	} else if (adev->irq.virq[src_id]) {
-		generic_handle_irq(irq_find_mapping(adev->irq.domain, src_id));
-#endif
-=======
 	} else if ((client_id == AMDGPU_IRQ_CLIENTID_LEGACY) &&
 		   adev->irq.virq[src_id]) {
 		generic_handle_domain_irq(adev->irq.domain, src_id);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	} else if (!adev->irq.client[client_id].sources) {
 		DRM_DEBUG("Unregistered interrupt client_id: %d src_id: %d\n",

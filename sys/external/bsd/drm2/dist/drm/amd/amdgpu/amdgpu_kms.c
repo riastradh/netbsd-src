@@ -92,13 +92,11 @@ void amdgpu_driver_unload_kms(struct drm_device *dev)
 
 	amdgpu_unregister_gpu_instance(adev);
 
-<<<<<<< HEAD
+#ifdef __NetBSD__
 	if (adev->rmmio_size == 0)
-		goto done_free;
-=======
+#else
 	if (adev->rmmio == NULL)
 		return;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (amdgpu_acpi_smart_shift_update(dev, AMDGPU_SS_DRV_UNLOAD))
 		DRM_WARN("smart shift update failed\n");
@@ -156,11 +154,7 @@ int amdgpu_driver_load_kms(struct amdgpu_device *adev, unsigned long flags)
 	 */
 	r = amdgpu_device_init(adev, flags);
 	if (r) {
-<<<<<<< HEAD
-		dev_err(pci_dev_dev(dev->pdev), "Fatal error during GPU init\n");
-=======
 		dev_err(dev->dev, "Fatal error during GPU init\n");
->>>>>>> vendor/linux-drm-v6.6.35
 		goto out;
 	}
 
@@ -200,15 +194,6 @@ int amdgpu_driver_load_kms(struct amdgpu_device *adev, unsigned long flags)
 	/* Call ACPI methods: require modeset init
 	 * but failure is not fatal
 	 */
-<<<<<<< HEAD
-	if (!r) {
-		acpi_status = amdgpu_acpi_init(adev);
-		if (acpi_status)
-			dev_dbg(pci_dev_dev(dev->pdev),
-				"Error during ACPI methods call\n");
-	}
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	acpi_status = amdgpu_acpi_init(adev);
 	if (acpi_status)
@@ -218,14 +203,7 @@ int amdgpu_driver_load_kms(struct amdgpu_device *adev, unsigned long flags)
 		DRM_WARN("smart shift update failed\n");
 
 out:
-<<<<<<< HEAD
-	if (r) {
-		/* balance pm_runtime_get_sync in amdgpu_driver_unload_kms */
-		if (adev->rmmio_size && adev->runpm)
-			pm_runtime_put_noidle(dev->dev);
-=======
 	if (r)
->>>>>>> vendor/linux-drm-v6.6.35
 		amdgpu_driver_unload_kms(dev);
 
 	return r;

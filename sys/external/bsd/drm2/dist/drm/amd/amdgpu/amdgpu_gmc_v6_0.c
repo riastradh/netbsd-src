@@ -66,20 +66,6 @@ MODULE_FIRMWARE("amdgpu/si58_mc.bin");
 #define MC_SEQ_MISC0__MT__HBM    0x60000000
 #define MC_SEQ_MISC0__MT__DDR3   0xB0000000
 
-<<<<<<< HEAD
-
-static const u32 crtc_offsets[6] __unused =
-{
-	SI_CRTC0_REGISTER_OFFSET,
-	SI_CRTC1_REGISTER_OFFSET,
-	SI_CRTC2_REGISTER_OFFSET,
-	SI_CRTC3_REGISTER_OFFSET,
-	SI_CRTC4_REGISTER_OFFSET,
-	SI_CRTC5_REGISTER_OFFSET
-};
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static void gmc_v6_0_mc_stop(struct amdgpu_device *adev)
 {
 	u32 blackout;
@@ -854,15 +840,11 @@ static int gmc_v6_0_sw_init(void *handle)
 
 	adev->gmc.mc_mask = 0xffffffffffULL;
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
-	r = drm_limit_dma_space(adev->ddev, 0, DMA_BIT_MASK(44));
+	r = drm_limit_dma_space(adev->ddev, 0, DMA_BIT_MASK(40));
 #else
-	r = dma_set_mask_and_coherent(adev->dev, DMA_BIT_MASK(44));
-#endif
-=======
 	r = dma_set_mask_and_coherent(adev->dev, DMA_BIT_MASK(40));
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	if (r) {
 		dev_warn(adev->dev, "No suitable DMA available.\n");
 		return r;

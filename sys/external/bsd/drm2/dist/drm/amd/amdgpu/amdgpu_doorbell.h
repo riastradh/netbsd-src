@@ -33,15 +33,6 @@ struct amdgpu_doorbell {
 	/* doorbell mmio */
 	resource_size_t		base;
 	resource_size_t		size;
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	bus_space_tag_t		bst;
-	bus_space_handle_t	bsh;
-#else
-	u32 __iomem		*ptr;
-#endif
-	u32			num_doorbells;	/* Number of doorbells actually reserved for amdgpu. */
-=======
 
 	/* Number of doorbells reserved for amdgpu kernel driver */
 	u32 num_kernel_doorbells;
@@ -51,7 +42,6 @@ struct amdgpu_doorbell {
 
 	/* For CPU access of doorbells */
 	uint32_t *cpu_addr;
->>>>>>> vendor/linux-drm-v6.6.35
 };
 
 /* Reserved doorbells for amdgpu (including multimedia).

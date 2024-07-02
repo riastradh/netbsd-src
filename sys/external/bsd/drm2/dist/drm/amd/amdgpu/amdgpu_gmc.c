@@ -39,11 +39,10 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_gmc.c,v 1.3 2021/12/19 12:02:39 riastradh Exp
 #include "amdgpu_ras.h"
 #include "amdgpu_xgmi.h"
 
-<<<<<<< HEAD
-#include <linux/nbsd-namespace.h>
-=======
 #include <drm/drm_drv.h>
 #include <drm/ttm/ttm_tt.h>
+
+#include <linux/nbsd-namespace.h>
 
 /**
  * amdgpu_gmc_pdb0_alloc - allocate vram for pdb0
@@ -116,16 +115,11 @@ void amdgpu_gmc_get_pde_for_bo(struct amdgpu_bo *bo, int level,
 
 	switch (bo->tbo.resource->mem_type) {
 	case TTM_PL_TT:
-<<<<<<< HEAD
-		ttm = container_of(bo->tbo.ttm, struct ttm_dma_tt, ttm);
 #ifdef __NetBSD__
-		*addr = ttm->dma_address->dm_segs[0].ds_addr;
+		*addr = bo->tbo.ttm->dma_address->dm_segs[0].ds_addr;
 #else
-		*addr = ttm->dma_address[0];
-#endif
-=======
 		*addr = bo->tbo.ttm->dma_address[0];
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 		break;
 	case TTM_PL_VRAM:
 		*addr = amdgpu_bo_gpu_offset(bo);
@@ -188,11 +182,8 @@ int amdgpu_gmc_set_pte_pde(struct amdgpu_device *adev, void *cpu_pt_addr,
 	((uint64_t *)cpu_pt_addr)[gpu_page_idx] = value;
 #else
 	writeq(value, ptr + (gpu_page_idx * 8));
-<<<<<<< HEAD
 #endif
-=======
 
->>>>>>> vendor/linux-drm-v6.6.35
 	return 0;
 }
 
@@ -207,32 +198,23 @@ int amdgpu_gmc_set_pte_pde(struct amdgpu_device *adev, void *cpu_pt_addr,
 uint64_t amdgpu_gmc_agp_addr(struct ttm_buffer_object *bo)
 {
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->bdev);
-<<<<<<< HEAD
-	struct ttm_dma_tt *ttm;
-	resource_size_t addr;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (bo->ttm->num_pages != 1 || bo->ttm->caching == ttm_cached)
 		return AMDGPU_BO_INVALID_OFFSET;
 
-<<<<<<< HEAD
-	ttm = container_of(bo->ttm, struct ttm_dma_tt, ttm);
 #ifdef __NetBSD__
-	addr = ttm->dma_address->dm_segs[0].ds_addr;
+	if (bo->ttm->dma_address->dm_segs[0].ds_addr + PAGE_SIZE >=
+	    adev->gmc.agp_size)
 #else
-	addr = ttm->dma_address[0];
-#endif
-	if (addr + PAGE_SIZE >= adev->gmc.agp_size)
-		return AMDGPU_BO_INVALID_OFFSET;
-
-	return adev->gmc.agp_start + addr;
-=======
 	if (bo->ttm->dma_address[0] + PAGE_SIZE >= adev->gmc.agp_size)
+#endif
 		return AMDGPU_BO_INVALID_OFFSET;
 
+#ifdef __NetBSD__
+	return adev->gmc.agp_start + bo->ttm->dma_address->dm_segs[0].ds_addr;
+#else
 	return adev->gmc.agp_start + bo->ttm->dma_address[0];
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 /**

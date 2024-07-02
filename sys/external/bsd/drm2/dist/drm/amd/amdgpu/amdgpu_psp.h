@@ -325,18 +325,6 @@ struct psp_context {
 
 	/* sos firmware */
 	const struct firmware		*sos_fw;
-<<<<<<< HEAD
-	uint32_t			sos_fw_version;
-	uint32_t			sos_feature_version;
-	uint32_t			sys_bin_size;
-	uint32_t			sos_bin_size;
-	uint32_t			toc_bin_size;
-	uint32_t			kdb_bin_size;
-	const uint8_t			*sys_start_addr;
-	const uint8_t			*sos_start_addr;
-	const uint8_t			*toc_start_addr;
-	const uint8_t			*kdb_start_addr;
-=======
 	struct psp_bin_desc		sys;
 	struct psp_bin_desc		sos;
 	struct psp_bin_desc		toc;
@@ -347,7 +335,6 @@ struct psp_context {
 	struct psp_bin_desc		intf_drv;
 	struct psp_bin_desc		dbg_drv;
 	struct psp_bin_desc		ras_drv;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* tmr buffer */
 	struct amdgpu_bo		*tmr_bo;
@@ -355,19 +342,12 @@ struct psp_context {
 
 	/* asd firmware */
 	const struct firmware		*asd_fw;
-<<<<<<< HEAD
-	uint32_t			asd_fw_version;
-	uint32_t			asd_feature_version;
-	uint32_t			asd_ucode_size;
-	const uint8_t			*asd_start_addr;
-=======
 
 	/* toc firmware */
 	const struct firmware		*toc_fw;
 
 	/* cap firmware */
 	const struct firmware		*cap_fw;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* fence buffer */
 	struct amdgpu_bo		*fence_buf_bo;
@@ -389,31 +369,12 @@ struct psp_context {
 	/* xgmi ta firmware and buffer */
 	const struct firmware		*ta_fw;
 	uint32_t			ta_fw_version;
-<<<<<<< HEAD
-	uint32_t			ta_xgmi_ucode_version;
-	uint32_t			ta_xgmi_ucode_size;
-	const uint8_t			*ta_xgmi_start_addr;
-	uint32_t			ta_ras_ucode_version;
-	uint32_t			ta_ras_ucode_size;
-	const uint8_t			*ta_ras_start_addr;
-
-	uint32_t			ta_hdcp_ucode_version;
-	uint32_t			ta_hdcp_ucode_size;
-	const uint8_t			*ta_hdcp_start_addr;
-
-	uint32_t			ta_dtm_ucode_version;
-	uint32_t			ta_dtm_ucode_size;
-	const uint8_t			*ta_dtm_start_addr;
-
-	struct psp_asd_context		asd_context;
-=======
 
 	uint32_t			cap_fw_version;
 	uint32_t			cap_feature_version;
 	uint32_t			cap_ucode_size;
 
 	struct ta_context		asd_context;
->>>>>>> vendor/linux-drm-v6.6.35
 	struct psp_xgmi_context		xgmi_context;
 	struct psp_ras_context		ras_context;
 	struct ta_cp_context		hdcp_context;

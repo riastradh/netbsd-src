@@ -4135,13 +4135,27 @@ static void amdgpu_device_unmap_mmio(struct amdgpu_device *adev)
 	/* Unmap all mapped bars - Doorbell, registers and VRAM */
 	amdgpu_doorbell_fini(adev);
 
+#ifdef __NetBSD__
+	bus_space_unmap(adev->rmmiot, adev->rmmioh, adev->rmmio_size);
+	adev->rmmio_size = 0;
+	if (adev->gmc.visible_vram_size) {
+		bus_space_unmap(adev->gmc.aper_tag,
+		    adev->mman.aper_base_handle, adev->gmc.visible_vram_size);
+		adev->gmc.visible_vram_size = 0;
+	}
+#else
 	iounmap(adev->rmmio);
 	adev->rmmio = NULL;
 	if (adev->mman.aper_base_kaddr)
 		iounmap(adev->mman.aper_base_kaddr);
 	adev->mman.aper_base_kaddr = NULL;
+#endif
 
 	/* Memory manager related */
+#ifdef __NetBSD__
+	if (adev->gmc.aper_base)
+		pmap_pv_untrack(adev->gmc.aper_base, adev->gmc.aper_size);
+#endif
 	if (!adev->gmc.xgmi.connected_to_cpu && !adev->gmc.is_app_apu) {
 		arch_phys_wc_del(adev->gmc.vram_mtrr);
 		arch_io_free_memtype_wc(adev->gmc.aper_base, adev->gmc.aper_size);
@@ -4247,6 +4261,7 @@ void amdgpu_device_fini_sw(struct amdgpu_device *adev)
 	if (drm_dev_enter(adev_to_drm(adev), &idx)) {
 #ifdef __NetBSD__
 		bus_space_unmap(adev->rmmiot, adev->rmmioh, adev->rmmio_size);
+		adev->rmmio_size = 0;
 #else
 		iounmap(adev->rmmio);
 		adev->rmmio = NULL;

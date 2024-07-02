@@ -390,18 +390,12 @@ void amdgpu_ring_fini(struct amdgpu_ring *ring)
 		amdgpu_device_wb_free(ring->adev, ring->rptr_offs);
 		amdgpu_device_wb_free(ring->adev, ring->wptr_offs);
 
-<<<<<<< HEAD
-	amdgpu_bo_free_kernel(&ring->ring_obj,
-			      &ring->gpu_addr,
-			      (void **)__UNVOLATILE(&ring->ring));
-=======
 		amdgpu_device_wb_free(ring->adev, ring->cond_exe_offs);
 		amdgpu_device_wb_free(ring->adev, ring->fence_offs);
->>>>>>> vendor/linux-drm-v6.6.35
 
 		amdgpu_bo_free_kernel(&ring->ring_obj,
 				      &ring->gpu_addr,
-				      (void **)&ring->ring);
+				      (void **)__UNVOLATILE(&ring->ring));
 	} else {
 		kfree(ring->fence_drv.fences);
 	}
@@ -410,14 +404,10 @@ void amdgpu_ring_fini(struct amdgpu_ring *ring)
 	ring->vmid_wait = NULL;
 	ring->me = 0;
 
-<<<<<<< HEAD
-	ring->adev->rings[ring->idx] = NULL;
-
-	mutex_destroy(&ring->priority_mutex);
-=======
 	if (!ring->is_mes_queue)
 		ring->adev->rings[ring->idx] = NULL;
->>>>>>> vendor/linux-drm-v6.6.35
+
+	mutex_destroy(&ring->priority_mutex);
 }
 
 /**

@@ -496,14 +496,9 @@ static bool amdgpu_bo_validate_size(struct amdgpu_device *adev,
 	return true;
 
 fail:
-<<<<<<< HEAD
-	DRM_DEBUG("BO size %lu > total memory in domain: %"PRIu64"\n", size,
-		  man->size << PAGE_SHIFT);
-=======
 	if (man)
-		DRM_DEBUG("BO size %lu > total memory in domain: %llu\n", size,
+		DRM_DEBUG("BO size %lu > total memory in domain: %"PRIu64"\n", size,
 			  man->size);
->>>>>>> vendor/linux-drm-v6.6.35
 	return false;
 }
 
@@ -1096,18 +1091,12 @@ int amdgpu_bo_init(struct amdgpu_device *adev)
 				adev->gmc.aper_size);
 	}
 
-<<<<<<< HEAD
-	/* Add an MTRR for the VRAM */
-	adev->gmc.vram_mtrr = arch_phys_wc_add(adev->gmc.aper_base,
-					      adev->gmc.aper_size);
 #ifdef __NetBSD__
 	if (adev->gmc.aper_base)
 		pmap_pv_track(adev->gmc.aper_base, adev->gmc.aper_size);
 #endif
+
 	DRM_INFO("Detected VRAM RAM=%"PRIu64"M, BAR=%lluM\n",
-=======
-	DRM_INFO("Detected VRAM RAM=%lluM, BAR=%lluM\n",
->>>>>>> vendor/linux-drm-v6.6.35
 		 adev->gmc.mc_vram_size >> 20,
 		 (unsigned long long)adev->gmc.aper_size >> 20);
 	DRM_INFO("RAM width %dbits %s\n",
@@ -1126,45 +1115,22 @@ void amdgpu_bo_fini(struct amdgpu_device *adev)
 	int idx;
 
 	amdgpu_ttm_fini(adev);
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	if (adev->gmc.aper_base)
-		pmap_pv_untrack(adev->gmc.aper_base, adev->gmc.aper_size);
-#endif
-	arch_phys_wc_del(adev->gmc.vram_mtrr);
-	arch_io_free_memtype_wc(adev->gmc.aper_base, adev->gmc.aper_size);
-}
-
-#ifndef __NetBSD__		/* XXX unused? */
-/**
- * amdgpu_bo_fbdev_mmap - mmap fbdev memory
- * @bo: &amdgpu_bo buffer object
- * @vma: vma as input from the fbdev mmap method
- *
- * Calls ttm_fbdev_mmap() to mmap fbdev memory if it is backed by a bo.
- *
- * Returns:
- * 0 for success or a negative error code on failure.
- */
-int amdgpu_bo_fbdev_mmap(struct amdgpu_bo *bo,
-			     struct vm_area_struct *vma)
-{
-	if (vma->vm_pgoff != 0)
-		return -EACCES;
-
-	return ttm_bo_mmap_obj(vma, &bo->tbo);
-=======
 
 	if (drm_dev_enter(adev_to_drm(adev), &idx)) {
+#ifdef __NetBSD__
+		if (adev->gmc.aper_base) {
+			pmap_pv_untrack(adev->gmc.aper_base,
+			    adev->gmc.aper_size);
+		}
+#endif
+
 		if (!adev->gmc.xgmi.connected_to_cpu && !adev->gmc.is_app_apu) {
 			arch_phys_wc_del(adev->gmc.vram_mtrr);
 			arch_io_free_memtype_wc(adev->gmc.aper_base, adev->gmc.aper_size);
 		}
 		drm_dev_exit(idx);
 	}
->>>>>>> vendor/linux-drm-v6.6.35
 }
-#endif
 
 /**
  * amdgpu_bo_set_tiling_flags - set tiling flags

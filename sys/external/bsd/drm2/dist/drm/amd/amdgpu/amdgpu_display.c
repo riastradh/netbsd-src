@@ -1245,15 +1245,10 @@ amdgpu_display_user_framebuffer_create(struct drm_device *dev,
 
 	obj = drm_gem_object_lookup(file_priv, mode_cmd->handles[0]);
 	if (obj ==  NULL) {
-<<<<<<< HEAD
-		dev_err(pci_dev_dev(dev->pdev), "No GEM object associated to handle 0x%08X, "
-			"can't create framebuffer\n", mode_cmd->handles[0]);
-=======
 		drm_dbg_kms(dev,
 			    "No GEM object associated to handle 0x%08X, can't create framebuffer\n",
 			    mode_cmd->handles[0]);
 
->>>>>>> vendor/linux-drm-v6.6.35
 		return ERR_PTR(-ENOENT);
 	}
 

@@ -498,14 +498,8 @@ int amdgpu_fence_driver_start_ring(struct amdgpu_ring *ring,
 	ring->fence_drv.irq_type = irq_type;
 	ring->fence_drv.initialized = true;
 
-<<<<<<< HEAD
-	DRM_DEV_DEBUG(adev->dev, "fence driver on ring %s use gpu addr "
-		      "0x%016"PRIx64", cpu addr 0x%p\n", ring->name,
-		      ring->fence_drv.gpu_addr, ring->fence_drv.cpu_addr);
-=======
-	DRM_DEV_DEBUG(adev->dev, "fence driver on ring %s use gpu addr 0x%016llx\n",
+	DRM_DEV_DEBUG(adev->dev, "fence driver on ring %s use gpu addr 0x%016"PRIx64"\n",
 		      ring->name, ring->fence_drv.gpu_addr);
->>>>>>> vendor/linux-drm-v6.6.35
 	return 0;
 }
 
@@ -625,14 +619,6 @@ void amdgpu_fence_driver_hw_fini(struct amdgpu_device *adev)
 		/* no need to trigger GPU reset as we are unloading */
 		if (r)
 			amdgpu_fence_driver_force_completion(ring);
-<<<<<<< HEAD
-		}
-		amdgpu_irq_put(adev, ring->fence_drv.irq_src,
-			       ring->fence_drv.irq_type);
-		if (ring->funcs->type != AMDGPU_RING_TYPE_KIQ) {
-			drm_sched_fini(&ring->sched);
-		}
-=======
 
 		if (!drm_dev_is_unplugged(adev_to_drm(adev)) &&
 		    ring->fence_drv.irq_src &&
@@ -640,7 +626,6 @@ void amdgpu_fence_driver_hw_fini(struct amdgpu_device *adev)
 			amdgpu_irq_put(adev, ring->fence_drv.irq_src,
 				       ring->fence_drv.irq_type);
 
->>>>>>> vendor/linux-drm-v6.6.35
 		del_timer_sync(&ring->fence_drv.fallback_timer);
 	}
 }
@@ -852,11 +837,8 @@ static bool amdgpu_job_fence_enable_signaling(struct dma_fence *f)
 static void amdgpu_fence_free(struct rcu_head *rcu)
 {
 	struct dma_fence *f = container_of(rcu, struct dma_fence, rcu);
-<<<<<<< HEAD
-	struct amdgpu_fence *fence = to_amdgpu_fence(f);
+
 	dma_fence_destroy(f);
-	kmem_cache_free(amdgpu_fence_slab, fence);
-=======
 
 	/* free fence_slab if it's separated fence*/
 	kmem_cache_free(amdgpu_fence_slab, to_amdgpu_fence(f));
@@ -875,7 +857,6 @@ static void amdgpu_job_fence_free(struct rcu_head *rcu)
 
 	/* free job if fence has a parent job */
 	kfree(container_of(f, struct amdgpu_job, hw_fence));
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**

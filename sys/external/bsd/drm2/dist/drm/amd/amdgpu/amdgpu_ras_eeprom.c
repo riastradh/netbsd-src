@@ -36,13 +36,9 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_ras_eeprom.c,v 1.4 2021/12/19 12:31:45 riastr
 #include <linux/debugfs.h>
 #include <linux/uaccess.h>
 
-<<<<<<< HEAD
-#include <linux/nbsd-namespace.h>
-
-#define EEPROM_I2C_TARGET_ADDR_ARCTURUS  0xA8
-#define EEPROM_I2C_TARGET_ADDR_VEGA20    0xA0
-=======
 #include "amdgpu_reset.h"
+
+#include <linux/nbsd-namespace.h>
 
 /* These are memory addresses as would be seen by one or more EEPROM
  * chips strung on the I2C bus, usually by manipulating pins 1-3 of a
@@ -67,7 +63,6 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_ras_eeprom.c,v 1.4 2021/12/19 12:31:45 riastr
  */
 #define EEPROM_I2C_MADDR_0      0x0
 #define EEPROM_I2C_MADDR_4      0x40000
->>>>>>> vendor/linux-drm-v6.6.35
 
 /*
  * The 2 macros bellow represent the actual size in bytes that
@@ -483,35 +478,10 @@ int amdgpu_ras_eeprom_reset_table(struct amdgpu_ras_eeprom_control *control)
 	return res;
 }
 
-<<<<<<< HEAD
-void amdgpu_ras_eeprom_fini(struct amdgpu_ras_eeprom_control *control)
-{
-	struct amdgpu_device *adev = to_amdgpu_device(control);
-
-	switch (adev->asic_type) {
-	case CHIP_VEGA20:
-		smu_v11_0_i2c_eeprom_control_fini(&control->eeprom_accessor);
-		break;
-	case CHIP_ARCTURUS:
-		smu_i2c_eeprom_fini(&adev->smu, &control->eeprom_accessor);
-		break;
-
-	default:
-		return;
-	}
-
-	mutex_destroy(&control->tbl_mutex);
-}
-
-static void __encode_table_record_to_buff(struct amdgpu_ras_eeprom_control *control,
-					  struct eeprom_table_record *record,
-					  unsigned char *buff)
-=======
 static void
 __encode_table_record_to_buf(struct amdgpu_ras_eeprom_control *control,
 			     struct eeprom_table_record *record,
 			     unsigned char *buf)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	__le64 tmp = 0;
 	int i = 0;

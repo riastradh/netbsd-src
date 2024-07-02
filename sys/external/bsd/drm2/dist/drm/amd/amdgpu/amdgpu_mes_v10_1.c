@@ -256,9 +256,6 @@ static int mes_v10_1_resume_gang(struct amdgpu_mes *mes,
 	return 0;
 }
 
-<<<<<<< HEAD
-static const struct amdgpu_mes_funcs mes_v10_1_funcs __unused = {
-=======
 static int mes_v10_1_query_sched_status(struct amdgpu_mes *mes)
 {
 	union MESAPI__QUERY_MES_STATUS mes_status_pkt;
@@ -380,7 +377,6 @@ static void mes_v10_1_init_aggregated_doorbell(struct amdgpu_mes *mes)
 }
 
 static const struct amdgpu_mes_funcs mes_v10_1_funcs = {
->>>>>>> vendor/linux-drm-v6.6.35
 	.add_hw_queue = mes_v10_1_add_hw_queue,
 	.remove_hw_queue = mes_v10_1_remove_hw_queue,
 	.unmap_legacy_queue = mes_v10_1_unmap_legacy_queue,

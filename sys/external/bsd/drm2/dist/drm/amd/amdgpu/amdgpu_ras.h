@@ -396,11 +396,8 @@ struct amdgpu_ras {
 #ifdef CONFIG_SYSFS
 	struct device_attribute features_attr;
 	struct bin_attribute badpages_attr;
-<<<<<<< HEAD
-#endif
-=======
 	struct dentry *de_ras_eeprom_table;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	/* block array */
 	struct ras_manager *objs;
 

@@ -323,13 +323,6 @@ int amdgpu_bo_pin_restricted(struct amdgpu_bo *bo, u32 domain,
 void amdgpu_bo_unpin(struct amdgpu_bo *bo);
 int amdgpu_bo_init(struct amdgpu_device *adev);
 void amdgpu_bo_fini(struct amdgpu_device *adev);
-<<<<<<< HEAD
-#ifndef __NetBSD__
-int amdgpu_bo_fbdev_mmap(struct amdgpu_bo *bo,
-				struct vm_area_struct *vma);
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 int amdgpu_bo_set_tiling_flags(struct amdgpu_bo *bo, u64 tiling_flags);
 void amdgpu_bo_get_tiling_flags(struct amdgpu_bo *bo, u64 *tiling_flags);
 int amdgpu_bo_set_metadata (struct amdgpu_bo *bo, void *metadata,
@@ -369,9 +362,6 @@ to_amdgpu_sa_manager(struct drm_suballoc_manager *manager)
 
 static inline uint64_t amdgpu_sa_bo_gpu_addr(struct drm_suballoc *sa_bo)
 {
-<<<<<<< HEAD
-	return (char *)sa_bo->manager->cpu_ptr + sa_bo->soffset;
-=======
 	return to_amdgpu_sa_manager(sa_bo->manager)->gpu_addr +
 		drm_suballoc_soffset(sa_bo);
 }
@@ -380,7 +370,6 @@ static inline void *amdgpu_sa_bo_cpu_addr(struct drm_suballoc *sa_bo)
 {
 	return to_amdgpu_sa_manager(sa_bo->manager)->cpu_ptr +
 		drm_suballoc_soffset(sa_bo);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 int amdgpu_sa_bo_manager_init(struct amdgpu_device *adev,

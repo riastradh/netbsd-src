@@ -856,19 +856,12 @@ static int psp_tmr_load(struct psp_context *psp)
 	if (amdgpu_sriov_vf(psp->adev) && psp_skip_tmr(psp))
 		return 0;
 
-<<<<<<< HEAD
-	psp_prep_tmr_cmd_buf(psp, cmd, psp->tmr_mc_addr,
-			     amdgpu_bo_size(psp->tmr_bo));
-	DRM_INFO("reserve 0x%lx from 0x%"PRIx64" for PSP TMR\n",
-		 amdgpu_bo_size(psp->tmr_bo), psp->tmr_mc_addr);
-=======
 	cmd = acquire_psp_cmd_buf(psp);
 
 	psp_prep_tmr_cmd_buf(psp, cmd, psp->tmr_mc_addr, psp->tmr_bo);
 	if (psp->tmr_bo)
-		DRM_INFO("reserve 0x%lx from 0x%llx for PSP TMR\n",
+		DRM_INFO("reserve 0x%lx from 0x%"PRIx64" for PSP TMR\n",
 			 amdgpu_bo_size(psp->tmr_bo), psp->tmr_mc_addr);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);

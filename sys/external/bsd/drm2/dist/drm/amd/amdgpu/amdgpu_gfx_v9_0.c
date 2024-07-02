@@ -1097,30 +1097,6 @@ static void gfx_v9_0_free_microcode(struct amdgpu_device *adev)
 	kfree(adev->gfx.rlc.register_list_format);
 }
 
-<<<<<<< HEAD
-static void gfx_v9_0_init_rlc_ext_microcode(struct amdgpu_device *adev)
-{
-	const struct rlc_firmware_header_v2_1 *rlc_hdr;
-
-	rlc_hdr = (const struct rlc_firmware_header_v2_1 *)adev->gfx.rlc_fw->data;
-	adev->gfx.rlc_srlc_fw_version = le32_to_cpu(rlc_hdr->save_restore_list_cntl_ucode_ver);
-	adev->gfx.rlc_srlc_feature_version = le32_to_cpu(rlc_hdr->save_restore_list_cntl_feature_ver);
-	adev->gfx.rlc.save_restore_list_cntl_size_bytes = le32_to_cpu(rlc_hdr->save_restore_list_cntl_size_bytes);
-	adev->gfx.rlc.save_restore_list_cntl = (const u8 *)rlc_hdr + le32_to_cpu(rlc_hdr->save_restore_list_cntl_offset_bytes);
-	adev->gfx.rlc_srlg_fw_version = le32_to_cpu(rlc_hdr->save_restore_list_gpm_ucode_ver);
-	adev->gfx.rlc_srlg_feature_version = le32_to_cpu(rlc_hdr->save_restore_list_gpm_feature_ver);
-	adev->gfx.rlc.save_restore_list_gpm_size_bytes = le32_to_cpu(rlc_hdr->save_restore_list_gpm_size_bytes);
-	adev->gfx.rlc.save_restore_list_gpm = (const u8 *)rlc_hdr + le32_to_cpu(rlc_hdr->save_restore_list_gpm_offset_bytes);
-	adev->gfx.rlc_srls_fw_version = le32_to_cpu(rlc_hdr->save_restore_list_srm_ucode_ver);
-	adev->gfx.rlc_srls_feature_version = le32_to_cpu(rlc_hdr->save_restore_list_srm_feature_ver);
-	adev->gfx.rlc.save_restore_list_srm_size_bytes = le32_to_cpu(rlc_hdr->save_restore_list_srm_size_bytes);
-	adev->gfx.rlc.save_restore_list_srm = (const u8 *)rlc_hdr + le32_to_cpu(rlc_hdr->save_restore_list_srm_offset_bytes);
-	adev->gfx.rlc.reg_list_format_direct_reg_list_length =
-			le32_to_cpu(rlc_hdr->reg_list_format_direct_reg_list_length);
-}
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static void gfx_v9_0_check_fw_write_wait(struct amdgpu_device *adev)
 {
 	adev->gfx.me_fw_write_wait = false;
@@ -2012,12 +1988,8 @@ static int gfx_v9_0_compute_ring_init(struct amdgpu_device *adev, int ring_id,
 	ring->doorbell_index = (adev->doorbell_index.mec_ring0 + ring_id) << 1;
 	ring->eop_gpu_addr = adev->gfx.mec.hpd_eop_gpu_addr
 				+ (ring_id * GFX9_MEC_HPD_SIZE);
-<<<<<<< HEAD
-	snprintf(ring->name, sizeof(ring->name), "comp_%d.%d.%d", ring->me, ring->pipe, ring->queue);
-=======
 	ring->vm_hub = AMDGPU_GFXHUB(0);
-	sprintf(ring->name, "comp_%d.%d.%d", ring->me, ring->pipe, ring->queue);
->>>>>>> vendor/linux-drm-v6.6.35
+	snprintf(ring->name, sizeof(ring->name), "comp_%d.%d.%d", ring->me, ring->pipe, ring->queue);
 
 	irq_type = AMDGPU_CP_IRQ_COMPUTE_MEC1_PIPE0_EOP
 		+ ((ring->me - 1) * adev->gfx.mec.num_pipe_per_mec)
@@ -5115,11 +5087,7 @@ static u64 gfx_v9_0_ring_get_wptr_gfx(struct amdgpu_ring *ring)
 
 	/* XXX check if swapping is necessary on BE */
 	if (ring->use_doorbell) {
-<<<<<<< HEAD
-		wptr = atomic_load_relaxed(&adev->wb.wb[ring->wptr_offs]);
-=======
 		wptr = atomic64_read((atomic64_t *)ring->wptr_cpu_addr);
->>>>>>> vendor/linux-drm-v6.6.35
 	} else {
 		wptr = RREG32_SOC15(GC, 0, mmCP_RB0_WPTR);
 		wptr += (u64)RREG32_SOC15(GC, 0, mmCP_RB0_WPTR_HI) << 32;
@@ -5134,11 +5102,7 @@ static void gfx_v9_0_ring_set_wptr_gfx(struct amdgpu_ring *ring)
 
 	if (ring->use_doorbell) {
 		/* XXX check if swapping is necessary on BE */
-<<<<<<< HEAD
-		atomic_store_relaxed(&adev->wb.wb[ring->wptr_offs], ring->wptr);
-=======
 		atomic64_set((atomic64_t *)ring->wptr_cpu_addr, ring->wptr);
->>>>>>> vendor/linux-drm-v6.6.35
 		WDOORBELL64(ring->doorbell_index, ring->wptr);
 	} else {
 		WREG32_SOC15(GC, 0, mmCP_RB0_WPTR, lower_32_bits(ring->wptr));
@@ -5403,11 +5367,7 @@ static u64 gfx_v9_0_ring_get_wptr_compute(struct amdgpu_ring *ring)
 
 	/* XXX check if swapping is necessary on BE */
 	if (ring->use_doorbell)
-<<<<<<< HEAD
-		wptr = atomic_load_relaxed(&ring->adev->wb.wb[ring->wptr_offs]);
-=======
 		wptr = atomic64_read((atomic64_t *)ring->wptr_cpu_addr);
->>>>>>> vendor/linux-drm-v6.6.35
 	else
 		BUG();
 	return wptr;
@@ -5419,11 +5379,7 @@ static void gfx_v9_0_ring_set_wptr_compute(struct amdgpu_ring *ring)
 
 	/* XXX check if swapping is necessary on BE */
 	if (ring->use_doorbell) {
-<<<<<<< HEAD
-		atomic_store_relaxed(&adev->wb.wb[ring->wptr_offs], ring->wptr);
-=======
 		atomic64_set((atomic64_t *)ring->wptr_cpu_addr, ring->wptr);
->>>>>>> vendor/linux-drm-v6.6.35
 		WDOORBELL64(ring->doorbell_index, ring->wptr);
 	} else{
 		BUG(); /* only DOORBELL method supported on gfx9 now */

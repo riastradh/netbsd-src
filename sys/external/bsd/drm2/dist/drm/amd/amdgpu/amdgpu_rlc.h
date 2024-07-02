@@ -234,14 +234,9 @@ struct amdgpu_rlc {
 
 	u32 *register_list_format;
 	u32 *register_restore;
-<<<<<<< HEAD
 	const u8 *save_restore_list_cntl;
 	const u8 *save_restore_list_gpm;
 	const u8 *save_restore_list_srm;
-=======
-	u8 *save_restore_list_cntl;
-	u8 *save_restore_list_gpm;
-	u8 *save_restore_list_srm;
 	u8 *rlc_iram_ucode;
 	u8 *rlc_dram_ucode;
 	u8 *rlcp_ucode;
@@ -251,7 +246,6 @@ struct amdgpu_rlc {
 	u8 *se1_tap_delays_ucode;
 	u8 *se2_tap_delays_ucode;
 	u8 *se3_tap_delays_ucode;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	bool is_rlc_v2_1;
 

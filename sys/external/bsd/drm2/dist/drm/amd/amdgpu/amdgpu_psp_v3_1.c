@@ -75,38 +75,7 @@ static int psp_v3_1_init_microcode(struct psp_context *psp)
 
 	err = psp_init_asd_microcode(psp, ucode_prefix);
 	if (err)
-<<<<<<< HEAD
-		goto out;
-
-	hdr = (const struct psp_firmware_header_v1_0 *)adev->psp.sos_fw->data;
-	adev->psp.sos_fw_version = le32_to_cpu(hdr->header.ucode_version);
-	adev->psp.sos_feature_version = le32_to_cpu(hdr->ucode_feature_version);
-	adev->psp.sos_bin_size = le32_to_cpu(hdr->sos_size_bytes);
-	adev->psp.sys_bin_size = le32_to_cpu(hdr->header.ucode_size_bytes) -
-					le32_to_cpu(hdr->sos_size_bytes);
-	adev->psp.sys_start_addr = (const uint8_t *)hdr +
-				le32_to_cpu(hdr->header.ucode_array_offset_bytes);
-	adev->psp.sos_start_addr = (const uint8_t *)adev->psp.sys_start_addr +
-				le32_to_cpu(hdr->sos_offset_bytes);
-
-	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_asd.bin", chip_name);
-	err = request_firmware(&adev->psp.asd_fw, fw_name, adev->dev);
-	if (err)
-		goto out;
-
-	err = amdgpu_ucode_validate(adev->psp.asd_fw);
-	if (err)
-		goto out;
-
-	hdr = (const struct psp_firmware_header_v1_0 *)adev->psp.asd_fw->data;
-	adev->psp.asd_fw_version = le32_to_cpu(hdr->header.ucode_version);
-	adev->psp.asd_feature_version = le32_to_cpu(hdr->ucode_feature_version);
-	adev->psp.asd_ucode_size = le32_to_cpu(hdr->header.ucode_size_bytes);
-	adev->psp.asd_start_addr = (const uint8_t *)hdr +
-				le32_to_cpu(hdr->header.ucode_array_offset_bytes);
-=======
 		return err;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	return 0;
 }

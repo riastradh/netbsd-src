@@ -45,150 +45,8 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_dma_buf.c,v 1.3 2021/12/19 12:01:40 riastradh
 #include <drm/ttm/ttm_tt.h>
 #include <linux/dma-buf.h>
 #include <linux/dma-fence-array.h>
-<<<<<<< HEAD
-
-/**
- * amdgpu_gem_prime_vmap - &dma_buf_ops.vmap implementation
- * @obj: GEM BO
- *
- * Sets up an in-kernel virtual mapping of the BO's memory.
- *
- * Returns:
- * The virtual address of the mapping or an error pointer.
- */
-void *amdgpu_gem_prime_vmap(struct drm_gem_object *obj)
-{
-	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
-	int ret;
-
-	ret = ttm_bo_kmap(&bo->tbo, 0, bo->tbo.num_pages,
-			  &bo->dma_buf_vmap);
-	if (ret)
-		return ERR_PTR(ret);
-
-	return bo->dma_buf_vmap.virtual;
-}
-
-/**
- * amdgpu_gem_prime_vunmap - &dma_buf_ops.vunmap implementation
- * @obj: GEM BO
- * @vaddr: Virtual address (unused)
- *
- * Tears down the in-kernel virtual mapping of the BO's memory.
- */
-void amdgpu_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr)
-{
-	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
-
-	ttm_bo_kunmap(&bo->dma_buf_vmap);
-}
-
-/**
- * amdgpu_gem_prime_mmap - &drm_driver.gem_prime_mmap implementation
- * @obj: GEM BO
- * @vma: Virtual memory area
- *
- * Sets up a userspace mapping of the BO's memory in the given
- * virtual memory area.
- *
- * Returns:
- * 0 on success or a negative error code on failure.
- */
-#ifdef __NetBSD__
-int
-amdgpu_gem_prime_mmap(struct drm_gem_object *obj, off_t *offp, size_t size,
-    int prot, int *flagsp, int *advicep, struct uvm_object **uobjp,
-    int *maxprotp)
-#else
-int amdgpu_gem_prime_mmap(struct drm_gem_object *obj,
-			  struct vm_area_struct *vma)
-#endif
-{
-#ifdef __NetBSD__		/* XXX amdgpu prime */
-	return -ENODEV;
-#else
-	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
-	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
-	unsigned asize = amdgpu_bo_size(bo);
-	int ret;
-
-	if (!vma->vm_file)
-		return -ENODEV;
-
-	if (adev == NULL)
-		return -ENODEV;
-
-	/* Check for valid size. */
-#ifdef __NetBSD__
-	if (asize < size)
-#else
-	if (asize < vma->vm_end - vma->vm_start)
-#endif
-		return -EINVAL;
-
-	if (amdgpu_ttm_tt_get_usermm(bo->tbo.ttm) ||
-	    (bo->flags & AMDGPU_GEM_CREATE_NO_CPU_ACCESS)) {
-		return -EPERM;
-	}
-	vma->vm_pgoff += amdgpu_bo_mmap_offset(bo) >> PAGE_SHIFT;
-
-	/* prime mmap does not need to check access, so allow here */
-	ret = drm_vma_node_allow(&obj->vma_node, vma->vm_file->private_data);
-	if (ret)
-		return ret;
-
-	ret = ttm_bo_mmap(vma->vm_file, vma, &adev->mman.bdev);
-	drm_vma_node_revoke(&obj->vma_node, vma->vm_file->private_data);
-
-	return ret;
-#endif
-}
-
-static int
-__dma_resv_make_exclusive(struct dma_resv *obj)
-{
-	struct dma_fence **fences;
-	unsigned int count;
-	int r;
-
-	if (!dma_resv_get_list(obj)) /* no shared fences to convert */
-		return 0;
-
-	r = dma_resv_get_fences_rcu(obj, NULL, &count, &fences);
-	if (r)
-		return r;
-
-	if (count == 0) {
-		/* Now that was unexpected. */
-	} else if (count == 1) {
-		dma_resv_add_excl_fence(obj, fences[0]);
-		dma_fence_put(fences[0]);
-		kfree(fences);
-	} else {
-		struct dma_fence_array *array;
-
-		array = dma_fence_array_create(count, fences,
-					       dma_fence_context_alloc(1), 0,
-					       false);
-		if (!array)
-			goto err_fences_put;
-
-		dma_resv_add_excl_fence(obj, &array->base);
-		dma_fence_put(&array->base);
-	}
-
-	return 0;
-
-err_fences_put:
-	while (count--)
-		dma_fence_put(fences[count]);
-	kfree(fences);
-	return -ENOMEM;
-}
-=======
 #include <linux/pci-p2pdma.h>
 #include <linux/pm_runtime.h>
->>>>>>> vendor/linux-drm-v6.6.35
 
 /**
  * amdgpu_dma_buf_attach - &dma_buf_ops.attach implementation
@@ -206,17 +64,8 @@ static int amdgpu_dma_buf_attach(struct dma_buf *dmabuf,
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	int r;
 
-<<<<<<< HEAD
-#ifdef __NetBSD__		/* XXX */
-	__USE(adev);
-#else
-	if (attach->dev->driver == adev->dev->driver)
-		return 0;
-#endif
-=======
 	if (pci_p2pdma_distance(adev->pdev, attach->dev, false) < 0)
 		attach->peer2peer = false;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	r = pm_runtime_get_sync(adev_to_drm(adev)->dev);
 	if (r < 0)
@@ -244,15 +93,6 @@ static void amdgpu_dma_buf_detach(struct dma_buf *dmabuf,
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	__USE(adev);
-	if (bo->prime_shared_count)
-#else
-	if (attach->dev->driver != adev->dev->driver && bo->prime_shared_count)
-#endif
-		bo->prime_shared_count--;
-=======
 	pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
 	pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
 }
@@ -286,7 +126,6 @@ static void amdgpu_dma_buf_unpin(struct dma_buf_attachment *attach)
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 
 	amdgpu_bo_unpin(bo);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**
@@ -622,16 +461,13 @@ struct drm_gem_object *amdgpu_gem_prime_import(struct drm_device *dev,
 	if (IS_ERR(obj))
 		return obj;
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
-	attach = dma_buf_dynamic_attach(dma_buf, dev->dmat, true);
+	attach = dma_buf_dynamic_attach(dma_buf, dev->dmat,
+					&amdgpu_dma_buf_attach_ops, obj);
 #else
-	attach = dma_buf_dynamic_attach(dma_buf, dev->dev, true);
-#endif
-=======
 	attach = dma_buf_dynamic_attach(dma_buf, dev->dev,
 					&amdgpu_dma_buf_attach_ops, obj);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	if (IS_ERR(attach)) {
 		drm_gem_object_put(obj);
 		return ERR_CAST(attach);

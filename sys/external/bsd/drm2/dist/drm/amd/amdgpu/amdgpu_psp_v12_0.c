@@ -67,18 +67,9 @@ static int psp_v12_0_init_microcode(struct psp_context *psp)
 	if (err)
 		return err;
 
-<<<<<<< HEAD
-	asd_hdr = (const struct psp_firmware_header_v1_0 *)adev->psp.asd_fw->data;
-	adev->psp.asd_fw_version = le32_to_cpu(asd_hdr->header.ucode_version);
-	adev->psp.asd_feature_version = le32_to_cpu(asd_hdr->ucode_feature_version);
-	adev->psp.asd_ucode_size = le32_to_cpu(asd_hdr->header.ucode_size_bytes);
-	adev->psp.asd_start_addr = (const uint8_t *)asd_hdr +
-				le32_to_cpu(asd_hdr->header.ucode_array_offset_bytes);
-=======
 	/* only supported on renoir */
 	if (!(adev->apu_flags & AMD_APU_IS_RENOIR))
 		adev->psp.securedisplay_context.context.bin_desc.size_bytes = 0;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	return 0;
 }

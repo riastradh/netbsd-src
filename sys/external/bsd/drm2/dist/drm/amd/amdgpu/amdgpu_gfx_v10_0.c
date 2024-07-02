@@ -52,13 +52,9 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_gfx_v10_0.c,v 1.3 2021/12/19 12:02:39 riastra
 #include "gfx_v10_0.h"
 #include "nbio_v2_3.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-/**
-=======
 /*
->>>>>>> vendor/linux-drm-v6.6.35
  * Navi10 has two graphic rings to share each graphic pipe.
  * 1. Primary ring
  * 2. Async ring
@@ -3934,31 +3930,6 @@ static void gfx_v10_0_check_fw_write_wait(struct amdgpu_device *adev)
 		DRM_WARN_ONCE("CP firmware version too old, please update!");
 }
 
-<<<<<<< HEAD
-
-static void gfx_v10_0_init_rlc_ext_microcode(struct amdgpu_device *adev)
-{
-	const struct rlc_firmware_header_v2_1 *rlc_hdr;
-
-	rlc_hdr = (const struct rlc_firmware_header_v2_1 *)adev->gfx.rlc_fw->data;
-	adev->gfx.rlc_srlc_fw_version = le32_to_cpu(rlc_hdr->save_restore_list_cntl_ucode_ver);
-	adev->gfx.rlc_srlc_feature_version = le32_to_cpu(rlc_hdr->save_restore_list_cntl_feature_ver);
-	adev->gfx.rlc.save_restore_list_cntl_size_bytes = le32_to_cpu(rlc_hdr->save_restore_list_cntl_size_bytes);
-	adev->gfx.rlc.save_restore_list_cntl = (const u8 *)rlc_hdr + le32_to_cpu(rlc_hdr->save_restore_list_cntl_offset_bytes);
-	adev->gfx.rlc_srlg_fw_version = le32_to_cpu(rlc_hdr->save_restore_list_gpm_ucode_ver);
-	adev->gfx.rlc_srlg_feature_version = le32_to_cpu(rlc_hdr->save_restore_list_gpm_feature_ver);
-	adev->gfx.rlc.save_restore_list_gpm_size_bytes = le32_to_cpu(rlc_hdr->save_restore_list_gpm_size_bytes);
-	adev->gfx.rlc.save_restore_list_gpm = (const u8 *)rlc_hdr + le32_to_cpu(rlc_hdr->save_restore_list_gpm_offset_bytes);
-	adev->gfx.rlc_srls_fw_version = le32_to_cpu(rlc_hdr->save_restore_list_srm_ucode_ver);
-	adev->gfx.rlc_srls_feature_version = le32_to_cpu(rlc_hdr->save_restore_list_srm_feature_ver);
-	adev->gfx.rlc.save_restore_list_srm_size_bytes = le32_to_cpu(rlc_hdr->save_restore_list_srm_size_bytes);
-	adev->gfx.rlc.save_restore_list_srm = (const u8 *)rlc_hdr + le32_to_cpu(rlc_hdr->save_restore_list_srm_offset_bytes);
-	adev->gfx.rlc.reg_list_format_direct_reg_list_length =
-			le32_to_cpu(rlc_hdr->reg_list_format_direct_reg_list_length);
-}
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static bool gfx_v10_0_navi10_gfxoff_should_enable(struct amdgpu_device *adev)
 {
 	bool ret = false;
@@ -4474,12 +4445,8 @@ static int gfx_v10_0_gfx_ring_init(struct amdgpu_device *adev, int ring_id,
 		ring->doorbell_index = adev->doorbell_index.gfx_ring0 << 1;
 	else
 		ring->doorbell_index = adev->doorbell_index.gfx_ring1 << 1;
-<<<<<<< HEAD
-	snprintf(ring->name, sizeof(ring->name), "gfx_%d.%d.%d", ring->me, ring->pipe, ring->queue);
-=======
 	ring->vm_hub = AMDGPU_GFXHUB(0);
-	sprintf(ring->name, "gfx_%d.%d.%d", ring->me, ring->pipe, ring->queue);
->>>>>>> vendor/linux-drm-v6.6.35
+	snprintf(ring->name, sizeof(ring->name), "gfx_%d.%d.%d", ring->me, ring->pipe, ring->queue);
 
 	irq_type = AMDGPU_CP_IRQ_GFX_ME0_PIPE0_EOP + ring->pipe;
 	hw_prio = amdgpu_gfx_is_high_priority_graphics_queue(adev, ring) ?
@@ -4507,12 +4474,8 @@ static int gfx_v10_0_compute_ring_init(struct amdgpu_device *adev, int ring_id,
 	ring->doorbell_index = (adev->doorbell_index.mec_ring0 + ring_id) << 1;
 	ring->eop_gpu_addr = adev->gfx.mec.hpd_eop_gpu_addr
 				+ (ring_id * GFX10_MEC_HPD_SIZE);
-<<<<<<< HEAD
-	snprintf(ring->name, sizeof(ring->name), "comp_%d.%d.%d", ring->me, ring->pipe, ring->queue);
-=======
 	ring->vm_hub = AMDGPU_GFXHUB(0);
-	sprintf(ring->name, "comp_%d.%d.%d", ring->me, ring->pipe, ring->queue);
->>>>>>> vendor/linux-drm-v6.6.35
+	snprintf(ring->name, sizeof(ring->name), "comp_%d.%d.%d", ring->me, ring->pipe, ring->queue);
 
 	irq_type = AMDGPU_CP_IRQ_COMPUTE_MEC1_PIPE0_EOP
 		+ ((ring->me - 1) * adev->gfx.mec.num_pipe_per_mec)
@@ -8188,11 +8151,7 @@ static u64 gfx_v10_0_ring_get_wptr_gfx(struct amdgpu_ring *ring)
 
 	/* XXX check if swapping is necessary on BE */
 	if (ring->use_doorbell) {
-<<<<<<< HEAD
-		wptr = atomic_load_relaxed(&adev->wb.wb[ring->wptr_offs]);
-=======
 		wptr = atomic64_read((atomic64_t *)ring->wptr_cpu_addr);
->>>>>>> vendor/linux-drm-v6.6.35
 	} else {
 		wptr = RREG32_SOC15(GC, 0, mmCP_RB0_WPTR);
 		wptr += (u64)RREG32_SOC15(GC, 0, mmCP_RB0_WPTR_HI) << 32;
@@ -8210,12 +8169,6 @@ static void gfx_v10_0_ring_set_wptr_gfx(struct amdgpu_ring *ring)
 	uint32_t mqd_size = adev->mqds[AMDGPU_HW_IP_GFX].mqd_size;
 	uint64_t wptr_tmp;
 
-<<<<<<< HEAD
-	if (ring->use_doorbell) {
-		/* XXX check if swapping is necessary on BE */
-		atomic_store_relaxed(&adev->wb.wb[ring->wptr_offs], ring->wptr);
-		WDOORBELL64(ring->doorbell_index, ring->wptr);
-=======
 	if (ring->is_mes_queue) {
 		wptr_saved = (uint32_t *)(ring->mqd_ptr + mqd_size);
 		is_queue_unmap = (uint32_t *)(ring->mqd_ptr + mqd_size +
@@ -8237,7 +8190,6 @@ static void gfx_v10_0_ring_set_wptr_gfx(struct amdgpu_ring *ring)
 			if (*is_queue_unmap)
 				WDOORBELL64(aggregated_db_index, wptr_tmp);
 		}
->>>>>>> vendor/linux-drm-v6.6.35
 	} else {
 		if (ring->use_doorbell) {
 			/* XXX check if swapping is necessary on BE */
@@ -8265,11 +8217,7 @@ static u64 gfx_v10_0_ring_get_wptr_compute(struct amdgpu_ring *ring)
 
 	/* XXX check if swapping is necessary on BE */
 	if (ring->use_doorbell)
-<<<<<<< HEAD
-		wptr = atomic_load_relaxed(&ring->adev->wb.wb[ring->wptr_offs]);
-=======
 		wptr = atomic64_read((atomic64_t *)ring->wptr_cpu_addr);
->>>>>>> vendor/linux-drm-v6.6.35
 	else
 		BUG();
 	return wptr;
@@ -8284,12 +8232,6 @@ static void gfx_v10_0_ring_set_wptr_compute(struct amdgpu_ring *ring)
 	uint32_t mqd_size = adev->mqds[AMDGPU_HW_IP_COMPUTE].mqd_size;
 	uint64_t wptr_tmp;
 
-<<<<<<< HEAD
-	/* XXX check if swapping is necessary on BE */
-	if (ring->use_doorbell) {
-		atomic_store_relaxed(&adev->wb.wb[ring->wptr_offs], ring->wptr);
-		WDOORBELL64(ring->doorbell_index, ring->wptr);
-=======
 	if (ring->is_mes_queue) {
 		wptr_saved = (uint32_t *)(ring->mqd_ptr + mqd_size);
 		is_queue_unmap = (uint32_t *)(ring->mqd_ptr + mqd_size +
@@ -8311,7 +8253,6 @@ static void gfx_v10_0_ring_set_wptr_compute(struct amdgpu_ring *ring)
 			if (*is_queue_unmap)
 				WDOORBELL64(aggregated_db_index, wptr_tmp);
 		}
->>>>>>> vendor/linux-drm-v6.6.35
 	} else {
 		/* XXX check if swapping is necessary on BE */
 		if (ring->use_doorbell) {

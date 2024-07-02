@@ -48,11 +48,8 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_gem.c,v 1.9 2021/12/19 12:02:39 riastradh Exp
 #include "amdgpu_hmm.h"
 #include "amdgpu_xgmi.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-void amdgpu_gem_object_free(struct drm_gem_object *gobj)
-=======
 static const struct drm_gem_object_funcs amdgpu_gem_object_funcs;
 
 static vm_fault_t amdgpu_gem_fault(struct vm_fault *vmf)
@@ -96,7 +93,6 @@ static const struct vm_operations_struct amdgpu_gem_vm_ops = {
 };
 
 static void amdgpu_gem_object_free(struct drm_gem_object *gobj)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct amdgpu_bo *robj = gem_to_amdgpu_bo(gobj);
 
@@ -702,31 +698,18 @@ int amdgpu_gem_va_ioctl(struct drm_device *dev, void *data,
 	int r = 0;
 
 	if (args->va_address < AMDGPU_VA_RESERVED_SIZE) {
-<<<<<<< HEAD
-		dev_dbg(pci_dev_dev(dev->pdev),
-			"va_address 0x%"PRIX64" is in reserved area 0x%"PRIX64"\n",
-			args->va_address, (uint64_t)AMDGPU_VA_RESERVED_SIZE);
-=======
 		dev_dbg(dev->dev,
-			"va_address 0x%llx is in reserved area 0x%llx\n",
+			"va_address 0x%"PRIx64" is in reserved area 0x%"PRIx64"\n",
 			args->va_address, AMDGPU_VA_RESERVED_SIZE);
->>>>>>> vendor/linux-drm-v6.6.35
 		return -EINVAL;
 	}
 
 	if (args->va_address >= AMDGPU_GMC_HOLE_START &&
 	    args->va_address < AMDGPU_GMC_HOLE_END) {
-<<<<<<< HEAD
-		dev_dbg(pci_dev_dev(dev->pdev),
-			"va_address 0x%"PRIX64" is in VA hole 0x%"PRIX64"-0x%"PRIX64"\n",
-			args->va_address, (uint64_t)AMDGPU_GMC_HOLE_START,
-			(uint64_t)AMDGPU_GMC_HOLE_END);
-=======
 		dev_dbg(dev->dev,
-			"va_address 0x%llx is in VA hole 0x%llx-0x%llx\n",
+			"va_address 0x%"PRIx64" is in VA hole 0x%llx-0x%"PRIx64"\n",
 			args->va_address, AMDGPU_GMC_HOLE_START,
 			AMDGPU_GMC_HOLE_END);
->>>>>>> vendor/linux-drm-v6.6.35
 		return -EINVAL;
 	}
 
@@ -742,11 +725,7 @@ int amdgpu_gem_va_ioctl(struct drm_device *dev, void *data,
 	}
 
 	if ((args->flags & ~valid_flags) && (args->flags & ~prt_flags)) {
-<<<<<<< HEAD
-		dev_dbg(pci_dev_dev(dev->pdev), "invalid flags combination 0x%08X\n",
-=======
 		dev_dbg(dev->dev, "invalid flags combination 0x%08X\n",
->>>>>>> vendor/linux-drm-v6.6.35
 			args->flags);
 		return -EINVAL;
 	}
@@ -758,11 +737,7 @@ int amdgpu_gem_va_ioctl(struct drm_device *dev, void *data,
 	case AMDGPU_VA_OP_REPLACE:
 		break;
 	default:
-<<<<<<< HEAD
-		dev_dbg(pci_dev_dev(dev->pdev), "unsupported operation %d\n",
-=======
 		dev_dbg(dev->dev, "unsupported operation %d\n",
->>>>>>> vendor/linux-drm-v6.6.35
 			args->operation);
 		return -EINVAL;
 	}

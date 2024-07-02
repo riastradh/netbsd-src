@@ -297,11 +297,7 @@ static uint64_t sdma_v5_0_ring_get_rptr(struct amdgpu_ring *ring)
 	volatile u64 *rptr;
 
 	/* XXX check if swapping is necessary on BE */
-<<<<<<< HEAD
-	rptr = ((volatile u64 *)&ring->adev->wb.wb[ring->rptr_offs]);
-=======
-	rptr = (u64 *)ring->rptr_cpu_addr;
->>>>>>> vendor/linux-drm-v6.6.35
+	rptr = (volatile u64 *)ring->rptr_cpu_addr;
 
 	DRM_DEBUG("rptr before shift == 0x%016"PRIx64"\n", *rptr);
 	return ((*rptr) >> 2);
@@ -317,29 +313,17 @@ static uint64_t sdma_v5_0_ring_get_rptr(struct amdgpu_ring *ring)
 static uint64_t sdma_v5_0_ring_get_wptr(struct amdgpu_ring *ring)
 {
 	struct amdgpu_device *adev = ring->adev;
-<<<<<<< HEAD
-	volatile u64 *wptr = NULL;
-	uint64_t local_wptr = 0;
-
-	if (ring->use_doorbell) {
-		/* XXX check if swapping is necessary on BE */
-		wptr = ((volatile u64 *)&adev->wb.wb[ring->wptr_offs]);
-		DRM_DEBUG("wptr/doorbell before shift == 0x%016"PRIx64"\n", *wptr);
-		*wptr = (*wptr) >> 2;
-		DRM_DEBUG("wptr/doorbell after shift == 0x%016"PRIx64"\n", *wptr);
-=======
 	u64 wptr;
 
 	if (ring->use_doorbell) {
 		/* XXX check if swapping is necessary on BE */
-		wptr = READ_ONCE(*((u64 *)ring->wptr_cpu_addr));
-		DRM_DEBUG("wptr/doorbell before shift == 0x%016llx\n", wptr);
->>>>>>> vendor/linux-drm-v6.6.35
+		wptr = READ_ONCE(*((const volatile u64 *)ring->wptr_cpu_addr));
+		DRM_DEBUG("wptr/doorbell before shift == 0x%016"PRIx64"\n", wptr);
 	} else {
 		wptr = RREG32_SOC15_IP(GC, sdma_v5_0_get_reg_offset(adev, ring->me, mmSDMA0_GFX_RB_WPTR_HI));
 		wptr = wptr << 32;
 		wptr |= RREG32_SOC15_IP(GC, sdma_v5_0_get_reg_offset(adev, ring->me, mmSDMA0_GFX_RB_WPTR));
-		DRM_DEBUG("wptr before shift [%i] wptr == 0x%016llx\n", ring->me, wptr);
+		DRM_DEBUG("wptr before shift [%i] wptr == 0x%016"PRIx64"\n", ring->me, wptr);
 	}
 
 	return wptr >> 2;
@@ -361,22 +345,6 @@ static void sdma_v5_0_ring_set_wptr(struct amdgpu_ring *ring)
 	uint32_t mqd_size = adev->mqds[AMDGPU_HW_IP_DMA].mqd_size;
 
 	DRM_DEBUG("Setting write pointer\n");
-<<<<<<< HEAD
-	if (ring->use_doorbell) {
-		DRM_DEBUG("Using doorbell -- "
-				"wptr_offs == 0x%08x "
-				"lower_32_bits(ring->wptr) << 2 == 0x%08x "
-				"upper_32_bits(ring->wptr) << 2 == 0x%08x\n",
-				ring->wptr_offs,
-				lower_32_bits(ring->wptr << 2),
-				upper_32_bits(ring->wptr << 2));
-		/* XXX check if swapping is necessary on BE */
-		adev->wb.wb[ring->wptr_offs] = lower_32_bits(ring->wptr << 2);
-		adev->wb.wb[ring->wptr_offs + 1] = upper_32_bits(ring->wptr << 2);
-		DRM_DEBUG("calling WDOORBELL64(0x%08x, 0x%016"PRIx64")\n",
-				ring->doorbell_index, ring->wptr << 2);
-		WDOORBELL64(ring->doorbell_index, ring->wptr << 2);
-=======
 	if (ring->is_mes_queue) {
 		wptr_saved = (uint32_t *)(ring->mqd_ptr + mqd_size);
 		is_queue_unmap = (uint32_t *)(ring->mqd_ptr + mqd_size +
@@ -390,11 +358,11 @@ static void sdma_v5_0_ring_set_wptr(struct amdgpu_ring *ring)
 		*wptr_saved = ring->wptr << 2;
 		if (*is_queue_unmap) {
 			WDOORBELL64(aggregated_db_index, ring->wptr << 2);
-			DRM_DEBUG("calling WDOORBELL64(0x%08x, 0x%016llx)\n",
+			DRM_DEBUG("calling WDOORBELL64(0x%08x, 0x%016"PRIx64")\n",
 					ring->doorbell_index, ring->wptr << 2);
 			WDOORBELL64(ring->doorbell_index, ring->wptr << 2);
 		} else {
-			DRM_DEBUG("calling WDOORBELL64(0x%08x, 0x%016llx)\n",
+			DRM_DEBUG("calling WDOORBELL64(0x%08x, 0x%016"PRIx64")\n",
 					ring->doorbell_index, ring->wptr << 2);
 			WDOORBELL64(ring->doorbell_index, ring->wptr << 2);
 
@@ -402,7 +370,6 @@ static void sdma_v5_0_ring_set_wptr(struct amdgpu_ring *ring)
 				WDOORBELL64(aggregated_db_index,
 					    ring->wptr << 2);
 		}
->>>>>>> vendor/linux-drm-v6.6.35
 	} else {
 		if (ring->use_doorbell) {
 			DRM_DEBUG("Using doorbell -- "
@@ -415,7 +382,7 @@ static void sdma_v5_0_ring_set_wptr(struct amdgpu_ring *ring)
 			/* XXX check if swapping is necessary on BE */
 			atomic64_set((atomic64_t *)ring->wptr_cpu_addr,
 				     ring->wptr << 2);
-			DRM_DEBUG("calling WDOORBELL64(0x%08x, 0x%016llx)\n",
+			DRM_DEBUG("calling WDOORBELL64(0x%08x, 0x%016"PRIx64")\n",
 				  ring->doorbell_index, ring->wptr << 2);
 			WDOORBELL64(ring->doorbell_index, ring->wptr << 2);
 		} else {
@@ -857,7 +824,7 @@ static int sdma_v5_0_gfx_resume(struct amdgpu_device *adev)
 		/* enable DMA IBs */
 		WREG32_SOC15_IP(GC, sdma_v5_0_get_reg_offset(adev, i, mmSDMA0_GFX_IB_CNTL), ib_cntl);
 
-		if (amdgpu_sriov_vf(adev)) { /* bare-metal sequence doesn't need below to lines */
+u		if (amdgpu_sriov_vf(adev)) { /* bare-metal sequence doesn't need below to lines */
 			sdma_v5_0_ctx_switch_enable(adev, true);
 			sdma_v5_0_enable(adev, true);
 		}
@@ -1425,21 +1392,12 @@ static int sdma_v5_0_sw_init(void *handle)
 			(adev->doorbell_index.sdma_engine[0] << 1) //get DWORD offset
 			: (adev->doorbell_index.sdma_engine[1] << 1); // get DWORD offset
 
-<<<<<<< HEAD
-		snprintf(ring->name, sizeof(ring->name), "sdma%d", i);
-		r = amdgpu_ring_init(adev, ring, 1024,
-				     &adev->sdma.trap_irq,
-				     (i == 0) ?
-				     AMDGPU_SDMA_IRQ_INSTANCE0 :
-				     AMDGPU_SDMA_IRQ_INSTANCE1);
-=======
 		ring->vm_hub = AMDGPU_GFXHUB(0);
 		sprintf(ring->name, "sdma%d", i);
 		r = amdgpu_ring_init(adev, ring, 1024, &adev->sdma.trap_irq,
 				     (i == 0) ? AMDGPU_SDMA_IRQ_INSTANCE0 :
 				     AMDGPU_SDMA_IRQ_INSTANCE1,
 				     AMDGPU_RING_PRIO_DEFAULT, NULL);
->>>>>>> vendor/linux-drm-v6.6.35
 		if (r)
 			return r;
 	}

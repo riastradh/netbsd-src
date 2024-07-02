@@ -387,20 +387,12 @@ static void sdma_v3_0_ring_set_wptr(struct amdgpu_ring *ring)
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->use_doorbell) {
-<<<<<<< HEAD
-		volatile u32 *wb = (volatile u32 *)&adev->wb.wb[ring->wptr_offs];
-=======
-		u32 *wb = (u32 *)ring->wptr_cpu_addr;
->>>>>>> vendor/linux-drm-v6.6.35
+		volatile u32 *wb = (volatile u32 *)ring->wptr_cpu_addr;
 		/* XXX check if swapping is necessary on BE */
 		WRITE_ONCE(*wb, ring->wptr << 2);
 		WDOORBELL32(ring->doorbell_index, ring->wptr << 2);
 	} else if (ring->use_pollmem) {
-<<<<<<< HEAD
-		volatile u32 *wb = (volatile u32 *)&adev->wb.wb[ring->wptr_offs];
-=======
-		u32 *wb = (u32 *)ring->wptr_cpu_addr;
->>>>>>> vendor/linux-drm-v6.6.35
+		volatile u32 *wb = (volatile u32 *)ring->wptr_cpu_addr;
 
 		WRITE_ONCE(*wb, ring->wptr << 2);
 	} else {
@@ -1159,20 +1151,11 @@ static int sdma_v3_0_sw_init(void *handle)
 			ring->use_pollmem = true;
 		}
 
-<<<<<<< HEAD
-		snprintf(ring->name, sizeof ring->name, "sdma%d", i);
-		r = amdgpu_ring_init(adev, ring, 1024,
-				     &adev->sdma.trap_irq,
-				     (i == 0) ?
-				     AMDGPU_SDMA_IRQ_INSTANCE0 :
-				     AMDGPU_SDMA_IRQ_INSTANCE1);
-=======
-		sprintf(ring->name, "sdma%d", i);
+		snprintf(ring->name, sizeof(ring->name), "sdma%d", i);
 		r = amdgpu_ring_init(adev, ring, 1024, &adev->sdma.trap_irq,
 				     (i == 0) ? AMDGPU_SDMA_IRQ_INSTANCE0 :
 				     AMDGPU_SDMA_IRQ_INSTANCE1,
 				     AMDGPU_RING_PRIO_DEFAULT, NULL);
->>>>>>> vendor/linux-drm-v6.6.35
 		if (r)
 			return r;
 	}
