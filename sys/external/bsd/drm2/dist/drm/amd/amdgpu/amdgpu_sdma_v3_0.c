@@ -1151,7 +1151,7 @@ static int sdma_v3_0_sw_init(void *handle)
 			ring->use_pollmem = true;
 		}
 
-		snprintf(ring->name, sizeof(ring->name), "sdma%d", i);
+		sprintf(ring->name, "sdma%d", i);
 		r = amdgpu_ring_init(adev, ring, 1024, &adev->sdma.trap_irq,
 				     (i == 0) ? AMDGPU_SDMA_IRQ_INSTANCE0 :
 				     AMDGPU_SDMA_IRQ_INSTANCE1,

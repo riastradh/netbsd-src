@@ -1989,7 +1989,7 @@ static int gfx_v9_0_compute_ring_init(struct amdgpu_device *adev, int ring_id,
 	ring->eop_gpu_addr = adev->gfx.mec.hpd_eop_gpu_addr
 				+ (ring_id * GFX9_MEC_HPD_SIZE);
 	ring->vm_hub = AMDGPU_GFXHUB(0);
-	snprintf(ring->name, sizeof(ring->name), "comp_%d.%d.%d", ring->me, ring->pipe, ring->queue);
+	sprintf(ring->name, "comp_%d.%d.%d", ring->me, ring->pipe, ring->queue);
 
 	irq_type = AMDGPU_CP_IRQ_COMPUTE_MEC1_PIPE0_EOP
 		+ ((ring->me - 1) * adev->gfx.mec.num_pipe_per_mec)
@@ -2080,9 +2080,9 @@ static int gfx_v9_0_sw_init(void *handle)
 		ring = &adev->gfx.gfx_ring[i];
 		ring->ring_obj = NULL;
 		if (!i)
-			snprintf(ring->name, sizeof(ring->name), "gfx");
+			sprintf(ring->name, "gfx");
 		else
-			snprintf(ring->name, sizeof(ring->name), "gfx_%d", i);
+			sprintf(ring->name, "gfx_%d", i);
 		ring->use_doorbell = true;
 		ring->doorbell_index = adev->doorbell_index.gfx_ring0 << 1;
 
