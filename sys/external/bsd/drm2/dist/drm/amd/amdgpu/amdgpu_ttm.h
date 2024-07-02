@@ -42,14 +42,10 @@
 
 #define AMDGPU_POISON	0xd0bed0be
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-#  define	__amdgpu_aperture_iomem
-#  define	__iomem	__amdgpu_aperture_iomem
-#endif
-=======
+#ifndef __NetBSD__		/* XXX amdgpu sysfs */
 extern const struct attribute_group amdgpu_vram_mgr_attr_group;
 extern const struct attribute_group amdgpu_gtt_mgr_attr_group;
+#endif
 
 struct hmm_range;
 
@@ -58,7 +54,11 @@ struct amdgpu_gtt_mgr {
 	struct drm_mm mm;
 	spinlock_t lock;
 };
->>>>>>> vendor/linux-drm-v6.6.35
+
+#ifdef __NetBSD__
+#  define	__amdgpu_aperture_iomem
+#  define	__iomem	__amdgpu_aperture_iomem
+#endif
 
 struct amdgpu_mman {
 	struct ttm_device		bdev;
@@ -182,15 +182,6 @@ int amdgpu_fill_buffer(struct amdgpu_bo *bo,
 			struct dma_fence **fence,
 			bool delayed);
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-int amdgpu_mmap_object(struct drm_device *, off_t, size_t, vm_prot_t,
-    struct uvm_object **, voff_t *, struct file *);
-#else
-int amdgpu_mmap(struct file *filp, struct vm_area_struct *vma);
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 int amdgpu_ttm_alloc_gart(struct ttm_buffer_object *bo);
 void amdgpu_ttm_recover_gart(struct ttm_buffer_object *tbo);
 uint64_t amdgpu_ttm_domain_start(struct amdgpu_device *adev, uint32_t type);

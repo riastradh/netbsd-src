@@ -737,17 +737,10 @@ int smu_v11_0_i2c_control_init(struct amdgpu_device *adev)
 	smu_i2c->port = 0;
 	mutex_init(&smu_i2c->mutex);
 	control->owner = THIS_MODULE;
-<<<<<<< HEAD
-	control->class = I2C_CLASS_SPD;
-	control->dev.parent = pci_dev_dev(adev->pdev);
-	control->algo = &smu_v11_0_i2c_eeprom_i2c_algo;
-	snprintf(control->name, sizeof(control->name), "RAS EEPROM");
-=======
 	control->class = I2C_CLASS_HWMON;
-	control->dev.parent = &adev->pdev->dev;
+	control->dev.parent = pci_dev_dev(adev->pdev);
 	control->algo = &smu_v11_0_i2c_algo;
 	snprintf(control->name, sizeof(control->name), "AMDGPU SMU 0");
->>>>>>> vendor/linux-drm-v6.6.35
 	control->lock_ops = &smu_v11_0_i2c_i2c_lock_ops;
 	control->quirks = &smu_v11_0_i2c_control_quirks;
 	i2c_set_adapdata(control, smu_i2c);

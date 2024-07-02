@@ -4138,18 +4138,18 @@ static void amdgpu_device_unmap_mmio(struct amdgpu_device *adev)
 #ifdef __NetBSD__
 	bus_space_unmap(adev->rmmiot, adev->rmmioh, adev->rmmio_size);
 	adev->rmmio_size = 0;
-	if (adev->gmc.visible_vram_size) {
-		bus_space_unmap(adev->gmc.aper_tag,
-		    adev->mman.aper_base_handle, adev->gmc.visible_vram_size);
-		adev->gmc.visible_vram_size = 0;
-	}
 #else
 	iounmap(adev->rmmio);
 	adev->rmmio = NULL;
-	if (adev->mman.aper_base_kaddr)
-		iounmap(adev->mman.aper_base_kaddr);
-	adev->mman.aper_base_kaddr = NULL;
 #endif
+	if (adev->mman.aper_base_kaddr)
+#ifdef __NetBSD__
+		bus_space_unmap(adev->gmc.aper_tag,
+		    adev->mman.aper_base_handle, adev->gmc.visible_vram_size);
+#endif
+		iounmap(adev->mman.aper_base_kaddr);
+#endif
+	adev->mman.aper_base_kaddr = NULL;
 
 	/* Memory manager related */
 #ifdef __NetBSD__

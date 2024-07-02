@@ -59,11 +59,9 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_si.c,v 1.5 2023/09/30 10:46:45 mrg Exp $");
 #include "bif/bif_3_0_d.h"
 #include "bif/bif_3_0_sh_mask.h"
 
-<<<<<<< HEAD
-#include <linux/nbsd-namespace.h>
-=======
 #include "amdgpu_dm.h"
->>>>>>> vendor/linux-drm-v6.6.35
+
+#include <linux/nbsd-namespace.h>
 
 static const u32 tahiti_golden_registers[] =
 {
