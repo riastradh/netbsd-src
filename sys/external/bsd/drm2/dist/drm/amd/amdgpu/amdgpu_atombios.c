@@ -154,7 +154,7 @@ void amdgpu_atombios_i2c_init(struct amdgpu_device *adev)
 			i2c = amdgpu_atombios_get_bus_rec_for_i2c_gpio(gpio);
 
 			if (i2c.valid) {
-				snprintf(stmp, sizeof stmp, "0x%x", i2c.i2c_id);
+				sprintf(stmp, "0x%x", i2c.i2c_id);
 				adev->i2c_bus[i] = amdgpu_i2c_create(adev_to_drm(adev), &i2c, stmp);
 			}
 			gpio = (ATOM_GPIO_I2C_ASSIGMENT *)
