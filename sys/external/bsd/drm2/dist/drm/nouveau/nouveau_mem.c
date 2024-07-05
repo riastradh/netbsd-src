@@ -116,19 +116,14 @@ nouveau_mem_host(struct ttm_resource *reg, struct ttm_tt *tt)
 		mem->comp = 0;
 	}
 
-<<<<<<< HEAD
 #ifdef __NetBSD__		/* XXX prime */
 	args.dma = tt->dma_address;
 #else
-	if (tt->ttm.sg) args.sgl = tt->ttm.sg->sgl;
-	else            args.dma = tt->dma_address;
-#endif
-=======
 	if (tt->sg)
 		args.sgl = tt->sg->sgl;
 	else
 		args.dma = tt->dma_address;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	mutex_lock(&drm->master.lock);
 	ret = nvif_mem_ctor_type(mmu, "ttmHostMem", cli->mem->oclass, type, PAGE_SHIFT,

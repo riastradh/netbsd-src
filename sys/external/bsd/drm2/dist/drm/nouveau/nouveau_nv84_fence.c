@@ -33,13 +33,10 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nv84_fence.c,v 1.8 2021/12/18 23:45:32 riast
 
 #include "nv50_display.h"
 
-<<<<<<< HEAD
-#include <linux/nbsd-namespace.h>
-=======
 #include <nvif/push206e.h>
 
 #include <nvhw/class/cl826f.h>
->>>>>>> vendor/linux-drm-v6.6.35
+#include <linux/nbsd-namespace.h>
 
 static int
 nv84_fence_emit32(struct nouveau_channel *chan, u64 virtual, u32 sequence)

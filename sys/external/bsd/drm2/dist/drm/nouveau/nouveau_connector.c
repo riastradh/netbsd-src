@@ -410,12 +410,7 @@ nouveau_connector_destroy(struct drm_connector *connector)
 	drm_connector_cleanup(connector);
 	if (nv_connector->aux.transfer) {
 		drm_dp_cec_unregister_connector(&nv_connector->aux);
-<<<<<<< HEAD
-		drm_dp_aux_unregister(&nv_connector->aux);
 		kfree(__UNCONST(nv_connector->aux.name));
-=======
-		kfree(nv_connector->aux.name);
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 	nvif_conn_dtor(&nv_connector->conn);
 	kfree(connector);
@@ -457,22 +452,14 @@ nouveau_connector_ddc_detect(struct drm_connector *connector)
 			__USE(dev);
 #else
 			if (switcheroo_ddc)
-<<<<<<< HEAD
-				vga_switcheroo_lock_ddc(dev->pdev);
-#endif
-=======
 				vga_switcheroo_lock_ddc(pdev);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 			if (nvkm_probe_i2c(nv_encoder->i2c, 0x50))
 				found = nv_encoder;
 #ifndef __NetBSD__
 			if (switcheroo_ddc)
-<<<<<<< HEAD
-				vga_switcheroo_unlock_ddc(dev->pdev);
-#endif
-=======
 				vga_switcheroo_unlock_ddc(pdev);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 			break;
 		}
