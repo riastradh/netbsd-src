@@ -885,11 +885,7 @@ int tn_get_temp(struct radeon_device *rdev)
 static void cayman_gpu_init(struct radeon_device *rdev)
 {
 	u32 gb_addr_config = 0;
-<<<<<<< HEAD
-	u32 mc_shared_chmap __unused, mc_arb_ramcfg;
-=======
 	u32 mc_arb_ramcfg;
->>>>>>> vendor/linux-drm-v6.6.35
 	u32 cgts_tcc_disable;
 	u32 sx_debug_1;
 	u32 smx_dc_ctl0;

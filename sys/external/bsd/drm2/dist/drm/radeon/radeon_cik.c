@@ -3185,11 +3185,7 @@ static void cik_setup_rb(struct radeon_device *rdev,
 static void cik_gpu_init(struct radeon_device *rdev)
 {
 	u32 gb_addr_config = RREG32(GB_ADDR_CONFIG);
-<<<<<<< HEAD
-	u32 mc_shared_chmap __unused, mc_arb_ramcfg;
-=======
 	u32 mc_arb_ramcfg;
->>>>>>> vendor/linux-drm-v6.6.35
 	u32 hdp_host_path_cntl;
 	u32 tmp;
 	int i, j;

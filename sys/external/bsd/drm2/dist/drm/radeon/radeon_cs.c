@@ -204,12 +204,8 @@ static int radeon_cs_parser_relocs(struct radeon_cs_parser *p)
 		vm_map_lock_read(&curproc->p_vmspace->vm_map);
 #else
 	if (need_mmap_lock)
-<<<<<<< HEAD
-		down_read(&current->mm->mmap_sem);
-#endif
-=======
 		mmap_read_lock(current->mm);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	r = radeon_bo_list_validate(p->rdev, &p->ticket, &p->validated, p->ring);
 
@@ -218,12 +214,8 @@ static int radeon_cs_parser_relocs(struct radeon_cs_parser *p)
 		vm_map_unlock_read(&curproc->p_vmspace->vm_map);
 #else
 	if (need_mmap_lock)
-<<<<<<< HEAD
-		up_read(&current->mm->mmap_sem);
-#endif
-=======
 		mmap_read_unlock(current->mm);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	return r;
 }

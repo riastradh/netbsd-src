@@ -1109,11 +1109,6 @@ void radeon_compute_pll_avivo(struct radeon_pll *pll,
 /* pre-avivo */
 static inline uint32_t radeon_div(uint64_t n, uint32_t d)
 {
-<<<<<<< HEAD
-	uint64_t mod __unused;
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	n += d / 2;
 
 	do_div(n, d);

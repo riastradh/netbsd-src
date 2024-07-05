@@ -462,6 +462,15 @@ bool radeon_has_atpx_dgpu_power_cntl(void);
 bool radeon_is_atpx_hybrid(void);
 bool radeon_has_atpx(void);
 bool radeon_atpx_dgpu_req_power_for_displays(void);
+#else
+
+#ifndef __NetBSD__
+static inline void radeon_register_atpx_handler(void) {}
+static inline void radeon_unregister_atpx_handler(void) {}
+static inline bool radeon_has_atpx_dgpu_power_cntl(void) { return false; }
+static inline bool radeon_is_atpx_hybrid(void) { return false; }
+#endif
+
 #endif
 
 #endif

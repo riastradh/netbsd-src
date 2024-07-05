@@ -39,19 +39,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_i2c.c,v 1.8 2021/12/18 23:45:43 riastradh Exp
 #include "radeon.h"
 #include "atom.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
-
-extern int radeon_atom_hw_i2c_xfer(struct i2c_adapter *i2c_adap,
-				   struct i2c_msg *msgs, int num);
-extern u32 radeon_atom_hw_i2c_func(struct i2c_adapter *adap);
-
-/**
- * radeon_ddc_probe
- *
- */
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 bool radeon_ddc_probe(struct radeon_connector *radeon_connector, bool use_aux)
 {
 	u8 out = 0x0;

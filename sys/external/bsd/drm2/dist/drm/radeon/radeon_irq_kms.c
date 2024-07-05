@@ -55,11 +55,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_irq_kms.c,v 1.6 2021/12/18 23:45:43 riastradh
  * radeon_irq_process is a macro that points to the per-asic
  * irq handler callback.
  */
-<<<<<<< HEAD
-irqreturn_t radeon_driver_irq_handler_kms(DRM_IRQ_ARGS)
-=======
-static irqreturn_t radeon_driver_irq_handler_kms(int irq, void *arg)
->>>>>>> vendor/linux-drm-v6.6.35
+static irqreturn_t radeon_driver_irq_handler_kms(DRM_IRQ_ARGS)
 {
 	struct drm_device *dev = (struct drm_device *) arg;
 	struct radeon_device *rdev = dev->dev_private;
@@ -354,15 +350,11 @@ int radeon_irq_kms_init(struct radeon_device *rdev)
 	INIT_WORK(&rdev->audio_work, r600_audio_update_hdmi);
 
 	rdev->irq.installed = true;
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	r = drm_irq_install(rdev->ddev);
 #else
-	r = drm_irq_install(rdev->ddev, rdev->ddev->pdev->irq);
-#endif
-=======
 	r = radeon_irq_install(rdev, rdev->pdev->irq);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	if (r) {
 		rdev->irq.installed = false;
 		flush_delayed_work(&rdev->hotplug_work);

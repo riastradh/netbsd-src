@@ -165,17 +165,12 @@ static bool radeon_read_bios(struct radeon_device *rdev)
 
 static bool radeon_read_platform_bios(struct radeon_device *rdev)
 {
-<<<<<<< HEAD
 #ifdef __NetBSD__		/* XXX radeon platform bios */
 	return false;
 #else
-	uint8_t __iomem *bios;
-	size_t size;
-=======
 	phys_addr_t rom = rdev->pdev->rom;
 	size_t romlen = rdev->pdev->romlen;
 	void __iomem *bios;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	rdev->bios = NULL;
 
@@ -197,13 +192,10 @@ static bool radeon_read_platform_bios(struct radeon_device *rdev)
 		goto free_bios;
 
 	return true;
-<<<<<<< HEAD
-#endif
-=======
 free_bios:
 	kfree(rdev->bios);
 	return false;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 #ifdef CONFIG_ACPI

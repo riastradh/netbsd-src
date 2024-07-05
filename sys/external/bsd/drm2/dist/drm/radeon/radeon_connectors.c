@@ -2533,30 +2533,3 @@ radeon_add_legacy_connector(struct drm_device *dev,
 	connector->display_info.subpixel_order = subpixel_order;
 	drm_connector_register(connector);
 }
-<<<<<<< HEAD
-
-void radeon_setup_mst_connector(struct drm_device *dev)
-{
-	struct radeon_device *rdev = dev->dev_private;
-	struct drm_connector *connector;
-	struct radeon_connector *radeon_connector;
-
-	if (!ASIC_IS_DCE5(rdev))
-		return;
-
-	if (radeon_mst == 0)
-		return;
-
-	list_for_each_entry(connector, &dev->mode_config.connector_list, head) {
-		int ret __unused;
-
-		radeon_connector = to_radeon_connector(connector);
-
-		if (connector->connector_type != DRM_MODE_CONNECTOR_DisplayPort)
-			continue;
-
-		ret = radeon_dp_mst_init(radeon_connector);
-	}
-}
-=======
->>>>>>> vendor/linux-drm-v6.6.35

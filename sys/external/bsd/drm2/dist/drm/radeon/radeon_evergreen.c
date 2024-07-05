@@ -3140,11 +3140,7 @@ static int evergreen_cp_resume(struct radeon_device *rdev)
 static void evergreen_gpu_init(struct radeon_device *rdev)
 {
 	u32 gb_addr_config;
-<<<<<<< HEAD
-	u32 mc_shared_chmap __unused, mc_arb_ramcfg;
-=======
 	u32 mc_arb_ramcfg;
->>>>>>> vendor/linux-drm-v6.6.35
 	u32 sx_debug_1;
 	u32 smx_dc_ctl0;
 	u32 sq_config;

@@ -1108,11 +1108,7 @@ void r600_pcie_gart_tlb_flush(struct radeon_device *rdev)
 	/* flush hdp cache so updates hit vram */
 	if ((rdev->family >= CHIP_RV770) && (rdev->family <= CHIP_RV740) &&
 	    !(rdev->flags & RADEON_IS_AGP)) {
-<<<<<<< HEAD
-		void __iomem *ptr = rdev->gart.ptr;
-=======
 		void __iomem *ptr = (void *)rdev->gart.ptr;
->>>>>>> vendor/linux-drm-v6.6.35
 
 		/* r7xx hw bug.  write to HDP_DEBUG1 followed by fb read
 		 * rather than write to HDP_REG_COHERENCY_FLUSH_CNTL
@@ -1120,11 +1116,7 @@ void r600_pcie_gart_tlb_flush(struct radeon_device *rdev)
 		 * method for them.
 		 */
 		WREG32(HDP_DEBUG1, 0);
-<<<<<<< HEAD
-		(void)readl(ptr);
-=======
-		readl((void __iomem *)ptr);
->>>>>>> vendor/linux-drm-v6.6.35
+		(void)readl((void __iomem *)ptr);
 	} else
 		WREG32(R_005480_HDP_MEM_COHERENCY_FLUSH_CNTL, 0x1);
 
@@ -4445,17 +4437,10 @@ void r600_mmio_hdp_flush(struct radeon_device *rdev)
 	 */
 	if ((rdev->family >= CHIP_RV770) && (rdev->family <= CHIP_RV740) &&
 	    rdev->vram_scratch.ptr && !(rdev->flags & RADEON_IS_AGP)) {
-<<<<<<< HEAD
-		void __iomem *ptr = rdev->vram_scratch.ptr;
-
-		WREG32(HDP_DEBUG1, 0);
-		(void)readl(ptr);
-=======
 		void __iomem *ptr = (void *)rdev->vram_scratch.ptr;
 
 		WREG32(HDP_DEBUG1, 0);
-		readl((void __iomem *)ptr);
->>>>>>> vendor/linux-drm-v6.6.35
+		(void)readl((void __iomem *)ptr);
 	} else
 		WREG32(R_005480_HDP_MEM_COHERENCY_FLUSH_CNTL, 0x1);
 }

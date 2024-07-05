@@ -320,9 +320,10 @@ static void radeon_fbdev_client_unregister(struct drm_client_dev *client)
 
 static int radeon_fbdev_client_restore(struct drm_client_dev *client)
 {
+#ifndef __NetBSD__			/* XXX radeon vga */
 	drm_fb_helper_lastclose(client->dev);
 	vga_switcheroo_process_delayed_switch();
-
+#endif
 	return 0;
 }
 

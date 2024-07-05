@@ -42,11 +42,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_gem.c,v 1.9 2021/12/18 23:45:43 riastradh Exp
 #include "radeon.h"
 #include "radeon_prime.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
-
-void radeon_gem_object_free(struct drm_gem_object *gobj)
-=======
 struct dma_buf *radeon_gem_prime_export(struct drm_gem_object *gobj,
 					int flags);
 struct sg_table *radeon_gem_prime_get_sg_table(struct drm_gem_object *obj);
@@ -92,7 +88,6 @@ static const struct vm_operations_struct radeon_gem_vm_ops = {
 };
 
 static void radeon_gem_object_free(struct drm_gem_object *gobj)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct radeon_bo *robj = gem_to_radeon_bo(gobj);
 
@@ -142,11 +137,8 @@ retry:
 		return r;
 	}
 	*obj = &robj->tbo.base;
-<<<<<<< HEAD
-#ifndef __NetBSD__
-=======
 	(*obj)->funcs = &radeon_gem_object_funcs;
->>>>>>> vendor/linux-drm-v6.6.35
+#ifndef __NetBSD__
 	robj->pid = task_pid_nr(current);
 #endif
 
@@ -416,40 +408,29 @@ int radeon_gem_userptr_ioctl(struct drm_device *dev, void *data,
 	}
 
 	if (args->flags & RADEON_GEM_USERPTR_VALIDATE) {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 		vm_map_lock_read(&curproc->p_vmspace->vm_map);
 #else
-		down_read(&current->mm->mmap_sem);
+		mmap_read_lock(current->mm);
 #endif
 		r = radeon_bo_reserve(bo, true);
 		if (r) {
 #ifdef __NetBSD__
 			vm_map_unlock_read(&curproc->p_vmspace->vm_map);
 #else
-			up_read(&current->mm->mmap_sem);
-#endif
-=======
-		mmap_read_lock(current->mm);
-		r = radeon_bo_reserve(bo, true);
-		if (r) {
 			mmap_read_unlock(current->mm);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 			goto release_object;
 		}
 
 		radeon_ttm_placement_from_domain(bo, RADEON_GEM_DOMAIN_GTT);
 		r = ttm_bo_validate(&bo->tbo, &bo->placement, &ctx);
 		radeon_bo_unreserve(bo);
-<<<<<<< HEAD
 #ifdef __NetBSD__
 		vm_map_unlock_read(&curproc->p_vmspace->vm_map);
 #else
-		up_read(&current->mm->mmap_sem);
-#endif
-=======
 		mmap_read_unlock(current->mm);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 		if (r)
 			goto release_object;
 	}

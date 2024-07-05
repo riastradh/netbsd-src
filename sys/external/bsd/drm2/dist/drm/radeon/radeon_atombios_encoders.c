@@ -149,11 +149,6 @@ atombios_set_backlight_level(struct radeon_encoder *radeon_encoder, u8 level)
 	}
 }
 
-<<<<<<< HEAD
-#if IS_ENABLED(CONFIG_BACKLIGHT_CLASS_DEVICE) || IS_ENABLED(CONFIG_BACKLIGHT_CLASS_DEVICE_MODULE)
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static u8 radeon_atom_bl_level(struct backlight_device *bd)
 {
 	u8 level;

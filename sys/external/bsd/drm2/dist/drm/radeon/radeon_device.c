@@ -1673,8 +1673,6 @@ void radeon_device_fini(struct radeon_device *rdev)
 		vga_switcheroo_unregister_client(rdev->pdev);
 	if (rdev->flags & RADEON_IS_PX)
 		vga_switcheroo_fini_domain_pm_ops(rdev->dev);
-<<<<<<< HEAD
-	vga_client_register(rdev->pdev, NULL, NULL, NULL);
 #endif
 #ifdef __NetBSD__
 	if (rdev->rio_mem_size)
@@ -1683,9 +1681,7 @@ void radeon_device_fini(struct radeon_device *rdev)
 	rdev->rio_mem_size = 0;
 	bus_space_unmap(rdev->rmmio_bst, rdev->rmmio_bsh, rdev->rmmio_size);
 #else
-=======
 	vga_client_unregister(rdev->pdev);
->>>>>>> vendor/linux-drm-v6.6.35
 	if (rdev->rio_mem)
 		pci_iounmap(rdev->pdev, rdev->rio_mem);
 	rdev->rio_mem = NULL;
@@ -1801,12 +1797,8 @@ int radeon_suspend_kms(struct drm_device *dev, bool suspend,
 
 	radeon_agp_suspend(rdev);
 
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* pmf handles this for us.  */
-	pci_save_state(dev->pdev);
-=======
 	pci_save_state(pdev);
->>>>>>> vendor/linux-drm-v6.6.35
 	if (freeze && rdev->family >= CHIP_CEDAR && !(rdev->flags & RADEON_IS_IGP)) {
 		rdev->asic->asic_reset(rdev, true);
 		pci_restore_state(pdev);
