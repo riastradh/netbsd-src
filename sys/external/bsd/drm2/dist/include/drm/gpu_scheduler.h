@@ -30,10 +30,7 @@
 #include <drm/drm_wait_netbsd.h>
 #include <linux/dma-fence.h>
 #include <linux/completion.h>
-<<<<<<< HEAD
-=======
 #include <linux/xarray.h>
->>>>>>> vendor/linux-drm-v6.6.35
 #include <linux/workqueue.h>
 
 #define MAX_WAIT_SCHED_ENTITY_Q_EMPTY msecs_to_jiffies(1000)
@@ -198,14 +195,6 @@ struct drm_sched_entity {
 	 * Points to entities' guilty.
 	 */
 	atomic_t			*guilty;
-<<<<<<< HEAD
-	struct dma_fence                *last_scheduled;
-#ifdef __NetBSD__
-	struct proc			*last_user;
-#else
-	struct task_struct		*last_user;
-#endif
-=======
 
 	/**
 	 * @last_scheduled:
@@ -219,7 +208,11 @@ struct drm_sched_entity {
 	/**
 	 * @last_user: last group leader pushing a job into the entity.
 	 */
+#ifdef __NetBSD__
+	struct proc			*last_user;
+#else
 	struct task_struct		*last_user;
+#endif
 
 	/**
 	 * @stopped:
@@ -228,7 +221,6 @@ struct drm_sched_entity {
 	 * termination. This is set by calling drm_sched_entity_flush() and by
 	 * drm_sched_fini().
 	 */
->>>>>>> vendor/linux-drm-v6.6.35
 	bool 				stopped;
 
 	/**
@@ -515,15 +507,9 @@ struct drm_gpu_scheduler {
 	uint32_t			hw_submission_limit;
 	long				timeout;
 	const char			*name;
-<<<<<<< HEAD
-	struct drm_sched_rq		sched_rq[DRM_SCHED_PRIORITY_MAX];
+	struct drm_sched_rq		sched_rq[DRM_SCHED_PRIORITY_COUNT];
 	drm_waitqueue_t			wake_up_worker;
 	drm_waitqueue_t			job_scheduled;
-=======
-	struct drm_sched_rq		sched_rq[DRM_SCHED_PRIORITY_COUNT];
-	wait_queue_head_t		wake_up_worker;
-	wait_queue_head_t		job_scheduled;
->>>>>>> vendor/linux-drm-v6.6.35
 	atomic_t			hw_rq_count;
 	atomic64_t			job_id_count;
 	struct workqueue_struct		*timeout_wq;

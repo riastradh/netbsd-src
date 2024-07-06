@@ -35,12 +35,9 @@
 #include <linux/seqlock.h>
 #include <linux/idr.h>
 #include <linux/poll.h>
-<<<<<<< HEAD
 #include <linux/timer.h>
 #include <linux/ktime.h>
-=======
 #include <linux/kthread.h>
->>>>>>> vendor/linux-drm-v6.6.35
 
 #include <drm/drm_file.h>
 #include <drm/drm_modes.h>

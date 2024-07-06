@@ -273,15 +273,10 @@ struct drm_file {
 	 */
 	struct drm_master *master;
 
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	/** @pid: Process that opened this file. */
-	struct pid *pid;
-#endif
-=======
 	/** @master_lookup_lock: Serializes @master. */
 	spinlock_t master_lookup_lock;
 
+#ifndef __NetBSD__
 	/**
 	 * @pid: Process that is using this file.
 	 *
@@ -291,10 +286,10 @@ struct drm_file {
 	 * dropped after a RCU grace period to accommodate lockless readers.
 	 */
 	struct pid __rcu *pid;
+#endif
 
 	/** @client_id: A unique id for fdinfo */
 	u64 client_id;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/** @magic: Authentication magic, see @authenticated. */
 	drm_magic_t magic;

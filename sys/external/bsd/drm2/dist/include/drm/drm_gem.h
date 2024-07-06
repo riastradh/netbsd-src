@@ -489,7 +489,7 @@ int drm_gem_object_init(struct drm_device *dev,
 			struct drm_gem_object *obj, size_t size);
 void drm_gem_private_object_init(struct drm_device *dev,
 				 struct drm_gem_object *obj, size_t size);
-<<<<<<< HEAD
+void drm_gem_private_object_fini(struct drm_gem_object *obj);
 #ifdef __NetBSD__
 void drm_gem_pager_reference(struct uvm_object *);
 void drm_gem_pager_detach(struct uvm_object *);
@@ -498,9 +498,6 @@ int drm_gem_mmap_object(struct drm_device *, off_t, size_t, int,
 int drm_gem_or_legacy_mmap_object(struct drm_device *, off_t, size_t, int,
     struct uvm_object **, voff_t *, struct file *);
 #else
-=======
-void drm_gem_private_object_fini(struct drm_gem_object *obj);
->>>>>>> vendor/linux-drm-v6.6.35
 void drm_gem_vm_open(struct vm_area_struct *vma);
 void drm_gem_vm_close(struct vm_area_struct *vma);
 int drm_gem_mmap_obj(struct drm_gem_object *obj, unsigned long obj_size,
