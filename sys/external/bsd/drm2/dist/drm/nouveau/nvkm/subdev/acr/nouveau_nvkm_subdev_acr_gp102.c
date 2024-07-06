@@ -34,13 +34,9 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_subdev_acr_gp102.c,v 1.3 2021/12/19 10:
 #include <nvfw/acr.h>
 #include <nvfw/flcn.h>
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-void
-=======
 int
->>>>>>> vendor/linux-drm-v6.6.35
 gp102_acr_wpr_patch(struct nvkm_acr *acr, s64 adjust)
 {
 	struct wpr_header_v1 hdr;

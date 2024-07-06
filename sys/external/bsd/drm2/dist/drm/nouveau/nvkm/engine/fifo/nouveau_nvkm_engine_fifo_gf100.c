@@ -626,23 +626,13 @@ gf100_fifo_mmu_fault_recover(struct nvkm_fifo *fifo, struct nvkm_fault_data *inf
 	chan = nvkm_chan_get_inst(&fifo->engine, info->inst, &flags);
 
 	nvkm_error(subdev,
-<<<<<<< HEAD
-		   "%s fault at %010"PRIx64" engine %02x [%s] client %02x [%s%s] "
-		   "reason %02x [%s] on channel %d [%010"PRIx64" %s]\n",
-		   info->access ? "write" : "read", info->addr,
-		   info->engine, eu ? eu->name : "",
-		   info->client, gpcid, ec ? ec->name : "",
-		   info->reason, er ? er->name : "", chan ? chan->chid : -1,
-		   info->inst, chan ? chan->object.client->name : "unknown");
-=======
-		   "fault %02x [%s] at %016llx engine %02x [%s] client %02x "
-		   "[%s%s] reason %02x [%s] on channel %d [%010llx %s]\n",
+		   "fault %02x [%s] at %016"PRIx64" engine %02x [%s] client %02x "
+		   "[%s%s] reason %02x [%s] on channel %d [%010"PRIx64" %s]\n",
 		   info->access, ea ? ea->name : "", info->addr,
 		   info->engine, ee ? ee->name : engine ? engine->subdev.name : "",
 		   info->client, ct, ec ? ec->name : "",
 		   info->reason, er ? er->name : "",
 		   chan ? chan->id : -1, info->inst, chan ? chan->name : "unknown");
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* Handle host/engine faults. */
 	if (chan)
@@ -791,23 +781,7 @@ gf100_fifo_intr_pbdma(struct nvkm_fifo *fifo)
 		nvkm_wr32(device, 0x0025a0, BIT(runq->id));
 	}
 
-<<<<<<< HEAD
-	if (show) {
-		nvkm_snprintbf(msg, sizeof(msg), gf100_fifo_pbdma_intr, show);
-		chan = nvkm_fifo_chan_chid(&fifo->base, chid, &flags);
-		nvkm_error(subdev, "PBDMA%d: %08x [%s] ch %d [%010"PRIx64" %s] "
-				   "subc %d mthd %04x data %08x\n",
-			   unit, show, msg, chid, chan ? chan->inst->addr : 0,
-			   chan ? chan->object.client->name : "unknown",
-			   subc, mthd, data);
-		nvkm_fifo_chan_put(&fifo->base, flags, &chan);
-	}
-
-	nvkm_wr32(device, 0x0400c0 + (unit * 0x2000), 0x80600008);
-	nvkm_wr32(device, 0x040108 + (unit * 0x2000), stat);
-=======
 	return handled;
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static void

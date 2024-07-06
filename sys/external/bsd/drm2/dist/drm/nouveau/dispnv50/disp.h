@@ -83,10 +83,7 @@ struct nv50_dmac {
 	/* Protects against concurrent pushbuf access to this channel, lock is
 	 * grabbed by evo_wait (if the pushbuf reservation is successful) and
 	 * dropped again by evo_kick. */
-<<<<<<< HEAD
 	struct spinlock lock;
-=======
-	struct mutex lock;
 
 	u32 cur;
 	u32 put;
@@ -105,7 +102,6 @@ struct nv50_outp_atom {
 		};
 		u8 mask;
 	} set, clr;
->>>>>>> vendor/linux-drm-v6.6.35
 };
 
 int nv50_dmac_create(struct nvif_device *device, struct nvif_object *disp,

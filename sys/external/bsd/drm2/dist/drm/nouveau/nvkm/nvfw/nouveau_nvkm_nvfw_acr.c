@@ -51,10 +51,6 @@ wpr_header_v1_dump(struct nvkm_subdev *subdev, const struct wpr_header_v1 *hdr)
 }
 
 static void
-<<<<<<< HEAD
-lsb_header_tail_dump(struct nvkm_subdev *subdev,
-			struct lsb_header_tail *hdr)
-=======
 wpr_generic_header_dump(struct nvkm_subdev *subdev, const struct wpr_generic_header *hdr)
 {
 	nvkm_debug(subdev, "wprGenericHeader\n");
@@ -97,7 +93,6 @@ lsb_header_v2_dump(struct nvkm_subdev *subdev, struct lsb_header_v2 *hdr)
 
 static void
 lsb_header_tail_dump(struct nvkm_subdev *subdev, struct lsb_header_tail *hdr)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	nvkm_debug(subdev, "lsbHeader\n");
 	nvkm_debug(subdev, "\tucodeOff      : 0x%x\n", hdr->ucode_off);

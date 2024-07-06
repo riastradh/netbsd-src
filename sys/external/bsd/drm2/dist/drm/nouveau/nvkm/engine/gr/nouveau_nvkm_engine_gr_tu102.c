@@ -29,13 +29,9 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_engine_gr_tu102.c,v 1.3 2021/12/19 10:5
 
 #include <nvif/class.h>
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
 static void
-=======
-void
->>>>>>> vendor/linux-drm-v6.6.35
 tu102_gr_init_fecs_exceptions(struct gf100_gr *gr)
 {
 	nvkm_wr32(gr->base.engine.subdev.device, 0x409c24, 0x006e0003);

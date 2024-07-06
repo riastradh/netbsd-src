@@ -434,13 +434,10 @@ nouveau_dmem_fini(struct nouveau_drm *drm)
 		nouveau_bo_ref(NULL, &chunk->bo);
 		WARN_ON(chunk->callocated);
 		list_del(&chunk->list);
-<<<<<<< HEAD
 		spin_lock_destroy(&chunk->lock);
-=======
 		memunmap_pages(&chunk->pagemap);
 		release_mem_region(chunk->pagemap.range.start,
 				   range_len(&chunk->pagemap.range));
->>>>>>> vendor/linux-drm-v6.6.35
 		kfree(chunk);
 	}
 
@@ -616,19 +613,10 @@ nouveau_dmem_init(struct nouveau_drm *drm)
 	/* Initialize migration dma helpers before registering memory */
 	ret = nouveau_dmem_migrate_init(drm);
 	if (ret) {
+		mutex_destroy(&drm->dmem->mutex);
 		kfree(drm->dmem);
 		drm->dmem = NULL;
 	}
-<<<<<<< HEAD
-
-	NV_INFO(drm, "DMEM: registered %ldMB of device memory\n", size >> 20);
-	return;
-out_free:
-	mutex_destroy(&drm->dmem->mutex);
-	kfree(drm->dmem);
-	drm->dmem = NULL;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static unsigned long nouveau_dmem_migrate_copy_one(struct nouveau_drm *drm,

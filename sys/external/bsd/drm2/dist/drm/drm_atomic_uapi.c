@@ -573,14 +573,9 @@ static int drm_atomic_plane_set_property(struct drm_plane *plane,
 		state->pixel_blend_mode = val;
 	} else if (property == plane->rotation_property) {
 		if (!is_power_of_2(val & DRM_MODE_ROTATE_MASK)) {
-<<<<<<< HEAD
-			DRM_DEBUG_ATOMIC("[PLANE:%d:%s] bad rotation bitmask: 0x%"PRIx64"\n",
-					 plane->base.id, plane->name, val);
-=======
 			drm_dbg_atomic(plane->dev,
-				       "[PLANE:%d:%s] bad rotation bitmask: 0x%llx\n",
+				       "[PLANE:%d:%s] bad rotation bitmask: 0x%"PRIx64"\n",
 				       plane->base.id, plane->name, val);
->>>>>>> vendor/linux-drm-v6.6.35
 			return -EINVAL;
 		}
 		state->rotation = val;

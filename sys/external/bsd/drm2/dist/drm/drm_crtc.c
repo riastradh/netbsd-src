@@ -812,15 +812,8 @@ int drm_mode_setcrtc(struct drm_device *dev, void *data,
 							   fb->format->format,
 							   fb->modifier);
 			if (ret) {
-<<<<<<< HEAD
-				struct drm_format_name_buf format_name;
-				DRM_DEBUG_KMS("Invalid pixel format %s, modifier 0x%"PRIx64"\n",
-					      drm_get_format_name(fb->format->format,
-								  &format_name),
-=======
-				DRM_DEBUG_KMS("Invalid pixel format %p4cc, modifier 0x%llx\n",
+				DRM_DEBUG_KMS("Invalid pixel format %p4cc, modifier 0x%"PRIx64"\n",
 					      &fb->format->format,
->>>>>>> vendor/linux-drm-v6.6.35
 					      fb->modifier);
 				goto out;
 			}

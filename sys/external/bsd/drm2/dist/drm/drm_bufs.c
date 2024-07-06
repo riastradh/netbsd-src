@@ -547,12 +547,6 @@ int drm_legacy_getmap_ioctl(struct drm_device *dev, void *data,
 int drm_legacy_rmmap_locked(struct drm_device *dev, struct drm_local_map *map)
 {
 	struct drm_map_list *r_list = NULL, *list_t;
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	drm_dma_handle_t dmah;
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	int found = 0;
 	struct drm_master *master;
 
@@ -578,12 +572,8 @@ int drm_legacy_rmmap_locked(struct drm_device *dev, struct drm_local_map *map)
 		drm_legacy_ioremapfree(map, dev);
 #else
 		iounmap(map->handle);
-<<<<<<< HEAD
 #endif
-		/* FALLTHROUGH */
-=======
 		fallthrough;
->>>>>>> vendor/linux-drm-v6.6.35
 	case _DRM_FRAME_BUFFER:
 		arch_phys_wc_del(map->mtrr);
 		break;

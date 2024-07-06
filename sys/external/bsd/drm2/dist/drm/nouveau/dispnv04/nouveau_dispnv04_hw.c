@@ -355,7 +355,6 @@ nouveau_hw_save_vga_fonts(struct drm_device *dev, bool save)
 	NV_INFO(drm, "%sing VGA fonts\n", save ? "Sav" : "Restor");
 
 	/* map first 64KiB of VRAM, holds VGA fonts etc */
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	if (pci_mapreg_map(&dev->pdev->pd_pa, PCI_BAR(1),
 		pci_mapreg_type(dev->pdev->pd_pa.pa_pc,
@@ -366,10 +365,7 @@ nouveau_hw_save_vga_fonts(struct drm_device *dev, bool save)
 		return;
 	}
 #else
-	iovram = ioremap(pci_resource_start(dev->pdev, 1), 65536);
-=======
 	iovram = ioremap(pci_resource_start(pdev, 1), 65536);
->>>>>>> vendor/linux-drm-v6.6.35
 	if (!iovram) {
 		NV_ERROR(drm, "Failed to map VRAM, "
 					"cannot save/restore VGA fonts.\n");

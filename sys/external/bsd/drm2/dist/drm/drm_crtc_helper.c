@@ -48,12 +48,6 @@ __KERNEL_RCSID(0, "$NetBSD: drm_crtc_helper.c,v 1.7 2021/12/18 23:44:57 riastrad
 #include <drm/drm_drv.h>
 #include <drm/drm_edid.h>
 #include <drm/drm_encoder.h>
-<<<<<<< HEAD
-#ifndef __NetBSD__
-#include <drm/drm_fb_helper.h>
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_print.h>

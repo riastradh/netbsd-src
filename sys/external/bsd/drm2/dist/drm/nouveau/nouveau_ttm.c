@@ -164,7 +164,6 @@ const struct ttm_resource_manager_func nv04_gart_manager = {
 	.compatible = nouveau_manager_compatible,
 };
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 
 int
@@ -193,8 +192,6 @@ nouveau_ttm_mmap(struct file *filp, struct vm_area_struct *vma)
 
 #endif
 
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static int
 nouveau_ttm_init_host(struct nouveau_drm *drm, u8 kind)
 {
@@ -338,16 +335,11 @@ nouveau_ttm_init(struct nouveau_drm *drm)
 		drm->agp.cma = pci->agp.cma;
 	}
 
-<<<<<<< HEAD
-	ret = ttm_bo_device_init(&drm->ttm.bdev,
-				  &nouveau_bo_driver,
+	ret = ttm_device_init(&drm->ttm.bdev, &nouveau_bo_driver, drm->dev->dev,
 #ifdef __NetBSD__
 				  dev->bst,
 				  dev->dmat,
 #else
-=======
-	ret = ttm_device_init(&drm->ttm.bdev, &nouveau_bo_driver, drm->dev->dev,
->>>>>>> vendor/linux-drm-v6.6.35
 				  dev->anon_inode->i_mapping,
 #endif
 				  dev->vma_offset_manager,

@@ -338,16 +338,8 @@ nvkm_pstate_work(struct work_struct *work)
 		}
 	}
 
-#ifdef __NetBSD__
 	DRM_SPIN_WAKEUP_ALL(&clk->wait, &clk->lock);
-#else
-	wake_up_all(&clk->wait);
-<<<<<<< HEAD
-#endif
 	spin_unlock(&clk->lock);
-	nvkm_notify_get(&clk->pwrsrc_ntfy);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static int

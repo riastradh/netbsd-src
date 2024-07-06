@@ -38,14 +38,8 @@ struct gk20a_fw_av
 	u32 data;
 };
 
-<<<<<<< HEAD
 static int
-gk20a_gr_av_to_init(struct gf100_gr *gr, const char *path, const char *name,
-		    int ver, struct gf100_gr_pack **ppack)
-=======
-int
 gk20a_gr_av_to_init_(struct nvkm_blob *blob, u8 count, u32 pitch, struct gf100_gr_pack **ppack)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct gf100_gr_init *init;
 	struct gf100_gr_pack *pack;
@@ -87,14 +81,8 @@ struct gk20a_fw_aiv
 	u32 data;
 };
 
-<<<<<<< HEAD
 static int
-gk20a_gr_aiv_to_init(struct gf100_gr *gr, const char *path, const char *name,
-		     int ver, struct gf100_gr_pack **ppack)
-=======
-int
 gk20a_gr_aiv_to_init(struct nvkm_blob *blob, struct gf100_gr_pack **ppack)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct gf100_gr_init *init;
 	struct gf100_gr_pack *pack;
@@ -123,14 +111,8 @@ gk20a_gr_aiv_to_init(struct nvkm_blob *blob, struct gf100_gr_pack **ppack)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int
-gk20a_gr_av_to_method(struct gf100_gr *gr, const char *path, const char *name,
-		      int ver, struct gf100_gr_pack **ppack)
-=======
-int
 gk20a_gr_av_to_method(struct nvkm_blob *blob, struct gf100_gr_pack **ppack)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct gf100_gr_init *init;
 	struct gf100_gr_pack *pack;

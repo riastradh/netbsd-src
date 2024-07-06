@@ -40,15 +40,13 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_engine_disp_dp.c,v 1.4 2021/12/19 11:34
 
 #include <nvif/event.h>
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
-=======
+
 /* IED scripts are no longer used by UEFI/RM from Ampere, but have been updated for
  * the x86 option ROM.  However, the relevant VBIOS table versions weren't modified,
  * so we're unable to detect this in a nice way.
  */
 #define AMPERE_IED_HACK(disp) ((disp)->engine.subdev.device->card_type >= GA100)
->>>>>>> vendor/linux-drm-v6.6.35
 
 struct lt_state {
 	struct nvkm_outp *outp;

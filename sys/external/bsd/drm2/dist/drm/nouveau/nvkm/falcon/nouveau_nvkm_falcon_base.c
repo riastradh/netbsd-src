@@ -30,9 +30,7 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_falcon_base.c,v 1.4 2021/12/19 11:34:45
 #include <subdev/timer.h>
 #include <subdev/top.h>
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
-=======
 static const struct nvkm_falcon_func_dma *
 nvkm_falcon_dma(struct nvkm_falcon *falcon, enum nvkm_falcon_mem *mem_type, u32 *mem_base)
 {
@@ -199,7 +197,6 @@ nvkm_falcon_pio_wr(struct nvkm_falcon *falcon, const u8 *img, u32 img_base, u8 p
 
 	return 0;
 }
->>>>>>> vendor/linux-drm-v6.6.35
 
 void
 nvkm_falcon_load_imem(struct nvkm_falcon *falcon, void *data, u32 start,

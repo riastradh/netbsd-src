@@ -58,15 +58,6 @@ nouveau_dp_probe_dpcd(struct nouveau_connector *nv_connector,
 	int ret;
 	u8 *dpcd = outp->dp.dpcd;
 
-<<<<<<< HEAD
-	if (!nvkm_rdaux(aux, DP_SINK_OUI, buf, 3))
-		NV_DEBUG(drm, "Sink OUI: %02"PRIx8"%02"PRIx8"%02"PRIx8"\n",
-			     buf[0], buf[1], buf[2]);
-
-	if (!nvkm_rdaux(aux, DP_BRANCH_OUI, buf, 3))
-		NV_DEBUG(drm, "Branch OUI: %02"PRIx8"%02"PRIx8"%02"PRIx8"\n",
-			     buf[0], buf[1], buf[2]);
-=======
 	ret = drm_dp_read_dpcd_caps(aux, dpcd);
 	if (ret < 0)
 		goto out;
@@ -74,7 +65,6 @@ nouveau_dp_probe_dpcd(struct nouveau_connector *nv_connector,
 	ret = drm_dp_read_desc(aux, &outp->dp.desc, drm_dp_is_branch(dpcd));
 	if (ret < 0)
 		goto out;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (nouveau_mst) {
 		mstm = outp->dp.mstm;

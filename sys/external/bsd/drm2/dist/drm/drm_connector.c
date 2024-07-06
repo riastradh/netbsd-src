@@ -163,18 +163,12 @@ EXPORT_SYMBOL(drm_get_connector_type_name);
 static void drm_connector_get_cmdline_mode(struct drm_connector *connector)
 {
 	struct drm_cmdline_mode *mode = &connector->cmdline_mode;
-<<<<<<< HEAD
-#ifdef __NetBSD__
 	const char *option;
+#ifdef __NetBSD__
 	prop_dictionary_t prop = device_properties(connector->dev->dev);
 	if (!prop_dictionary_get_string(prop, connector->name, &option))
 		return;
 #else
-	char *option = NULL;
-=======
-	const char *option;
->>>>>>> vendor/linux-drm-v6.6.35
-
 	option = video_get_options(connector->name);
 	if (!option)
 		return;
@@ -2904,11 +2898,7 @@ int drm_mode_getconnector(struct drm_device *dev, void *data,
 	struct drm_mode_modeinfo u_mode;
 	struct drm_mode_modeinfo __user *mode_ptr;
 	uint32_t __user *encoder_ptr;
-<<<<<<< HEAD
-	struct list_head export_list = LIST_HEAD_INIT(export_list);
-=======
 	bool is_current_master;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (!drm_core_check_feature(dev, DRIVER_MODESET))
 		return -EOPNOTSUPP;
