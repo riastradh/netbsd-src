@@ -34,13 +34,6 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_subdev_fault_user.c,v 1.3 2021/12/19 10
 #include <nvif/unpack.h>
 
 static int
-<<<<<<< HEAD
-#ifdef __NetBSD__
-nvkm_ufault_map(struct nvkm_object *object, void *argv, u32 argc,
-		enum nvkm_object_map *type,
-		bus_space_tag_t *tag, u64 *addr, u64 *size)
-#else
-=======
 nvkm_ufault_uevent(struct nvkm_object *object, void *argv, u32 argc, struct nvkm_uevent *uevent)
 {
 	struct nvkm_fault_buffer *buffer = nvkm_fault_buffer(object);
@@ -56,7 +49,11 @@ nvkm_ufault_uevent(struct nvkm_object *object, void *argv, u32 argc, struct nvkm
 }
 
 static int
->>>>>>> vendor/linux-drm-v6.6.35
+#ifdef __NetBSD__
+nvkm_ufault_map(struct nvkm_object *object, void *argv, u32 argc,
+		enum nvkm_object_map *type,
+		bus_space_tag_t *tag, u64 *addr, u64 *size)
+#else
 nvkm_ufault_map(struct nvkm_object *object, void *argv, u32 argc,
 		enum nvkm_object_map *type, u64 *addr, u64 *size)
 #endif

@@ -12,17 +12,12 @@ struct nvkm_client {
 	u64 device;
 	u32 debug;
 
-<<<<<<< HEAD
-	struct nvkm_client_notify *notify[32];
 #ifdef __NetBSD__
 	rb_tree_t objtree;
 #else
 	struct rb_root objroot;
 #endif
-=======
-	struct rb_root objroot;
 	spinlock_t obj_lock;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	void *data;
 	int (*event)(u64 token, void *argv, u32 argc);

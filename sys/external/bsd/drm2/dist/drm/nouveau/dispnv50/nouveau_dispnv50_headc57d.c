@@ -85,11 +85,7 @@ headc57d_procamp(struct nv50_head *head, struct nv50_head_atom *asyh)
 	return 0;
 }
 
-<<<<<<< HEAD
-static void
-=======
 static int
->>>>>>> vendor/linux-drm-v6.6.35
 headc57d_olut_clr(struct nv50_head *head)
 {
 	struct nvif_push *push = nv50_disp(head->base.base.dev)->core->chan.push;
@@ -103,11 +99,7 @@ headc57d_olut_clr(struct nv50_head *head)
 	return 0;
 }
 
-<<<<<<< HEAD
-static void
-=======
 static int
->>>>>>> vendor/linux-drm-v6.6.35
 headc57d_olut_set(struct nv50_head *head, struct nv50_head_atom *asyh)
 {
 	struct nvif_push *push = nv50_disp(head->base.base.dev)->core->chan.push;

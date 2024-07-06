@@ -34,15 +34,10 @@ struct nvif_object {
 	} map;
 };
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 #  undef	__iomem
 #endif
 
-int  nvif_object_init(struct nvif_object *, u32 handle, s32 oclass, void *, u32,
-		      struct nvif_object *);
-void nvif_object_fini(struct nvif_object *);
-=======
 static inline bool
 nvif_object_constructed(struct nvif_object *object)
 {
@@ -52,7 +47,6 @@ nvif_object_constructed(struct nvif_object *object)
 int  nvif_object_ctor(struct nvif_object *, const char *name, u32 handle,
 		      s32 oclass, void *, u32, struct nvif_object *);
 void nvif_object_dtor(struct nvif_object *);
->>>>>>> vendor/linux-drm-v6.6.35
 int  nvif_object_ioctl(struct nvif_object *, void *, u32, void **);
 int  nvif_object_sclass_get(struct nvif_object *, struct nvif_sclass **);
 void nvif_object_sclass_put(struct nvif_sclass **);

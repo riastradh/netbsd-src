@@ -18,19 +18,7 @@ struct nvkm_mc_map {
 
 struct nvkm_mc_func {
 	void (*init)(struct nvkm_mc *);
-<<<<<<< HEAD
 	void *(*dtor)(struct nvkm_mc *);
-	const struct nvkm_mc_map *intr;
-	/* disable reporting of interrupts to host */
-	void (*intr_unarm)(struct nvkm_mc *);
-	/* enable reporting of interrupts to host */
-	void (*intr_rearm)(struct nvkm_mc *);
-	/* (un)mask delivery of specific interrupts */
-	void (*intr_mask)(struct nvkm_mc *, u32 mask, u32 stat);
-	/* retrieve pending interrupt mask (NV_PMC_INTR) */
-	u32 (*intr_stat)(struct nvkm_mc *);
-	void (*intr_hack)(struct nvkm_mc *, bool *handled);
-=======
 
 	const struct nvkm_intr_func *intr;
 	const struct nvkm_intr_data *intrs;
@@ -42,7 +30,6 @@ struct nvkm_mc_func {
 		void (*disable)(struct nvkm_mc *, u32 mask);
 	} *device;
 
->>>>>>> vendor/linux-drm-v6.6.35
 	const struct nvkm_mc_map *reset;
 
 	void (*unk260)(struct nvkm_mc *, u32);

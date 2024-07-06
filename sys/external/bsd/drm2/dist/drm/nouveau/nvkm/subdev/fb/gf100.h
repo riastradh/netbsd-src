@@ -8,17 +8,6 @@
 
 struct gf100_fb {
 	struct nvkm_fb base;
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	bus_dma_segment_t r100c10_seg;
-	bus_dmamap_t r100c10_page;
-	void *r100c10_kva;
-#else
-	struct page *r100c10_page;
-#endif
-	dma_addr_t r100c10;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 };
 
 int gf100_fb_new_(const struct nvkm_fb_func *, struct nvkm_device *, enum nvkm_subdev_type, int,

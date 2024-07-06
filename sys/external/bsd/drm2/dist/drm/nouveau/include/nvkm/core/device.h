@@ -95,14 +95,11 @@ struct nvkm_device_func {
 	int (*preinit)(struct nvkm_device *);
 	int (*init)(struct nvkm_device *);
 	void (*fini)(struct nvkm_device *, bool suspend);
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	bus_dma_tag_t (*dma_tag)(struct nvkm_device *);
 	bus_space_tag_t (*resource_tag)(struct nvkm_device *, unsigned bar);
 #endif
-=======
 	int (*irq)(struct nvkm_device *);
->>>>>>> vendor/linux-drm-v6.6.35
 	resource_size_t (*resource_addr)(struct nvkm_device *, unsigned bar);
 	resource_size_t (*resource_size)(struct nvkm_device *, unsigned bar);
 	bool cpu_coherent;

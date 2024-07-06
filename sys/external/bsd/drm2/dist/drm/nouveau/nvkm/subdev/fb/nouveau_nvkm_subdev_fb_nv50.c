@@ -193,73 +193,7 @@ nv50_fb_intr(struct nvkm_fb *base)
 		   st0, en ? en->name : "",
 		   st2, cl ? cl->name : "", st3, sc ? sc->name : "",
 		   st1, re ? re->name : "");
-<<<<<<< HEAD
-	nvkm_fifo_chan_put(fifo, flags, &chan);
-}
-
-static int
-nv50_fb_oneinit(struct nvkm_fb *base)
-{
-	struct nv50_fb *fb = nv50_fb(base);
-	struct nvkm_device *device = fb->base.subdev.device;
-
-#ifdef __NetBSD__
-    {
-	const bus_dma_tag_t dmat = device->func->dma_tag(device);
-	int nsegs;
-	int ret;
-
-	fb->r100c08_page = NULL; /* paranoia */
-	fb->r100c08_kva = NULL;
-
-	/* XXX errno NetBSD->Linux */
-	ret = -bus_dmamem_alloc(dmat, PAGE_SIZE, PAGE_SIZE, 0,
-	    &fb->r100c08_seg, 1, &nsegs, BUS_DMA_WAITOK);
-	if (ret)
-fail0:		return ret;
-	KASSERT(nsegs == 1);
-
-	/* XXX errno NetBSD->Linux */
-	ret = -bus_dmamap_create(dmat, PAGE_SIZE, 1, PAGE_SIZE, 0,
-	    BUS_DMA_WAITOK, &fb->r100c08_page);
-	if (ret) {
-fail1:		bus_dmamem_free(dmat, &fb->r100c08_seg, 1);
-		goto fail0;
-	}
-
-	/* XXX errno NetBSD->Linux */
-	ret = -bus_dmamem_map(dmat, &fb->r100c08_seg, 1, PAGE_SIZE,
-	    &fb->r100c08_kva, BUS_DMA_WAITOK);
-	if (ret) {
-fail2:		bus_dmamap_destroy(dmat, fb->r100c08_page);
-		goto fail1;
-	}
-	(void)memset(fb->r100c08_kva, 0, PAGE_SIZE);
-
-	/* XXX errno NetBSD->Linux */
-	ret = -bus_dmamap_load(dmat, fb->r100c08_page, fb->r100c08_kva,
-	    PAGE_SIZE, NULL, BUS_DMA_WAITOK);
-	if (ret) {
-fail3: __unused	bus_dmamem_unmap(dmat, fb->r100c08_kva, PAGE_SIZE);
-		goto fail2;
-	}
-
-	fb->r100c08 = fb->r100c08_page->dm_segs[0].ds_addr;
-    }
-#else
-	fb->r100c08_page = alloc_page(GFP_KERNEL | __GFP_ZERO);
-	if (fb->r100c08_page) {
-		fb->r100c08 = dma_map_page(device->dev, fb->r100c08_page, 0,
-					   PAGE_SIZE, DMA_BIDIRECTIONAL);
-		if (dma_mapping_error(device->dev, fb->r100c08))
-			return -EFAULT;
-	}
-#endif
-
-	return 0;
-=======
 	nvkm_chan_put(&chan, flags);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static void
@@ -292,26 +226,6 @@ static void *
 nv50_fb_dtor(struct nvkm_fb *base)
 {
 	struct nv50_fb *fb = nv50_fb(base);
-<<<<<<< HEAD
-	struct nvkm_device *device = fb->base.subdev.device;
-
-	if (fb->r100c08_page) {
-#ifdef __NetBSD__
-		const bus_dma_tag_t dmat = device->func->dma_tag(device);
-
-		bus_dmamap_unload(dmat, fb->r100c08_page);
-		bus_dmamem_unmap(dmat, fb->r100c08_kva, PAGE_SIZE);
-		bus_dmamap_destroy(dmat, fb->r100c08_page);
-		bus_dmamem_free(dmat, &fb->r100c08_seg, 1);
-		fb->r100c08_page = NULL;
-#else
-		dma_unmap_page(device->dev, fb->r100c08, PAGE_SIZE,
-			       DMA_BIDIRECTIONAL);
-		__free_page(fb->r100c08_page);
-#endif
-	}
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	return fb;
 }

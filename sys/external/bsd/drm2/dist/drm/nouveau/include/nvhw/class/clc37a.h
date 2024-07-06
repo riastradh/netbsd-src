@@ -21,11 +21,6 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/nouveau/nvkm/engine/fifo/nouveau_nvkm_engine_fifo_gm20b.c
-#include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_engine_fifo_gm20b.c,v 1.3 2021/12/18 23:45:35 riastradh Exp $");
-=======
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/nouveau/include/nvhw/class/clc37a.h
 
 
 #ifndef _clc37a__h_

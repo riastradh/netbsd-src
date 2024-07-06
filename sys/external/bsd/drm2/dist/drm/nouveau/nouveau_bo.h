@@ -13,11 +13,6 @@ struct nouveau_channel;
 struct nouveau_cli;
 struct nouveau_drm;
 struct nouveau_fence;
-<<<<<<< HEAD
-struct nvkm_vm;
-struct nvkm_vma;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 struct nouveau_bo {
 	struct ttm_buffer_object bo;

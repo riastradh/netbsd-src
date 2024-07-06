@@ -239,14 +239,11 @@ static void *
 nvkm_instmem_dtor(struct nvkm_subdev *subdev)
 {
 	struct nvkm_instmem *imem = nvkm_instmem(subdev);
-<<<<<<< HEAD
-	spin_lock_destroy(&imem->lock);
-=======
 	void *data = imem;
->>>>>>> vendor/linux-drm-v6.6.35
 	if (imem->func->dtor)
 		data = imem->func->dtor(imem);
 	mutex_destroy(&imem->mutex);
+	spin_lock_destroy(&imem->lock);
 	return data;
 }
 

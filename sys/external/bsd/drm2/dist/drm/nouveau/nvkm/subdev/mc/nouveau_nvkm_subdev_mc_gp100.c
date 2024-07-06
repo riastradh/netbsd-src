@@ -100,19 +100,11 @@ nv50_mc_dtor(struct nvkm_mc *mc)
 static const struct nvkm_mc_func
 gp100_mc = {
 	.init = nv50_mc_init,
-<<<<<<< HEAD
 	.dtor = nv50_mc_dtor,
-	.intr = gp100_mc_intr,
-	.intr_unarm = gp100_mc_intr_unarm,
-	.intr_rearm = gp100_mc_intr_rearm,
-	.intr_mask = gp100_mc_intr_mask,
-	.intr_stat = gf100_mc_intr_stat,
-=======
 	.intr = &gp100_mc_intr,
 	.intrs = gp100_mc_intrs,
 	.intr_nonstall = true,
 	.device = &nv04_mc_device,
->>>>>>> vendor/linux-drm-v6.6.35
 	.reset = gk104_mc_reset,
 };
 

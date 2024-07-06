@@ -69,10 +69,6 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_dispnv50_disp.c,v 1.7 2021/12/26 21:00:14 ri
 #include "nouveau_connector.h"
 #include "nouveau_encoder.h"
 #include "nouveau_fence.h"
-<<<<<<< HEAD
-#include "nouveau_fbcon.h"
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 #include "nv50_display.h"
 
 #include <subdev/bios/dp.h>
@@ -100,10 +96,10 @@ nv50_chan_create(struct nvif_device *device, struct nvif_object *disp,
 	while (oclass[0]) {
 		for (i = 0; i < n; i++) {
 			if (sclass[i].oclass == oclass[0]) {
-<<<<<<< HEAD
-				ret = nvif_object_init(disp, 0, oclass[0],
-						       data, size, &chan->user);
-				if (ret == 0) {
+				ret = nvif_object_ctor(disp, "kmsChan", 0,
+						       oclass[0], data, size,
+						       &chan->user);
+				if (ret == 0)
 					ret = nvif_object_map(&chan->user, NULL, 0);
 					if (ret) {
 						printk(KERN_ERR "%s:%d"
@@ -111,14 +107,6 @@ nv50_chan_create(struct nvif_device *device, struct nvif_object *disp,
 						    __func__, __LINE__, ret);
 						nvif_object_fini(&chan->user);
 					}
-				}
-=======
-				ret = nvif_object_ctor(disp, "kmsChan", 0,
-						       oclass[0], data, size,
-						       &chan->user);
-				if (ret == 0)
-					nvif_object_map(&chan->user, NULL, 0);
->>>>>>> vendor/linux-drm-v6.6.35
 				nvif_object_sclass_put(&sclass);
 				return ret;
 			}
@@ -143,14 +131,9 @@ nv50_chan_destroy(struct nv50_chan *chan)
 void
 nv50_dmac_destroy(struct nv50_dmac *dmac)
 {
-<<<<<<< HEAD
 	spin_lock_destroy(&dmac->lock);
-	nvif_object_fini(&dmac->vram);
-	nvif_object_fini(&dmac->sync);
-=======
 	nvif_object_dtor(&dmac->vram);
 	nvif_object_dtor(&dmac->sync);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	nv50_chan_destroy(&dmac->base);
 
@@ -285,18 +268,14 @@ nv50_dmac_create(struct nvif_device *device, struct nvif_object *disp,
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
-	dmac->ptr = __UNVOLATILE(dmac->push.object.map.ptr);
-=======
 	dmac->ptr = dmac->_push.mem.object.map.ptr;
 	dmac->_push.wait = nv50_dmac_wait;
 	dmac->_push.kick = nv50_dmac_kick;
 	dmac->push = &dmac->_push;
-	dmac->push->bgn = dmac->_push.mem.object.map.ptr;
+	dmac->push->bgn = __UNVOLATILE(dmac->_push.mem.object.map.ptr);
 	dmac->push->cur = dmac->push->bgn;
 	dmac->push->end = dmac->push->bgn;
 	dmac->max = 0x1000/4 - 1;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* EVO channels are affected by a HW bug where the last 12 DWORDs
 	 * of the push buffer aren't able to be used safely.
@@ -342,67 +321,6 @@ nv50_dmac_create(struct nvif_device *device, struct nvif_object *disp,
 }
 
 /******************************************************************************
-<<<<<<< HEAD
- * EVO channel helpers
- *****************************************************************************/
-static void
-evo_flush(struct nv50_dmac *dmac)
-{
-	/* Push buffer fetches are not coherent with BAR1, we need to ensure
-	 * writes have been flushed right through to VRAM before writing PUT.
-	 */
-	if (dmac->push.type & NVIF_MEM_VRAM) {
-		struct nvif_device *device = dmac->base.device;
-		nvif_wr32(&device->object, 0x070000, 0x00000001);
-		nvif_msec(device, 2000,
-			if (!(nvif_rd32(&device->object, 0x070000) & 0x00000002))
-				break;
-		);
-	}
-}
-
-u32 *
-evo_wait(struct nv50_dmac *evoc, int nr)
-{
-	struct nv50_dmac *dmac = evoc;
-	struct nvif_device *device = dmac->base.device;
-	u32 put = nvif_rd32(&dmac->base.user, 0x0000) / 4;
-
-	spin_lock(&dmac->lock);
-	if (put + nr >= (PAGE_SIZE / 4) - 8) {
-		dmac->ptr[put] = 0x20000000;
-		evo_flush(dmac);
-
-		nvif_wr32(&dmac->base.user, 0x0000, 0x00000000);
-		if (nvif_msec(device, 2000,
-			if (!nvif_rd32(&dmac->base.user, 0x0004))
-				break;
-		) < 0) {
-			spin_unlock(&dmac->lock);
-			pr_err("nouveau: evo channel stalled\n");
-			return NULL;
-		}
-
-		put = 0;
-	}
-
-	return dmac->ptr + put;
-}
-
-void
-evo_kick(u32 *push, struct nv50_dmac *evoc)
-{
-	struct nv50_dmac *dmac = evoc;
-
-	evo_flush(dmac);
-
-	nvif_wr32(&dmac->base.user, 0x0000, (push - dmac->ptr) << 2);
-	spin_unlock(&dmac->lock);
-}
-
-/******************************************************************************
-=======
->>>>>>> vendor/linux-drm-v6.6.35
  * Output path helpers
  *****************************************************************************/
 static void
@@ -689,12 +607,8 @@ nv50_audio_component_eld_notify(struct drm_audio_component *acomp, int port,
 #ifndef __NetBSD__		/* XXX nouveau audio component */
 	if (acomp && acomp->audio_ops && acomp->audio_ops->pin_eld_notify)
 		acomp->audio_ops->pin_eld_notify(acomp->audio_ops->audio_ptr,
-<<<<<<< HEAD
-						 port, -1);
-#endif
-=======
 						 port, dev_id);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 #ifndef __NetBSD__		/* XXX nouveau audio component */
@@ -789,38 +703,26 @@ static const struct component_ops nv50_audio_component_bind_ops = {
 static void
 nv50_audio_component_init(struct nouveau_drm *drm)
 {
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX nouveau audio component */
-	if (!component_add(drm->dev->dev, &nv50_audio_component_bind_ops))
-		drm->audio.component_registered = true;
-#endif
-=======
 	if (component_add(drm->dev->dev, &nv50_audio_component_bind_ops))
 		return;
 
 	drm->audio.component_registered = true;
 	mutex_init(&drm->audio.lock);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 static void
 nv50_audio_component_fini(struct nouveau_drm *drm)
 {
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX nouveau audio component */
-	if (drm->audio.component_registered) {
-		component_del(drm->dev->dev, &nv50_audio_component_bind_ops);
-		drm->audio.component_registered = false;
-	}
-#endif
-=======
 	if (!drm->audio.component_registered)
 		return;
 
 	component_del(drm->dev->dev, &nv50_audio_component_bind_ops);
 	drm->audio.component_registered = false;
 	mutex_destroy(&drm->audio.lock);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 /******************************************************************************
@@ -1398,10 +1300,6 @@ nv50_mstm_cleanup(struct drm_atomic_state *state,
 {
 	struct nouveau_drm *drm = nouveau_drm(mstm->outp->base.base.dev);
 	struct drm_encoder *encoder;
-<<<<<<< HEAD
-	int ret __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	NV_ATOMIC(drm, "%s: mstm cleanup\n", mstm->outp->base.base.name);
 	drm_dp_check_act_status(&mstm->mgr);
@@ -1425,10 +1323,6 @@ nv50_mstm_prepare(struct drm_atomic_state *state,
 {
 	struct nouveau_drm *drm = nouveau_drm(mstm->outp->base.base.dev);
 	struct drm_encoder *encoder;
-<<<<<<< HEAD
-	int ret __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	NV_ATOMIC(drm, "%s: mstm prepare\n", mstm->outp->base.base.name);
 

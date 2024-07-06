@@ -17,17 +17,10 @@ struct nvif_ioctl_v0 {
 #define NVIF_IOCTL_V0_WR                                                   0x06
 #define NVIF_IOCTL_V0_MAP                                                  0x07
 #define NVIF_IOCTL_V0_UNMAP                                                0x08
-<<<<<<< HEAD
-#define NVIF_IOCTL_V0_NTFY_NEW                                             0x09
-#define NVIF_IOCTL_V0_NTFY_DEL                                             0x0a
-#define NVIF_IOCTL_V0_NTFY_GET                                             0x0b
-#define NVIF_IOCTL_V0_NTFY_PUT                                             0x0c
 #ifdef __NetBSD__
 /* XXX Kludge for NetBSD kernel-only use.  */
 #define NVIF_IOCTL_V0_MAP_NETBSD                                           0x0d
 #endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	__u8  type;
 	__u8  pad02[4];
 #define NVIF_IOCTL_V0_OWNER_NVIF                                           0x00

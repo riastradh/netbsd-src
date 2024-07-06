@@ -27,17 +27,12 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_dispnv50_head507d.c,v 1.4 2021/12/19 10:49:4
 #include "head.h"
 #include "core.h"
 
-<<<<<<< HEAD
-#include <linux/nbsd-namespace.h>
-
-void
-=======
 #include <nvif/push507c.h>
 
 #include <nvhw/class/cl507d.h>
+#include <linux/nbsd-namespace.h>
 
 int
->>>>>>> vendor/linux-drm-v6.6.35
 head507d_procamp(struct nv50_head *head, struct nv50_head_atom *asyh)
 {
 	struct nvif_push *push = nv50_disp(head->base.base.dev)->core->chan.push;

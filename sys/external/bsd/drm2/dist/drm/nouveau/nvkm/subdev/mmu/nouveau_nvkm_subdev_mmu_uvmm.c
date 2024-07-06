@@ -135,14 +135,8 @@ nvkm_uvmm_mthd_unmap(struct nvkm_uvmm *uvmm, void *argv, u32 argc)
 		goto done;
 	}
 
-<<<<<<< HEAD
-	if (ret = -ENOENT, (!vma->user && !client->super) || vma->busy) {
-		VMM_DEBUG(vmm, "denied %016"PRIx64": %d %d %d", addr,
-			  vma->user, !client->super, vma->busy);
-=======
 	if (ret = -ENOENT, vma->busy) {
-		VMM_DEBUG(vmm, "denied %016llx: %d", addr, vma->busy);
->>>>>>> vendor/linux-drm-v6.6.35
+		VMM_DEBUG(vmm, "denied %016"PRIx64": %d", addr, vma->busy);
 		goto done;
 	}
 
@@ -194,14 +188,8 @@ nvkm_uvmm_mthd_map(struct nvkm_uvmm *uvmm, void *argv, u32 argc)
 		goto fail;
 	}
 
-<<<<<<< HEAD
-	if (ret = -ENOENT, (!vma->user && !client->super) || vma->busy) {
-		VMM_DEBUG(vmm, "denied %016"PRIx64": %d %d %d", addr,
-			  vma->user, !client->super, vma->busy);
-=======
 	if (ret = -ENOENT, vma->busy) {
-		VMM_DEBUG(vmm, "denied %016llx: %d", addr, vma->busy);
->>>>>>> vendor/linux-drm-v6.6.35
+		VMM_DEBUG(vmm, "denied %016"PRIx64": %d", addr, vma->busy);
 		goto fail;
 	}
 
@@ -269,14 +257,8 @@ nvkm_uvmm_mthd_put(struct nvkm_uvmm *uvmm, void *argv, u32 argc)
 		goto done;
 	}
 
-<<<<<<< HEAD
-	if (ret = -ENOENT, (!vma->user && !client->super) || vma->busy) {
-		VMM_DEBUG(vmm, "denied %016"PRIx64": %d %d %d", addr,
-			  vma->user, !client->super, vma->busy);
-=======
 	if (ret = -ENOENT, vma->busy) {
-		VMM_DEBUG(vmm, "denied %016llx: %d", addr, vma->busy);
->>>>>>> vendor/linux-drm-v6.6.35
+		VMM_DEBUG(vmm, "denied %016"PRIx64": %d", addr, vma->busy);
 		goto done;
 	}
 

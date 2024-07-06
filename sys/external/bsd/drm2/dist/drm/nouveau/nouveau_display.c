@@ -46,28 +46,14 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_display.c,v 1.6 2024/04/16 14:34:02 riastrad
 #include "nv50_display.h"
 
 #include <nvif/class.h>
-<<<<<<< HEAD
-#include <nvif/cl0046.h>
-#include <nvif/event.h>
+#include <nvif/if0011.h>
+#include <nvif/if0013.h>
+#include <dispnv50/crc.h>
 
 #ifdef __NetBSD__
 /* Used only for runtime power management, not in NetBSD for now.  */
 #undef	CONFIG_ACPI
 #endif
-
-static int
-nouveau_display_vblank_handler(struct nvif_notify *notify)
-{
-	struct nouveau_crtc *nv_crtc =
-		container_of(notify, typeof(*nv_crtc), vblank);
-	drm_crtc_handle_vblank(&nv_crtc->base);
-	return NVIF_NOTIFY_KEEP;
-}
-=======
-#include <nvif/if0011.h>
-#include <nvif/if0013.h>
-#include <dispnv50/crc.h>
->>>>>>> vendor/linux-drm-v6.6.35
 
 int
 nouveau_display_vblank_enable(struct drm_crtc *crtc)

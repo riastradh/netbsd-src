@@ -1112,11 +1112,7 @@ nvkm_vmm_node_split(struct nvkm_vmm *vmm,
 static void
 nvkm_vma_dump(struct nvkm_vma *vma)
 {
-<<<<<<< HEAD
-	printk(KERN_ERR "%016"PRIx64" %016"PRIx64" %c%c%c%c%c%c%c%c%c %p\n",
-=======
-	printk(KERN_ERR "%016llx %016llx %c%c%c%c%c%c%c%c %p\n",
->>>>>>> vendor/linux-drm-v6.6.35
+	printk(KERN_ERR "%016"PRIx64" %016"PRIx64" %c%c%c%c%c%c%c%c %p\n",
 	       vma->addr, (u64)vma->size,
 	       vma->used ? '-' : 'F',
 	       vma->mapref ? 'R' : '-',
