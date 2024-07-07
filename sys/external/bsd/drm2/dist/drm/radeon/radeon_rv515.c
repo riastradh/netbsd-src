@@ -34,7 +34,6 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_rv515.c,v 1.2 2021/12/18 23:45:43 riastradh E
 #include <linux/seq_file.h>
 #include <linux/slab.h>
 
-#include <drm/drm_debugfs.h>
 #include <drm/drm_device.h>
 #include <drm/drm_file.h>
 
@@ -45,8 +44,6 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_rv515.c,v 1.2 2021/12/18 23:45:43 riastradh E
 #include "rv515d.h"
 
 /* This files gather functions specifics to: rv515 */
-static int rv515_debugfs_pipes_info_init(struct radeon_device *rdev);
-static int rv515_debugfs_ga_info_init(struct radeon_device *rdev);
 static void rv515_gpu_init(struct radeon_device *rdev);
 int rv515_mc_wait_for_idle(struct radeon_device *rdev);
 
@@ -55,19 +52,6 @@ static const u32 crtc_offsets[2] =
 	0,
 	AVIVO_D2CRTC_H_TOTAL - AVIVO_D1CRTC_H_TOTAL
 };
-
-void rv515_debugfs(struct radeon_device *rdev)
-{
-	if (r100_debugfs_rbbm_init(rdev)) {
-		DRM_ERROR("Failed to register debugfs file for RBBM !\n");
-	}
-	if (rv515_debugfs_pipes_info_init(rdev)) {
-		DRM_ERROR("Failed to register debugfs file for pipes !\n");
-	}
-	if (rv515_debugfs_ga_info_init(rdev)) {
-		DRM_ERROR("Failed to register debugfs file for pipes !\n");
-	}
-}
 
 void rv515_ring_start(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -240,11 +224,9 @@ void rv515_mc_wreg(struct radeon_device *rdev, uint32_t reg, uint32_t v)
 }
 
 #if defined(CONFIG_DEBUG_FS)
-static int rv515_debugfs_pipes_info(struct seq_file *m, void *data)
+static int rv515_debugfs_pipes_info_show(struct seq_file *m, void *unused)
 {
-	struct drm_info_node *node = (struct drm_info_node *) m->private;
-	struct drm_device *dev = node->minor->dev;
-	struct radeon_device *rdev = dev->dev_private;
+	struct radeon_device *rdev = m->private;
 	uint32_t tmp;
 
 	tmp = RREG32(GB_PIPE_SELECT);
@@ -258,11 +240,9 @@ static int rv515_debugfs_pipes_info(struct seq_file *m, void *data)
 	return 0;
 }
 
-static int rv515_debugfs_ga_info(struct seq_file *m, void *data)
+static int rv515_debugfs_ga_info_show(struct seq_file *m, void *unused)
 {
-	struct drm_info_node *node = (struct drm_info_node *) m->private;
-	struct drm_device *dev = node->minor->dev;
-	struct radeon_device *rdev = dev->dev_private;
+	struct radeon_device *rdev = m->private;
 	uint32_t tmp;
 
 	tmp = RREG32(0x2140);
@@ -273,31 +253,21 @@ static int rv515_debugfs_ga_info(struct seq_file *m, void *data)
 	return 0;
 }
 
-static struct drm_info_list rv515_pipes_info_list[] = {
-	{"rv515_pipes_info", rv515_debugfs_pipes_info, 0, NULL},
-};
-
-static struct drm_info_list rv515_ga_info_list[] = {
-	{"rv515_ga_info", rv515_debugfs_ga_info, 0, NULL},
-};
+DEFINE_SHOW_ATTRIBUTE(rv515_debugfs_pipes_info);
+DEFINE_SHOW_ATTRIBUTE(rv515_debugfs_ga_info);
 #endif
 
-static int rv515_debugfs_pipes_info_init(struct radeon_device *rdev)
+void rv515_debugfs(struct radeon_device *rdev)
 {
 #if defined(CONFIG_DEBUG_FS)
-	return radeon_debugfs_add_files(rdev, rv515_pipes_info_list, 1);
-#else
-	return 0;
-#endif
-}
+	struct dentry *root = rdev->ddev->primary->debugfs_root;
 
-static int rv515_debugfs_ga_info_init(struct radeon_device *rdev)
-{
-#if defined(CONFIG_DEBUG_FS)
-	return radeon_debugfs_add_files(rdev, rv515_ga_info_list, 1);
-#else
-	return 0;
+	debugfs_create_file("rv515_pipes_info", 0444, root, rdev,
+			    &rv515_debugfs_pipes_info_fops);
+	debugfs_create_file("rv515_ga_info", 0444, root, rdev,
+			    &rv515_debugfs_ga_info_fops);
 #endif
+	r100_debugfs_rbbm_init(rdev);
 }
 
 void rv515_mc_stop(struct radeon_device *rdev, struct rv515_mc_save *save)
@@ -683,9 +653,7 @@ int rv515_init(struct radeon_device *rdev)
 	rv515_mc_init(rdev);
 	rv515_debugfs(rdev);
 	/* Fence driver */
-	r = radeon_fence_driver_init(rdev);
-	if (r)
-		return r;
+	radeon_fence_driver_init(rdev);
 	/* Memory manager */
 	r = radeon_bo_init(rdev);
 	if (r)

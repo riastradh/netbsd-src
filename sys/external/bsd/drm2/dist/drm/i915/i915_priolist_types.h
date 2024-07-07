@@ -26,6 +26,7 @@ enum {
 	I915_PRIORITY_DISPLAY,
 };
 
+<<<<<<< HEAD
 #define I915_USER_PRIORITY_SHIFT 2
 #define I915_USER_PRIORITY(x) ((x) * (1 << I915_USER_PRIORITY_SHIFT))
 
@@ -35,8 +36,10 @@ enum {
 #define I915_PRIORITY_WAIT		((u8)BIT(0))
 #define I915_PRIORITY_NOSEMAPHORE	((u8)BIT(1))
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 /* Smallest priority value that cannot be bumped. */
-#define I915_PRIORITY_INVALID (INT_MIN | (u8)I915_PRIORITY_MASK)
+#define I915_PRIORITY_INVALID (INT_MIN)
 
 /*
  * Requests containing performance queries must not be preempted by
@@ -47,14 +50,11 @@ enum {
  * active request.
  */
 #define I915_PRIORITY_UNPREEMPTABLE INT_MAX
-#define I915_PRIORITY_BARRIER INT_MAX
-
-#define __NO_PREEMPTION (I915_PRIORITY_WAIT)
+#define I915_PRIORITY_BARRIER (I915_PRIORITY_UNPREEMPTABLE - 1)
 
 struct i915_priolist {
-	struct list_head requests[I915_PRIORITY_COUNT];
+	struct list_head requests;
 	struct rb_node node;
-	unsigned long used;
 	int priority;
 };
 

@@ -65,12 +65,13 @@ __KERNEL_RCSID(0, "$NetBSD: drm_irq.c,v 1.18 2021/12/19 12:05:08 riastradh Exp $
 #include <drm/drm.h>
 #include <drm/drm_device.h>
 #include <drm/drm_drv.h>
-#include <drm/drm_irq.h>
+#include <drm/drm_legacy.h>
 #include <drm/drm_print.h>
 #include <drm/drm_vblank.h>
 
 #include "drm_internal.h"
 
+<<<<<<< HEAD
 #ifdef __NetBSD__		/* XXX hurk -- selnotify &c. */
 #include <sys/poll.h>
 #include <sys/select.h>
@@ -119,6 +120,9 @@ int drm_irq_install(struct drm_device *dev)
 #else
 int drm_irq_install(struct drm_device *dev, int irq)
 #endif
+=======
+static int drm_legacy_irq_install(struct drm_device *dev, int irq)
+>>>>>>> vendor/linux-drm-v6.6.35
 {
 	int ret;
 	unsigned long sh_flags = 0;
@@ -127,10 +131,6 @@ int drm_irq_install(struct drm_device *dev, int irq)
 	if (irq == 0)
 		return -EINVAL;
 #endif
-
-	/* Driver must have been initialized */
-	if (!dev->dev_private)
-		return -EINVAL;
 
 	if (dev->irq_enabled)
 		return -EBUSY;
@@ -145,7 +145,7 @@ int drm_irq_install(struct drm_device *dev, int irq)
 		dev->driver->irq_preinstall(dev);
 
 	/* PCI devices require shared interrupts. */
-	if (dev->pdev)
+	if (dev_is_pci(dev->dev))
 		sh_flags = IRQF_SHARED;
 
 #ifdef __NetBSD__
@@ -167,10 +167,14 @@ int drm_irq_install(struct drm_device *dev, int irq)
 	if (ret < 0) {
 		dev->irq_enabled = false;
 		if (drm_core_check_feature(dev, DRIVER_LEGACY))
+<<<<<<< HEAD
 			vga_client_register(dev->pdev, NULL, NULL, NULL);
 #ifdef __NetBSD__
 		(*dev->driver->free_irq)(dev);
 #else
+=======
+			vga_client_unregister(to_pci_dev(dev->dev));
+>>>>>>> vendor/linux-drm-v6.6.35
 		free_irq(irq, dev);
 #endif
 	} else {
@@ -181,25 +185,8 @@ int drm_irq_install(struct drm_device *dev, int irq)
 
 	return ret;
 }
-EXPORT_SYMBOL(drm_irq_install);
 
-/**
- * drm_irq_uninstall - uninstall the IRQ handler
- * @dev: DRM device
- *
- * Calls the driver's &drm_driver.irq_uninstall function and unregisters the IRQ
- * handler.  This should only be called by drivers which used drm_irq_install()
- * to set up their interrupt handler. Other drivers must only reset
- * &drm_device.irq_enabled to false.
- *
- * Note that for kernel modesetting drivers it is a bug if this function fails.
- * The sanity checks are only to catch buggy user modesetting drivers which call
- * the same function through an ioctl.
- *
- * Returns:
- * Zero on success or a negative error code on failure.
- */
-int drm_irq_uninstall(struct drm_device *dev)
+int drm_legacy_irq_uninstall(struct drm_device *dev)
 {
 	unsigned long irqflags;
 	bool irq_enabled;
@@ -214,8 +201,13 @@ int drm_irq_uninstall(struct drm_device *dev)
 	 * vblank/irq handling. KMS drivers must ensure that vblanks are all
 	 * disabled when uninstalling the irq handler.
 	 */
+<<<<<<< HEAD
 	if (dev->num_crtcs) {
 		spin_lock_irqsave(&dev->event_lock, irqflags);
+=======
+	if (drm_dev_has_vblank(dev)) {
+		spin_lock_irqsave(&dev->vbl_lock, irqflags);
+>>>>>>> vendor/linux-drm-v6.6.35
 		for (i = 0; i < dev->num_crtcs; i++) {
 			struct drm_vblank_crtc *vblank = &dev->vblank[i];
 
@@ -241,7 +233,7 @@ int drm_irq_uninstall(struct drm_device *dev)
 	DRM_DEBUG("irq=%d\n", dev->irq);
 
 	if (drm_core_check_feature(dev, DRIVER_LEGACY))
-		vga_client_register(dev->pdev, NULL, NULL, NULL);
+		vga_client_unregister(to_pci_dev(dev->dev));
 
 	if (dev->driver->irq_uninstall)
 		dev->driver->irq_uninstall(dev);
@@ -254,14 +246,14 @@ int drm_irq_uninstall(struct drm_device *dev)
 
 	return 0;
 }
-EXPORT_SYMBOL(drm_irq_uninstall);
+EXPORT_SYMBOL(drm_legacy_irq_uninstall);
 
-#if IS_ENABLED(CONFIG_DRM_LEGACY)
 int drm_legacy_irq_control(struct drm_device *dev, void *data,
 			   struct drm_file *file_priv)
 {
 	struct drm_control *ctl = data;
 	int ret = 0, irq;
+	struct pci_dev *pdev;
 
 	/* if we haven't irq we fallback for compatibility reasons -
 	 * this used to be a separate function in drm_dma.h
@@ -272,32 +264,41 @@ int drm_legacy_irq_control(struct drm_device *dev, void *data,
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
 		return 0;
 	/* UMS was only ever supported on pci devices. */
-	if (WARN_ON(!dev->pdev))
+	if (WARN_ON(!dev_is_pci(dev->dev)))
 		return -EINVAL;
 
 	switch (ctl->func) {
 	case DRM_INST_HANDLER:
+<<<<<<< HEAD
 #ifdef __NetBSD__
 		irq = ctl->irq;
 #else
 		irq = dev->pdev->irq;
 #endif
+=======
+		pdev = to_pci_dev(dev->dev);
+		irq = pdev->irq;
+>>>>>>> vendor/linux-drm-v6.6.35
 
 		if (dev->if_version < DRM_IF_VERSION(1, 2) &&
 		    ctl->irq != irq)
 			return -EINVAL;
 		mutex_lock(&dev->struct_mutex);
+<<<<<<< HEAD
 #ifdef __NetBSD__
 		ret = drm_irq_install(dev);
 #else
 		ret = drm_irq_install(dev, irq);
 #endif
+=======
+		ret = drm_legacy_irq_install(dev, irq);
+>>>>>>> vendor/linux-drm-v6.6.35
 		mutex_unlock(&dev->struct_mutex);
 
 		return ret;
 	case DRM_UNINST_HANDLER:
 		mutex_lock(&dev->struct_mutex);
-		ret = drm_irq_uninstall(dev);
+		ret = drm_legacy_irq_uninstall(dev);
 		mutex_unlock(&dev->struct_mutex);
 
 		return ret;
@@ -305,4 +306,3 @@ int drm_legacy_irq_control(struct drm_device *dev, void *data,
 		return -EINVAL;
 	}
 }
-#endif

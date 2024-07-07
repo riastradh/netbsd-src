@@ -29,13 +29,16 @@
 #ifndef _OS_TYPES_H_
 #define _OS_TYPES_H_
 
+#include <linux/slab.h>
 #include <linux/kgdb.h>
 #include <linux/kref.h>
 #include <linux/types.h>
-#include <linux/slab.h>
+#include <linux/delay.h>
+#include <linux/mm.h>
 
 #include <asm/byteorder.h>
 
+#include <drm/display/drm_dp_helper.h>
 #include <drm/drm_print.h>
 
 #include "cgs_common.h"
@@ -52,6 +55,7 @@
 
 #define dm_error(fmt, ...) DRM_ERROR(fmt, ##__VA_ARGS__)
 
+<<<<<<< HEAD
 #if defined(CONFIG_DRM_AMD_DC_DCN)
 #ifdef __NetBSD__
 #if defined(__i386__) || defined(__x86_64__)
@@ -98,34 +102,40 @@
 #endif
 #endif
 #endif
+=======
+#if defined(CONFIG_DRM_AMD_DC_FP)
+#include "amdgpu_dm/dc_fpu.h"
+#define DC_FP_START() dc_fpu_begin(__func__, __LINE__)
+#define DC_FP_END() dc_fpu_end(__func__, __LINE__)
+#endif /* CONFIG_DRM_AMD_DC_FP */
+>>>>>>> vendor/linux-drm-v6.6.35
 
 /*
  *
  * general debug capabilities
  *
  */
-#if defined(CONFIG_HAVE_KGDB) || defined(CONFIG_KGDB)
-#define ASSERT_CRITICAL(expr) do {	\
-	if (WARN_ON(!(expr))) { \
-		kgdb_breakpoint(); \
-	} \
-} while (0)
+#ifdef CONFIG_DEBUG_KERNEL_DC
+#define dc_breakpoint()		kgdb_breakpoint()
 #else
-#define ASSERT_CRITICAL(expr) do {	\
-	if (WARN_ON(!(expr))) { \
-		; \
-	} \
-} while (0)
+#define dc_breakpoint()		do {} while (0)
 #endif
 
-#if defined(CONFIG_DEBUG_KERNEL_DC)
-#define ASSERT(expr) ASSERT_CRITICAL(expr)
+#define ASSERT_CRITICAL(expr) do {		\
+		if (WARN_ON(!(expr)))		\
+			dc_breakpoint();	\
+	} while (0)
 
-#else
-#define ASSERT(expr) WARN_ON(!(expr))
-#endif
+#define ASSERT(expr) do {			\
+		if (WARN_ON_ONCE(!(expr)))	\
+			dc_breakpoint();	\
+	} while (0)
 
-#define BREAK_TO_DEBUGGER() ASSERT(0)
+#define BREAK_TO_DEBUGGER() \
+	do { \
+		DRM_DEBUG_DRIVER("%s():%d\n", __func__, __LINE__); \
+		dc_breakpoint(); \
+	} while (0)
 
 #define DC_ERR(...)  do { \
 	dm_error(__VA_ARGS__); \

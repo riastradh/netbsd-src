@@ -10,7 +10,7 @@
 
 #include <linux/types.h>
 
-#include "i915_reg.h"
+#include "i915_reg_defs.h"
 
 #include <sys/file.h>
 #define	pipe	pipe_drmhack	/* see intel_display.h */

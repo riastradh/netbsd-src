@@ -15,6 +15,7 @@ __KERNEL_RCSID(0, "$NetBSD: xen_drm_front_conn.c,v 1.2 2021/12/18 23:45:45 riast
 
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_drv.h>
+#include <drm/drm_fourcc.h>
 #include <drm/drm_probe_helper.h>
 
 #include <video/videomode.h>
@@ -38,6 +39,7 @@ static const u32 plane_formats[] = {
 	DRM_FORMAT_ARGB4444,
 	DRM_FORMAT_XRGB1555,
 	DRM_FORMAT_ARGB1555,
+	DRM_FORMAT_YUYV,
 };
 
 const u32 *xen_drm_front_conn_get_formats(int *format_count)

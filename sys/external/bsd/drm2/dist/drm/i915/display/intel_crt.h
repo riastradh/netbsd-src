@@ -8,14 +8,13 @@
 #ifndef __INTEL_CRT_H__
 #define __INTEL_CRT_H__
 
-#include "i915_reg.h"
+#include "i915_reg_defs.h"
 
 #include <sys/file.h>
 #define	pipe	pipe_drmhack	/* see intel_display.h */
 
 enum pipe;
 struct drm_encoder;
-struct drm_i915_private;
 struct drm_i915_private;
 
 bool intel_crt_port_enabled(struct drm_i915_private *dev_priv,

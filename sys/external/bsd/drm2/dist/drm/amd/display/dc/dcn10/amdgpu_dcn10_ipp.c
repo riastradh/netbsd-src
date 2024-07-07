@@ -28,8 +28,6 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: amdgpu_dcn10_ipp.c,v 1.2 2021/12/18 23:45:03 riastradh Exp $");
 
-#include <linux/slab.h>
-
 #include "dm_services.h"
 #include "dcn10_ipp.h"
 #include "reg_helper.h"

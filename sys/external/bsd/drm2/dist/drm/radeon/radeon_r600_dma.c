@@ -29,9 +29,8 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_r600_dma.c,v 1.3 2022/06/02 06:51:48 mrg Exp 
 
 #include "radeon.h"
 #include "radeon_asic.h"
+#include "r600.h"
 #include "r600d.h"
-
-u32 r600_gpu_check_soft_reset(struct radeon_device *rdev);
 
 /*
  * DMA

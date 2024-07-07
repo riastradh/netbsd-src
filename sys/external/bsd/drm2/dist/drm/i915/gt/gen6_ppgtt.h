@@ -10,6 +10,8 @@
 
 #include "intel_gtt.h"
 
+struct i915_gem_ww_ctx;
+
 struct gen6_ppgtt {
 	struct i915_ppgtt base;
 
@@ -20,10 +22,13 @@ struct gen6_ppgtt {
 	bus_space_handle_t pd_bsh;
 #else
 	gen6_pte_t __iomem *pd_addr;
+<<<<<<< HEAD
 #endif
+=======
+	u32 pp_dir;
+>>>>>>> vendor/linux-drm-v6.6.35
 
 	atomic_t pin_count;
-	struct mutex pin_mutex;
 
 	bool scan_for_unused_pt;
 };
@@ -63,9 +68,13 @@ static inline struct gen6_ppgtt *to_gen6_ppgtt(struct i915_ppgtt *base)
 	for (iter = gen6_pde_index(start);				\
 	     length > 0 && iter < I915_PDES &&				\
 		     (pt = i915_pt_entry(pd, iter), true);		\
+<<<<<<< HEAD
 	     ({ u32 temp = round_up(start+1, 1 << GEN6_PDE_SHIFT);	\
+=======
+	     ({ u32 temp = ALIGN(start + 1, 1 << GEN6_PDE_SHIFT);	\
+>>>>>>> vendor/linux-drm-v6.6.35
 		    temp = min(temp - start, length);			\
-		    start += temp, length -= temp; }), ++iter)
+		    start += temp; length -= temp; }), ++iter)
 
 #define gen6_for_all_pdes(pt, pd, iter)					\
 	for (iter = 0;							\
@@ -73,9 +82,8 @@ static inline struct gen6_ppgtt *to_gen6_ppgtt(struct i915_ppgtt *base)
 		     (pt = i915_pt_entry(pd, iter), true);		\
 	     ++iter)
 
-int gen6_ppgtt_pin(struct i915_ppgtt *base);
+int gen6_ppgtt_pin(struct i915_ppgtt *base, struct i915_gem_ww_ctx *ww);
 void gen6_ppgtt_unpin(struct i915_ppgtt *base);
-void gen6_ppgtt_unpin_all(struct i915_ppgtt *base);
 void gen6_ppgtt_enable(struct intel_gt *gt);
 void gen7_ppgtt_enable(struct intel_gt *gt);
 struct i915_ppgtt *gen6_ppgtt_create(struct intel_gt *gt);

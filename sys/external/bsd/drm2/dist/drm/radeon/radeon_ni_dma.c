@@ -30,9 +30,8 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_ni_dma.c,v 1.2 2021/12/18 23:45:43 riastradh 
 #include "radeon.h"
 #include "radeon_asic.h"
 #include "radeon_trace.h"
+#include "ni.h"
 #include "nid.h"
-
-u32 cayman_gpu_check_soft_reset(struct radeon_device *rdev);
 
 /*
  * DMA

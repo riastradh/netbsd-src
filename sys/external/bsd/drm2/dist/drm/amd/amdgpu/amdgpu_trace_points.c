@@ -28,6 +28,7 @@
 __KERNEL_RCSID(0, "$NetBSD: amdgpu_trace_points.c,v 1.3 2021/12/18 23:44:58 riastradh Exp $");
 
 #include <drm/amdgpu_drm.h>
+#include "amdgpu_cs.h"
 #include "amdgpu.h"
 
 #define CREATE_TRACE_POINTS

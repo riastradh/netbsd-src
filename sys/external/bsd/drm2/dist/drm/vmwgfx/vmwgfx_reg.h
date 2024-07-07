@@ -36,11 +36,14 @@
 
 #include <linux/types.h>
 
+<<<<<<< HEAD
 #define VMWGFX_INDEX_PORT     0x0
 #define VMWGFX_VALUE_PORT     0x1
 #define VMWGFX_IRQSTATUS_PORT 0x8
 #define VMWGFX_IOSIZE	      0xc
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 struct svga_guest_mem_descriptor {
 	u32 ppn;
 	u32 num_pages;

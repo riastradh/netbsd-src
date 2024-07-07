@@ -32,13 +32,12 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_cik_sdma.c,v 1.3 2021/12/18 23:45:43 riastrad
 #include "radeon_ucode.h"
 #include "radeon_asic.h"
 #include "radeon_trace.h"
+#include "cik.h"
 #include "cikd.h"
 
 /* sdma */
 #define CIK_SDMA_UCODE_SIZE 1050
 #define CIK_SDMA_UCODE_VERSION 64
-
-u32 cik_gpu_check_soft_reset(struct radeon_device *rdev);
 
 /*
  * sDMA - System DMA
@@ -941,10 +940,8 @@ void cik_sdma_vm_pad_ib(struct radeon_ib *ib)
 		ib->ptr[ib->length_dw++] = SDMA_PACKET(SDMA_OPCODE_NOP, 0, 0);
 }
 
-/**
+/*
  * cik_dma_vm_flush - cik vm flush using sDMA
- *
- * @rdev: radeon_device pointer
  *
  * Update the page table base and flush the VM TLB
  * using sDMA (CIK).

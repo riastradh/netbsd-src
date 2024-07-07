@@ -30,7 +30,7 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_engine_msppp_base.c,v 1.3 2021/12/18 23
 
 int
 nvkm_msppp_new_(const struct nvkm_falcon_func *func, struct nvkm_device *device,
-		int index, struct nvkm_engine **pengine)
+		enum nvkm_subdev_type type, int inst, struct nvkm_engine **pengine)
 {
-	return nvkm_falcon_new_(func, device, index, true, 0x086000, pengine);
+	return nvkm_falcon_new_(func, device, type, inst, true, 0x086000, pengine);
 }

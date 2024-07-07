@@ -1,7 +1,8 @@
 /*	$NetBSD: kfd_events.h,v 1.3 2021/12/18 23:44:59 riastradh Exp $	*/
 
+/* SPDX-License-Identifier: GPL-2.0 OR MIT */
 /*
- * Copyright 2014 Advanced Micro Devices, Inc.
+ * Copyright 2014-2022 Advanced Micro Devices, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -54,12 +55,14 @@ struct signal_page;
 
 struct kfd_event {
 	u32 event_id;
+	u64 event_age;
 
 	bool signaled;
 	bool auto_reset;
 
 	int type;
 
+	spinlock_t lock;
 	wait_queue_head_t wq; /* List of event waiters. */
 
 	/* Only for signal events. */
@@ -70,6 +73,8 @@ struct kfd_event {
 		struct kfd_hsa_memory_exception_data memory_exception_data;
 		struct kfd_hsa_hw_exception_data hw_exception_data;
 	};
+
+	struct rcu_head rcu; /* for asynchronous kfree_rcu */
 };
 
 #define KFD_EVENT_TIMEOUT_IMMEDIATE 0
@@ -81,7 +86,7 @@ struct kfd_event {
 #define KFD_EVENT_TYPE_DEBUG 5
 #define KFD_EVENT_TYPE_MEMORY 8
 
-extern void kfd_signal_event_interrupt(unsigned int pasid, uint32_t partial_id,
-					uint32_t valid_id_bits);
+extern void kfd_signal_event_interrupt(u32 pasid, uint32_t partial_id,
+				       uint32_t valid_id_bits);
 
 #endif

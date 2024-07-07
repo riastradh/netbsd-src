@@ -36,8 +36,6 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_r300.c,v 1.3 2021/12/18 23:45:43 riastradh Ex
 #include <linux/slab.h>
 
 #include <drm/drm.h>
-#include <drm/drm_crtc_helper.h>
-#include <drm/drm_debugfs.h>
 #include <drm/drm_device.h>
 #include <drm/drm_file.h>
 #include <drm/radeon_drm.h>
@@ -88,7 +86,7 @@ void rv370_pcie_wreg(struct radeon_device *rdev, uint32_t reg, uint32_t v)
 /*
  * rv370,rv380 PCIE GART
  */
-static int rv370_debugfs_pcie_gart_info_init(struct radeon_device *rdev);
+static void rv370_debugfs_pcie_gart_info_init(struct radeon_device *rdev);
 
 void rv370_pcie_gart_tlb_flush(struct radeon_device *rdev)
 {
@@ -169,9 +167,8 @@ int rv370_pcie_gart_init(struct radeon_device *rdev)
 	r = radeon_gart_init(rdev);
 	if (r)
 		return r;
-	r = rv370_debugfs_pcie_gart_info_init(rdev);
-	if (r)
-		DRM_ERROR("Failed to register debugfs file for PCIE gart !\n");
+	rv370_debugfs_pcie_gart_info_init(rdev);
+
 	rdev->gart.table_size = rdev->gart.num_gpu_pages * 4;
 	rdev->asic->gart.tlb_flush = &rv370_pcie_gart_tlb_flush;
 	rdev->asic->gart.get_page_entry = &rv370_pcie_gart_get_page_entry;
@@ -281,7 +278,7 @@ void r300_ring_start(struct radeon_device *rdev, struct radeon_ring *ring)
 
 	/* Sub pixel 1/12 so we can have 4K rendering according to doc */
 	gb_tile_config = (R300_ENABLE_TILING | R300_TILE_SIZE_16);
-	switch(rdev->num_gb_pipes) {
+	switch (rdev->num_gb_pipes) {
 	case 2:
 		gb_tile_config |= R300_PIPE_COUNT_R300;
 		break;
@@ -619,11 +616,9 @@ int rv370_get_pcie_lanes(struct radeon_device *rdev)
 }
 
 #if defined(CONFIG_DEBUG_FS)
-static int rv370_debugfs_pcie_gart_info(struct seq_file *m, void *data)
+static int rv370_debugfs_pcie_gart_info_show(struct seq_file *m, void *unused)
 {
-	struct drm_info_node *node = (struct drm_info_node *) m->private;
-	struct drm_device *dev = node->minor->dev;
-	struct radeon_device *rdev = dev->dev_private;
+	struct radeon_device *rdev = m->private;
 	uint32_t tmp;
 
 	tmp = RREG32_PCIE(RADEON_PCIE_TX_GART_CNTL);
@@ -643,17 +638,16 @@ static int rv370_debugfs_pcie_gart_info(struct seq_file *m, void *data)
 	return 0;
 }
 
-static struct drm_info_list rv370_pcie_gart_info_list[] = {
-	{"rv370_pcie_gart_info", rv370_debugfs_pcie_gart_info, 0, NULL},
-};
+DEFINE_SHOW_ATTRIBUTE(rv370_debugfs_pcie_gart_info);
 #endif
 
-static int rv370_debugfs_pcie_gart_info_init(struct radeon_device *rdev)
+static void rv370_debugfs_pcie_gart_info_init(struct radeon_device *rdev)
 {
 #if defined(CONFIG_DEBUG_FS)
-	return radeon_debugfs_add_files(rdev, rv370_pcie_gart_info_list, 1);
-#else
-	return 0;
+	struct dentry *root = rdev->ddev->primary->debugfs_root;
+
+	debugfs_create_file("rv370_pcie_gart_info", 0444, root, rdev,
+			    &rv370_debugfs_pcie_gart_info_fops);
 #endif
 }
 
@@ -673,7 +667,7 @@ static int r300_packet0_check(struct radeon_cs_parser *p,
 	track = (struct r100_cs_track *)p->track;
 	idx_value = radeon_get_ib_value(p, idx);
 
-	switch(reg) {
+	switch (reg) {
 	case AVIVO_D1MODE_VLINE_START_END:
 	case RADEON_CRTC_GUI_TRIG_VLINE:
 		r = r100_cs_packet_parse_vline(p);
@@ -849,7 +843,7 @@ static int r300_packet0_check(struct radeon_cs_parser *p,
 					  ((idx_value >> 21) & 0xF));
 				return -EINVAL;
 			}
-			/* Fall through. */
+			fallthrough;
 		case 6:
 			track->cb[i].cpp = 4;
 			break;
@@ -1000,7 +994,7 @@ static int r300_packet0_check(struct radeon_cs_parser *p,
 				return -EINVAL;
 			}
 			/* The same rules apply as for DXT3/5. */
-			/* Fall through. */
+			fallthrough;
 		case R300_TX_FORMAT_DXT3:
 		case R300_TX_FORMAT_DXT5:
 			track->textures[i].cpp = 1;
@@ -1191,6 +1185,7 @@ static int r300_packet0_check(struct radeon_cs_parser *p,
 		/* valid register only on RV530 */
 		if (p->rdev->family == CHIP_RV530)
 			break;
+		fallthrough;
 		/* fallthrough do not move */
 	default:
 		goto fail;
@@ -1214,7 +1209,7 @@ static int r300_packet3_check(struct radeon_cs_parser *p,
 	ib = p->ib.ptr;
 	idx = pkt->idx + 1;
 	track = (struct r100_cs_track *)p->track;
-	switch(pkt->opcode) {
+	switch (pkt->opcode) {
 	case PACKET3_3D_LOAD_VBPNTR:
 		r = r100_packet3_load_vbpntr(p, pkt, idx);
 		if (r)
@@ -1359,12 +1354,8 @@ void r300_set_reg_safe(struct radeon_device *rdev)
 void r300_mc_program(struct radeon_device *rdev)
 {
 	struct r100_mc_save save;
-	int r;
 
-	r = r100_debugfs_mc_info_init(rdev);
-	if (r) {
-		dev_err(rdev->dev, "Failed to create r100_mc debugfs file.\n");
-	}
+	r100_debugfs_mc_info_init(rdev);
 
 	/* Stops all mc clients */
 	r100_mc_stop(rdev, &save);
@@ -1586,9 +1577,7 @@ int r300_init(struct radeon_device *rdev)
 	/* initialize memory controller */
 	r300_mc_init(rdev);
 	/* Fence driver */
-	r = radeon_fence_driver_init(rdev);
-	if (r)
-		return r;
+	radeon_fence_driver_init(rdev);
 	/* Memory manager */
 	r = radeon_bo_init(rdev);
 	if (r)

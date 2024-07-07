@@ -28,7 +28,6 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_core_client.c,v 1.6 2021/12/19 11:34:44
 
 #include <core/client.h>
 #include <core/device.h>
-#include <core/notify.h>
 #include <core/option.h>
 
 #include <nvif/class.h>
@@ -49,7 +48,7 @@ nvkm_uclient_new(const struct nvkm_oclass *oclass, void *argv, u32 argc,
 	if (!(ret = nvif_unpack(ret, &argv, &argc, args->v0, 0, 0, false))){
 		args->v0.name[sizeof(args->v0.name) - 1] = 0;
 		ret = nvkm_client_new(args->v0.name, args->v0.device, NULL,
-				      NULL, oclass->client->ntfy, &client);
+				      NULL, oclass->client->event, &client);
 		if (ret)
 			return ret;
 	} else
@@ -65,7 +64,7 @@ nvkm_uclient_new(const struct nvkm_oclass *oclass, void *argv, u32 argc,
 	return 0;
 }
 
-const struct nvkm_sclass
+static const struct nvkm_sclass
 nvkm_uclient_sclass = {
 	.oclass = NVIF_CLASS_CLIENT,
 	.minver = 0,
@@ -73,6 +72,7 @@ nvkm_uclient_sclass = {
 	.ctor = nvkm_uclient_new,
 };
 
+<<<<<<< HEAD
 struct nvkm_client_notify {
 	struct nvkm_client *client;
 	struct nvkm_notify n;
@@ -180,6 +180,8 @@ nvkm_client_notify_new(struct nvkm_object *object,
 	return ret;
 }
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 static const struct nvkm_object_func nvkm_client;
 struct nvkm_client *
 nvkm_client_search(struct nvkm_client *client, u64 handle)
@@ -260,24 +262,22 @@ nvkm_client_child_get(struct nvkm_object *object, int index,
 static int
 nvkm_client_fini(struct nvkm_object *object, bool suspend)
 {
-	struct nvkm_client *client = nvkm_client(object);
-	const char *name[2] = { "fini", "suspend" };
-	int i;
-	nvif_debug(object, "%s notify\n", name[suspend]);
-	for (i = 0; i < ARRAY_SIZE(client->notify); i++)
-		nvkm_client_notify_put(client, i);
 	return 0;
 }
 
 static void *
 nvkm_client_dtor(struct nvkm_object *object)
 {
+<<<<<<< HEAD
 	struct nvkm_client *client = nvkm_client(object);
 	int i;
 	for (i = 0; i < ARRAY_SIZE(client->notify); i++)
 		nvkm_client_notify_del(client, i);
 	spin_lock_destroy(&client->lock);
 	return client;
+=======
+	return nvkm_client(object);
+>>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static const struct nvkm_object_func
@@ -324,10 +324,8 @@ static const rb_tree_ops_t nvkm_client_objtree_ops = {
 #endif
 
 int
-nvkm_client_new(const char *name, u64 device, const char *cfg,
-		const char *dbg,
-		int (*ntfy)(const void *, u32, const void *, u32),
-		struct nvkm_client **pclient)
+nvkm_client_new(const char *name, u64 device, const char *cfg, const char *dbg,
+		int (*event)(u64, void *, u32), struct nvkm_client **pclient)
 {
 	struct nvkm_oclass oclass = { .base = nvkm_uclient_sclass };
 	struct nvkm_client *client;
@@ -344,8 +342,13 @@ nvkm_client_new(const char *name, u64 device, const char *cfg,
 	rb_tree_init(&client->objtree, &nvkm_client_objtree_ops);
 #else
 	client->objroot = RB_ROOT;
+<<<<<<< HEAD
 #endif
 	client->ntfy = ntfy;
+=======
+	spin_lock_init(&client->obj_lock);
+	client->event = event;
+>>>>>>> vendor/linux-drm-v6.6.35
 	INIT_LIST_HEAD(&client->umem);
 	spin_lock_init(&client->lock);
 	return 0;

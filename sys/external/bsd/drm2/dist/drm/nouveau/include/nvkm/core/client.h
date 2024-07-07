@@ -12,16 +12,20 @@ struct nvkm_client {
 	u64 device;
 	u32 debug;
 
+<<<<<<< HEAD
 	struct nvkm_client_notify *notify[32];
 #ifdef __NetBSD__
 	rb_tree_t objtree;
 #else
 	struct rb_root objroot;
 #endif
+=======
+	struct rb_root objroot;
+	spinlock_t obj_lock;
+>>>>>>> vendor/linux-drm-v6.6.35
 
-	bool super;
 	void *data;
-	int (*ntfy)(const void *, u32, const void *, u32);
+	int (*event)(u64 token, void *argv, u32 argc);
 
 	struct list_head umem;
 #ifdef __NetBSD__
@@ -33,17 +37,9 @@ struct nvkm_client {
 	spinlock_t lock;
 };
 
-int  nvkm_client_new(const char *name, u64 device, const char *cfg,
-		     const char *dbg,
-		     int (*)(const void *, u32, const void *, u32),
-		     struct nvkm_client **);
+int  nvkm_client_new(const char *name, u64 device, const char *cfg, const char *dbg,
+		     int (*)(u64, void *, u32), struct nvkm_client **);
 struct nvkm_client *nvkm_client_search(struct nvkm_client *, u64 handle);
-
-int nvkm_client_notify_new(struct nvkm_object *, struct nvkm_event *,
-			   void *data, u32 size);
-int nvkm_client_notify_del(struct nvkm_client *, int index);
-int nvkm_client_notify_get(struct nvkm_client *, int index);
-int nvkm_client_notify_put(struct nvkm_client *, int index);
 
 /* logging for client-facing objects */
 #define nvif_printk(o,l,p,f,a...) do {                                         \

@@ -8,7 +8,7 @@
 #include <linux/mutex.h>
 #include <linux/idr.h>
 
-#include <drm/drm_hashtab.h>
+#include <drm/drm_legacy.h>
 #include <drm/drm_mode_config.h>
 
 #ifdef __NetBSD__
@@ -19,10 +19,7 @@
 struct drm_driver;
 struct drm_minor;
 struct drm_master;
-struct drm_device_dma;
 struct drm_vblank_crtc;
-struct drm_sg_mem;
-struct drm_local_map;
 struct drm_vma_offset_manager;
 struct drm_vram_mm;
 struct drm_fb_helper;
@@ -31,7 +28,7 @@ struct pci_dev;
 struct pci_controller;
 
 /**
- * enum drm_switch_power - power state of drm device
+ * enum switch_power_state - power state of drm device
  */
 
 enum switch_power_state {
@@ -55,13 +52,6 @@ enum switch_power_state {
  * may contain multiple heads.
  */
 struct drm_device {
-	/**
-	 * @legacy_dev_list:
-	 *
-	 * List of devices per driver for stealth attach cleanup
-	 */
-	struct list_head legacy_dev_list;
-
 	/** @if_version: Highest interface version set */
 	int if_version;
 
@@ -71,23 +61,57 @@ struct drm_device {
 	/** @dev: Device structure of bus-device */
 	struct device *dev;
 
+	/**
+	 * @managed:
+	 *
+	 * Managed resources linked to the lifetime of this &drm_device as
+	 * tracked by @ref.
+	 */
+	struct {
+		/** @managed.resources: managed resources list */
+		struct list_head resources;
+		/** @managed.final_kfree: pointer for final kfree() call */
+		void *final_kfree;
+		/** @managed.lock: protects @managed.resources */
+		spinlock_t lock;
+	} managed;
+
 	/** @driver: DRM driver managing the device */
-	struct drm_driver *driver;
+	const struct drm_driver *driver;
 
 	/**
 	 * @dev_private:
 	 *
-	 * DRM driver private data. Instead of using this pointer it is
-	 * recommended that drivers use drm_dev_init() and embed struct
-	 * &drm_device in their larger per-device structure.
+	 * DRM driver private data. This is deprecated and should be left set to
+	 * NULL.
+	 *
+	 * Instead of using this pointer it is recommended that drivers use
+	 * devm_drm_dev_alloc() and embed struct &drm_device in their larger
+	 * per-device structure.
 	 */
 	void *dev_private;
 
-	/** @primary: Primary node */
+	/**
+	 * @primary:
+	 *
+	 * Primary node. Drivers should not interact with this
+	 * directly. debugfs interfaces can be registered with
+	 * drm_debugfs_add_file(), and sysfs should be directly added on the
+	 * hardware (and not character device node) struct device @dev.
+	 */
 	struct drm_minor *primary;
 
-	/** @render: Render node */
+	/**
+	 * @render:
+	 *
+	 * Render node. Drivers should not interact with this directly ever.
+	 * Drivers should not expose any additional interfaces in debugfs or
+	 * sysfs on this node.
+	 */
 	struct drm_minor *render;
+
+	/** @accel: Compute Acceleration node */
+	struct drm_minor *accel;
 
 	/**
 	 * @registered:
@@ -132,6 +156,9 @@ struct drm_device {
 	 * @struct_mutex:
 	 *
 	 * Lock for others (not &drm_minor.master and &drm_file.is_master)
+	 *
+	 * WARNING:
+	 * Only drivers annotated with DRIVER_LEGACY should be using this.
 	 */
 	struct mutex struct_mutex;
 
@@ -148,7 +175,7 @@ struct drm_device {
 	 * Usage counter for outstanding files open,
 	 * protected by drm_global_mutex
 	 */
-	int open_count;
+	atomic_t open_count;
 
 	/** @filelist_mutex: Protects @filelist. */
 	struct mutex filelist_mutex;
@@ -182,6 +209,7 @@ struct drm_device {
 	struct list_head clientlist;
 
 	/**
+<<<<<<< HEAD
 	 * @irq_enabled:
 	 *
 	 * Indicates that interrupt handling is enabled, specifically vblank
@@ -199,6 +227,8 @@ struct drm_device {
 #endif
 
 	/**
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 	 * @vblank_disable_immediate:
 	 *
 	 * If true, vblank interrupt will be disabled immediately when the
@@ -271,6 +301,7 @@ struct drm_device {
 	 */
 	spinlock_t event_lock;
 
+<<<<<<< HEAD
 	/** @agp: AGP data */
 	struct drm_agp_head *agp;
 
@@ -295,6 +326,8 @@ struct drm_device {
 	struct vmem *cma_pool;
 #endif
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 	/** @num_crtcs: Number of CRTCs on this device */
 	unsigned int num_crtcs;
 
@@ -331,6 +364,7 @@ struct drm_device {
 	 */
 	struct drm_fb_helper *fb_helper;
 
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	struct sysmon_pswitch sc_monitor_hotplug;
 	struct mutex suspend_lock;
@@ -343,6 +377,37 @@ struct drm_device {
 	/* private: */
 #if IS_ENABLED(CONFIG_DRM_LEGACY) || \
     defined(__NetBSD__) /* XXX drm_vm.c / drm_cdevsw.c use this */
+=======
+	/**
+	 * @debugfs_mutex:
+	 *
+	 * Protects &debugfs_list access.
+	 */
+	struct mutex debugfs_mutex;
+
+	/**
+	 * @debugfs_list:
+	 *
+	 * List of debugfs files to be created by the DRM device. The files
+	 * must be added during drm_dev_register().
+	 */
+	struct list_head debugfs_list;
+
+	/* Everything below here is for legacy driver, never use! */
+	/* private: */
+#if IS_ENABLED(CONFIG_DRM_LEGACY)
+	/* List of devices per driver for stealth attach cleanup */
+	struct list_head legacy_dev_list;
+
+#ifdef __alpha__
+	/** @hose: PCI hose, only used on ALPHA platforms. */
+	struct pci_controller *hose;
+#endif
+
+	/* AGP data */
+	struct drm_agp_head *agp;
+
+>>>>>>> vendor/linux-drm-v6.6.35
 	/* Context handle management - linked list of context handles */
 	struct list_head ctxlist;
 
@@ -389,6 +454,10 @@ struct drm_device {
 
 	/* Scatter gather memory */
 	struct drm_sg_mem *sg;
+
+	/* IRQs */
+	bool irq_enabled;
+	int irq;
 #endif
 };
 

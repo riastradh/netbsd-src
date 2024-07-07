@@ -11,16 +11,20 @@ __KERNEL_RCSID(0, "$NetBSD: intel_vga.c,v 1.4 2021/12/19 11:49:11 riastradh Exp 
 #include <linux/pci.h>
 #include <linux/vgaarb.h>
 
-#include <drm/i915_drm.h>
+#include <video/vga.h>
+
+#include "soc/intel_gmch.h"
 
 #include "i915_drv.h"
+#include "i915_reg.h"
+#include "intel_de.h"
 #include "intel_vga.h"
 
 static i915_reg_t intel_vga_cntrl_reg(struct drm_i915_private *i915)
 {
 	if (IS_VALLEYVIEW(i915) || IS_CHERRYVIEW(i915))
 		return VLV_VGACNTRL;
-	else if (INTEL_GEN(i915) >= 5)
+	else if (DISPLAY_VER(i915) >= 5)
 		return CPU_VGACNTRL;
 	else
 		return VGACNTRL;
@@ -29,10 +33,11 @@ static i915_reg_t intel_vga_cntrl_reg(struct drm_i915_private *i915)
 /* Disable the VGA plane that we never use */
 void intel_vga_disable(struct drm_i915_private *dev_priv)
 {
-	struct pci_dev *pdev = dev_priv->drm.pdev;
+	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
 	i915_reg_t vga_reg = intel_vga_cntrl_reg(dev_priv);
 	u8 sr1;
 
+<<<<<<< HEAD
 #ifdef __NetBSD__
     {
 	const bus_addr_t vgabase = 0x3c0;
@@ -55,25 +60,31 @@ void intel_vga_disable(struct drm_i915_private *dev_priv)
 	}
     }
 #else
+=======
+	if (intel_de_read(dev_priv, vga_reg) & VGA_DISP_DISABLE)
+		return;
+
+>>>>>>> vendor/linux-drm-v6.6.35
 	/* WaEnableVGAAccessThroughIOPort:ctg,elk,ilk,snb,ivb,vlv,hsw */
 	vga_get_uninterruptible(pdev, VGA_RSRC_LEGACY_IO);
-	outb(SR01, VGA_SR_INDEX);
-	sr1 = inb(VGA_SR_DATA);
-	outb(sr1 | 1 << 5, VGA_SR_DATA);
+	outb(0x01, VGA_SEQ_I);
+	sr1 = inb(VGA_SEQ_D);
+	outb(sr1 | VGA_SR01_SCREEN_OFF, VGA_SEQ_D);
 	vga_put(pdev, VGA_RSRC_LEGACY_IO);
 #endif
 	udelay(300);
 
-	I915_WRITE(vga_reg, VGA_DISP_DISABLE);
-	POSTING_READ(vga_reg);
+	intel_de_write(dev_priv, vga_reg, VGA_DISP_DISABLE);
+	intel_de_posting_read(dev_priv, vga_reg);
 }
 
 void intel_vga_redisable_power_on(struct drm_i915_private *dev_priv)
 {
 	i915_reg_t vga_reg = intel_vga_cntrl_reg(dev_priv);
 
-	if (!(I915_READ(vga_reg) & VGA_DISP_DISABLE)) {
-		DRM_DEBUG_KMS("Something enabled VGA plane, disabling it\n");
+	if (!(intel_de_read(dev_priv, vga_reg) & VGA_DISP_DISABLE)) {
+		drm_dbg_kms(&dev_priv->drm,
+			    "Something enabled VGA plane, disabling it\n");
 		intel_vga_disable(dev_priv);
 	}
 }
@@ -102,7 +113,7 @@ void intel_vga_redisable(struct drm_i915_private *i915)
 
 void intel_vga_reset_io_mem(struct drm_i915_private *i915)
 {
-	struct pci_dev *pdev = i915->drm.pdev;
+	struct pci_dev *pdev = to_pci_dev(i915->drm.dev);
 
 	/*
 	 * After we re-enable the power well, if we touch VGA register 0x3d5
@@ -135,11 +146,12 @@ void intel_vga_reset_io_mem(struct drm_i915_private *i915)
     }
 #else
 	vga_get_uninterruptible(pdev, VGA_RSRC_LEGACY_IO);
-	outb(inb(VGA_MSR_READ), VGA_MSR_WRITE);
+	outb(inb(VGA_MIS_R), VGA_MIS_W);
 	vga_put(pdev, VGA_RSRC_LEGACY_IO);
 #endif
 }
 
+<<<<<<< HEAD
 #ifndef __NetBSD__
 static int
 intel_vga_set_state(struct drm_i915_private *i915, bool enable_decode)
@@ -168,12 +180,14 @@ intel_vga_set_state(struct drm_i915_private *i915, bool enable_decode)
 	return 0;
 }
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 static unsigned int
-intel_vga_set_decode(void *cookie, bool enable_decode)
+intel_vga_set_decode(struct pci_dev *pdev, bool enable_decode)
 {
-	struct drm_i915_private *i915 = cookie;
+	struct drm_i915_private *i915 = pdev_to_i915(pdev);
 
-	intel_vga_set_state(i915, enable_decode);
+	intel_gmch_vga_set_state(i915, enable_decode);
 
 	if (enable_decode)
 		return VGA_RSRC_LEGACY_IO | VGA_RSRC_LEGACY_MEM |
@@ -185,8 +199,13 @@ intel_vga_set_decode(void *cookie, bool enable_decode)
 
 int intel_vga_register(struct drm_i915_private *i915)
 {
+<<<<<<< HEAD
 #ifndef __NetBSD__
 	struct pci_dev *pdev = i915->drm.pdev;
+=======
+
+	struct pci_dev *pdev = to_pci_dev(i915->drm.dev);
+>>>>>>> vendor/linux-drm-v6.6.35
 	int ret;
 
 	/*
@@ -197,7 +216,7 @@ int intel_vga_register(struct drm_i915_private *i915)
 	 * then we do not take part in VGA arbitration and the
 	 * vga_client_register() fails with -ENODEV.
 	 */
-	ret = vga_client_register(pdev, i915, NULL, intel_vga_set_decode);
+	ret = vga_client_register(pdev, intel_vga_set_decode);
 	if (ret && ret != -ENODEV)
 		return ret;
 #endif
@@ -207,9 +226,15 @@ int intel_vga_register(struct drm_i915_private *i915)
 
 void intel_vga_unregister(struct drm_i915_private *i915)
 {
+<<<<<<< HEAD
 #ifndef __NetBSD__
 	struct pci_dev *pdev = i915->drm.pdev;
 
 	vga_client_register(pdev, NULL, NULL, NULL);
 #endif	/* __NetBSD__ */
+=======
+	struct pci_dev *pdev = to_pci_dev(i915->drm.dev);
+
+	vga_client_unregister(pdev);
+>>>>>>> vendor/linux-drm-v6.6.35
 }

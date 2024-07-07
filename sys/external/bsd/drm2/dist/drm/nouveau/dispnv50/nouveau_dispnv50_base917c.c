@@ -27,7 +27,7 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_dispnv50_base917c.c,v 1.2 2021/12/18 23:45:3
 #include "base.h"
 #include "atom.h"
 
-const u32
+static const u32
 base917c_format[] = {
 	DRM_FORMAT_C8,
 	DRM_FORMAT_XRGB8888,

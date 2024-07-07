@@ -43,14 +43,36 @@
 #include <linux/types.h>
 #include <linux/kref.h>
 #include <linux/dma-resv.h>
+#include <linux/list.h>
+#include <linux/mutex.h>
 
 #include <drm/drm_device.h>
 #include <drm/drm_print.h>
 #include <drm/drm_vma_manager.h>
 #undef free
 
+struct iosys_map;
 struct drm_gem_object;
 struct xarray;
+
+/**
+ * enum drm_gem_object_status - bitmask of object state for fdinfo reporting
+ * @DRM_GEM_OBJECT_RESIDENT: object is resident in memory (ie. not unpinned)
+ * @DRM_GEM_OBJECT_PURGEABLE: object marked as purgeable by userspace
+ *
+ * Bitmask of status used for fdinfo memory stats, see &drm_gem_object_funcs.status
+ * and drm_show_fdinfo().  Note that an object can DRM_GEM_OBJECT_PURGEABLE if
+ * it still active or not resident, in which case drm_show_fdinfo() will not
+ * account for it as purgeable.  So drivers do not need to check if the buffer
+ * is idle and resident to return this bit.  (Ie. userspace can mark a buffer
+ * as purgeable even while it is still busy on the GPU.. it does not _actually_
+ * become puregeable until it becomes idle.  The status gem object func does
+ * not need to consider this.)
+ */
+enum drm_gem_object_status {
+	DRM_GEM_OBJECT_RESIDENT  = BIT(0),
+	DRM_GEM_OBJECT_PURGEABLE = BIT(1),
+};
 
 /**
  * struct drm_gem_object_funcs - GEM object functions
@@ -149,17 +171,17 @@ struct drm_gem_object_funcs {
 	 *
 	 * This callback is optional.
 	 */
-	void *(*vmap)(struct drm_gem_object *obj);
+	int (*vmap)(struct drm_gem_object *obj, struct iosys_map *map);
 
 	/**
 	 * @vunmap:
 	 *
-	 * Releases the the address previously returned by @vmap. Used by the
+	 * Releases the address previously returned by @vmap. Used by the
 	 * drm_gem_dmabuf_vunmap() helper.
 	 *
 	 * This callback is optional.
 	 */
-	void (*vunmap)(struct drm_gem_object *obj, void *vaddr);
+	void (*vunmap)(struct drm_gem_object *obj, struct iosys_map *map);
 
 	/**
 	 * @mmap:
@@ -168,7 +190,7 @@ struct drm_gem_object_funcs {
 	 *
 	 * This callback is optional.
 	 *
-	 * The callback is used by by both drm_gem_mmap_obj() and
+	 * The callback is used by both drm_gem_mmap_obj() and
 	 * drm_gem_prime_mmap().  When @mmap is present @vm_ops is not
 	 * used, the @mmap callback must set vma->vm_ops instead.
 	 */
@@ -180,6 +202,29 @@ struct drm_gem_object_funcs {
 #endif
 
 	/**
+	 * @evict:
+	 *
+	 * Evicts gem object out from memory. Used by the drm_gem_object_evict()
+	 * helper. Returns 0 on success, -errno otherwise.
+	 *
+	 * This callback is optional.
+	 */
+	int (*evict)(struct drm_gem_object *obj);
+
+	/**
+	 * @status:
+	 *
+	 * The optional status callback can return additional object state
+	 * which determines which stats the object is counted against.  The
+	 * callback is called under table_lock.  Racing against object status
+	 * change is "harmless", and the callback can expect to not race
+	 * against object destruction.
+	 *
+	 * Called by drm_show_memory_stats().
+	 */
+	enum drm_gem_object_status (*status)(struct drm_gem_object *obj);
+
+	/**
 	 * @vm_ops:
 	 *
 	 * Virtual memory operations used with mmap.
@@ -187,6 +232,41 @@ struct drm_gem_object_funcs {
 	 * This is optional but necessary for mmap support.
 	 */
 	const struct vm_operations_struct *vm_ops;
+};
+
+/**
+ * struct drm_gem_lru - A simple LRU helper
+ *
+ * A helper for tracking GEM objects in a given state, to aid in
+ * driver's shrinker implementation.  Tracks the count of pages
+ * for lockless &shrinker.count_objects, and provides
+ * &drm_gem_lru_scan for driver's &shrinker.scan_objects
+ * implementation.
+ */
+struct drm_gem_lru {
+	/**
+	 * @lock:
+	 *
+	 * Lock protecting movement of GEM objects between LRUs.  All
+	 * LRUs that the object can move between should be protected
+	 * by the same lock.
+	 */
+	struct mutex *lock;
+
+	/**
+	 * @count:
+	 *
+	 * The total number of backing pages of the GEM objects in
+	 * this LRU.
+	 */
+	long count;
+
+	/**
+	 * @list:
+	 *
+	 * The LRU list.
+	 */
+	struct list_head list;
 };
 
 /**
@@ -203,8 +283,8 @@ struct drm_gem_object {
 	 *
 	 * Reference count of this object
 	 *
-	 * Please use drm_gem_object_get() to acquire and drm_gem_object_put()
-	 * or drm_gem_object_put_unlocked() to release a reference to a GEM
+	 * Please use drm_gem_object_get() to acquire and drm_gem_object_put_locked()
+	 * or drm_gem_object_put() to release a reference to a GEM
 	 * buffer object.
 	 */
 	struct kref refcount;
@@ -239,7 +319,7 @@ struct drm_gem_object {
 	 *
 	 * SHMEM file node used as backing storage for swappable buffer objects.
 	 * GEM also supports driver private objects with driver-specific backing
-	 * storage (contiguous CMA memory, special reserved blocks). In this
+	 * storage (contiguous DMA memory, special reserved blocks). In this
 	 * case @filp is NULL.
 	 */
 	struct file *filp;
@@ -296,8 +376,9 @@ struct drm_gem_object {
 	 * attachment point for the device. This is invariant over the lifetime
 	 * of a gem object.
 	 *
-	 * The &drm_driver.gem_free_object callback is responsible for cleaning
-	 * up the dma_buf attachment and references acquired at import time.
+	 * The &drm_gem_object_funcs.free callback is responsible for
+	 * cleaning up the dma_buf attachment and references acquired at import
+	 * time.
 	 *
 	 * Note that the drm gem/prime core does not depend upon drivers setting
 	 * this field any more. So for drivers where this doesn't make sense
@@ -325,6 +406,22 @@ struct drm_gem_object {
 	struct dma_resv _resv;
 
 	/**
+	 * @gpuva:
+	 *
+	 * Provides the list of GPU VAs attached to this GEM object.
+	 *
+	 * Drivers should lock list accesses with the GEMs &dma_resv lock
+	 * (&drm_gem_object.resv) or a custom lock if one is provided.
+	 */
+	struct {
+		struct list_head list;
+
+#ifdef CONFIG_LOCKDEP
+		struct lockdep_map *lock_dep_map;
+#endif
+	} gpuva;
+
+	/**
 	 * @funcs:
 	 *
 	 * Optional GEM object functions. If this is set, it will be used instead of the
@@ -334,7 +431,38 @@ struct drm_gem_object {
 	 *
 	 */
 	const struct drm_gem_object_funcs *funcs;
+
+	/**
+	 * @lru_node:
+	 *
+	 * List node in a &drm_gem_lru.
+	 */
+	struct list_head lru_node;
+
+	/**
+	 * @lru:
+	 *
+	 * The current LRU list that the GEM object is on.
+	 */
+	struct drm_gem_lru *lru;
 };
+
+/**
+ * DRM_GEM_FOPS - Default drm GEM file operations
+ *
+ * This macro provides a shorthand for setting the GEM file ops in the
+ * &file_operations structure.  If all you need are the default ops, use
+ * DEFINE_DRM_GEM_FOPS instead.
+ */
+#define DRM_GEM_FOPS \
+	.open		= drm_open,\
+	.release	= drm_release,\
+	.unlocked_ioctl	= drm_ioctl,\
+	.compat_ioctl	= drm_compat_ioctl,\
+	.poll		= drm_poll,\
+	.read		= drm_read,\
+	.llseek		= noop_llseek,\
+	.mmap		= drm_gem_mmap
 
 /**
  * DEFINE_DRM_GEM_FOPS() - macro to generate file operations for GEM drivers
@@ -352,14 +480,7 @@ struct drm_gem_object {
 #define DEFINE_DRM_GEM_FOPS(name) \
 	static const struct file_operations name = {\
 		.owner		= THIS_MODULE,\
-		.open		= drm_open,\
-		.release	= drm_release,\
-		.unlocked_ioctl	= drm_ioctl,\
-		.compat_ioctl	= drm_compat_ioctl,\
-		.poll		= drm_poll,\
-		.read		= drm_read,\
-		.llseek		= noop_llseek,\
-		.mmap		= drm_gem_mmap,\
+		DRM_GEM_FOPS,\
 	}
 
 void drm_gem_object_release(struct drm_gem_object *obj);
@@ -368,6 +489,7 @@ int drm_gem_object_init(struct drm_device *dev,
 			struct drm_gem_object *obj, size_t size);
 void drm_gem_private_object_init(struct drm_device *dev,
 				 struct drm_gem_object *obj, size_t size);
+<<<<<<< HEAD
 #ifdef __NetBSD__
 void drm_gem_pager_reference(struct uvm_object *);
 void drm_gem_pager_detach(struct uvm_object *);
@@ -376,6 +498,9 @@ int drm_gem_mmap_object(struct drm_device *, off_t, size_t, int,
 int drm_gem_or_legacy_mmap_object(struct drm_device *, off_t, size_t, int,
     struct uvm_object **, voff_t *, struct file *);
 #else
+=======
+void drm_gem_private_object_fini(struct drm_gem_object *obj);
+>>>>>>> vendor/linux-drm-v6.6.35
 void drm_gem_vm_open(struct vm_area_struct *vma);
 void drm_gem_vm_close(struct vm_area_struct *vma);
 int drm_gem_mmap_obj(struct drm_gem_object *obj, unsigned long obj_size,
@@ -395,29 +520,25 @@ static inline void drm_gem_object_get(struct drm_gem_object *obj)
 	kref_get(&obj->refcount);
 }
 
-/**
- * __drm_gem_object_put - raw function to release a GEM buffer object reference
- * @obj: GEM buffer object
- *
- * This function is meant to be used by drivers which are not encumbered with
- * &drm_device.struct_mutex legacy locking and which are using the
- * gem_free_object_unlocked callback. It avoids all the locking checks and
- * locking overhead of drm_gem_object_put() and drm_gem_object_put_unlocked().
- *
- * Drivers should never call this directly in their code. Instead they should
- * wrap it up into a ``driver_gem_object_put(struct driver_gem_object *obj)``
- * wrapper function, and use that. Shared code should never call this, to
- * avoid breaking drivers by accident which still depend upon
- * &drm_device.struct_mutex locking.
- */
+__attribute__((nonnull))
 static inline void
 __drm_gem_object_put(struct drm_gem_object *obj)
 {
 	kref_put(&obj->refcount, drm_gem_object_free);
 }
 
-void drm_gem_object_put_unlocked(struct drm_gem_object *obj);
-void drm_gem_object_put(struct drm_gem_object *obj);
+/**
+ * drm_gem_object_put - drop a GEM buffer object reference
+ * @obj: GEM buffer object
+ *
+ * This releases a reference to @obj.
+ */
+static inline void
+drm_gem_object_put(struct drm_gem_object *obj)
+{
+	if (obj)
+		__drm_gem_object_put(obj);
+}
 
 int drm_gem_handle_create(struct drm_file *file_priv,
 			  struct drm_gem_object *obj,
@@ -433,6 +554,9 @@ struct page **drm_gem_get_pages(struct drm_gem_object *obj);
 void drm_gem_put_pages(struct drm_gem_object *obj, struct page **pages,
 		bool dirty, bool accessed);
 
+int drm_gem_vmap_unlocked(struct drm_gem_object *obj, struct iosys_map *map);
+void drm_gem_vunmap_unlocked(struct drm_gem_object *obj, struct iosys_map *map);
+
 int drm_gem_objects_lookup(struct drm_file *filp, void __user *bo_handles,
 			   int count, struct drm_gem_object ***objs_out);
 struct drm_gem_object *drm_gem_object_lookup(struct drm_file *filp, u32 handle);
@@ -442,16 +566,96 @@ int drm_gem_lock_reservations(struct drm_gem_object **objs, int count,
 			      struct ww_acquire_ctx *acquire_ctx);
 void drm_gem_unlock_reservations(struct drm_gem_object **objs, int count,
 				 struct ww_acquire_ctx *acquire_ctx);
-int drm_gem_fence_array_add(struct xarray *fence_array,
-			    struct dma_fence *fence);
-int drm_gem_fence_array_add_implicit(struct xarray *fence_array,
-				     struct drm_gem_object *obj,
-				     bool write);
 int drm_gem_dumb_map_offset(struct drm_file *file, struct drm_device *dev,
 			    u32 handle, u64 *offset);
-int drm_gem_dumb_destroy(struct drm_file *file,
-			 struct drm_device *dev,
-			 uint32_t handle);
+
+void drm_gem_lru_init(struct drm_gem_lru *lru, struct mutex *lock);
+void drm_gem_lru_remove(struct drm_gem_object *obj);
+void drm_gem_lru_move_tail_locked(struct drm_gem_lru *lru, struct drm_gem_object *obj);
+void drm_gem_lru_move_tail(struct drm_gem_lru *lru, struct drm_gem_object *obj);
+unsigned long drm_gem_lru_scan(struct drm_gem_lru *lru,
+			       unsigned int nr_to_scan,
+			       unsigned long *remaining,
+			       bool (*shrink)(struct drm_gem_object *obj));
+
+int drm_gem_evict(struct drm_gem_object *obj);
+
+/**
+ * drm_gem_object_is_shared_for_memory_stats - helper for shared memory stats
+ *
+ * This helper should only be used for fdinfo shared memory stats to determine
+ * if a GEM object is shared.
+ *
+ * @obj: obj in question
+ */
+static inline bool drm_gem_object_is_shared_for_memory_stats(struct drm_gem_object *obj)
+{
+	return (obj->handle_count > 1) || obj->dma_buf;
+}
+
+#ifdef CONFIG_LOCKDEP
+/**
+ * drm_gem_gpuva_set_lock() - Set the lock protecting accesses to the gpuva list.
+ * @obj: the &drm_gem_object
+ * @lock: the lock used to protect the gpuva list. The locking primitive
+ * must contain a dep_map field.
+ *
+ * Call this if you're not proctecting access to the gpuva list with the
+ * dma-resv lock, but with a custom lock.
+ */
+#define drm_gem_gpuva_set_lock(obj, lock) \
+	if (!WARN((obj)->gpuva.lock_dep_map, \
+		  "GEM GPUVA lock should be set only once.")) \
+		(obj)->gpuva.lock_dep_map = &(lock)->dep_map
+#define drm_gem_gpuva_assert_lock_held(obj) \
+	lockdep_assert((obj)->gpuva.lock_dep_map ? \
+		       lock_is_held((obj)->gpuva.lock_dep_map) : \
+		       dma_resv_held((obj)->resv))
+#else
+#define drm_gem_gpuva_set_lock(obj, lock) do {} while (0)
+#define drm_gem_gpuva_assert_lock_held(obj) do {} while (0)
+#endif
+
+/**
+ * drm_gem_gpuva_init() - initialize the gpuva list of a GEM object
+ * @obj: the &drm_gem_object
+ *
+ * This initializes the &drm_gem_object's &drm_gpuva list.
+ *
+ * Calling this function is only necessary for drivers intending to support the
+ * &drm_driver_feature DRIVER_GEM_GPUVA.
+ *
+ * See also drm_gem_gpuva_set_lock().
+ */
+static inline void drm_gem_gpuva_init(struct drm_gem_object *obj)
+{
+	INIT_LIST_HEAD(&obj->gpuva.list);
+}
+
+/**
+ * drm_gem_for_each_gpuva() - iternator to walk over a list of gpuvas
+ * @entry__: &drm_gpuva structure to assign to in each iteration step
+ * @obj__: the &drm_gem_object the &drm_gpuvas to walk are associated with
+ *
+ * This iterator walks over all &drm_gpuva structures associated with the
+ * &drm_gpuva_manager.
+ */
+#define drm_gem_for_each_gpuva(entry__, obj__) \
+	list_for_each_entry(entry__, &(obj__)->gpuva.list, gem.entry)
+
+/**
+ * drm_gem_for_each_gpuva_safe() - iternator to safely walk over a list of
+ * gpuvas
+ * @entry__: &drm_gpuva structure to assign to in each iteration step
+ * @next__: &next &drm_gpuva to store the next step
+ * @obj__: the &drm_gem_object the &drm_gpuvas to walk are associated with
+ *
+ * This iterator walks over all &drm_gpuva structures associated with the
+ * &drm_gem_object. It is implemented with list_for_each_entry_safe(), hence
+ * it is save against removal of elements.
+ */
+#define drm_gem_for_each_gpuva_safe(entry__, next__, obj__) \
+	list_for_each_entry_safe(entry__, next__, &(obj__)->gpuva.list, gem.entry)
 
 #define	free(addr, type)		kern_free(addr)
 

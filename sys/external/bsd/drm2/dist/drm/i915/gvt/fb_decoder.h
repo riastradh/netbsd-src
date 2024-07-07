@@ -40,6 +40,10 @@
 
 #include <linux/types.h>
 
+#include "display/intel_display_limits.h"
+
+struct intel_vgpu;
+
 #define _PLANE_CTL_FORMAT_SHIFT		24
 #define _PLANE_CTL_TILED_SHIFT		10
 #define _PIPE_V_SRCSZ_SHIFT		0
@@ -99,8 +103,6 @@ enum DDI_PORT {
 	DDI_PORT_D	= 3,
 	DDI_PORT_E	= 4
 };
-
-struct intel_gvt;
 
 /* color space conversion and gamma correction are not included */
 struct intel_vgpu_primary_plane_format {

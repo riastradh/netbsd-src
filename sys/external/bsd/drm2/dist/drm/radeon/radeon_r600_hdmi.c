@@ -35,6 +35,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_r600_hdmi.c,v 1.2 2021/12/18 23:45:43 riastra
 #include "radeon.h"
 #include "radeon_asic.h"
 #include "radeon_audio.h"
+#include "r600.h"
 #include "r600d.h"
 #include "atom.h"
 

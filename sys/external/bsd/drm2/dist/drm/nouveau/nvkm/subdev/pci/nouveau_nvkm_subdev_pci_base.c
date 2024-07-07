@@ -31,7 +31,15 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_subdev_pci_base.c,v 1.11 2021/12/19 12:
 
 #include <core/option.h>
 #include <core/pci.h>
-#include <subdev/mc.h>
+
+void
+nvkm_pci_msi_rearm(struct nvkm_device *device)
+{
+	struct nvkm_pci *pci = device->pci;
+
+	if (pci && pci->msi)
+		pci->func->msi_rearm(pci);
+}
 
 u32
 nvkm_pci_rd32(struct nvkm_pci *pci, u16 addr)
@@ -70,6 +78,7 @@ nvkm_pci_rom_shadow(struct nvkm_pci *pci, bool shadow)
 	nvkm_pci_wr32(pci, 0x0050, data);
 }
 
+<<<<<<< HEAD
 static irqreturn_t
 nvkm_pci_intr(DRM_IRQ_ARGS)
 {
@@ -90,6 +99,8 @@ nvkm_pci_intr(DRM_IRQ_ARGS)
 	return handled ? IRQ_HANDLED : IRQ_NONE;
 }
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 static int
 nvkm_pci_fini(struct nvkm_subdev *subdev, bool suspend)
 {
@@ -114,7 +125,6 @@ static int
 nvkm_pci_oneinit(struct nvkm_subdev *subdev)
 {
 	struct nvkm_pci *pci = nvkm_pci(subdev);
-	struct pci_dev *pdev = pci->pdev;
 	int ret;
 
 	if (pci_is_pcie(pci->pdev)) {
@@ -123,6 +133,7 @@ nvkm_pci_oneinit(struct nvkm_subdev *subdev)
 			return ret;
 	}
 
+<<<<<<< HEAD
 #ifdef __NetBSD__
     {
 	const char *const name = device_xname(pci_dev_dev(pdev));
@@ -177,6 +188,8 @@ nvkm_pci_oneinit(struct nvkm_subdev *subdev)
 
 	pci->irq = pdev->irq;
 #endif
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 	return 0;
 }
 
@@ -213,6 +226,7 @@ nvkm_pci_dtor(struct nvkm_subdev *subdev)
 
 	nvkm_agp_dtor(pci);
 
+<<<<<<< HEAD
 #ifdef __NetBSD__
 	const struct pci_attach_args *pa = &pci->pdev->pd_pa;
 	if (pci->pci_intrcookie != NULL) {
@@ -234,6 +248,8 @@ nvkm_pci_dtor(struct nvkm_subdev *subdev)
 	}
 #endif
 
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 	if (pci->msi)
 		pci_disable_msi(pci->pdev);
 
@@ -251,18 +267,21 @@ nvkm_pci_func = {
 
 int
 nvkm_pci_new_(const struct nvkm_pci_func *func, struct nvkm_device *device,
-	      int index, struct nvkm_pci **ppci)
+	      enum nvkm_subdev_type type, int inst, struct nvkm_pci **ppci)
 {
 	struct nvkm_pci *pci;
 
 	if (!(pci = *ppci = kzalloc(sizeof(**ppci), GFP_KERNEL)))
 		return -ENOMEM;
-	nvkm_subdev_ctor(&nvkm_pci_func, device, index, &pci->subdev);
+	nvkm_subdev_ctor(&nvkm_pci_func, device, type, inst, &pci->subdev);
 	pci->func = func;
 	pci->pdev = device->func->pci(device)->pdev;
+<<<<<<< HEAD
 #ifndef __NetBSD__
 	pci->irq = -1;
 #endif
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 	pci->pcie.speed = -1;
 	pci->pcie.width = -1;
 
