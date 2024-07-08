@@ -149,8 +149,6 @@ void radeon_gart_table_ram_free(struct radeon_device *rdev)
 {
 	if (!rdev->gart.ptr)
 		return;
-<<<<<<< HEAD
-	}
 #ifdef __NetBSD__
 	bus_dmamap_unload(rdev->ddev->dmat, rdev->gart.rg_table_map);
 	bus_dmamem_unmap(rdev->ddev->dmat, rdev->gart.ptr,
@@ -158,9 +156,6 @@ void radeon_gart_table_ram_free(struct radeon_device *rdev)
 	bus_dmamap_destroy(rdev->ddev->dmat, rdev->gart.rg_table_map);
 	bus_dmamem_free(rdev->ddev->dmat, &rdev->gart.rg_table_seg, 1);
 #else
-=======
-
->>>>>>> vendor/linux-drm-v6.6.35
 #ifdef CONFIG_X86
 	if (rdev->family == CHIP_RS400 || rdev->family == CHIP_RS480 ||
 	    rdev->family == CHIP_RS690 || rdev->family == CHIP_RS740) {

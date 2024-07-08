@@ -55,7 +55,6 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_ttm.c,v 1.26 2022/07/20 01:22:38 riastradh Ex
 #include "radeon.h"
 #include "radeon_ttm.h"
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 #include <uvm/uvm_extern.h>
 #include <uvm/uvm_fault.h>
@@ -63,11 +62,7 @@ __KERNEL_RCSID(0, "$NetBSD: radeon_ttm.c,v 1.26 2022/07/20 01:22:38 riastradh Ex
 #include <drm/bus_dma_hacks.h>
 #endif
 
-static int radeon_ttm_debugfs_init(struct radeon_device *rdev);
-static void radeon_ttm_debugfs_fini(struct radeon_device *rdev);
-=======
 static void radeon_ttm_debugfs_init(struct radeon_device *rdev);
->>>>>>> vendor/linux-drm-v6.6.35
 
 static int radeon_ttm_tt_bind(struct ttm_device *bdev, struct ttm_tt *ttm,
 			      struct ttm_resource *bo_mem);
@@ -152,34 +147,6 @@ static void radeon_evict_flags(struct ttm_buffer_object *bo,
 	*placement = rbo->placement;
 }
 
-<<<<<<< HEAD
-static int radeon_verify_access(struct ttm_buffer_object *bo, struct file *filp)
-{
-	struct radeon_bo *rbo = container_of(bo, struct radeon_bo, tbo);
-
-	if (radeon_ttm_tt_has_userptr(bo->ttm))
-		return -EPERM;
-#ifdef __NetBSD__
-	struct drm_file *drm_file = filp->f_data;
-	return drm_vma_node_verify_access(&rbo->tbo.base.vma_node, drm_file);
-#else
-	return drm_vma_node_verify_access(&rbo->tbo.base.vma_node,
-					  filp->private_data);
-#endif
-}
-
-static void radeon_move_null(struct ttm_buffer_object *bo,
-			     struct ttm_mem_reg *new_mem)
-{
-	struct ttm_mem_reg *old_mem = &bo->mem;
-
-	BUG_ON(old_mem->mm_node != NULL);
-	*old_mem = *new_mem;
-	new_mem->mm_node = NULL;
-}
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static int radeon_move_blit(struct ttm_buffer_object *bo,
 			bool evict,
 			struct ttm_resource *new_mem,
@@ -962,16 +929,11 @@ static struct ttm_device_funcs radeon_bo_driver = {
 	.ttm_tt_create = &radeon_ttm_tt_create,
 	.ttm_tt_populate = &radeon_ttm_tt_populate,
 	.ttm_tt_unpopulate = &radeon_ttm_tt_unpopulate,
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	.ttm_tt_swapout = &radeon_ttm_tt_swapout,
 	.ttm_uvm_ops = &radeon_uvm_ops,
 #endif
-	.invalidate_caches = &radeon_invalidate_caches,
-	.init_mem_type = &radeon_init_mem_type,
-=======
 	.ttm_tt_destroy = &radeon_ttm_tt_destroy,
->>>>>>> vendor/linux-drm-v6.6.35
 	.eviction_valuable = ttm_bo_eviction_valuable,
 	.evict_flags = &radeon_evict_flags,
 	.move = &radeon_bo_move,
@@ -983,25 +945,16 @@ int radeon_ttm_init(struct radeon_device *rdev)
 	int r;
 
 	/* No others user of address space so set it to 0 */
-<<<<<<< HEAD
-	r = ttm_bo_device_init(&rdev->mman.bdev,
-			       &radeon_bo_driver,
+	r = ttm_device_init(&rdev->mman.bdev, &radeon_bo_driver, rdev->dev,
 #ifdef __NetBSD__
 			       rdev->ddev->bst,
 			       rdev->ddev->dmat,
 #else
-=======
-	r = ttm_device_init(&rdev->mman.bdev, &radeon_bo_driver, rdev->dev,
->>>>>>> vendor/linux-drm-v6.6.35
 			       rdev->ddev->anon_inode->i_mapping,
 #endif
 			       rdev->ddev->vma_offset_manager,
-<<<<<<< HEAD
-			       dma_addressing_limited(pci_dev_dev(rdev->pdev)));
-=======
 			       rdev->need_swiotlb,
-			       dma_addressing_limited(&rdev->pdev->dev));
->>>>>>> vendor/linux-drm-v6.6.35
+			       dma_addressing_limited(pci_dev_dev(rdev->pdev)));
 	if (r) {
 		DRM_ERROR("failed initializing buffer object driver(%d).\n", r);
 		return r;

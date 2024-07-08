@@ -467,16 +467,8 @@ bool radeon_fence_signaled(struct radeon_fence *fence)
 
 	spin_lock(&fence->rdev->fence_lock);
 	if (radeon_fence_seq_signaled(fence->rdev, fence->seq, fence->ring)) {
-<<<<<<< HEAD
-		int ret;
-
-		ret = dma_fence_signal_locked(&fence->base);
-		if (!ret)
-			DMA_FENCE_TRACE(&fence->base, "signaled from radeon_fence_signaled\n");
+		dma_fence_signal_locked(&fence->base);
 		spin_unlock(&fence->rdev->fence_lock);
-=======
-		dma_fence_signal(&fence->base);
->>>>>>> vendor/linux-drm-v6.6.35
 		return true;
 	}
 	spin_unlock(&fence->rdev->fence_lock);

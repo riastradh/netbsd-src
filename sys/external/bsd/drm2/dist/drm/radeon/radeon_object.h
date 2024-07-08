@@ -179,9 +179,6 @@ to_radeon_sa_manager(struct drm_suballoc_manager *manager)
 
 static inline uint64_t radeon_sa_bo_gpu_addr(struct drm_suballoc *sa_bo)
 {
-<<<<<<< HEAD
-	return (char *)sa_bo->manager->cpu_ptr + sa_bo->soffset;
-=======
 	return to_radeon_sa_manager(sa_bo->manager)->gpu_addr +
 		drm_suballoc_soffset(sa_bo);
 }
@@ -190,7 +187,6 @@ static inline void *radeon_sa_bo_cpu_addr(struct drm_suballoc *sa_bo)
 {
 	return to_radeon_sa_manager(sa_bo->manager)->cpu_ptr +
 		drm_suballoc_soffset(sa_bo);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 extern int radeon_sa_bo_manager_init(struct radeon_device *rdev,

@@ -517,11 +517,7 @@ struct radeon_bo {
 	/* Constant after initialization */
 	struct radeon_device		*rdev;
 
-<<<<<<< HEAD
-	struct ttm_bo_kmap_obj		dma_buf_vmap;
 #ifndef __NetBSD__		/* XXX pid???  */
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	pid_t				pid;
 #endif
 
@@ -532,41 +528,11 @@ struct radeon_bo {
 #define gem_to_radeon_bo(gobj) container_of((gobj), struct radeon_bo, tbo.base)
 
 struct radeon_sa_manager {
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	spinlock_t		wq_lock;
-	drm_waitqueue_t		wq;
-#else
-	wait_queue_head_t	wq;
-#endif
-	struct radeon_bo	*bo;
-	struct list_head	*hole;
-	struct list_head	flist[RADEON_NUM_RINGS];
-	struct list_head	olist;
-	unsigned		size;
-	uint64_t		gpu_addr;
-	void			*cpu_ptr;
-	uint32_t		domain;
-	uint32_t		align;
-};
-
-struct radeon_sa_bo;
-
-/* sub-allocation buffer */
-struct radeon_sa_bo {
-	struct list_head		olist;
-	struct list_head		flist;
-	struct radeon_sa_manager	*manager;
-	unsigned			soffset;
-	unsigned			eoffset;
-	struct radeon_fence		*fence;
-=======
 	struct drm_suballoc_manager	base;
 	struct radeon_bo		*bo;
 	uint64_t			gpu_addr;
 	void				*cpu_ptr;
 	u32 domain;
->>>>>>> vendor/linux-drm-v6.6.35
 };
 
 /*

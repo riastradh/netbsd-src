@@ -258,9 +258,6 @@ static struct pci_device_id pciidlist[] = {
 
 MODULE_DEVICE_TABLE(pci, pciidlist);
 
-<<<<<<< HEAD
-static struct drm_driver kms_driver;
-
 #ifdef __NetBSD__
 
 struct drm_driver *const radeon_drm_driver = &kms_driver;
@@ -271,11 +268,7 @@ const size_t radeon_n_device_ids = __arraycount(pciidlist);
 static const struct uvm_pagerops radeon_gem_uvm_ops;
 
 #else
-
-bool radeon_device_is_virtual(void);
-=======
 static const struct drm_driver kms_driver;
->>>>>>> vendor/linux-drm-v6.6.35
 
 static int radeon_pci_probe(struct pci_dev *pdev,
 			    const struct pci_device_id *ent)
@@ -596,22 +589,6 @@ static const struct drm_driver kms_driver = {
 	.open = radeon_driver_open_kms,
 	.postclose = radeon_driver_postclose_kms,
 	.unload = radeon_driver_unload_kms,
-<<<<<<< HEAD
-	.get_vblank_counter = radeon_get_vblank_counter_kms,
-	.enable_vblank = radeon_enable_vblank_kms,
-	.disable_vblank = radeon_disable_vblank_kms,
-	.get_vblank_timestamp = drm_calc_vbltimestamp_from_scanoutpos,
-	.get_scanout_position = radeon_get_crtc_scanout_position,
-	.irq_preinstall = radeon_driver_irq_preinstall_kms,
-	.irq_postinstall = radeon_driver_irq_postinstall_kms,
-	.irq_uninstall = radeon_driver_irq_uninstall_kms,
-	.irq_handler = radeon_driver_irq_handler_kms,
-#ifdef __NetBSD__
-	.request_irq = drm_pci_request_irq,
-	.free_irq = drm_pci_free_irq,
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	.ioctls = radeon_ioctls_kms,
 	.num_ioctls = ARRAY_SIZE(radeon_ioctls_kms),
 	.dumb_create = radeon_mode_dumb_create,
@@ -634,14 +611,8 @@ static const struct drm_driver kms_driver = {
 	.patchlevel = KMS_DRIVER_PATCHLEVEL,
 };
 
-<<<<<<< HEAD
 #ifndef __NetBSD__
 
-static struct drm_driver *driver;
-static struct pci_driver *pdriver;
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static struct pci_driver radeon_kms_pci_driver = {
 	.name = DRIVER_NAME,
 	.id_table = pciidlist,
@@ -672,15 +643,10 @@ static void __exit radeon_module_exit(void)
 	mmu_notifier_synchronize();
 }
 
-<<<<<<< HEAD
 #endif
 
-module_init(radeon_init);
-module_exit(radeon_exit);
-=======
 module_init(radeon_module_init);
 module_exit(radeon_module_exit);
->>>>>>> vendor/linux-drm-v6.6.35
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);
