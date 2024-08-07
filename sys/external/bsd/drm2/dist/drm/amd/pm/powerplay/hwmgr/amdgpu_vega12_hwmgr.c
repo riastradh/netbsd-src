@@ -51,10 +51,8 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_vega12_hwmgr.c,v 1.4 2021/12/19 12:37:54 rias
 #include "pp_thermal.h"
 #include "vega12_baco.h"
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/hwmgr/amdgpu_vega12_hwmgr.c
 #include <linux/nbsd-namespace.h>
 
-=======
 #define smnPCIE_LC_SPEED_CNTL			0x11140290
 #define smnPCIE_LC_LINK_WIDTH_CNTL		0x11140288
 
@@ -62,7 +60,6 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_vega12_hwmgr.c,v 1.4 2021/12/19 12:37:54 rias
 #define LINK_SPEED_MAX				3
 static const int link_width[] = {0, 1, 2, 4, 8, 12, 16};
 static const int link_speed[] = {25, 50, 80, 160};
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/hwmgr/amdgpu_vega12_hwmgr.c
 
 static int vega12_force_clock_level(struct pp_hwmgr *hwmgr,
 		enum pp_clock_type type, uint32_t mask);
@@ -2179,13 +2176,8 @@ static int vega12_get_ppfeature_status(struct pp_hwmgr *hwmgr, char *buf)
 		"[EnableAllSmuFeatures] Failed to get enabled smc features!",
 		return ret);
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/hwmgr/amdgpu_vega12_hwmgr.c
-	size += sprintf(buf + size, "Current ppfeatures: 0x%016"PRIx64"\n", features_enabled);
-	size += sprintf(buf + size, "%-19s %-22s %s\n",
-=======
 	size += sysfs_emit_at(buf, size, "Current ppfeatures: 0x%016llx\n", features_enabled);
 	size += sysfs_emit_at(buf, size, "%-19s %-22s %s\n",
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/hwmgr/amdgpu_vega12_hwmgr.c
 				output_title[0],
 				output_title[1],
 				output_title[2]);
