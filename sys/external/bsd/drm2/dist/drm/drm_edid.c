@@ -51,18 +51,12 @@ __KERNEL_RCSID(0, "$NetBSD: drm_edid.c,v 1.15 2021/12/19 12:44:04 riastradh Exp 
 
 #include "drm_crtc_internal.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-#define version_greater(edid, maj, min) \
-	(((edid)->version > (maj)) || \
-	 ((edid)->version == (maj) && (edid)->revision > (min)))
-=======
 static int oui(u8 first, u8 second, u8 third)
 {
 	return (first << 16) | (second << 8) | third;
 }
->>>>>>> vendor/linux-drm-v6.6.35
 
 #define EDID_EST_TIMINGS 16
 #define EDID_STD_TIMINGS 8
@@ -1789,15 +1783,7 @@ module_param_named(edid_fixup, edid_fixup, int, 0400);
 MODULE_PARM_DESC(edid_fixup,
 		 "Minimum number of valid EDID header bytes (0-8, default 6)");
 
-<<<<<<< HEAD
-static void drm_get_displayid(struct drm_connector *connector,
-			      struct edid *edid);
-static int validate_displayid(const u8 *displayid, int length, int idx);
-
-static int drm_edid_block_checksum(const u8 *raw_edid)
-=======
 static int edid_block_compute_checksum(const void *_block)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	const u8 *block = _block;
 	int i;
@@ -2229,31 +2215,10 @@ static void connector_bad_edid(struct drm_connector *connector,
 	if (connector->bad_edid_counter++ && !drm_debug_enabled(DRM_UT_KMS))
 		return;
 
-<<<<<<< HEAD
-	dev_warn(connector->dev->dev,
-		 "%s: EDID is invalid:\n",
-		 connector->name);
-	for (i = 0; i < num_blocks; i++) {
-		u8 *block = edid + i * EDID_LENGTH;
-		char prefix[20];
-
-		if (drm_edid_is_zero(block, EDID_LENGTH))
-			snprintf(prefix, sizeof prefix, "\t[%02x] ZERO ", i);
-		else if (!drm_edid_block_valid(block, i, false, NULL))
-			snprintf(prefix, sizeof prefix, "\t[%02x] BAD  ", i);
-		else
-			snprintf(prefix, sizeof prefix, "\t[%02x] GOOD ", i);
-
-		print_hex_dump(KERN_WARNING,
-			       prefix, DUMP_PREFIX_NONE, 16, 1,
-			       block, EDID_LENGTH, false);
-	}
-=======
 	drm_dbg_kms(connector->dev, "[CONNECTOR:%d:%s] EDID is invalid:\n",
 		    connector->base.id, connector->name);
 	for (i = 0; i < num_blocks; i++)
 		edid_block_dump(KERN_DEBUG, edid + i, i);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /* Get override or firmware EDID */
@@ -2877,14 +2842,6 @@ EXPORT_SYMBOL(drm_edid_get_panel_id);
 struct edid *drm_get_edid_switcheroo(struct drm_connector *connector,
 				     struct i2c_adapter *adapter)
 {
-<<<<<<< HEAD
-#ifndef __NetBSD__		/* XXX vga switcheroo */
-	struct pci_dev *pdev = connector->dev->pdev;
-#endif
-	struct edid *edid;
-
-#ifndef __NetBSD__		/* XXX vga switcheroo */
-=======
 	struct drm_device *dev = connector->dev;
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	struct edid *edid;
@@ -2892,7 +2849,9 @@ struct edid *drm_get_edid_switcheroo(struct drm_connector *connector,
 	if (drm_WARN_ON_ONCE(dev, !dev_is_pci(dev->dev)))
 		return NULL;
 
->>>>>>> vendor/linux-drm-v6.6.35
+#ifdef __NetBSD__		/* XXX vga switcheroo */
+	__USE(pdev);
+#else
 	vga_switcheroo_lock_ddc(pdev);
 #endif
 	edid = drm_get_edid(connector, adapter);
@@ -4171,12 +4130,8 @@ static int add_detailed_modes(struct drm_connector *connector,
  *
  * FIXME: Prefer not returning pointers to raw EDID data.
  */
-<<<<<<< HEAD
-static const u8 *drm_find_edid_extension(const struct edid *edid, int ext_id)
-=======
 const u8 *drm_find_edid_extension(const struct drm_edid *drm_edid,
 				  int ext_id, int *ext_index)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	const u8 *edid_ext = NULL;
 	int i;
@@ -4186,15 +4141,9 @@ const u8 *drm_find_edid_extension(const struct drm_edid *drm_edid,
 		return NULL;
 
 	/* Find CEA extension */
-<<<<<<< HEAD
-	for (i = 0; i < edid->extensions; i++) {
-		edid_ext = (const u8 *)edid + EDID_LENGTH * (i + 1);
-		if (edid_ext[0] == ext_id)
-=======
 	for (i = *ext_index; i < drm_edid_extension_block_count(drm_edid); i++) {
 		edid_ext = drm_edid_extension_block_data(drm_edid, i);
 		if (edid_block_tag(edid_ext) == ext_id)
->>>>>>> vendor/linux-drm-v6.6.35
 			break;
 	}
 
@@ -4206,22 +4155,6 @@ const u8 *drm_find_edid_extension(const struct drm_edid *drm_edid,
 	return edid_ext;
 }
 
-<<<<<<< HEAD
-
-static const u8 *drm_find_displayid_extension(const struct edid *edid)
-{
-	return drm_find_edid_extension(edid, DISPLAYID_EXT);
-}
-
-static const u8 *drm_find_cea_extension(const struct edid *edid)
-{
-	int ret;
-	int idx = 1;
-	int length = EDID_LENGTH;
-	const struct displayid_block *block;
-	const u8 *cea;
-	const u8 *displayid;
-=======
 /* Return true if the EDID has a CTA extension or a DisplayID CTA data block */
 static bool drm_edid_has_cta_extension(const struct drm_edid *drm_edid)
 {
@@ -4229,7 +4162,6 @@ static bool drm_edid_has_cta_extension(const struct drm_edid *drm_edid)
 	struct displayid_iter iter;
 	int ext_index = 0;
 	bool found = false;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* Look for a top level CEA extension block */
 	if (drm_find_edid_extension(drm_edid, CEA_EXT, &ext_index))
@@ -4239,11 +4171,7 @@ static bool drm_edid_has_cta_extension(const struct drm_edid *drm_edid)
 	displayid_iter_edid_begin(drm_edid, &iter);
 	displayid_iter_for_each(block, &iter) {
 		if (block->tag == DATA_BLOCK_CTA) {
-<<<<<<< HEAD
-			cea = (const u8 *)block;
-=======
 			found = true;
->>>>>>> vendor/linux-drm-v6.6.35
 			break;
 		}
 	}
@@ -5613,11 +5541,6 @@ static void drm_edid_to_eld(struct drm_connector *connector,
 	const struct cea_db *db;
 	struct cea_db_iter iter;
 	uint8_t *eld = connector->eld;
-<<<<<<< HEAD
-	const u8 *cea;
-	const u8 *db;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	int total_sad_count = 0;
 	int mnl;
 
@@ -5745,46 +5668,6 @@ static int _drm_edid_to_speaker_allocation(const struct drm_edid *drm_edid,
 	const struct cea_db *db;
 	struct cea_db_iter iter;
 	int count = 0;
-<<<<<<< HEAD
-	int i, start, end, dbl;
-	const u8 *cea;
-
-	cea = drm_find_cea_extension(edid);
-	if (!cea) {
-		DRM_DEBUG_KMS("SAD: no CEA Extension found\n");
-		return 0;
-	}
-
-	if (cea_revision(cea) < 3) {
-		DRM_DEBUG_KMS("SAD: wrong CEA revision\n");
-		return 0;
-	}
-
-	if (cea_db_offsets(cea, &start, &end)) {
-		DRM_DEBUG_KMS("SAD: invalid data block offsets\n");
-		return -EPROTO;
-	}
-
-	for_each_cea_db(cea, i, start, end) {
-		const u8 *db = &cea[i];
-
-		if (cea_db_tag(db) == AUDIO_BLOCK) {
-			int j;
-			dbl = cea_db_payload_len(db);
-
-			count = dbl / 3; /* SAD is 3B */
-			*sads = kcalloc(count, sizeof(**sads), GFP_KERNEL);
-			if (!*sads)
-				return -ENOMEM;
-			for (j = 0; j < count; j++) {
-				const u8 *sad = &db[1 + j * 3];
-
-				(*sads)[j].format = (sad[0] & 0x78) >> 3;
-				(*sads)[j].channels = sad[0] & 0x7;
-				(*sads)[j].freq = sad[1] & 0x7F;
-				(*sads)[j].byte2 = sad[2];
-			}
-=======
 
 	cea_db_iter_edid_begin(drm_edid, &iter);
 	cea_db_iter_for_each(db, &iter) {
@@ -5795,7 +5678,6 @@ static int _drm_edid_to_speaker_allocation(const struct drm_edid *drm_edid,
 			if (!*sadb)
 				return -ENOMEM;
 			count = cea_db_payload_len(db);
->>>>>>> vendor/linux-drm-v6.6.35
 			break;
 		}
 	}
@@ -5903,13 +5785,7 @@ static bool _drm_detect_hdmi_monitor(const struct drm_edid *drm_edid)
  */
 bool drm_detect_hdmi_monitor(const struct edid *edid)
 {
-<<<<<<< HEAD
-	const u8 *edid_ext;
-	int i;
-	int start_offset, end_offset;
-=======
 	struct drm_edid drm_edid;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	return _drm_detect_hdmi_monitor(drm_edid_legacy_init(&drm_edid, edid));
 }
@@ -5971,14 +5847,7 @@ end:
  */
 bool drm_detect_monitor_audio(const struct edid *edid)
 {
-<<<<<<< HEAD
-	const u8 *edid_ext;
-	int i, j;
-	bool has_audio = false;
-	int start_offset, end_offset;
-=======
 	struct drm_edid drm_edid;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	return _drm_detect_monitor_audio(drm_edid_legacy_init(&drm_edid, edid));
 }
@@ -6740,23 +6609,6 @@ static void update_display_info(struct drm_connector *connector,
 	if (edid->features & DRM_EDID_FEATURE_RGB_YCRCB422)
 		info->color_formats |= DRM_COLOR_FORMAT_YCBCR422;
 
-<<<<<<< HEAD
-static int validate_displayid(const u8 *displayid, int length, int idx)
-{
-	int i;
-	u8 csum = 0;
-	const struct displayid_hdr *base;
-
-	base = (const struct displayid_hdr *)&displayid[idx];
-
-	DRM_DEBUG_KMS("base revision 0x%x, length %d, %d %d\n",
-		      base->rev, base->bytes, base->prod_id, base->ext_count);
-
-	if (base->bytes + 5 > length - idx)
-		return -EINVAL;
-	for (i = idx; i <= base->bytes + 5; i++) {
-		csum += displayid[i];
-=======
 	drm_update_mso(connector, drm_edid);
 
 out:
@@ -6765,7 +6617,6 @@ out:
 			    connector->base.id, connector->name,
 			    info->non_desktop ? " (redundant quirk)" : "");
 		info->non_desktop = true;
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 
 	if (info->quirks & EDID_QUIRK_CAP_DSC_15BPP)
@@ -6788,12 +6639,8 @@ out:
 }
 
 static struct drm_display_mode *drm_mode_displayid_detailed(struct drm_device *dev,
-<<<<<<< HEAD
-							    const struct displayid_detailed_timings_1 *timings)
-=======
-							    struct displayid_detailed_timings_1 *timings,
+							    const struct displayid_detailed_timings_1 *timings,
 							    bool type_7)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_display_mode *mode;
 	unsigned pixel_clock = (timings->pixel_clock[0] |
@@ -6868,16 +6715,8 @@ static int add_displayid_detailed_1_modes(struct drm_connector *connector,
 static int add_displayid_detailed_modes(struct drm_connector *connector,
 					const struct drm_edid *drm_edid)
 {
-<<<<<<< HEAD
-	const u8 *displayid;
-	int ret;
-	int idx = 1;
-	int length = EDID_LENGTH;
-	const struct displayid_block *block;
-=======
 	const struct displayid_block *block;
 	struct displayid_iter iter;
->>>>>>> vendor/linux-drm-v6.6.35
 	int num_modes = 0;
 
 	displayid_iter_edid_begin(drm_edid, &iter);
@@ -7441,17 +7280,10 @@ drm_hdmi_vendor_infoframe_from_display_mode(struct hdmi_vendor_infoframe *frame,
 }
 EXPORT_SYMBOL(drm_hdmi_vendor_infoframe_from_display_mode);
 
-<<<<<<< HEAD
-static int drm_parse_tiled_block(struct drm_connector *connector,
-				 const struct displayid_block *block)
-{
-	const struct displayid_tiled_block *tile = (const struct displayid_tiled_block *)block;
-=======
 static void drm_parse_tiled_block(struct drm_connector *connector,
 				  const struct displayid_block *block)
 {
-	const struct displayid_tiled_block *tile = (struct displayid_tiled_block *)block;
->>>>>>> vendor/linux-drm-v6.6.35
+	const struct displayid_tiled_block *tile = (const struct displayid_tiled_block *)block;
 	u16 w, h;
 	u8 tile_v_loc, tile_h_loc;
 	u8 num_v_tile, num_h_tile;
@@ -7500,59 +7332,12 @@ static void drm_parse_tiled_block(struct drm_connector *connector,
 	} else {
 		/* if same tile group, then release the ref we just took. */
 		drm_mode_put_tile_group(connector->dev, tg);
-<<<<<<< HEAD
-	return 0;
-}
-
-static int drm_parse_display_id(struct drm_connector *connector,
-				const u8 *displayid, int length,
-				bool is_edid_extension)
-{
-	/* if this is an EDID extension the first byte will be 0x70 */
-	int idx = 0;
-	const struct displayid_block *block;
-	int ret;
-
-	if (is_edid_extension)
-		idx = 1;
-
-	ret = validate_displayid(displayid, length, idx);
-	if (ret)
-		return ret;
-
-	idx += sizeof(struct displayid_hdr);
-	for_each_displayid_db(displayid, block, idx, length) {
-		DRM_DEBUG_KMS("block id 0x%x, rev %d, len %d\n",
-			      block->tag, block->rev, block->num_bytes);
-
-		switch (block->tag) {
-		case DATA_BLOCK_TILED_DISPLAY:
-			ret = drm_parse_tiled_block(connector, block);
-			if (ret)
-				return ret;
-			break;
-		case DATA_BLOCK_TYPE_1_DETAILED_TIMING:
-			/* handled in mode gathering code. */
-			break;
-		case DATA_BLOCK_CTA:
-			/* handled in the cea parser code. */
-			break;
-		default:
-			DRM_DEBUG_KMS("found DisplayID tag 0x%x, unhandled\n", block->tag);
-			break;
-		}
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 }
 
 static bool displayid_is_tiled_block(const struct displayid_iter *iter,
 				     const struct displayid_block *block)
 {
-<<<<<<< HEAD
-	const void *displayid = NULL;
-	int ret;
-=======
 	return (displayid_version(iter) < DISPLAY_ID_STRUCTURE_VER_20 &&
 		block->tag == DATA_BLOCK_TILED_DISPLAY) ||
 		(displayid_version(iter) == DISPLAY_ID_STRUCTURE_VER_20 &&
@@ -7565,7 +7350,6 @@ static void _drm_update_tile_info(struct drm_connector *connector,
 	const struct displayid_block *block;
 	struct displayid_iter iter;
 
->>>>>>> vendor/linux-drm-v6.6.35
 	connector->has_tile = false;
 
 	displayid_iter_edid_begin(drm_edid, &iter);
