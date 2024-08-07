@@ -44,13 +44,8 @@ void dal_gpio_destroy(
 	struct gpio **ptr);
 
 struct gpio_service *dal_gpio_service_create(
-<<<<<<< HEAD
-	enum dce_version dce_version_major,
-	enum dce_environment dce_version_minor,
-=======
 	enum dce_version dce_version,
 	enum dce_environment dce_environment,
->>>>>>> vendor/linux-drm-v6.6.35
 	struct dc_context *ctx);
 
 struct gpio *dal_gpio_service_create_irq(
