@@ -64,10 +64,6 @@ void enc1_update_generic_info_packet(
 	uint32_t packet_index,
 	const struct dc_info_packet *info_packet)
 {
-<<<<<<< HEAD
-	uint32_t regval __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	/* TODOFPGA Figure out a proper number for max_retries polling for lock
 	 * use 50 for now.
 	 */
@@ -266,11 +262,6 @@ void enc1_stream_encoder_dp_set_stream_attribute(
 	uint32_t h_back_porch;
 	uint8_t synchronous_clock = 0; /* asynchronous mode */
 	uint8_t colorimetry_bpc;
-<<<<<<< HEAD
-	uint8_t dynamic_range_rgb __unused = 0; /*full range*/
-	uint8_t dynamic_range_ycbcr __unused = 1; /*bt709*/
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	uint8_t dp_pixel_encoding = 0;
 	uint8_t dp_component_depth = 0;
 
@@ -1243,10 +1234,6 @@ static void enc1_se_audio_setup(
 {
 	struct dcn10_stream_encoder *enc1 = DCN10STRENC_FROM_STRENC(enc);
 
-<<<<<<< HEAD
-	uint32_t speakers __unused = 0;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	uint32_t channels = 0;
 
 	ASSERT(audio_info);
