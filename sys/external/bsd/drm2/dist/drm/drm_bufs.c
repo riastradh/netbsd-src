@@ -341,24 +341,14 @@ static int drm_addmap_core(struct drm_device *dev, resource_size_t offset,
 		 * casting it down to 32 bits is no problem, but we
 		 * need to point to a 64bit variable first.
 		 */
-		map->handle = dma_alloc_coherent(dev->dev,
-						 map->size,
-						 &map->offset,
-						 GFP_KERNEL);
-		if (!map->handle) {
+		dmah = drm_pci_alloc(dev, map->size, map->size);
+		if (!dmah) {
 			kfree(map);
 			return -ENOMEM;
 		}
-<<<<<<< HEAD
 		map->handle = dmah->vaddr;
 		map->offset = (unsigned long)dmah->busaddr;
-#ifdef __NetBSD__
 		map->lm_data.dmah = dmah;
-#else
-		kfree(dmah);
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 		break;
 	default:
 		kfree(map);
@@ -613,21 +603,7 @@ int drm_legacy_rmmap_locked(struct drm_device *dev, struct drm_local_map *map)
 	case _DRM_SCATTER_GATHER:
 		break;
 	case _DRM_CONSISTENT:
-<<<<<<< HEAD
-#ifdef __NetBSD__
 		drm_pci_free(dev, map->lm_data.dmah);
-#else
-		dmah.vaddr = map->handle;
-		dmah.busaddr = map->offset;
-		dmah.size = map->size;
-		__drm_legacy_pci_free(dev, &dmah);
-#endif
-=======
-		dma_free_coherent(dev->dev,
-				  map->size,
-				  map->handle,
-				  map->offset);
->>>>>>> vendor/linux-drm-v6.6.35
 		break;
 	}
 	kfree(map);
@@ -746,12 +722,7 @@ static void drm_cleanup_buf_error(struct drm_device *dev,
 	if (entry->seg_count) {
 		for (i = 0; i < entry->seg_count; i++) {
 			if (entry->seglist[i]) {
-				dmah = entry->seglist[i];
-				dma_free_coherent(dev->dev,
-						  dmah->size,
-						  dmah->vaddr,
-						  dmah->busaddr);
-				kfree(dmah);
+				drm_pci_free(dev, entry->seglist[i]);
 			}
 		}
 		kfree(entry->seglist);
@@ -1050,26 +1021,10 @@ int drm_legacy_addbufs_pci(struct drm_device *dev,
 	page_count = 0;
 
 	while (entry->buf_count < count) {
-		dmah = kmalloc(sizeof(drm_dma_handle_t), GFP_KERNEL);
+
+		dmah = drm_pci_alloc(dev, PAGE_SIZE << page_order, 0x1000);
+
 		if (!dmah) {
-			/* Set count correctly so we free the proper amount. */
-			entry->buf_count = count;
-			entry->seg_count = count;
-			drm_cleanup_buf_error(dev, entry);
-			kfree(temp_pagelist);
-			mutex_unlock(&dev->struct_mutex);
-			atomic_dec(&dev->buf_alloc);
-			return -ENOMEM;
-		}
-
-		dmah->size = total;
-		dmah->vaddr = dma_alloc_coherent(dev->dev,
-						 dmah->size,
-						 &dmah->busaddr,
-						 GFP_KERNEL);
-		if (!dmah->vaddr) {
-			kfree(dmah);
-
 			/* Set count correctly so we free the proper amount. */
 			entry->buf_count = count;
 			entry->seg_count = count;
