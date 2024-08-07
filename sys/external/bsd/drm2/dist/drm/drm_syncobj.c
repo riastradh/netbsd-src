@@ -592,14 +592,11 @@ void drm_syncobj_free(struct kref *kref)
 	struct syncobj_eventfd_entry *ev_fd_cur, *ev_fd_tmp;
 
 	drm_syncobj_replace_fence(syncobj, NULL);
-<<<<<<< HEAD
-	spin_lock_destroy(&syncobj->lock);
-=======
 
 	list_for_each_entry_safe(ev_fd_cur, ev_fd_tmp, &syncobj->ev_fd_list, node)
 		syncobj_eventfd_entry_free(ev_fd_cur);
 
->>>>>>> vendor/linux-drm-v6.6.35
+	spin_lock_destroy(&syncobj->lock);
 	kfree(syncobj);
 }
 EXPORT_SYMBOL(drm_syncobj_free);
