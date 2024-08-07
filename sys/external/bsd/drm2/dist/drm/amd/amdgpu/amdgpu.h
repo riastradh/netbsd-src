@@ -59,11 +59,7 @@
 #include <linux/rbtree.h>
 #include <linux/hashtable.h>
 #include <linux/dma-fence.h>
-<<<<<<< HEAD
-#include <linux/acpi.h>
-=======
 #include <linux/pci.h>
->>>>>>> vendor/linux-drm-v6.6.35
 
 #include <drm/ttm/ttm_bo.h>
 #include <drm/ttm/ttm_placement.h>
@@ -443,34 +439,10 @@ struct amdgpu_clock {
  */
 
 struct amdgpu_sa_manager {
-<<<<<<< HEAD
-	spinlock_t		wq_lock;
-	drm_waitqueue_t		wq;
-	struct amdgpu_bo	*bo;
-	struct list_head	*hole;
-	struct list_head	flist[AMDGPU_SA_NUM_FENCE_LISTS];
-	struct list_head	olist;
-	unsigned		size;
-	uint64_t		gpu_addr;
-	void			*cpu_ptr;
-	uint32_t		domain;
-	uint32_t		align;
-};
-
-/* sub-allocation buffer */
-struct amdgpu_sa_bo {
-	struct list_head		olist;
-	struct list_head		flist;
-	struct amdgpu_sa_manager	*manager;
-	unsigned			soffset;
-	unsigned			eoffset;
-	struct dma_fence	        *fence;
-=======
 	struct drm_suballoc_manager	base;
 	struct amdgpu_bo		*bo;
 	uint64_t			gpu_addr;
 	void				*cpu_ptr;
->>>>>>> vendor/linux-drm-v6.6.35
 };
 
 int amdgpu_fence_slab_init(void);
@@ -891,17 +863,6 @@ struct amdgpu_device {
 	spinlock_t audio_endpt_idx_lock;
 	amdgpu_block_rreg_t		audio_endpt_rreg;
 	amdgpu_block_wreg_t		audio_endpt_wreg;
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	bus_space_tag_t			rio_memt;
-	bus_space_handle_t		rio_memh;
-	bus_size_t			rio_mem_size;
-#else
-	void __iomem                    *rio_mem;
-	resource_size_t			rio_mem_size;
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	struct amdgpu_doorbell		doorbell;
 
 	/* clock/pll info */
@@ -1048,12 +1009,8 @@ struct amdgpu_device {
 	atomic64_t gart_pin_size;
 
 	/* soc15 register offset based on ip, instance and  segment */
-<<<<<<< HEAD
 	const uint32_t 		*reg_offset[MAX_HWIP][HWIP_MAX_INSTANCE];
-=======
-	uint32_t		*reg_offset[MAX_HWIP][HWIP_MAX_INSTANCE];
 	struct amdgpu_ip_map_info	ip_map;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* delayed work_func for deferring clockgating during resume */
 	struct delayed_work     delayed_init_work;
@@ -1566,24 +1523,6 @@ static inline bool amdgpu_device_has_timeouts_enabled(struct amdgpu_device *adev
 
 #include "amdgpu_object.h"
 
-<<<<<<< HEAD
-#ifdef __NetBSD__	       /* XXX amdgpu sysfs */
-#define	AMDGPU_PMU_ATTR(_name, _object) CTASSERT(1)
-#else
-/* used by df_v3_6.c and amdgpu_pmu.c */
-#define AMDGPU_PMU_ATTR(_name, _object)					\
-static ssize_t								\
-_name##_show(struct device *dev,					\
-			       struct device_attribute *attr,		\
-			       char *page)				\
-{									\
-	BUILD_BUG_ON(sizeof(_object) >= PAGE_SIZE - 1);			\
-	return sprintf(page, _object "\n");				\
-}									\
-									\
-static struct device_attribute pmu_attr_##_name = __ATTR_RO(_name)
-#endif
-=======
 static inline bool amdgpu_is_tmz(struct amdgpu_device *adev)
 {
        return adev->gmc.tmz_enabled;
@@ -1591,9 +1530,10 @@ static inline bool amdgpu_is_tmz(struct amdgpu_device *adev)
 
 int amdgpu_in_reset(struct amdgpu_device *adev);
 
+#ifdef __NetBSD__	       /* XXX amdgpu sysfs */
 extern const struct attribute_group amdgpu_vram_mgr_attr_group;
 extern const struct attribute_group amdgpu_gtt_mgr_attr_group;
 extern const struct attribute_group amdgpu_flash_attr_group;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif	/* __NetBSD__ */
 
 #endif
