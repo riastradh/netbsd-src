@@ -1510,10 +1510,6 @@ void dcn_bw_notify_pplib_of_wm_ranges(
 {
 	struct pp_smu_funcs_rv *pp = NULL;
 	struct pp_smu_wm_range_sets ranges = {0};
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/display/dc/calcs/amdgpu_dcn_calcs.c
-	volatile int min_fclk_khz, min_dcfclk_khz, socclk_khz;
-=======
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/display/dc/dml/calcs/amdgpu_dcn_calcs.c
 	const int overdrive = 5000000; /* 5 GHz to cover Overdrive */
 
 	if (dc->res_pool->pp_smu)
