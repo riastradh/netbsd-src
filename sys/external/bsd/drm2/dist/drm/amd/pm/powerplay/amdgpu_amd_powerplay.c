@@ -37,13 +37,10 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_amd_powerplay.c,v 1.4 2021/12/19 12:31:45 ria
 #include "power_state.h"
 #include "amdgpu.h"
 #include "hwmgr.h"
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/amdgpu_amd_powerplay.c
-
-#include <linux/nbsd-namespace.h>
-=======
 #include "amdgpu_dpm_internal.h"
 #include "amdgpu_display.h"
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/amdgpu_amd_powerplay.c
+
+#include <linux/nbsd-namespace.h>
 
 static const struct amd_pm_funcs pp_dpm_funcs;
 
@@ -658,16 +655,8 @@ static int pp_dpm_get_pp_table(void *handle, char **table)
 	if (!hwmgr || !hwmgr->pm_en || !hwmgr->soft_pp_table)
 		return -EINVAL;
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/amdgpu_amd_powerplay.c
-	mutex_lock(&hwmgr->smu_lock);
 	*table = __UNCONST(hwmgr->soft_pp_table);
-	size = hwmgr->soft_pp_table_size;
-	mutex_unlock(&hwmgr->smu_lock);
-	return size;
-=======
-	*table = (char *)hwmgr->soft_pp_table;
 	return hwmgr->soft_pp_table_size;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/amdgpu_amd_powerplay.c
 }
 
 static int amd_powerplay_reset(void *handle)
