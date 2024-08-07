@@ -61,11 +61,7 @@ __KERNEL_RCSID(0, "$NetBSD: drm_agpsupport.c,v 1.13 2022/07/19 22:24:33 riastrad
  * Verifies the AGP device has been initialized and acquired and fills in the
  * drm_agp_info structure with the information in drm_agp_head::agp_info.
  */
-<<<<<<< HEAD
 static int drm_agp_info_hook(struct drm_device *dev, struct drm_agp_info *info)
-=======
-int drm_legacy_agp_info(struct drm_device *dev, struct drm_agp_info *info)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct agp_kern_info *kern;
 
@@ -99,13 +95,8 @@ int drm_legacy_agp_info(struct drm_device *dev, struct drm_agp_info *info)
 }
 EXPORT_SYMBOL(drm_legacy_agp_info);
 
-<<<<<<< HEAD
 static int drm_agp_info_ioctl_hook(struct drm_device *dev, void *data,
-		       struct drm_file *file_priv)
-=======
-int drm_legacy_agp_info_ioctl(struct drm_device *dev, void *data,
 			      struct drm_file *file_priv)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_agp_info *info = data;
 	int err;
@@ -126,11 +117,7 @@ int drm_legacy_agp_info_ioctl(struct drm_device *dev, void *data,
  * Verifies the AGP device hasn't been acquired before and calls
  * \c agp_backend_acquire.
  */
-<<<<<<< HEAD
 static int drm_agp_acquire_hook(struct drm_device * dev)
-=======
-int drm_legacy_agp_acquire(struct drm_device *dev)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
@@ -154,13 +141,8 @@ EXPORT_SYMBOL(drm_legacy_agp_acquire);
  * Verifies the AGP device hasn't been acquired before and calls
  * \c agp_backend_acquire.
  */
-<<<<<<< HEAD
 static int drm_agp_acquire_ioctl_hook(struct drm_device *dev, void *data,
-			  struct drm_file *file_priv)
-=======
-int drm_legacy_agp_acquire_ioctl(struct drm_device *dev, void *data,
 				 struct drm_file *file_priv)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	return drm_legacy_agp_acquire((struct drm_device *)file_priv->minor->dev);
 }
@@ -173,11 +155,7 @@ int drm_legacy_agp_acquire_ioctl(struct drm_device *dev, void *data,
  *
  * Verifies the AGP device has been acquired and calls \c agp_backend_release.
  */
-<<<<<<< HEAD
 static int drm_agp_release_hook(struct drm_device * dev)
-=======
-int drm_legacy_agp_release(struct drm_device *dev)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	if (!dev->agp || !dev->agp->acquired)
 		return -EINVAL;
@@ -187,13 +165,8 @@ int drm_legacy_agp_release(struct drm_device *dev)
 }
 EXPORT_SYMBOL(drm_legacy_agp_release);
 
-<<<<<<< HEAD
 static int drm_agp_release_ioctl_hook(struct drm_device *dev, void *data,
-			  struct drm_file *file_priv)
-=======
-int drm_legacy_agp_release_ioctl(struct drm_device *dev, void *data,
 				 struct drm_file *file_priv)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	return drm_legacy_agp_release(dev);
 }
@@ -208,11 +181,7 @@ int drm_legacy_agp_release_ioctl(struct drm_device *dev, void *data,
  * Verifies the AGP device has been acquired but not enabled, and calls
  * \c agp_enable.
  */
-<<<<<<< HEAD
 static int drm_agp_enable_hook(struct drm_device * dev, struct drm_agp_mode mode)
-=======
-int drm_legacy_agp_enable(struct drm_device *dev, struct drm_agp_mode mode)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	if (!dev->agp || !dev->agp->acquired)
 		return -EINVAL;
@@ -224,13 +193,8 @@ int drm_legacy_agp_enable(struct drm_device *dev, struct drm_agp_mode mode)
 }
 EXPORT_SYMBOL(drm_legacy_agp_enable);
 
-<<<<<<< HEAD
 static int drm_agp_enable_ioctl_hook(struct drm_device *dev, void *data,
-			 struct drm_file *file_priv)
-=======
-int drm_legacy_agp_enable_ioctl(struct drm_device *dev, void *data,
 				struct drm_file *file_priv)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_agp_mode *mode = data;
 
@@ -245,11 +209,7 @@ int drm_legacy_agp_enable_ioctl(struct drm_device *dev, void *data,
  * Verifies the AGP device is present and has been acquired, allocates the
  * memory via agp_allocate_memory() and creates a drm_agp_mem entry for it.
  */
-<<<<<<< HEAD
 static int drm_agp_alloc_hook(struct drm_device *dev, struct drm_agp_buffer *request)
-=======
-int drm_legacy_agp_alloc(struct drm_device *dev, struct drm_agp_buffer *request)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_agp_mem *entry;
 	struct agp_memory *memory;
@@ -297,11 +257,7 @@ int drm_legacy_agp_alloc(struct drm_device *dev, struct drm_agp_buffer *request)
 EXPORT_SYMBOL(drm_legacy_agp_alloc);
 
 
-<<<<<<< HEAD
 static int drm_agp_alloc_ioctl_hook(struct drm_device *dev, void *data,
-=======
-int drm_legacy_agp_alloc_ioctl(struct drm_device *dev, void *data,
->>>>>>> vendor/linux-drm-v6.6.35
 			struct drm_file *file_priv)
 {
 	struct drm_agp_buffer *request = data;
@@ -338,11 +294,7 @@ static struct drm_agp_mem *drm_legacy_agp_lookup_entry(struct drm_device *dev,
  * Verifies the AGP device is present and acquired, looks-up the AGP memory
  * entry and passes it to the unbind_agp() function.
  */
-<<<<<<< HEAD
 static int drm_agp_unbind_hook(struct drm_device *dev, struct drm_agp_binding *request)
-=======
-int drm_legacy_agp_unbind(struct drm_device *dev, struct drm_agp_binding *request)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_agp_mem *entry;
 	int ret;
@@ -352,15 +304,7 @@ int drm_legacy_agp_unbind(struct drm_device *dev, struct drm_agp_binding *reques
 	entry = drm_legacy_agp_lookup_entry(dev, request->handle);
 	if (!entry || !entry->bound)
 		return -EINVAL;
-<<<<<<< HEAD
-#ifdef __NetBSD__
 	ret = drm_unbind_agp(dev->agp->bridge, entry->memory);
-#else
-	ret = drm_unbind_agp(entry->memory);
-#endif
-=======
-	ret = agp_unbind_memory(entry->memory);
->>>>>>> vendor/linux-drm-v6.6.35
 	if (ret == 0)
 		entry->bound = 0;
 	return ret;
@@ -368,13 +312,8 @@ int drm_legacy_agp_unbind(struct drm_device *dev, struct drm_agp_binding *reques
 EXPORT_SYMBOL(drm_legacy_agp_unbind);
 
 
-<<<<<<< HEAD
 static int drm_agp_unbind_ioctl_hook(struct drm_device *dev, void *data,
-			 struct drm_file *file_priv)
-=======
-int drm_legacy_agp_unbind_ioctl(struct drm_device *dev, void *data,
 				struct drm_file *file_priv)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_agp_binding *request = data;
 
@@ -390,11 +329,7 @@ int drm_legacy_agp_unbind_ioctl(struct drm_device *dev, void *data,
  * is currently bound into the GATT. Looks-up the AGP memory entry and passes
  * it to bind_agp() function.
  */
-<<<<<<< HEAD
 static int drm_agp_bind_hook(struct drm_device *dev, struct drm_agp_binding *request)
-=======
-int drm_legacy_agp_bind(struct drm_device *dev, struct drm_agp_binding *request)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_agp_mem *entry;
 	int retcode;
@@ -405,20 +340,10 @@ int drm_legacy_agp_bind(struct drm_device *dev, struct drm_agp_binding *request)
 	entry = drm_legacy_agp_lookup_entry(dev, request->handle);
 	if (!entry || entry->bound)
 		return -EINVAL;
-<<<<<<< HEAD
 	page = DIV_ROUND_UP(request->offset, AGP_PAGE_SIZE);
-#ifdef __NetBSD__
-	if ((retcode = drm_bind_agp(dev->agp->bridge, entry->memory, page)))
-		return retcode;
-#else
-	retcode = drm_bind_agp(entry->memory, page);
-=======
-	page = DIV_ROUND_UP(request->offset, PAGE_SIZE);
-	retcode = agp_bind_memory(entry->memory, page);
->>>>>>> vendor/linux-drm-v6.6.35
+	retcode = drm_bind_agp(dev->agp->bridge, entry->memory, page);
 	if (retcode)
 		return retcode;
-#endif
 	entry->bound = dev->agp->base + (page << PAGE_SHIFT);
 	DRM_DEBUG("base = 0x%lx entry->bound = 0x%lx\n",
 		  dev->agp->base, entry->bound);
@@ -427,13 +352,8 @@ int drm_legacy_agp_bind(struct drm_device *dev, struct drm_agp_binding *request)
 EXPORT_SYMBOL(drm_legacy_agp_bind);
 
 
-<<<<<<< HEAD
 static int drm_agp_bind_ioctl_hook(struct drm_device *dev, void *data,
-		       struct drm_file *file_priv)
-=======
-int drm_legacy_agp_bind_ioctl(struct drm_device *dev, void *data,
 			      struct drm_file *file_priv)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_agp_binding *request = data;
 
@@ -450,11 +370,7 @@ int drm_legacy_agp_bind_ioctl(struct drm_device *dev, void *data,
  * unbind_agp(). Frees it via free_agp() as well as the entry itself
  * and unlinks from the doubly linked list it's inserted in.
  */
-<<<<<<< HEAD
 static int drm_agp_free_hook(struct drm_device *dev, struct drm_agp_buffer *request)
-=======
-int drm_legacy_agp_free(struct drm_device *dev, struct drm_agp_buffer *request)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_agp_mem *entry;
 
@@ -464,40 +380,19 @@ int drm_legacy_agp_free(struct drm_device *dev, struct drm_agp_buffer *request)
 	if (!entry)
 		return -EINVAL;
 	if (entry->bound)
-<<<<<<< HEAD
-#ifdef __NetBSD__
 		drm_unbind_agp(dev->agp->bridge, entry->memory);
-#else
-		drm_unbind_agp(entry->memory);
-#endif
 
 	list_del(&entry->head);
 
-#ifdef __NetBSD__
 	drm_free_agp(dev->agp->bridge, entry->memory, entry->pages);
-#else
-	drm_free_agp(entry->memory, entry->pages);
-#endif
-=======
-		agp_unbind_memory(entry->memory);
-
-	list_del(&entry->head);
-
-	agp_free_memory(entry->memory);
->>>>>>> vendor/linux-drm-v6.6.35
 	kfree(entry);
 	return 0;
 }
 EXPORT_SYMBOL(drm_legacy_agp_free);
 
 
-<<<<<<< HEAD
 static int drm_agp_free_ioctl_hook(struct drm_device *dev, void *data,
-		       struct drm_file *file_priv)
-=======
-int drm_legacy_agp_free_ioctl(struct drm_device *dev, void *data,
 			      struct drm_file *file_priv)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_agp_buffer *request = data;
 
@@ -516,11 +411,7 @@ int drm_legacy_agp_free_ioctl(struct drm_device *dev, void *data,
  * Note that final cleanup of the kmalloced structure is directly done in
  * drm_pci_agp_destroy.
  */
-<<<<<<< HEAD
 static struct drm_agp_head *drm_agp_init_hook(struct drm_device *dev)
-=======
-struct drm_agp_head *drm_legacy_agp_init(struct drm_device *dev)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	struct drm_agp_head *head = NULL;
@@ -582,20 +473,9 @@ static void drm_agp_clear_hook(struct drm_device *dev)
 		return;
 
 	list_for_each_entry_safe(entry, tempe, &dev->agp->memory, head) {
-#ifdef __NetBSD__
 		if (entry->bound)
 			drm_unbind_agp(dev->agp->bridge, entry->memory);
 		drm_free_agp(dev->agp->bridge, entry->memory, entry->pages);
-#else
-		if (entry->bound)
-<<<<<<< HEAD
-			drm_unbind_agp(entry->memory);
-		drm_free_agp(entry->memory, entry->pages);
-#endif
-=======
-			agp_unbind_memory(entry->memory);
-		agp_free_memory(entry->memory);
->>>>>>> vendor/linux-drm-v6.6.35
 		kfree(entry);
 	}
 	INIT_LIST_HEAD(&dev->agp->memory);
@@ -607,7 +487,6 @@ static void drm_agp_clear_hook(struct drm_device *dev)
 	dev->agp->enabled = 0;
 }
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 
 static void
@@ -698,6 +577,5 @@ drmkms_agp_modcmd(modcmd_t cmd, void *arg __unused)
 }
 
 #endif	/* __NetBSD__ */
-=======
+
 #endif
->>>>>>> vendor/linux-drm-v6.6.35
