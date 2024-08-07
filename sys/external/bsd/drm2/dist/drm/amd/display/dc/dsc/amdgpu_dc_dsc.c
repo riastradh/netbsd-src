@@ -578,24 +578,6 @@ static uint32_t compute_bpp_x16_from_target_bandwidth(
 	const uint32_t bpp_increment_div,
 	const bool is_dp)
 {
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	panic("what is your float doing in my kernel");
-#else
-	uint32_t dsc_target_bpp_x16;
-	float f_dsc_target_bpp;
-	float f_stream_bandwidth_100bps = stream_bandwidth_kbps * 10.0f;
-	uint32_t precision = bpp_increment_div; // bpp_increment_div is actually precision
-
-	f_dsc_target_bpp = f_stream_bandwidth_100bps / pix_clk_100hz;
-
-	// Round down to the nearest precision stop to bring it into DSC spec range
-	dsc_target_bpp_x16 = (uint32_t)(f_dsc_target_bpp * precision);
-	dsc_target_bpp_x16 = (dsc_target_bpp_x16 * 16) / precision;
-
-	return dsc_target_bpp_x16;
-#endif
-=======
 	uint32_t overhead_in_kbps;
 	struct fixed31_32 effective_bandwidth_in_kbps;
 	struct fixed31_32 bpp_x16;
@@ -611,7 +593,6 @@ static uint32_t compute_bpp_x16_from_target_bandwidth(
 	bpp_x16 = dc_fixpt_div_int(bpp_x16, bpp_increment_div);
 	bpp_x16 = dc_fixpt_mul_int(bpp_x16, 16);
 	return dc_fixpt_floor(bpp_x16);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /* Decide DSC bandwidth range based on signal, timing, specs specific and input min and max
