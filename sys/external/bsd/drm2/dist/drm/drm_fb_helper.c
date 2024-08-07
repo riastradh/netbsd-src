@@ -384,33 +384,8 @@ static void drm_fb_helper_resume_worker(struct work_struct *work)
 
 static void drm_fb_helper_fb_dirty(struct drm_fb_helper *helper)
 {
-<<<<<<< HEAD
-#ifndef __NetBSD__		/* XXX fb dirty */
-	struct drm_framebuffer *fb = fb_helper->fb;
-	unsigned int cpp = fb->format->cpp[0];
-	size_t offset = clip->y1 * fb->pitches[0] + clip->x1 * cpp;
-	void *src = (char *)fb_helper->fbdev->screen_buffer + offset;
-	void *dst = (char *)fb_helper->buffer->vaddr + offset;
-	size_t len = (clip->x2 - clip->x1) * cpp;
-	unsigned int y;
-
-	for (y = clip->y1; y < clip->y2; y++) {
-		memcpy(dst, src, len);
-		src = (char *)src + fb->pitches[0];
-		dst = (char *)dst + fb->pitches[0];
-	}
-#endif
-}
-
-static void drm_fb_helper_dirty_work(struct work_struct *work)
-{
-	struct drm_fb_helper *helper = container_of(work, struct drm_fb_helper,
-						    dirty_work);
-	struct drm_clip_rect *clip = &helper->dirty_clip;
-=======
 	struct drm_device *dev = helper->dev;
 	struct drm_clip_rect *clip = &helper->damage_clip;
->>>>>>> vendor/linux-drm-v6.6.35
 	struct drm_clip_rect clip_copy;
 	unsigned long flags;
 	int ret;
@@ -499,6 +474,7 @@ EXPORT_SYMBOL(drm_fb_helper_prepare);
 void drm_fb_helper_unprepare(struct drm_fb_helper *fb_helper)
 {
 	mutex_destroy(&fb_helper->lock);
+	spin_lock_destroy(&fb_helper->damage_lock);
 }
 EXPORT_SYMBOL(drm_fb_helper_unprepare);
 
@@ -534,8 +510,7 @@ int drm_fb_helper_init(struct drm_device *dev,
 			 * since the caller will not be going through
 			 * drm_fb_helper_fini.
 			 */
-			mutex_destroy(&fb_helper->lock);
-			spin_lock_destroy(&fb_helper->dirty_lock);
+			drm_fb_helper_unprepare(fb_helper);
 			return ret;
 		}
 	}
@@ -559,12 +534,8 @@ EXPORT_SYMBOL(drm_fb_helper_init);
  * fb_info pointer if things went okay, pointer containing error code
  * otherwise
  */
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX fb info */
-struct fb_info *drm_fb_helper_alloc_fbi(struct drm_fb_helper *fb_helper)
-=======
 struct fb_info *drm_fb_helper_alloc_info(struct drm_fb_helper *fb_helper)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct device *dev = fb_helper->dev->dev;
 	struct fb_info *info;
@@ -587,12 +558,8 @@ err_release:
 	framebuffer_release(info);
 	return ERR_PTR(ret);
 }
-<<<<<<< HEAD
-EXPORT_SYMBOL(drm_fb_helper_alloc_fbi);
-#endif
-=======
 EXPORT_SYMBOL(drm_fb_helper_alloc_info);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 /**
  * drm_fb_helper_release_info - release fb_info and its members
@@ -627,20 +594,15 @@ EXPORT_SYMBOL(drm_fb_helper_release_info);
  */
 void drm_fb_helper_unregister_info(struct drm_fb_helper *fb_helper)
 {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	/* XXX errno NetBSD->Linux */
-	int ret = -config_detach(fb_helper->fbdev, DETACH_FORCE);
+	int ret = -config_detach(fb_helper->child, DETACH_FORCE);
 	if (ret)
 		DRM_ERROR("failed to detach drm framebuffer: %d\n", ret);
 #else
-	if (fb_helper && fb_helper->fbdev)
-		unregister_framebuffer(fb_helper->fbdev);
-#endif
-=======
 	if (fb_helper && fb_helper->info)
 		unregister_framebuffer(fb_helper->info);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 EXPORT_SYMBOL(drm_fb_helper_unregister_info);
 
@@ -652,13 +614,6 @@ EXPORT_SYMBOL(drm_fb_helper_unregister_info);
  */
 void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 {
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	struct fb_info *info;
-#endif
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	if (!fb_helper)
 		return;
 
@@ -670,19 +625,7 @@ void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 	cancel_work_sync(&fb_helper->resume_work);
 	cancel_work_sync(&fb_helper->damage_work);
 
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	info = fb_helper->fbdev;
-	if (info) {
-		if (info->cmap.len)
-			fb_dealloc_cmap(&info->cmap);
-		framebuffer_release(info);
-	}
-#endif
-	fb_helper->fbdev = NULL;
-=======
 	drm_fb_helper_release_info(fb_helper);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	mutex_lock(&kernel_fb_helper_lock);
 	if (!list_empty(&fb_helper->kernel_fb_list)) {
@@ -692,25 +635,13 @@ void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 	}
 	mutex_unlock(&kernel_fb_helper_lock);
 
-<<<<<<< HEAD
-	mutex_destroy(&fb_helper->lock);
-	spin_lock_destroy(&fb_helper->dirty_lock);
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	if (!fb_helper->client.funcs)
 		drm_client_release(&fb_helper->client);
 }
 EXPORT_SYMBOL(drm_fb_helper_fini);
 
-<<<<<<< HEAD
-#ifndef __NetBSD__		/* XXX fb dirty */
-
-static bool drm_fbdev_use_shadow_fb(struct drm_fb_helper *fb_helper)
-=======
 static void drm_fb_helper_add_damage_clip(struct drm_fb_helper *helper, u32 x, u32 y,
 					  u32 width, u32 height)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_clip_rect *clip = &helper->damage_clip;
 	unsigned long flags;
@@ -723,11 +654,6 @@ static void drm_fb_helper_add_damage_clip(struct drm_fb_helper *helper, u32 x, u
 	spin_unlock_irqrestore(&helper->damage_lock, flags);
 }
 
-<<<<<<< HEAD
-#endif
-
-#ifndef __NetBSD__		/* XXX fb deferred */
-=======
 static void drm_fb_helper_damage(struct drm_fb_helper *helper, u32 x, u32 y,
 				 u32 width, u32 height)
 {
@@ -794,7 +720,6 @@ void drm_fb_helper_damage_area(struct fb_info *info, u32 x, u32 y, u32 width, u3
 	drm_fb_helper_damage(fb_helper, x, y, width, height);
 }
 EXPORT_SYMBOL(drm_fb_helper_damage_area);
->>>>>>> vendor/linux-drm-v6.6.35
 
 /**
  * drm_fb_helper_deferred_io() - fbdev deferred_io callback function
@@ -841,150 +766,6 @@ void drm_fb_helper_deferred_io(struct fb_info *info, struct list_head *pagerefli
 EXPORT_SYMBOL(drm_fb_helper_deferred_io);
 
 /**
-<<<<<<< HEAD
- * drm_fb_helper_sys_read - wrapper around fb_sys_read
- * @info: fb_info struct pointer
- * @buf: userspace buffer to read from framebuffer memory
- * @count: number of bytes to read from framebuffer memory
- * @ppos: read offset within framebuffer memory
- *
- * A wrapper around fb_sys_read implemented by fbdev core
- */
-ssize_t drm_fb_helper_sys_read(struct fb_info *info, char __user *buf,
-			       size_t count, loff_t *ppos)
-{
-	return fb_sys_read(info, buf, count, ppos);
-}
-EXPORT_SYMBOL(drm_fb_helper_sys_read);
-
-/**
- * drm_fb_helper_sys_write - wrapper around fb_sys_write
- * @info: fb_info struct pointer
- * @buf: userspace buffer to write to framebuffer memory
- * @count: number of bytes to write to framebuffer memory
- * @ppos: write offset within framebuffer memory
- *
- * A wrapper around fb_sys_write implemented by fbdev core
- */
-ssize_t drm_fb_helper_sys_write(struct fb_info *info, const char __user *buf,
-				size_t count, loff_t *ppos)
-{
-	ssize_t ret;
-
-	ret = fb_sys_write(info, buf, count, ppos);
-	if (ret > 0)
-		drm_fb_helper_dirty(info, 0, 0, info->var.xres,
-				    info->var.yres);
-
-	return ret;
-}
-EXPORT_SYMBOL(drm_fb_helper_sys_write);
-
-/**
- * drm_fb_helper_sys_fillrect - wrapper around sys_fillrect
- * @info: fbdev registered by the helper
- * @rect: info about rectangle to fill
- *
- * A wrapper around sys_fillrect implemented by fbdev core
- */
-void drm_fb_helper_sys_fillrect(struct fb_info *info,
-				const struct fb_fillrect *rect)
-{
-	sys_fillrect(info, rect);
-	drm_fb_helper_dirty(info, rect->dx, rect->dy,
-			    rect->width, rect->height);
-}
-EXPORT_SYMBOL(drm_fb_helper_sys_fillrect);
-
-/**
- * drm_fb_helper_sys_copyarea - wrapper around sys_copyarea
- * @info: fbdev registered by the helper
- * @area: info about area to copy
- *
- * A wrapper around sys_copyarea implemented by fbdev core
- */
-void drm_fb_helper_sys_copyarea(struct fb_info *info,
-				const struct fb_copyarea *area)
-{
-	sys_copyarea(info, area);
-	drm_fb_helper_dirty(info, area->dx, area->dy,
-			    area->width, area->height);
-}
-EXPORT_SYMBOL(drm_fb_helper_sys_copyarea);
-
-/**
- * drm_fb_helper_sys_imageblit - wrapper around sys_imageblit
- * @info: fbdev registered by the helper
- * @image: info about image to blit
- *
- * A wrapper around sys_imageblit implemented by fbdev core
- */
-void drm_fb_helper_sys_imageblit(struct fb_info *info,
-				 const struct fb_image *image)
-{
-	sys_imageblit(info, image);
-	drm_fb_helper_dirty(info, image->dx, image->dy,
-			    image->width, image->height);
-}
-EXPORT_SYMBOL(drm_fb_helper_sys_imageblit);
-
-/**
- * drm_fb_helper_cfb_fillrect - wrapper around cfb_fillrect
- * @info: fbdev registered by the helper
- * @rect: info about rectangle to fill
- *
- * A wrapper around cfb_fillrect implemented by fbdev core
- */
-void drm_fb_helper_cfb_fillrect(struct fb_info *info,
-				const struct fb_fillrect *rect)
-{
-	cfb_fillrect(info, rect);
-	drm_fb_helper_dirty(info, rect->dx, rect->dy,
-			    rect->width, rect->height);
-}
-EXPORT_SYMBOL(drm_fb_helper_cfb_fillrect);
-
-/**
- * drm_fb_helper_cfb_copyarea - wrapper around cfb_copyarea
- * @info: fbdev registered by the helper
- * @area: info about area to copy
- *
- * A wrapper around cfb_copyarea implemented by fbdev core
- */
-void drm_fb_helper_cfb_copyarea(struct fb_info *info,
-				const struct fb_copyarea *area)
-{
-	cfb_copyarea(info, area);
-	drm_fb_helper_dirty(info, area->dx, area->dy,
-			    area->width, area->height);
-}
-EXPORT_SYMBOL(drm_fb_helper_cfb_copyarea);
-
-/**
- * drm_fb_helper_cfb_imageblit - wrapper around cfb_imageblit
- * @info: fbdev registered by the helper
- * @image: info about image to blit
- *
- * A wrapper around cfb_imageblit implemented by fbdev core
- */
-void drm_fb_helper_cfb_imageblit(struct fb_info *info,
-				 const struct fb_image *image)
-{
-	cfb_imageblit(info, image);
-	drm_fb_helper_dirty(info, image->dx, image->dy,
-			    image->width, image->height);
-}
-EXPORT_SYMBOL(drm_fb_helper_cfb_imageblit);
-#endif	/* __NetBSD__ */
-
-#ifdef __NetBSD__		/* XXX fb info */
-void drm_fb_helper_set_suspend(struct drm_fb_helper *fb_helper, bool suspend)
-{
-}
-#else
-/**
-=======
->>>>>>> vendor/linux-drm-v6.6.35
  * drm_fb_helper_set_suspend - wrapper around fb_set_suspend
  * @fb_helper: driver-allocated fbdev helper, can be NULL
  * @suspend: whether to suspend or resume
@@ -995,11 +776,12 @@ void drm_fb_helper_set_suspend(struct drm_fb_helper *fb_helper, bool suspend)
  */
 void drm_fb_helper_set_suspend(struct drm_fb_helper *fb_helper, bool suspend)
 {
+#ifndef __NetBSD__		/* XXX fb info */
 	if (fb_helper && fb_helper->info)
 		fb_set_suspend(fb_helper->info, suspend);
+#endif
 }
 EXPORT_SYMBOL(drm_fb_helper_set_suspend);
-#endif
 
 /**
  * drm_fb_helper_set_suspend_unlocked - wrapper around fb_set_suspend that also
@@ -1692,16 +1474,6 @@ unlock:
 }
 EXPORT_SYMBOL(drm_fb_helper_pan_display);
 
-<<<<<<< HEAD
-#endif
-
-/*
- * Allocates the backing storage and sets up the fbdev info structure through
- * the ->fb_probe callback.
- */
-static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
-					 int preferred_bpp)
-=======
 static uint32_t drm_fb_helper_find_format(struct drm_fb_helper *fb_helper, const uint32_t *formats,
 					  size_t format_count, uint32_t bpp, uint32_t depth)
 {
@@ -1766,7 +1538,6 @@ static uint32_t drm_fb_helper_find_color_mode_format(struct drm_fb_helper *fb_he
 
 static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 				      struct drm_fb_helper_surface_size *sizes)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_client_dev *client = &fb_helper->client;
 	struct drm_device *dev = fb_helper->dev;
@@ -2042,12 +1813,8 @@ static void drm_setup_crtcs_fb(struct drm_fb_helper *fb_helper)
 	struct drm_client_dev *client = &fb_helper->client;
 #ifndef __NetBSD__		/* XXX fb info */
 	struct drm_connector_list_iter conn_iter;
-<<<<<<< HEAD
-	struct fb_info *info = fb_helper->fbdev;
-=======
 	struct fb_info *info = fb_helper->info;
 	unsigned int rotation, sw_rotations = 0;
->>>>>>> vendor/linux-drm-v6.6.35
 	struct drm_connector *connector;
 #endif
 	unsigned int rotation, sw_rotations = 0;
@@ -2134,12 +1901,8 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper)
 
 	fb_helper->deferred_setup = false;
 
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX fb info */
-	info = fb_helper->fbdev;
-=======
 	info = fb_helper->info;
->>>>>>> vendor/linux-drm-v6.6.35
 	info->var.pixclock = 0;
 
 	if (!drm_leak_fbdev_smem)
@@ -2272,15 +2035,11 @@ int drm_fb_helper_hotplug_event(struct drm_fb_helper *fb_helper)
 	drm_setup_crtcs_fb(fb_helper);
 	mutex_unlock(&fb_helper->lock);
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	drm_fb_helper_restore_fbdev_mode_unlocked(fb_helper);
 #else
-	drm_fb_helper_set_par(fb_helper->fbdev);
-#endif
-=======
 	drm_fb_helper_set_par(fb_helper->info);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	return 0;
 }
@@ -2313,339 +2072,3 @@ void drm_fb_helper_output_poll_changed(struct drm_device *dev)
 	drm_fb_helper_hotplug_event(dev->fb_helper);
 }
 EXPORT_SYMBOL(drm_fb_helper_output_poll_changed);
-<<<<<<< HEAD
-
-#ifndef __NetBSD__		/* XXX fb info */
-
-/* @user: 1=userspace, 0=fbcon */
-static int drm_fbdev_fb_open(struct fb_info *info, int user)
-{
-	struct drm_fb_helper *fb_helper = info->par;
-
-	/* No need to take a ref for fbcon because it unbinds on unregister */
-	if (user && !try_module_get(fb_helper->dev->driver->fops->owner))
-		return -ENODEV;
-
-	return 0;
-}
-
-static int drm_fbdev_fb_release(struct fb_info *info, int user)
-{
-	struct drm_fb_helper *fb_helper = info->par;
-
-	if (user)
-		module_put(fb_helper->dev->driver->fops->owner);
-
-	return 0;
-}
-
-#endif	/* __NetBSD__ */
-
-static void drm_fbdev_cleanup(struct drm_fb_helper *fb_helper)
-{
-#ifndef __NetBSD__		/* XXX fb info */
-	struct fb_info *fbi = fb_helper->fbdev;
-#endif
-	void *shadow = NULL;
-
-	if (!fb_helper->dev)
-		return;
-
-#ifndef __NetBSD__		/* XXX fb info */
-	if (fbi && fbi->fbdefio) {
-		fb_deferred_io_cleanup(fbi);
-		shadow = fbi->screen_buffer;
-	}
-#endif
-
-	drm_fb_helper_fini(fb_helper);
-
-	vfree(shadow);
-
-	drm_client_framebuffer_delete(fb_helper->buffer);
-}
-
-static void drm_fbdev_release(struct drm_fb_helper *fb_helper)
-{
-	drm_fbdev_cleanup(fb_helper);
-	drm_client_release(&fb_helper->client);
-	kfree(fb_helper);
-}
-
-
-#ifndef __NetBSD__		/* XXX fb info */
-/*
- * fb_ops.fb_destroy is called by the last put_fb_info() call at the end of
- * unregister_framebuffer() or fb_release().
- */
-static void drm_fbdev_fb_destroy(struct fb_info *info)
-{
-	drm_fbdev_release(info->par);
-}
-
-static int drm_fbdev_fb_mmap(struct fb_info *info, struct vm_area_struct *vma)
-{
-	struct drm_fb_helper *fb_helper = info->par;
-
-	if (fb_helper->dev->driver->gem_prime_mmap)
-		return fb_helper->dev->driver->gem_prime_mmap(fb_helper->buffer->gem, vma);
-	else
-		return -ENODEV;
-}
-
-static const struct fb_ops drm_fbdev_fb_ops = {
-	.owner		= THIS_MODULE,
-	DRM_FB_HELPER_DEFAULT_OPS,
-	.fb_open	= drm_fbdev_fb_open,
-	.fb_release	= drm_fbdev_fb_release,
-	.fb_destroy	= drm_fbdev_fb_destroy,
-	.fb_mmap	= drm_fbdev_fb_mmap,
-	.fb_read	= drm_fb_helper_sys_read,
-	.fb_write	= drm_fb_helper_sys_write,
-	.fb_fillrect	= drm_fb_helper_sys_fillrect,
-	.fb_copyarea	= drm_fb_helper_sys_copyarea,
-	.fb_imageblit	= drm_fb_helper_sys_imageblit,
-};
-
-static struct fb_deferred_io drm_fbdev_defio = {
-	.delay		= HZ / 20,
-	.deferred_io	= drm_fb_helper_deferred_io,
-};
-
-#endif	/* __NetBSD__ */
-/*
- * This function uses the client API to create a framebuffer backed by a dumb buffer.
- *
- * The _sys_ versions are used for &fb_ops.fb_read, fb_write, fb_fillrect,
- * fb_copyarea, fb_imageblit.
- */
-static int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
-				       struct drm_fb_helper_surface_size *sizes)
-{
-	struct drm_client_dev *client = &fb_helper->client;
-	struct drm_device *dev = fb_helper->dev;
-	struct drm_client_buffer *buffer;
-	struct drm_framebuffer *fb;
-#ifndef __NetBSD__		/* XXX fb info */
-	struct fb_info *fbi;
-#endif
-	u32 format;
-	void *vaddr;
-
-	drm_dbg_kms(dev, "surface width(%d), height(%d) and bpp(%d)\n",
-		    sizes->surface_width, sizes->surface_height,
-		    sizes->surface_bpp);
-
-	format = drm_mode_legacy_fb_format(sizes->surface_bpp, sizes->surface_depth);
-	buffer = drm_client_framebuffer_create(client, sizes->surface_width,
-					       sizes->surface_height, format);
-	if (IS_ERR(buffer))
-		return PTR_ERR(buffer);
-
-	fb_helper->buffer = buffer;
-	fb_helper->fb = buffer->fb;
-	fb = buffer->fb;
-
-#ifdef __NetBSD__		/* XXX fb info */
-	__USE(fb);
-	__USE(vaddr);
-#else
-	fbi = drm_fb_helper_alloc_fbi(fb_helper);
-	if (IS_ERR(fbi))
-		return PTR_ERR(fbi);
-
-	fbi->fbops = &drm_fbdev_fb_ops;
-	fbi->screen_size = fb->height * fb->pitches[0];
-	fbi->fix.smem_len = fbi->screen_size;
-
-	drm_fb_helper_fill_info(fbi, fb_helper, sizes);
-
-	if (drm_fbdev_use_shadow_fb(fb_helper)) {
-		fbi->screen_buffer = vzalloc(fbi->screen_size);
-		if (!fbi->screen_buffer)
-			return -ENOMEM;
-
-		fbi->fbdefio = &drm_fbdev_defio;
-
-		fb_deferred_io_init(fbi);
-	} else {
-		/* buffer is mapped for HW framebuffer */
-		vaddr = drm_client_buffer_vmap(fb_helper->buffer);
-		if (IS_ERR(vaddr))
-			return PTR_ERR(vaddr);
-
-		fbi->screen_buffer = vaddr;
-		/* Shamelessly leak the physical address to user-space */
-#if IS_ENABLED(CONFIG_DRM_FBDEV_LEAK_PHYS_SMEM)
-		if (drm_leak_fbdev_smem && fbi->fix.smem_start == 0)
-			fbi->fix.smem_start =
-				page_to_phys(virt_to_page(fbi->screen_buffer));
-#endif
-	}
-#endif	/* __NetBSD__ */
-
-	return 0;
-}
-
-static const struct drm_fb_helper_funcs drm_fb_helper_generic_funcs = {
-	.fb_probe = drm_fb_helper_generic_probe,
-};
-
-static void drm_fbdev_client_unregister(struct drm_client_dev *client)
-{
-	struct drm_fb_helper *fb_helper = drm_fb_helper_from_client(client);
-
-#ifndef __NetBSD__		/* XXX fb info */
-	if (fb_helper->fbdev)
-		/* drm_fbdev_fb_destroy() takes care of cleanup */
-		drm_fb_helper_unregister_fbi(fb_helper);
-	else
-#endif
-		drm_fbdev_release(fb_helper);
-}
-
-static int drm_fbdev_client_restore(struct drm_client_dev *client)
-{
-	drm_fb_helper_lastclose(client->dev);
-
-	return 0;
-}
-
-static int drm_fbdev_client_hotplug(struct drm_client_dev *client)
-{
-	struct drm_fb_helper *fb_helper = drm_fb_helper_from_client(client);
-	struct drm_device *dev = client->dev;
-	int ret;
-
-	/* Setup is not retried if it has failed */
-	if (!fb_helper->dev && fb_helper->funcs)
-		return 0;
-
-	if (dev->fb_helper)
-		return drm_fb_helper_hotplug_event(dev->fb_helper);
-
-	if (!dev->mode_config.num_connector) {
-		drm_dbg_kms(dev, "No connectors found, will not create framebuffer!\n");
-		return 0;
-	}
-
-	drm_fb_helper_prepare(dev, fb_helper, &drm_fb_helper_generic_funcs);
-
-	ret = drm_fb_helper_init(dev, fb_helper, 0);
-	if (ret)
-		goto err;
-
-	if (!drm_drv_uses_atomic_modeset(dev))
-		drm_helper_disable_unused_functions(dev);
-
-	ret = drm_fb_helper_initial_config(fb_helper, fb_helper->preferred_bpp);
-	if (ret)
-		goto err_cleanup;
-
-	return 0;
-
-err_cleanup:
-	drm_fbdev_cleanup(fb_helper);
-err:
-	fb_helper->dev = NULL;
-	fb_helper->fbdev = NULL;
-
-	drm_err(dev, "fbdev: Failed to setup generic emulation (ret=%d)\n", ret);
-
-	return ret;
-}
-
-static const struct drm_client_funcs drm_fbdev_client_funcs = {
-	.owner		= THIS_MODULE,
-	.unregister	= drm_fbdev_client_unregister,
-	.restore	= drm_fbdev_client_restore,
-	.hotplug	= drm_fbdev_client_hotplug,
-};
-
-/**
- * drm_fbdev_generic_setup() - Setup generic fbdev emulation
- * @dev: DRM device
- * @preferred_bpp: Preferred bits per pixel for the device.
- *                 @dev->mode_config.preferred_depth is used if this is zero.
- *
- * This function sets up generic fbdev emulation for drivers that supports
- * dumb buffers with a virtual address and that can be mmap'ed.
- *
- * Restore, hotplug events and teardown are all taken care of. Drivers that do
- * suspend/resume need to call drm_fb_helper_set_suspend_unlocked() themselves.
- * Simple drivers might use drm_mode_config_helper_suspend().
- *
- * Drivers that set the dirty callback on their framebuffer will get a shadow
- * fbdev buffer that is blitted onto the real buffer. This is done in order to
- * make deferred I/O work with all kinds of buffers. A shadow buffer can be
- * requested explicitly by setting struct drm_mode_config.prefer_shadow or
- * struct drm_mode_config.prefer_shadow_fbdev to true beforehand. This is
- * required to use generic fbdev emulation with SHMEM helpers.
- *
- * This function is safe to call even when there are no connectors present.
- * Setup will be retried on the next hotplug event.
- *
- * The fbdev is destroyed by drm_dev_unregister().
- *
- * Returns:
- * Zero on success or negative error code on failure.
- */
-int drm_fbdev_generic_setup(struct drm_device *dev, unsigned int preferred_bpp)
-{
-	struct drm_fb_helper *fb_helper;
-	int ret;
-
-	WARN(dev->fb_helper, "fb_helper is already set!\n");
-
-	if (!drm_fbdev_emulation)
-		return 0;
-
-	fb_helper = kzalloc(sizeof(*fb_helper), GFP_KERNEL);
-	if (!fb_helper)
-		return -ENOMEM;
-
-	ret = drm_client_init(dev, &fb_helper->client, "fbdev", &drm_fbdev_client_funcs);
-	if (ret) {
-		kfree(fb_helper);
-		drm_err(dev, "Failed to register client: %d\n", ret);
-		return ret;
-	}
-
-	if (!preferred_bpp)
-		preferred_bpp = dev->mode_config.preferred_depth;
-	if (!preferred_bpp)
-		preferred_bpp = 32;
-	fb_helper->preferred_bpp = preferred_bpp;
-
-	ret = drm_fbdev_client_hotplug(&fb_helper->client);
-	if (ret)
-		drm_dbg_kms(dev, "client hotplug ret=%d\n", ret);
-
-	drm_client_register(&fb_helper->client);
-
-	return 0;
-}
-EXPORT_SYMBOL(drm_fbdev_generic_setup);
-
-/* The Kconfig DRM_KMS_HELPER selects FRAMEBUFFER_CONSOLE (if !EXPERT)
- * but the module doesn't depend on any fb console symbols.  At least
- * attempt to load fbcon to avoid leaving the system without a usable console.
- */
-int __init drm_fb_helper_modinit(void)
-{
-#if defined(CONFIG_FRAMEBUFFER_CONSOLE_MODULE) && !defined(CONFIG_EXPERT)
-	const char name[] = "fbcon";
-	struct module *fbcon;
-
-	mutex_lock(&module_mutex);
-	fbcon = find_module(name);
-	mutex_unlock(&module_mutex);
-
-	if (!fbcon)
-		request_module_nowait(name);
-#endif
-	return 0;
-}
-EXPORT_SYMBOL(drm_fb_helper_modinit);
-=======
->>>>>>> vendor/linux-drm-v6.6.35

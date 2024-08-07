@@ -32,27 +32,16 @@
 #ifndef DRM_FB_HELPER_H
 #define DRM_FB_HELPER_H
 
-<<<<<<< HEAD
-struct apertures_struct;
-=======
-struct drm_clip_rect;
->>>>>>> vendor/linux-drm-v6.6.35
-struct drm_fb_helper;
-
-#include <linux/fb.h>
-
-<<<<<<< HEAD
 #ifdef __NetBSD__
 #include <sys/device_if.h>
 #endif
 
-enum mode_set_atomic {
-	LEAVE_ATOMIC_MODE_SET,
-	ENTER_ATOMIC_MODE_SET,
-};
-=======
+struct drm_clip_rect;
+struct drm_fb_helper;
+
+#include <linux/fb.h>
+
 #include <drm/drm_client.h>
->>>>>>> vendor/linux-drm-v6.6.35
 
 /**
  * struct drm_fb_helper_surface_size - describes fbdev size and scanout surface size
@@ -154,15 +143,11 @@ struct drm_fb_helper {
 	struct drm_framebuffer *fb;
 	struct drm_device *dev;
 	const struct drm_fb_helper_funcs *funcs;
-<<<<<<< HEAD
-#ifdef __NetBSD__		/* XXX fb info */
-	device_t fbdev;
+#ifdef __NetBSD__
+	device_t child;
 #else
-	struct fb_info *fbdev;
-#endif
-=======
 	struct fb_info *info;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	u32 pseudo_palette[17];
 	struct drm_clip_rect damage_clip;
 	spinlock_t damage_lock;
@@ -273,17 +258,12 @@ int drm_fb_helper_check_var(struct fb_var_screeninfo *var,
 
 int drm_fb_helper_restore_fbdev_mode_unlocked(struct drm_fb_helper *fb_helper);
 
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX fb info */
-struct fb_info *drm_fb_helper_alloc_fbi(struct drm_fb_helper *fb_helper);
-#endif
-void drm_fb_helper_unregister_fbi(struct drm_fb_helper *fb_helper);
-#ifndef __NetBSD__		/* XXX fb info */
-=======
 struct fb_info *drm_fb_helper_alloc_info(struct drm_fb_helper *fb_helper);
+#endif
 void drm_fb_helper_release_info(struct drm_fb_helper *fb_helper);
 void drm_fb_helper_unregister_info(struct drm_fb_helper *fb_helper);
->>>>>>> vendor/linux-drm-v6.6.35
+#ifndef __NetBSD__		/* XXX fb info */
 void drm_fb_helper_fill_info(struct fb_info *info,
 			     struct drm_fb_helper *fb_helper,
 			     struct drm_fb_helper_surface_size *sizes);
@@ -291,29 +271,8 @@ void drm_fb_helper_fill_info(struct fb_info *info,
 void drm_fb_helper_damage_range(struct fb_info *info, off_t off, size_t len);
 void drm_fb_helper_damage_area(struct fb_info *info, u32 x, u32 y, u32 width, u32 height);
 
-<<<<<<< HEAD
-ssize_t drm_fb_helper_sys_read(struct fb_info *info, char __user *buf,
-			       size_t count, loff_t *ppos);
-ssize_t drm_fb_helper_sys_write(struct fb_info *info, const char __user *buf,
-				size_t count, loff_t *ppos);
-
-void drm_fb_helper_sys_fillrect(struct fb_info *info,
-				const struct fb_fillrect *rect);
-void drm_fb_helper_sys_copyarea(struct fb_info *info,
-				const struct fb_copyarea *area);
-void drm_fb_helper_sys_imageblit(struct fb_info *info,
-				 const struct fb_image *image);
-
-void drm_fb_helper_cfb_fillrect(struct fb_info *info,
-				const struct fb_fillrect *rect);
-void drm_fb_helper_cfb_copyarea(struct fb_info *info,
-				const struct fb_copyarea *area);
-void drm_fb_helper_cfb_imageblit(struct fb_info *info,
-				 const struct fb_image *image);
-#endif
-=======
 void drm_fb_helper_deferred_io(struct fb_info *info, struct list_head *pagereflist);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 void drm_fb_helper_set_suspend(struct drm_fb_helper *fb_helper, bool suspend);
 void drm_fb_helper_set_suspend_unlocked(struct drm_fb_helper *fb_helper,
@@ -327,15 +286,9 @@ int drm_fb_helper_ioctl(struct fb_info *info, unsigned int cmd,
 #endif
 
 int drm_fb_helper_hotplug_event(struct drm_fb_helper *fb_helper);
-<<<<<<< HEAD
-int drm_fb_helper_initial_config(struct drm_fb_helper *fb_helper, int bpp_sel);
+int drm_fb_helper_initial_config(struct drm_fb_helper *fb_helper);
 int drm_fb_helper_debug_enter_fb(struct drm_fb_helper *);
 int drm_fb_helper_debug_leave_fb(struct drm_fb_helper *);
-=======
-int drm_fb_helper_initial_config(struct drm_fb_helper *fb_helper);
-int drm_fb_helper_debug_enter(struct fb_info *info);
-int drm_fb_helper_debug_leave(struct fb_info *info);
->>>>>>> vendor/linux-drm-v6.6.35
 
 void drm_fb_helper_lastclose(struct drm_device *dev);
 void drm_fb_helper_output_poll_changed(struct drm_device *dev);
