@@ -229,25 +229,15 @@ static int framebuffer_check(struct drm_device *dev,
 		}
 
 		if (r->modifier[i] && !(r->flags & DRM_MODE_FB_MODIFIERS)) {
-<<<<<<< HEAD
-			DRM_DEBUG_KMS("bad fb modifier %"PRIu64" for plane %d\n",
-				      r->modifier[i], i);
-=======
-			drm_dbg_kms(dev, "bad fb modifier %llu for plane %d\n",
+			drm_dbg_kms(dev, "bad fb modifier %"PRIu64" for plane %d\n",
 				    r->modifier[i], i);
->>>>>>> vendor/linux-drm-v6.6.35
 			return -EINVAL;
 		}
 
 		if (r->flags & DRM_MODE_FB_MODIFIERS &&
 		    r->modifier[i] != r->modifier[0]) {
-<<<<<<< HEAD
-			DRM_DEBUG_KMS("bad fb modifier %"PRIu64" for plane %d\n",
-				      r->modifier[i], i);
-=======
-			drm_dbg_kms(dev, "bad fb modifier %llu for plane %d\n",
+			drm_dbg_kms(dev, "bad fb modifier %"PRIu64" for plane %d\n",
 				    r->modifier[i], i);
->>>>>>> vendor/linux-drm-v6.6.35
 			return -EINVAL;
 		}
 
@@ -1202,14 +1192,8 @@ void drm_framebuffer_print_info(struct drm_printer *p, unsigned int indent,
 	drm_printf_indent(p, indent, "allocated by = %s\n", fb->comm);
 	drm_printf_indent(p, indent, "refcount=%u\n",
 			  drm_framebuffer_read_refcount(fb));
-<<<<<<< HEAD
-	drm_printf_indent(p, indent, "format=%s\n",
-			  drm_get_format_name(fb->format->format, &format_name));
-	drm_printf_indent(p, indent, "modifier=0x%"PRIx64"\n", fb->modifier);
-=======
 	drm_printf_indent(p, indent, "format=%p4cc\n", &fb->format->format);
-	drm_printf_indent(p, indent, "modifier=0x%llx\n", fb->modifier);
->>>>>>> vendor/linux-drm-v6.6.35
+	drm_printf_indent(p, indent, "modifier=0x%"PRIx64"\n", fb->modifier);
 	drm_printf_indent(p, indent, "size=%ux%u\n", fb->width, fb->height);
 	drm_printf_indent(p, indent, "layers:\n");
 
