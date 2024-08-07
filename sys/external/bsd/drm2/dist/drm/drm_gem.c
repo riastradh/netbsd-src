@@ -94,6 +94,9 @@ static void
 drm_gem_init_release(struct drm_device *dev, void *ptr)
 {
 	drm_vma_offset_manager_destroy(dev->vma_offset_manager);
+
+	idr_destroy(&dev->object_name_idr);
+	mutex_destroy(&dev->object_name_lock);
 }
 
 /**
@@ -120,23 +123,7 @@ drm_gem_init(struct drm_device *dev)
 				    DRM_FILE_PAGE_OFFSET_START,
 				    DRM_FILE_PAGE_OFFSET_SIZE);
 
-<<<<<<< HEAD
-	return 0;
-}
-
-void
-drm_gem_destroy(struct drm_device *dev)
-{
-
-	drm_vma_offset_manager_destroy(dev->vma_offset_manager);
-	kfree(dev->vma_offset_manager);
-	dev->vma_offset_manager = NULL;
-
-	idr_destroy(&dev->object_name_idr);
-	mutex_destroy(&dev->object_name_lock);
-=======
 	return drmm_add_action(dev, drm_gem_init_release, NULL);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**
@@ -215,19 +202,15 @@ void drm_gem_private_object_init(struct drm_device *dev,
 	if (!obj->resv)
 		obj->resv = &obj->_resv;
 
-<<<<<<< HEAD
+	if (drm_core_check_feature(dev, DRIVER_GEM_GPUVA))
+		drm_gem_gpuva_init(obj);
+
 #ifdef __NetBSD__
 	drm_vma_node_init(&obj->vma_node);
 #else
 	drm_vma_node_reset(&obj->vma_node);
 #endif
-=======
-	if (drm_core_check_feature(dev, DRIVER_GEM_GPUVA))
-		drm_gem_gpuva_init(obj);
-
-	drm_vma_node_reset(&obj->vma_node);
 	INIT_LIST_HEAD(&obj->lru_node);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 EXPORT_SYMBOL(drm_gem_private_object_init);
 
@@ -563,12 +546,9 @@ EXPORT_SYMBOL(drm_gem_create_mmap_offset);
  * Move folios to appropriate lru and release the folios, decrementing the
  * ref count of those folios.
  */
-<<<<<<< HEAD
 #ifndef __NetBSD__
-static void drm_gem_check_release_pagevec(struct pagevec *pvec)
-=======
 static void drm_gem_check_release_batch(struct folio_batch *fbatch)
->>>>>>> vendor/linux-drm-v6.6.35
+static void drm_gem_check_release_pagevec(struct pagevec *pvec)
 {
 	check_move_unevictable_folios(fbatch);
 	__folio_batch_release(fbatch);
@@ -986,12 +966,8 @@ drm_gem_flink_ioctl(struct drm_device *dev, void *data,
 
 err:
 	mutex_unlock(&dev->object_name_lock);
-<<<<<<< HEAD
 	idr_preload_end();
-	drm_gem_object_put_unlocked(obj);
-=======
 	drm_gem_object_put(obj);
->>>>>>> vendor/linux-drm-v6.6.35
 	return ret;
 }
 
@@ -1085,18 +1061,11 @@ drm_gem_release(struct drm_device *dev, struct drm_file *file_private)
 void
 drm_gem_object_release(struct drm_gem_object *obj)
 {
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	WARN_ON(obj->dma_buf);
-#endif
-
 #ifdef __NetBSD__
 	if (obj->filp)
 		uao_detach(obj->filp);
 	uvm_obj_destroy(&obj->gemo_uvmobj, /*free lock*/true);
 #else
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	if (obj->filp)
 		fput(obj->filp);
 #endif
@@ -1104,13 +1073,10 @@ drm_gem_object_release(struct drm_gem_object *obj)
 	drm_gem_private_object_fini(obj);
 
 	drm_gem_free_mmap_offset(obj);
-<<<<<<< HEAD
+	drm_gem_lru_remove(obj);
 #ifdef __NetBSD__
 	drm_vma_node_destroy(&obj->vma_node);
 #endif
-=======
-	drm_gem_lru_remove(obj);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 EXPORT_SYMBOL(drm_gem_object_release);
 

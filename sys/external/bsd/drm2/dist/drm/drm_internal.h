@@ -23,12 +23,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-<<<<<<< HEAD
-#include <linux/kernel.h>
-=======
 #include <linux/kthread.h>
 
->>>>>>> vendor/linux-drm-v6.6.35
 #include <drm/drm_ioctl.h>
 #include <drm/drm_vblank.h>
 
@@ -271,15 +267,7 @@ int drm_syncobj_query_ioctl(struct drm_device *dev, void *data,
 /* drm_framebuffer.c */
 void drm_framebuffer_print_info(struct drm_printer *p, unsigned int indent,
 				const struct drm_framebuffer *fb);
-<<<<<<< HEAD
-int drm_framebuffer_debugfs_init(struct drm_minor *minor);
-
-/* drm_hdcp.c */
-int drm_setup_hdcp_srm(struct class *drm_class);
-void drm_teardown_hdcp_srm(struct class *drm_class);
+void drm_framebuffer_debugfs_init(struct drm_minor *minor);
 
 /* drm_fb_helper.c */
 extern struct mutex drm_kernel_fb_helper_lock;
-=======
-void drm_framebuffer_debugfs_init(struct drm_minor *minor);
->>>>>>> vendor/linux-drm-v6.6.35

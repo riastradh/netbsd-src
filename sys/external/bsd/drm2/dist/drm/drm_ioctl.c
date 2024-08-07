@@ -129,35 +129,23 @@ int drm_getunique(struct drm_device *dev, void *data,
 {
 	struct drm_unique *u = data;
 	struct drm_master *master;
-<<<<<<< HEAD
-	int ret;
+	int ret = 0;
 
 	mutex_lock(&dev->master_mutex);
+#ifdef __NetBSD__
+	/*
+	 * NetBSD local change: Allow this for unauthenticated render
+	 * nodes so they can use this vector to get the bus id.
+	 */
 	master = dev->master;
 	if (master == NULL) {
-		ret = -ENXIO;
-		goto out;
+		mutex_unlock(&dev->master_mutex);
+		return -ENXIO;
 	}
-
-	/*
-	 * Copy out only if the user allocated enough space.  Either
-	 * way, on success, report the actual size -- so the user can
-	 * allocate enough space if they didn't before, or so they know
-	 * exactly how much we copied out.
-	 */
-	if (u->unique_len < master->unique_len) {
-		ret = 0;
-	} else {
-		ret = copy_to_user(u->unique, master->unique,
-		    master->unique_len);
-		if (ret)
-			goto out;
-	}
-	u->unique_len = master->unique_len;
-=======
-
-	mutex_lock(&dev->master_mutex);
+#else
 	master = file_priv->master;
+#endif
+
 	if (u->unique_len >= master->unique_len) {
 		if (copy_to_user(u->unique, master->unique, master->unique_len)) {
 			mutex_unlock(&dev->master_mutex);
@@ -166,11 +154,8 @@ int drm_getunique(struct drm_device *dev, void *data,
 	}
 	u->unique_len = master->unique_len;
 	mutex_unlock(&dev->master_mutex);
->>>>>>> vendor/linux-drm-v6.6.35
 
-out:	mutex_unlock(&dev->master_mutex);
-
-	return ret;
+	return 0;
 }
 
 static void
