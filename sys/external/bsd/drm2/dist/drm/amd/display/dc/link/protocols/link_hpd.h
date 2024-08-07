@@ -1,4 +1,4 @@
-/*	$NetBSD: amdgpu_hw_factory_diag.c,v 1.2 2021/12/18 23:45:05 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2022 Advanced Micro Devices, Inc.
@@ -40,22 +40,9 @@ enum hpd_source_id get_hpd_line(struct dc_link *link);
  *  @return
  *     true on success, false otherwise
  */
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/display/dc/gpio/diagnostics/amdgpu_hw_factory_diag.c
-
-#include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: amdgpu_hw_factory_diag.c,v 1.2 2021/12/18 23:45:05 riastradh Exp $");
-
-#include "dm_services.h"
-#include "include/gpio_types.h"
-#include "../hw_factory.h"
-
-/*
- * Header of this unit
-=======
 bool program_hpd_filter(const struct dc_link *link);
 /* Query hot plug status of USB4 DP tunnel.
  * Returns true if HPD high.
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/display/dc/link/protocols/link_hpd.h
  */
 bool dpia_query_hpd_status(struct dc_link *link);
 bool query_hpd_status(struct dc_link *link, uint32_t *is_hpd_high);
