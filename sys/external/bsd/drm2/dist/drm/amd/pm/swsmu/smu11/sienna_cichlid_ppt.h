@@ -31,14 +31,6 @@ typedef enum {
   POWER_SOURCE_COUNT,
 } POWER_SOURCE_e;
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/display/dmub/inc/dmub_types.h
-/* Basic type definitions. */
-#include <asm/byteorder.h>
-#include <linux/types.h>
-#include <linux/string.h>
-#include <linux/delay.h>
-#include <sys/stdarg.h>
-=======
 #define SIENNA_CICHLID_UMD_PSTATE_PROFILING_GFXCLK    1825
 #define SIENNA_CICHLID_UMD_PSTATE_PROFILING_SOCCLK    960
 #define SIENNA_CICHLID_UMD_PSTATE_PROFILING_MEMCLK    1000
@@ -52,6 +44,5 @@ typedef enum {
 #define BEIGE_GOBY_UMD_PSTATE_PROFILING_MEMCLK 1000
 
 extern void sienna_cichlid_set_ppt_funcs(struct smu_context *smu);
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/swsmu/smu11/sienna_cichlid_ppt.h
 
 #endif
