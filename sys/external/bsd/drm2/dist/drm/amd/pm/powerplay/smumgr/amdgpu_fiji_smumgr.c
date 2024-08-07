@@ -1605,10 +1605,6 @@ static int fiji_populate_smc_uvd_level(struct pp_hwmgr *hwmgr,
 static int fiji_populate_smc_boot_level(struct pp_hwmgr *hwmgr,
 		struct SMU73_Discrete_DpmTable *table)
 {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/smumgr/amdgpu_fiji_smumgr.c
-	int result __unused = 0;
-=======
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/smumgr/amdgpu_fiji_smumgr.c
 	struct smu7_hwmgr *data = (struct smu7_hwmgr *)(hwmgr->backend);
 
 	table->GraphicsBootLevel = 0;
