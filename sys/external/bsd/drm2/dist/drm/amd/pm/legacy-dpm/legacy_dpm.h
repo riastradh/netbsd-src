@@ -25,25 +25,13 @@
 #ifndef __LEGACY_DPM_H__
 #define __LEGACY_DPM_H__
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_pm.h
-#ifndef __AMDGPU_PM_H__
-#define __AMDGPU_PM_H__
+#include <linux/types.h>
 
 struct amdgpu_device;
+struct amdgpu_vce_state;
+struct amdgpu_ps;
+struct work_struct;
 
-#include <sys/stdbool.h>
-struct cg_flag_name
-{
-	u32 flag;
-	const char *name;
-};
-
-void amdgpu_pm_acpi_event_handler(struct amdgpu_device *adev);
-int amdgpu_pm_sysfs_init(struct amdgpu_device *adev);
-int amdgpu_pm_virt_sysfs_init(struct amdgpu_device *adev);
-void amdgpu_pm_sysfs_fini(struct amdgpu_device *adev);
-void amdgpu_pm_virt_sysfs_fini(struct amdgpu_device *adev);
-=======
 void amdgpu_dpm_print_class_info(u32 class, u32 class2);
 void amdgpu_dpm_print_cap_info(u32 caps);
 void amdgpu_dpm_print_ps_status(struct amdgpu_device *adev,
@@ -53,7 +41,6 @@ int amdgpu_parse_extended_power_table(struct amdgpu_device *adev);
 void amdgpu_free_extended_power_table(struct amdgpu_device *adev);
 void amdgpu_add_thermal_controller(struct amdgpu_device *adev);
 struct amd_vce_state* amdgpu_get_vce_clock_state(void *handle, u32 idx);
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/legacy-dpm/legacy_dpm.h
 void amdgpu_pm_print_power_states(struct amdgpu_device *adev);
 void amdgpu_legacy_dpm_compute_clocks(void *handle);
 void amdgpu_dpm_thermal_work_handler(struct work_struct *work);
