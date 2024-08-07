@@ -783,12 +783,7 @@ static int drm_dp_sideband_msg_set_header(struct drm_dp_sideband_msg_rx *msg,
 static bool drm_dp_sideband_append_payload(struct drm_dp_sideband_msg_rx *msg,
 					   u8 *replybuf, u8 replybuflen)
 {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int ret;
-	u8 crc4 __unused;	/* XXX Mistake?  */
-=======
 	u8 crc4;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 
 	memcpy(&msg->chunk[msg->curchunk_idx], replybuf, replybuflen);
 	msg->curchunk_idx += replybuflen;
@@ -1271,11 +1266,7 @@ static int drm_dp_mst_wait_tx_reply(struct drm_dp_mst_branch *mstb,
 	unsigned long wait_expires = jiffies + wait_timeout;
 	int ret;
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	mutex_lock(&mstb->mgr->qlock);
-	DRM_TIMED_WAIT_UNTIL(ret, &mgr->tx_waitq, &mstb->mgr->qlock, 4*HZ,
-	    check_txmsg_state(mgr, txmsg));
-=======
+	mutex_lock(&mgr->qlock);
 	for (;;) {
 		/*
 		 * If the driver provides a way for this, change to
@@ -1290,11 +1281,11 @@ static int drm_dp_mst_wait_tx_reply(struct drm_dp_mst_branch *mstb,
 		 * after the sink has cleared it (after a 110msec timeout
 		 * since it raised the interrupt).
 		 */
-		ret = wait_event_timeout(mgr->tx_waitq,
-					 check_txmsg_state(mgr, txmsg),
-					 mgr->cbs->poll_hpd_irq ?
-						msecs_to_jiffies(50) :
-						wait_timeout);
+		DRM_TIMED_WAIT_UNTIL(ret, &mgr->tx_waitq, &mgr->qlock,
+		    (mgr->cbs->poll_hpd_irq ?
+			msecs_to_jiffies(50) :
+			wait_timeout),
+		    check_txmsg_state(mgr, txmsg));
 
 		if (ret || !mgr->cbs->poll_hpd_irq ||
 		    time_after(jiffies, wait_expires))
@@ -1303,8 +1294,6 @@ static int drm_dp_mst_wait_tx_reply(struct drm_dp_mst_branch *mstb,
 		mgr->cbs->poll_hpd_irq(mgr);
 	}
 
-	mutex_lock(&mgr->qlock);
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 	if (ret > 0) {
 		if (txmsg->state == DRM_DP_SIDEBAND_TX_TIMEOUT) {
 			ret = -EIO;
@@ -2193,11 +2182,7 @@ ssize_t drm_dp_mst_dpcd_write(struct drm_dp_aux *aux,
 
 static int drm_dp_check_mstb_guid(struct drm_dp_mst_branch *mstb, u8 *guid)
 {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int ret __unused;
-=======
 	int ret = 0;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 
 	memcpy(mstb->guid, guid, 16);
 
@@ -2252,13 +2237,8 @@ static void build_mst_prop_path(const struct drm_dp_mst_branch *mstb,
 int drm_dp_mst_connector_late_register(struct drm_connector *connector,
 				       struct drm_dp_mst_port *port)
 {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	DRM_DEBUG_KMS("registering %s remote bus for %s\n",
-		      port->aux.name, device_xname(connector->dev->dev));
-=======
 	drm_dbg_kms(port->mgr->dev, "registering %s remote bus for %s\n",
-		    port->aux.name, connector->kdev->kobj.name);
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
+		    port->aux.name, device_xname(connector->dev->dev));
 
 	port->aux.dev = connector->kdev;
 	return drm_dp_aux_register_devnode(&port->aux);
@@ -2277,13 +2257,8 @@ EXPORT_SYMBOL(drm_dp_mst_connector_late_register);
 void drm_dp_mst_connector_early_unregister(struct drm_connector *connector,
 					   struct drm_dp_mst_port *port)
 {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	DRM_DEBUG_KMS("unregistering %s remote bus for %s\n",
-		      port->aux.name, device_xname(connector->dev->dev));
-=======
 	drm_dbg_kms(port->mgr->dev, "unregistering %s remote bus for %s\n",
-		    port->aux.name, connector->kdev->kobj.name);
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
+		    port->aux.name, device_xname(connector->dev->dev));
 	drm_dp_aux_unregister_devnode(&port->aux);
 }
 EXPORT_SYMBOL(drm_dp_mst_connector_early_unregister);
@@ -2942,11 +2917,7 @@ static int drm_dp_send_link_address(struct drm_dp_mst_topology_mgr *mgr,
 	struct drm_dp_sideband_msg_tx *txmsg;
 	struct drm_dp_link_address_ack_reply *reply;
 	struct drm_dp_mst_port *port, *tmp;
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int i, len __unused, ret, port_mask = 0;
-=======
 	int i, ret, port_mask = 0;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 	bool changed = false;
 
 	txmsg = kzalloc(sizeof(*txmsg), GFP_KERNEL);
@@ -3024,11 +2995,7 @@ drm_dp_send_clear_payload_id_table(struct drm_dp_mst_topology_mgr *mgr,
 				   struct drm_dp_mst_branch *mstb)
 {
 	struct drm_dp_sideband_msg_tx *txmsg;
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int len __unused, ret;
-=======
 	int ret;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 
 	txmsg = kzalloc(sizeof(*txmsg), GFP_KERNEL);
 	if (!txmsg)
@@ -3053,10 +3020,6 @@ drm_dp_send_enum_path_resources(struct drm_dp_mst_topology_mgr *mgr,
 {
 	struct drm_dp_enum_path_resources_ack_reply *path_res;
 	struct drm_dp_sideband_msg_tx *txmsg;
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int len __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 	int ret;
 
 	txmsg = kzalloc(sizeof(*txmsg), GFP_KERNEL);
@@ -3157,11 +3120,7 @@ static int drm_dp_payload_send_msg(struct drm_dp_mst_topology_mgr *mgr,
 {
 	struct drm_dp_sideband_msg_tx *txmsg;
 	struct drm_dp_mst_branch *mstb;
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int len __unused, ret, port_num;
-=======
 	int ret, port_num;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 	u8 sinks[DRM_DP_MAX_SDP_STREAMS];
 	int i;
 
@@ -3217,11 +3176,7 @@ int drm_dp_send_power_updown_phy(struct drm_dp_mst_topology_mgr *mgr,
 				 struct drm_dp_mst_port *port, bool power_up)
 {
 	struct drm_dp_sideband_msg_tx *txmsg;
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int len __unused, ret;
-=======
 	int ret;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 
 	port = drm_dp_mst_topology_get_port_validated(mgr, port);
 	if (!port)
@@ -3481,10 +3436,6 @@ static int drm_dp_send_dpcd_read(struct drm_dp_mst_topology_mgr *mgr,
 				 struct drm_dp_mst_port *port,
 				 int offset, int size, u8 *bytes)
 {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int len __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 	int ret = 0;
 	struct drm_dp_sideband_msg_tx *txmsg;
 	struct drm_dp_mst_branch *mstb;
@@ -3536,10 +3487,6 @@ static int drm_dp_send_dpcd_write(struct drm_dp_mst_topology_mgr *mgr,
 				  struct drm_dp_mst_port *port,
 				  int offset, int size, u8 *bytes)
 {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int len __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 	int ret;
 	struct drm_dp_sideband_msg_tx *txmsg;
 	struct drm_dp_mst_branch *mstb;
@@ -3849,11 +3796,7 @@ drm_dp_get_one_sb_msg(struct drm_dp_mst_topology_mgr *mgr, bool up,
 {
 	int len;
 	u8 replyblock[32];
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	int replylen, origlen __unused, curreply;
-=======
 	int replylen, curreply;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 	int ret;
 	u8 hdrlen;
 	struct drm_dp_sideband_msg_hdr hdr;
@@ -3971,13 +3914,8 @@ static int drm_dp_mst_handle_down_rep(struct drm_dp_mst_topology_mgr *mgr)
 
 	mutex_lock(&mgr->qlock);
 	txmsg->state = DRM_DP_SIDEBAND_TX_RX;
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	mstb->tx_slots[slot] = NULL;
-	mgr->is_waiting_for_dwn_reply = false;
-	DRM_WAKEUP_ALL(&mgr->tx_waitq, &mgr->qlock);
-=======
 	list_del(&txmsg->next);
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
+	DRM_WAKEUP_ALL(&mgr->tx_waitq, &mgr->qlock);
 	mutex_unlock(&mgr->qlock);
 
 	return 0;
@@ -4788,9 +4726,8 @@ static void drm_dp_mst_kick_tx(struct drm_dp_mst_topology_mgr *mgr)
 	queue_work(system_long_wq, &mgr->tx_work);
 }
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
 #if IS_ENABLED(CONFIG_DEBUG_FS)
-=======
+
 /*
  * Helper function for parsing DP device types into convenient strings
  * for use with dp_mst_topology
@@ -4813,7 +4750,6 @@ static const char *pdt_to_string(u8 pdt)
 	}
 }
 
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
 static void drm_dp_mst_dump_mstb(struct seq_file *m,
 				 struct drm_dp_mst_branch *mstb)
 {
@@ -4970,6 +4906,7 @@ out:
 	drm_modeset_unlock(&mgr->base.lock);
 }
 EXPORT_SYMBOL(drm_dp_mst_dump_topology);
+
 #endif	/* IS_ENABLED(CONFIG_DEBUG_FS) */
 
 static void drm_dp_tx_work(struct work_struct *work)
@@ -5834,16 +5771,11 @@ static int drm_dp_mst_register_i2c_bus(struct drm_dp_mst_port *port)
 
 	aux->ddc.class = I2C_CLASS_DDC;
 	aux->ddc.owner = THIS_MODULE;
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/drm_dp_mst_topology.c
-	aux->ddc.dev.parent = aux->dev;
-#ifndef __NetBSD__		/* XXX of? */
-	aux->ddc.dev.of_node = aux->dev->of_node;
-#endif
-=======
 	/* FIXME: set the kdev of the port's connector as parent */
 	aux->ddc.dev.parent = parent_dev;
+#ifndef __NetBSD__		/* XXX of? */
 	aux->ddc.dev.of_node = parent_dev->of_node;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/display/drm_dp_mst_topology.c
+#endif
 
 	strscpy(aux->ddc.name, aux->name ? aux->name : dev_name(parent_dev),
 		sizeof(aux->ddc.name));
