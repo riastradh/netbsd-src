@@ -28,11 +28,6 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: drm_print.c,v 1.16 2021/12/29 23:59:37 riastradh Exp $");
 
-<<<<<<< HEAD
-#ifndef __NetBSD__		/* XXX ??? */
-#define DEBUG /* for pr_debug() */
-#endif
-
 #ifdef __NetBSD__
 #include <sys/param.h>
 #include <sys/stdarg.h>
@@ -40,12 +35,9 @@ __KERNEL_RCSID(0, "$NetBSD: drm_print.c,v 1.16 2021/12/29 23:59:37 riastradh Exp
 #include <sys/device.h>
 #include <sys/ksyms.h>
 #include <sys/pserialize.h>
-#else
-#include <stdarg.h>
 #endif
-=======
+
 #include <linux/stdarg.h>
->>>>>>> vendor/linux-drm-v6.6.35
 
 #include <linux/io.h>
 #include <linux/moduleparam.h>
@@ -243,17 +235,13 @@ EXPORT_SYMBOL(__drm_printfn_info);
 
 void __drm_printfn_debug(struct drm_printer *p, struct va_format *vaf)
 {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	pr_debug("%s ", p->prefix);
 	vprintf(vaf->fmt, *vaf->va);	/* XXX */
 #else
-	pr_debug("%s %pV", p->prefix, vaf);
-#endif
-=======
 	/* pr_debug callsite decorations are unhelpful here */
 	printk(KERN_DEBUG "%s %pV", p->prefix, vaf);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 EXPORT_SYMBOL(__drm_printfn_debug);
 
