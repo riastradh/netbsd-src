@@ -172,15 +172,11 @@ struct drm_file *drm_file_alloc(struct drm_minor *minor)
 	if (!file)
 		return ERR_PTR(-ENOMEM);
 
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	file->pid = get_pid(task_pid(current));
-#endif
-=======
 	/* Get a unique identifier for fdinfo: */
 	file->client_id = atomic64_inc_return(&ident);
+#ifndef __NetBSD__
 	rcu_assign_pointer(file->pid, get_pid(task_tgid(current)));
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	file->minor = minor;
 
 	/* for compatibility root is always authenticated */
@@ -201,13 +197,10 @@ struct drm_file *drm_file_alloc(struct drm_minor *minor)
 #endif
 	file->event_space = 4096; /* set aside 4k for event buffer */
 
-<<<<<<< HEAD
+	spin_lock_init(&file->master_lookup_lock);
 #ifdef __NetBSD__
 	file->event_read_lock = NULL;
 #else
-=======
-	spin_lock_init(&file->master_lookup_lock);
->>>>>>> vendor/linux-drm-v6.6.35
 	mutex_init(&file->event_read_lock);
 #endif
 
@@ -233,23 +226,21 @@ out_prime_destroy:
 		drm_syncobj_release(file);
 	if (drm_core_check_feature(dev, DRIVER_GEM))
 		drm_gem_release(dev, file);
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	KASSERT(file->event_read_lock == NULL);
 #else
 	mutex_destroy(&file->event_read_lock);
 #endif
-	mutex_destroy(&file->fbs_lock);
+	spin_lock_destroy(&file->master_lookup_lock);
 #ifdef __NetBSD__
-	DRM_DESTROY_WAITQUEUE(&file->event_wait);
-	DRM_DESTROY_WAITQUEUE(&file->event_read_wq);
 	seldestroy(&file->event_selq);
-#else
-	put_pid(file->pid);
+	DRM_DESTROY_WAITQUEUE(&file->event_read_wq);
+	DRM_DESTROY_WAITQUEUE(&file->event_wait);
 #endif
-=======
+	mutex_destroy(&file->fbs_lock);
+#ifndef __NetBSD__
 	put_pid(rcu_access_pointer(file->pid));
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	kfree(file);
 
 	return ERR_PTR(ret);
@@ -298,21 +289,14 @@ void drm_file_free(struct drm_file *file)
 
 	dev = file->minor->dev;
 
-<<<<<<< HEAD
-	DRM_DEBUG("pid = %d, device = 0x%lx, open_count = %d\n",
-		  task_pid_nr(current),
-#ifdef __NetBSD__
-		  (unsigned long)device_unit(file->minor->dev->dev),
-#else
-		  (long)old_encode_dev(file->minor->kdev->devt),
-#endif
-		  dev->open_count);
-=======
 	drm_dbg_core(dev, "comm=\"%s\", pid=%d, dev=0x%lx, open_count=%d\n",
 		     current->comm, task_pid_nr(current),
+#ifdef __NetBSD__
+		     (unsigned long)device_unit(file->minor->dev->dev),
+#else
 		     (long)old_encode_dev(file->minor->kdev->devt),
+#endif
 		     atomic_read(&dev->open_count));
->>>>>>> vendor/linux-drm-v6.6.35
 
 #ifdef CONFIG_DRM_LEGACY
 	if (drm_core_check_feature(dev, DRIVER_LEGACY) &&
@@ -351,19 +335,21 @@ void drm_file_free(struct drm_file *file)
 
 	WARN_ON(!list_empty(&file->event_list));
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
-	DRM_DESTROY_WAITQUEUE(&file->event_wait);
-	DRM_DESTROY_WAITQUEUE(&file->event_read_wq);
-	seldestroy(&file->event_selq);
+	KASSERT(file->event_read_lock == NULL);
 #else
-	put_pid(file->pid);
 	mutex_destroy(&file->event_read_lock);
 #endif
+	spin_lock_destroy(&file->master_lookup_lock);
+#ifdef __NetBSD__
+	seldestroy(&file->event_selq);
+	DRM_DESTROY_WAITQUEUE(&file->event_read_wq);
+	DRM_DESTROY_WAITQUEUE(&file->event_wait);
+#endif
 	mutex_destroy(&file->fbs_lock);
-=======
+#ifndef __NetBSD__
 	put_pid(rcu_access_pointer(file->pid));
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	kfree(file);
 }
 
@@ -405,12 +391,8 @@ static int drm_cpu_valid(void)
  * Creates and initializes a drm_file structure for the file private data in \p
  * filp and add it into the double linked list in \p dev.
  */
-<<<<<<< HEAD
 #ifndef __NetBSD__
-static int drm_open_helper(struct file *filp, struct drm_minor *minor)
-=======
 int drm_open_helper(struct file *filp, struct drm_minor *minor)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_device *dev = minor->dev;
 	struct drm_file *priv;
@@ -923,8 +905,13 @@ static void drm_send_event_helper(struct drm_device *dev,
 	list_del(&e->pending_link);
 	list_add_tail(&e->link,
 		      &e->file_priv->event_list);
+#ifdef __NetBSD__
+	DRM_SPIN_WAKEUP_ONE(&e->file_priv->event_wait, &dev->event_lock);
+	selnotify(&e->file_priv->event_selq, POLLIN|POLLRDNORM, NOTE_SUBMIT);
+#else
 	wake_up_interruptible_poll(&e->file_priv->event_wait,
 		EPOLLIN | EPOLLRDNORM);
+#endif
 }
 
 /**
@@ -966,37 +953,7 @@ EXPORT_SYMBOL(drm_send_event_timestamp_locked);
  */
 void drm_send_event_locked(struct drm_device *dev, struct drm_pending_event *e)
 {
-<<<<<<< HEAD
-	assert_spin_locked(&dev->event_lock);
-
-	if (e->completion) {
-		complete_all(e->completion);
-		e->completion_release(e->completion);
-		e->completion = NULL;
-	}
-
-	if (e->fence) {
-		dma_fence_signal(e->fence);
-		dma_fence_put(e->fence);
-	}
-
-	if (!e->file_priv) {
-		kfree(e);
-		return;
-	}
-
-	list_del(&e->pending_link);
-	list_add_tail(&e->link,
-		      &e->file_priv->event_list);
-#ifdef __NetBSD__
-	DRM_SPIN_WAKEUP_ONE(&e->file_priv->event_wait, &dev->event_lock);
-	selnotify(&e->file_priv->event_selq, POLLIN|POLLRDNORM, NOTE_SUBMIT);
-#else
-	wake_up_interruptible(&e->file_priv->event_wait);
-#endif
-=======
 	drm_send_event_helper(dev, e, 0);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 EXPORT_SYMBOL(drm_send_event_locked);
 
