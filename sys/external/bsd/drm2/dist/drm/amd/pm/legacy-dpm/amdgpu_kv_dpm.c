@@ -1618,24 +1618,7 @@ static int kv_update_samu_dpm(struct amdgpu_device *adev, bool gate)
 
 static u8 kv_get_acp_boot_level(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_kv_dpm.c
-	u8 i;
-	struct amdgpu_clock_voltage_dependency_table *table =
-		&adev->pm.dpm.dyn_state.acp_clock_voltage_dependency_table;
-
-	for (i = 0; i < table->count; i++) {
-		/* XXX Fake out -Wtype-limits.  */
-		if (table->entries[i].clk == 0 || table->entries[i].clk > 0) /* XXX */
-			break;
-	}
-
-	if (i >= table->count)
-		i = table->count - 1;
-
-	return i;
-=======
 	return 0;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/legacy-dpm/amdgpu_kv_dpm.c
 }
 
 static void kv_update_acp_boot_level(struct amdgpu_device *adev)
@@ -1689,10 +1672,6 @@ static void kv_dpm_powergate_uvd(void *handle, bool gate)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct kv_power_info *pi = kv_get_pi(adev);
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_kv_dpm.c
-	int ret __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/legacy-dpm/amdgpu_kv_dpm.c
 
 	pi->uvd_power_gated = gate;
 
@@ -1720,10 +1699,6 @@ static void kv_dpm_powergate_vce(void *handle, bool gate)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct kv_power_info *pi = kv_get_pi(adev);
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/amdgpu/amdgpu_kv_dpm.c
-	int ret __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/legacy-dpm/amdgpu_kv_dpm.c
 
 	pi->vce_power_gated = gate;
 
