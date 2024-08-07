@@ -241,30 +241,19 @@ struct kfd2kgd_calls {
 	int (*init_interrupts)(struct amdgpu_device *adev, uint32_t pipe_id,
 			uint32_t inst);
 
-<<<<<<< HEAD
 #ifndef __NetBSD__
-	int (*hqd_load)(struct kgd_dev *kgd, void *mqd, uint32_t pipe_id,
-			uint32_t queue_id, uint32_t __user *wptr,
-			uint32_t wptr_shift, uint32_t wptr_mask,
-			struct mm_struct *mm);
-#endif
-=======
 	int (*hqd_load)(struct amdgpu_device *adev, void *mqd, uint32_t pipe_id,
 			uint32_t queue_id, uint32_t __user *wptr,
 			uint32_t wptr_shift, uint32_t wptr_mask,
 			struct mm_struct *mm, uint32_t inst);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	int (*hiq_mqd_load)(struct amdgpu_device *adev, void *mqd,
 			    uint32_t pipe_id, uint32_t queue_id,
 			    uint32_t doorbell_off, uint32_t inst);
 
-<<<<<<< HEAD
 #ifndef __NetBSD__
-	int (*hqd_sdma_load)(struct kgd_dev *kgd, void *mqd,
-=======
 	int (*hqd_sdma_load)(struct amdgpu_device *adev, void *mqd,
->>>>>>> vendor/linux-drm-v6.6.35
 			     uint32_t __user *wptr, struct mm_struct *mm);
 #endif
 
