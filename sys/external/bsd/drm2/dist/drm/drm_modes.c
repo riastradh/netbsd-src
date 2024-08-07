@@ -40,17 +40,12 @@ __KERNEL_RCSID(0, "$NetBSD: drm_modes.c,v 1.11 2021/12/19 01:13:59 riastradh Exp
 #include <linux/fb.h> /* for KHZ2PICOS() */
 #include <linux/list.h>
 #include <linux/list_sort.h>
-<<<<<<< HEAD
-#include <linux/export.h>
+#include <linux/of.h>
 #include <asm/div64.h>
 
 #ifdef CONFIG_VIDEOMODE_HELPERS
 #ifdef CONFIG_OF
-=======
-#include <linux/of.h>
-
 #include <video/of_display_timing.h>
->>>>>>> vendor/linux-drm-v6.6.35
 #include <video/of_videomode.h>
 #endif
 #include <video/videomode.h>
