@@ -649,19 +649,10 @@ static int drm_atomic_plane_check(const struct drm_plane_state *old_plane_state,
 	ret = drm_plane_check_pixel_format(plane, fb->format->format,
 					   fb->modifier);
 	if (ret) {
-<<<<<<< HEAD
-		struct drm_format_name_buf format_name;
-		DRM_DEBUG_ATOMIC("[PLANE:%d:%s] invalid pixel format %s, modifier 0x%"PRIx64"\n",
-				 plane->base.id, plane->name,
-				 drm_get_format_name(fb->format->format,
-						     &format_name),
-				 fb->modifier);
-=======
 		drm_dbg_atomic(plane->dev,
-			       "[PLANE:%d:%s] invalid pixel format %p4cc, modifier 0x%llx\n",
+			       "[PLANE:%d:%s] invalid pixel format %p4cc, modifier 0x%"PRIx64"\n",
 			       plane->base.id, plane->name,
 			       &fb->format->format, fb->modifier);
->>>>>>> vendor/linux-drm-v6.6.35
 		return ret;
 	}
 
@@ -1754,12 +1745,7 @@ static void drm_atomic_private_obj_print_state(struct drm_printer *p,
 void drm_atomic_print_new_state(const struct drm_atomic_state *state,
 		struct drm_printer *p)
 {
-<<<<<<< HEAD
-	struct drm_printer p = drm_info_printer(state->dev->dev);
-	struct drm_plane *plane __unused;
-=======
 	struct drm_plane *plane;
->>>>>>> vendor/linux-drm-v6.6.35
 	struct drm_plane_state *plane_state;
 	struct drm_crtc *crtc __unused;
 	struct drm_crtc_state *crtc_state;
