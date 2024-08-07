@@ -235,10 +235,6 @@ static void hubp21_set_vm_system_aperture_settings(struct hubp *hubp,
 {
 	struct dcn21_hubp *hubp21 = TO_DCN21_HUBP(hubp);
 
-<<<<<<< HEAD
-	PHYSICAL_ADDRESS_LOC mc_vm_apt_default __unused;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	PHYSICAL_ADDRESS_LOC mc_vm_apt_low;
 	PHYSICAL_ADDRESS_LOC mc_vm_apt_high;
 
