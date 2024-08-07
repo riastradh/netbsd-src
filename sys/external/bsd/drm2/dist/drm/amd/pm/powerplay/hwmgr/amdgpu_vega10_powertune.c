@@ -636,24 +636,7 @@ static const struct vega10_didt_config_reg   PSMSEEDCStallDelayConfig_Vega10[] =
 	{   0xFFFFFFFF  }  /* End of list */
 };
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/hwmgr/amdgpu_vega10_powertune.c
-static const struct vega10_didt_config_reg   PSMSEEDCThresholdConfig_Vega10[] __unused =
-{
-/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- *      Offset                             Mask                                                 Shift                                                  Value
- * ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- */
-	/* SQ EDC THRESHOLD */
-	{   ixDIDT_SQ_EDC_THRESHOLD,           DIDT_SQ_EDC_THRESHOLD__EDC_THRESHOLD_MASK,           DIDT_SQ_EDC_THRESHOLD__EDC_THRESHOLD__SHIFT,            0x0000 },
-
-	{   0xFFFFFFFF  }  /* End of list */
-};
-
-static const struct vega10_didt_config_reg   PSMSEEDCCtrlResetConfig_Vega10[] =
-{
-=======
 static const struct vega10_didt_config_reg   PSMSEEDCCtrlResetConfig_Vega10[] = {
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/hwmgr/amdgpu_vega10_powertune.c
 /* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  *      Offset                             Mask                                                 Shift                                                  Value
  * ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -695,23 +678,7 @@ static const struct vega10_didt_config_reg   PSMSEEDCCtrlConfig_Vega10[] = {
 	{   0xFFFFFFFF  }  /* End of list */
 };
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/hwmgr/amdgpu_vega10_powertune.c
-static const struct vega10_didt_config_reg   PSMGCEDCThresholdConfig_vega10[] __unused =
-{
-/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- *      Offset                             Mask                                                 Shift                                                  Value
- * ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- */
-	{   mmGC_EDC_THRESHOLD,                GC_EDC_THRESHOLD__EDC_THRESHOLD_MASK,                GC_EDC_THRESHOLD__EDC_THRESHOLD__SHIFT,                 0x0000000 },
-
-	{   0xFFFFFFFF  }  /* End of list */
-};
-
-static const struct vega10_didt_config_reg   PSMGCEDCDroopCtrlConfig_vega10[] =
-{
-=======
 static const struct vega10_didt_config_reg   PSMGCEDCDroopCtrlConfig_vega10[] = {
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/hwmgr/amdgpu_vega10_powertune.c
 /* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  *      Offset                             Mask                                                 Shift                                                  Value
  * ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
