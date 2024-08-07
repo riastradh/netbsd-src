@@ -45,7 +45,6 @@ __KERNEL_RCSID(0, "$NetBSD: drm_prime.c,v 1.20 2022/07/06 01:12:45 riastradh Exp
 
 #include "drm_internal.h"
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 
 #include <sys/file.h>
@@ -55,9 +54,8 @@ __KERNEL_RCSID(0, "$NetBSD: drm_prime.c,v 1.20 2022/07/06 01:12:45 riastradh Exp
 #include <linux/nbsd-namespace.h>
 
 #endif	/* __NetBSD__ */
-=======
+
 MODULE_IMPORT_NS(DMA_BUF);
->>>>>>> vendor/linux-drm-v6.6.35
 
 /**
  * DOC: overview and lifetime rules
@@ -308,7 +306,13 @@ void drm_prime_remove_buf_handle(struct drm_prime_file_private *prime_fpriv,
 {
 #ifdef __NetBSD__
 	struct drm_prime_member *member;
+#else
+	struct rb_node *rb;
+#endif
 
+	mutex_lock(&prime_fpriv->lock);
+
+#ifdef __NetBSD__
 	member = rb_tree_find_node(&prime_fpriv->dmabufs.rbr_tree, &dma_buf);
 	if (member != NULL) {
 		rb_tree_remove_node(&prime_fpriv->handles.rbr_tree, member);
@@ -317,10 +321,6 @@ void drm_prime_remove_buf_handle(struct drm_prime_file_private *prime_fpriv,
 		kfree(member);
 	}
 #else
-	struct rb_node *rb;
-
-	mutex_lock(&prime_fpriv->lock);
-
 	rb = prime_fpriv->handles.rb_node;
 	while (rb) {
 		struct drm_prime_member *member;
@@ -339,12 +339,9 @@ void drm_prime_remove_buf_handle(struct drm_prime_file_private *prime_fpriv,
 			rb = rb->rb_left;
 		}
 	}
-<<<<<<< HEAD
 #endif
-=======
 
 	mutex_unlock(&prime_fpriv->lock);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 void drm_prime_init_file_private(struct drm_prime_file_private *prime_fpriv)
@@ -881,29 +878,24 @@ int drm_gem_prime_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 #endif
 
 	if (obj->funcs && obj->funcs->mmap) {
-<<<<<<< HEAD
+#ifndef __NetBSD__
+		vma->vm_ops = obj->funcs->vm_ops;
+#endif
+
+		drm_gem_object_get(obj);
 #ifdef __NetBSD__
 		ret = obj->funcs->mmap(obj, offp, size, prot, flagsp, advicep,
 		    uobjp, maxprotp);
 #else
 		ret = obj->funcs->mmap(obj, vma);
 #endif
-		if (ret)
-			return ret;
-#ifndef __NetBSD__
-		vma->vm_private_data = obj;
-#endif
-=======
-		vma->vm_ops = obj->funcs->vm_ops;
-
->>>>>>> vendor/linux-drm-v6.6.35
-		drm_gem_object_get(obj);
-		ret = obj->funcs->mmap(obj, vma);
 		if (ret) {
 			drm_gem_object_put(obj);
 			return ret;
 		}
+#ifndef __NetBSD__
 		vma->vm_private_data = obj;
+#endif
 		return 0;
 	}
 
@@ -964,20 +956,13 @@ int drm_gem_dmabuf_mmap(struct dma_buf *dma_buf, struct vm_area_struct *vma)
 {
 	struct drm_gem_object *obj = dma_buf->priv;
 
-<<<<<<< HEAD
-	if (!dev->driver->gem_prime_mmap)
-		return -ENOSYS;
-
 #ifdef __NetBSD__
 	KASSERT(size > 0);
-	return dev->driver->gem_prime_mmap(obj, offp, size, prot, flagsp,
+	return drm_gem_prime_mmap(obj, offp, size, prot, flagsp,
 	    advicep, uobjp, maxprotp);
 #else
-	return dev->driver->gem_prime_mmap(obj, vma);
-#endif
-=======
 	return drm_gem_prime_mmap(obj, vma);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 EXPORT_SYMBOL(drm_gem_dmabuf_mmap);
 
