@@ -1,4 +1,4 @@
-/*	$NetBSD: amdgpu_dml_common_defs.c,v 1.2 2021/12/18 23:45:04 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2020 Mauro Rossi <issor.oruam@gmail.com>
@@ -25,13 +25,8 @@
  *
  */
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/display/dc/dml/amdgpu_dml_common_defs.c
-#include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: amdgpu_dml_common_defs.c,v 1.2 2021/12/18 23:45:04 riastradh Exp $");
-=======
 #ifndef __DAL_IRQ_SERVICE_DCE60_H__
 #define __DAL_IRQ_SERVICE_DCE60_H__
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/display/dc/irq/dce60/irq_service_dce60.h
 
 #include "../irq_service.h"
 
