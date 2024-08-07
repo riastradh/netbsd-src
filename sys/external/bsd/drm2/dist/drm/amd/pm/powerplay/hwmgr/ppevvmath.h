@@ -335,14 +335,10 @@ static fInt fMultiply (fInt X, fInt Y) /* Uses 64-bit integers (int64_t) */
 {
 	fInt Product;
 	int64_t tempProduct;
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/hwmgr/ppevvmath.h
-	bool X_LessThanOne __unused, Y_LessThanOne __unused;
-=======
 
 	/*The following is for a very specific common case: Non-zero number with ONLY fractional portion*/
 	/* TEMPORARILY DISABLED - CAN BE USED TO IMPROVE PRECISION
 	bool X_LessThanOne, Y_LessThanOne;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/hwmgr/ppevvmath.h
 
 	X_LessThanOne = (X.partial.real == 0 && X.partial.decimal != 0 && X.full >= 0);
 	Y_LessThanOne = (Y.partial.real == 0 && Y.partial.decimal != 0 && Y.full >= 0);
