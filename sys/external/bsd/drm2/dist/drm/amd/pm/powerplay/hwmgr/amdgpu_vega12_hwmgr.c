@@ -2176,7 +2176,7 @@ static int vega12_get_ppfeature_status(struct pp_hwmgr *hwmgr, char *buf)
 		"[EnableAllSmuFeatures] Failed to get enabled smc features!",
 		return ret);
 
-	size += sysfs_emit_at(buf, size, "Current ppfeatures: 0x%016llx\n", features_enabled);
+	size += sysfs_emit_at(buf, size, "Current ppfeatures: 0x%016"PRIx64"\n", features_enabled);
 	size += sysfs_emit_at(buf, size, "%-19s %-22s %s\n",
 				output_title[0],
 				output_title[1],

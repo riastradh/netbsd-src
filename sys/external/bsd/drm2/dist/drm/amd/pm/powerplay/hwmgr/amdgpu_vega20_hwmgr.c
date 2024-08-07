@@ -3254,13 +3254,8 @@ static int vega20_get_ppfeature_status(struct pp_hwmgr *hwmgr, char *buf)
 			"[EnableAllSmuFeatures] Failed to get enabled smc features!",
 			return ret);
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/hwmgr/amdgpu_vega20_hwmgr.c
-	size += sprintf(buf + size, "Current ppfeatures: 0x%016"PRIx64"\n", features_enabled);
-	size += sprintf(buf + size, "%-19s %-22s %s\n",
-=======
-	size += sysfs_emit_at(buf, size, "Current ppfeatures: 0x%016llx\n", features_enabled);
+	size += sysfs_emit_at(buf, size, "Current ppfeatures: 0x%016"PRIx64"\n", features_enabled);
 	size += sysfs_emit_at(buf, size, "%-19s %-22s %s\n",
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/hwmgr/amdgpu_vega20_hwmgr.c
 				output_title[0],
 				output_title[1],
 				output_title[2]);
