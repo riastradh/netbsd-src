@@ -56,13 +56,8 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_gpio_service.c,v 1.3 2021/12/19 11:22:31 rias
  */
 
 struct gpio_service *dal_gpio_service_create(
-<<<<<<< HEAD
-	enum dce_version dce_version_major,
-	enum dce_environment dce_version_minor,
-=======
 	enum dce_version dce_version,
 	enum dce_environment dce_environment,
->>>>>>> vendor/linux-drm-v6.6.35
 	struct dc_context *ctx)
 {
 	struct gpio_service *service;
