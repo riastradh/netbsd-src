@@ -50,12 +50,8 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_dcn10_hw_sequencer_debug.c,v 1.3 2021/12/19 1
 #include "dcn10_cm_common.h"
 #include "clk_mgr.h"
 
-<<<<<<< HEAD
-unsigned int __printflike(3,4) snprintf_count(char *pBuf, unsigned int bufSize, const char *fmt, ...)
-=======
 __printf(3, 4)
 unsigned int snprintf_count(char *pbuf, unsigned int bufsize, char *fmt, ...)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	int ret_vsnprintf;
 	unsigned int chars_printed;
