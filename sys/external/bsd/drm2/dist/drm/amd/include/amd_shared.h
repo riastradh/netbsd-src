@@ -288,18 +288,7 @@ enum amd_dpm_forced_level;
  * that the driver initializes the IP blocks in a safe sequence.
  */
 struct amd_ip_funcs {
-<<<<<<< HEAD
-	/** @name: Name of IP block */
 	const char *name;
-	/**
-	 * @early_init:
-	 *
-	 * sets up early driver state (pre sw_init),
-	 * does not configure hw - Optional
-	 */
-=======
-	char *name;
->>>>>>> vendor/linux-drm-v6.6.35
 	int (*early_init)(void *handle);
 	int (*late_init)(void *handle);
 	int (*sw_init)(void *handle);
