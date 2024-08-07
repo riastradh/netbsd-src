@@ -76,11 +76,7 @@ static struct idr drm_minors_idr;
  * prefer to embed struct drm_device into their own device
  * structure and call drm_dev_init() themselves.
  */
-<<<<<<< HEAD
-bool drm_core_init_complete = false;
-=======
-static bool drm_core_init_complete;
->>>>>>> vendor/linux-drm-v6.6.35
+bool drm_core_init_complete;
 
 #ifndef __NetBSD__
 static struct dentry *drm_debugfs_root;
@@ -127,7 +123,9 @@ static void drm_minor_alloc_release(struct drm_device *dev, void *data)
 
 	WARN_ON(dev != minor->dev);
 
+#ifndef __NetBSD__		/* XXX drm sysfs */
 	put_device(minor->kdev);
+#endif
 
 	if (minor->type == DRM_MINOR_ACCEL) {
 		accel_minor_remove(minor->index);
@@ -170,65 +168,21 @@ static int drm_minor_alloc(struct drm_device *dev, enum drm_minor_type type)
 
 	minor->index = r;
 
-<<<<<<< HEAD
-#ifndef __NetBSD__		/* XXX drm sysfs */
-	minor->kdev = drm_sysfs_minor_alloc(minor);
-	if (IS_ERR(minor->kdev)) {
-		r = PTR_ERR(minor->kdev);
-		goto err_index;
-	}
-#endif
-
-	*drm_minor_get_slot(dev, type) = minor;
-	return 0;
-
-err_index: __unused
-	spin_lock_irqsave(&drm_minor_lock, flags);
-	idr_remove(&drm_minors_idr, minor->index);
-	spin_unlock_irqrestore(&drm_minor_lock, flags);
-err_free:
-	kfree(minor);
-	return r;
-}
-
-static void drm_minor_free(struct drm_device *dev, unsigned int type)
-{
-	struct drm_minor **slot, *minor;
-	unsigned long flags;
-
-	slot = drm_minor_get_slot(dev, type);
-	minor = *slot;
-	if (!minor)
-		return;
-
-#ifndef __NetBSD__		/* XXX drm sysfs */
-	put_device(minor->kdev);
-#endif
-
-	spin_lock_irqsave(&drm_minor_lock, flags);
-	idr_remove(&drm_minors_idr, minor->index);
-	spin_unlock_irqrestore(&drm_minor_lock, flags);
-
-	kfree(minor);
-	*slot = NULL;
-}
-
-static int drm_minor_register(struct drm_device *dev, unsigned int type)
-=======
 	r = drmm_add_action_or_reset(dev, drm_minor_alloc_release, minor);
 	if (r)
 		return r;
 
+#ifndef __NetBSD__		/* XXX drm sysfs */
 	minor->kdev = drm_sysfs_minor_alloc(minor);
 	if (IS_ERR(minor->kdev))
 		return PTR_ERR(minor->kdev);
+#endif
 
 	*drm_minor_get_slot(dev, type) = minor;
 	return 0;
 }
 
 static int drm_minor_register(struct drm_device *dev, enum drm_minor_type type)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_minor *minor;
 	unsigned long flags;
@@ -242,13 +196,7 @@ static int drm_minor_register(struct drm_device *dev, enum drm_minor_type type)
 	if (!minor)
 		return 0;
 
-<<<<<<< HEAD
 #ifndef __NetBSD__
-	ret = drm_debugfs_init(minor, minor->index, drm_debugfs_root);
-	if (ret) {
-		DRM_ERROR("DRM: Failed to initialize /sys/kernel/debug/dri.\n");
-		goto err_debugfs;
-=======
 	if (minor->type == DRM_MINOR_ACCEL) {
 		accel_debugfs_init(minor, minor->index);
 	} else {
@@ -257,7 +205,6 @@ static int drm_minor_register(struct drm_device *dev, enum drm_minor_type type)
 			DRM_ERROR("DRM: Failed to initialize /sys/kernel/debug/dri.\n");
 			goto err_debugfs;
 		}
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 
 	ret = device_add(minor->kdev);
@@ -695,16 +642,26 @@ static void drm_dev_init_release(struct drm_device *dev, void *res)
 	drm_legacy_remove_map_hash(dev);
 	drm_fs_inode_free(dev->anon_inode);
 
+#ifdef __NetBSD__
+	sysmon_pswitch_unregister(&dev->sc_monitor_hotplug);
+#endif
+
 	put_device(dev->dev);
 	/* Prevent use-after-free in drm_managed_release when debugging is
 	 * enabled. Slightly awkward, but can't really be helped. */
 	dev->dev = NULL;
+#ifdef __NetBSD__
+	mutex_destroy(&dev->suspend_lock);
+	DRM_DESTROY_WAITQUEUE(&dev->suspend_cv);
+#endif
 	mutex_destroy(&dev->master_mutex);
 	mutex_destroy(&dev->clientlist_mutex);
 	mutex_destroy(&dev->filelist_mutex);
 	mutex_destroy(&dev->struct_mutex);
 	mutex_destroy(&dev->debugfs_mutex);
+	spin_lock_destroy(&dev->event_lock);
 	drm_legacy_destroy_members(dev);
+	spin_lock_destroy(&dev->managed.lock);
 }
 
 static int drm_dev_init(struct drm_device *dev,
@@ -751,7 +708,7 @@ static int drm_dev_init(struct drm_device *dev,
 	mutex_init(&dev->filelist_mutex);
 	mutex_init(&dev->clientlist_mutex);
 	mutex_init(&dev->master_mutex);
-<<<<<<< HEAD
+	mutex_init(&dev->debugfs_mutex);
 #ifdef __NetBSD__
 	mutex_init(&dev->suspend_lock);
 	DRM_INIT_WAITQUEUE(&dev->suspend_cv, "drmsusp");
@@ -759,18 +716,17 @@ static int drm_dev_init(struct drm_device *dev,
 	dev->suspender = NULL;
 #endif
 
+	ret = drmm_add_action_or_reset(dev, drm_dev_init_release, NULL);
+	if (ret)
+		return ret;
+
+#ifdef __NetBSD__
 	dev->sc_monitor_hotplug.smpsw_name = PSWITCH_HK_DISPLAY_CYCLE;
 	dev->sc_monitor_hotplug.smpsw_type = PSWITCH_TYPE_HOTKEY;
 	ret = sysmon_pswitch_register(&dev->sc_monitor_hotplug);
 	if (ret)
-		goto err_pswitch;
-=======
-	mutex_init(&dev->debugfs_mutex);
->>>>>>> vendor/linux-drm-v6.6.35
-
-	ret = drmm_add_action_or_reset(dev, drm_dev_init_release, NULL);
-	if (ret)
-		return ret;
+		goto err;
+#endif
 
 	inode = drm_fs_inode_new();
 	if (IS_ERR(inode)) {
@@ -819,42 +775,9 @@ static int drm_dev_init(struct drm_device *dev,
 
 	return 0;
 
-<<<<<<< HEAD
-err_setunique:
-	if (drm_core_check_feature(dev, DRIVER_GEM))
-		drm_gem_destroy(dev);
-err_ctxbitmap:
-	drm_legacy_ctxbitmap_cleanup(dev);
-	drm_legacy_remove_map_hash(dev);
-err_minors:
-	drm_minor_free(dev, DRM_MINOR_PRIMARY);
-	drm_minor_free(dev, DRM_MINOR_RENDER);
-	drm_fs_inode_free(dev->anon_inode);
-err_free:
-#ifdef __NetBSD__
-	sysmon_pswitch_unregister(&dev->sc_monitor_hotplug);
-err_pswitch:
-#endif
-#ifndef __NetBSD__		/* XXX drm sysfs */
-	put_device(dev->dev);
-#endif
-#ifdef __NetBSD__
-	KASSERT(dev->suspender == NULL);
-	KASSERT(dev->active_ioctls == 0);
-	DRM_DESTROY_WAITQUEUE(&dev->suspend_cv);
-	mutex_destroy(&dev->suspend_lock);
-#endif
-	mutex_destroy(&dev->master_mutex);
-	mutex_destroy(&dev->clientlist_mutex);
-	mutex_destroy(&dev->filelist_mutex);
-	mutex_destroy(&dev->struct_mutex);
-	spin_lock_destroy(&dev->event_lock);
-	drm_legacy_destroy_members(dev);
-=======
 err:
 	drm_managed_release(dev);
 
->>>>>>> vendor/linux-drm-v6.6.35
 	return ret;
 }
 
@@ -879,27 +802,9 @@ static int devm_drm_dev_init(struct device *parent,
 					devm_drm_dev_init_release, dev);
 }
 
-<<<<<<< HEAD
-#endif
-
-/**
- * drm_dev_fini - Finalize a dead DRM device
- * @dev: DRM device
- *
- * Finalize a dead DRM device. This is the converse to drm_dev_init() and
- * frees up all data allocated by it. All driver private data should be
- * finalized first. Note that this function does not free the @dev, that is
- * left to the caller.
- *
- * The ref-count of @dev must be zero, and drm_dev_fini() should only be called
- * from a &drm_driver.release callback.
- */
-void drm_dev_fini(struct drm_device *dev)
-=======
 void *__devm_drm_dev_alloc(struct device *parent,
 			   const struct drm_driver *driver,
 			   size_t size, size_t offset)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	void *container;
 	struct drm_device *drm;
@@ -917,37 +822,11 @@ void *__devm_drm_dev_alloc(struct device *parent,
 	}
 	drmm_add_final_kfree(drm, container);
 
-<<<<<<< HEAD
-	drm_minor_free(dev, DRM_MINOR_PRIMARY);
-	drm_minor_free(dev, DRM_MINOR_RENDER);
-
-#ifdef __NetBSD__
-	sysmon_pswitch_unregister(&dev->sc_monitor_hotplug);
-#endif
-
-#ifndef __NetBSD__		/* XXX drm sysfs */
-	put_device(dev->dev);
-#endif
-
-#ifdef __NetBSD__
-	KASSERT(dev->suspender == NULL);
-	KASSERT(dev->active_ioctls == 0);
-	DRM_DESTROY_WAITQUEUE(&dev->suspend_cv);
-	mutex_destroy(&dev->suspend_lock);
-#endif
-
-	mutex_destroy(&dev->master_mutex);
-	mutex_destroy(&dev->clientlist_mutex);
-	mutex_destroy(&dev->filelist_mutex);
-	mutex_destroy(&dev->struct_mutex);
-	spin_lock_destroy(&dev->event_lock);
-	drm_legacy_destroy_members(dev);
-	kfree(dev->unique);
-=======
 	return container;
->>>>>>> vendor/linux-drm-v6.6.35
 }
 EXPORT_SYMBOL(__devm_drm_dev_alloc);
+
+#endif	/* __NetBSD__ */
 
 /**
  * drm_dev_alloc - Allocate new DRM device
@@ -1115,11 +994,6 @@ int drm_dev_register(struct drm_device *dev, unsigned long flags)
 	const struct drm_driver *driver = dev->driver;
 	int ret;
 
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	mutex_lock(&drm_global_mutex);
-#endif
-=======
 	if (!driver->load)
 		drm_mode_config_validate(dev);
 
@@ -1127,7 +1001,6 @@ int drm_dev_register(struct drm_device *dev, unsigned long flags)
 
 	if (drm_dev_needs_global_mutex(dev))
 		mutex_lock(&drm_global_mutex);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	ret = drm_minor_register(dev, DRM_MINOR_RENDER);
 	if (ret)
@@ -1176,14 +1049,8 @@ err_minors:
 	drm_minor_unregister(dev, DRM_MINOR_PRIMARY);
 	drm_minor_unregister(dev, DRM_MINOR_RENDER);
 out_unlock:
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	mutex_unlock(&drm_global_mutex);
-#endif
-=======
 	if (drm_dev_needs_global_mutex(dev))
 		mutex_unlock(&drm_global_mutex);
->>>>>>> vendor/linux-drm-v6.6.35
 	return ret;
 }
 EXPORT_SYMBOL(drm_dev_register);
@@ -1219,15 +1086,9 @@ void drm_dev_unregister(struct drm_device *dev)
 	if (dev->driver->unload)
 		dev->driver->unload(dev);
 
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* Moved to drm_pci.  */
-	if (dev->agp)
-		drm_pci_agp_destroy(dev);
-#endif
-
-=======
 	drm_legacy_pci_agp_destroy(dev);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	drm_legacy_rmmaps(dev);
 
 	remove_compat_control_link(dev);
@@ -1237,31 +1098,8 @@ void drm_dev_unregister(struct drm_device *dev)
 }
 EXPORT_SYMBOL(drm_dev_unregister);
 
-<<<<<<< HEAD
-/**
- * drm_dev_set_unique - Set the unique name of a DRM device
- * @dev: device of which to set the unique name
- * @name: unique name
- *
- * Sets the unique name of a DRM device using the specified string. This is
- * already done by drm_dev_init(), drivers should only override the default
- * unique name for backwards compatibility reasons.
- *
- * Return: 0 on success or a negative error code on failure.
- */
-int drm_dev_set_unique(struct drm_device *dev, const char *name)
-{
-	kfree(dev->unique);
-	dev->unique = kstrdup(name, GFP_KERNEL);
-
-	return dev->unique ? 0 : -ENOMEM;
-}
-EXPORT_SYMBOL(drm_dev_set_unique);
-
 #ifndef __NetBSD__
 
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 /*
  * DRM Core
  * The DRM core module initializes all global DRM objects and makes them
