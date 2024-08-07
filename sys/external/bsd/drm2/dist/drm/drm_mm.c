@@ -136,14 +136,8 @@ static void show_leaks(struct drm_mm *mm)
 			continue;
 		}
 
-<<<<<<< HEAD
-		nr_entries = stack_depot_fetch(node->stack, &entries);
-		stack_trace_snprint(buf, BUFSZ, entries, nr_entries, 0);
-		DRM_ERROR("node [%08"PRIx64" + %08"PRIx64"]: inserted at\n%s",
-=======
 		stack_depot_snprint(node->stack, buf, BUFSZ, 0);
-		DRM_ERROR("node [%08llx + %08llx]: inserted at\n%s",
->>>>>>> vendor/linux-drm-v6.6.35
+		DRM_ERROR("node [%08"PRIx64" + %08"PRIx64"]: inserted at\n%s",
 			  node->start, node->size, buf);
 	}
 
@@ -277,27 +271,8 @@ static const rb_tree_ops_t holes_addr_rb_ops = {
 	.rbto_node_offset = offsetof(struct drm_mm_node, rb_hole_addr),
 };
 
-#else
-
-<<<<<<< HEAD
-#define RB_INSERT(root, member, expr) do { \
-	struct rb_node **link = &root.rb_node, *rb = NULL; \
-	u64 x = expr(node); \
-	while (*link) { \
-		rb = *link; \
-		if (x < expr(rb_entry(rb, struct drm_mm_node, member))) \
-			link = &rb->rb_left; \
-		else \
-			link = &rb->rb_right; \
-	} \
-	rb_link_node(&node->member, rb, link); \
-	rb_insert_color(&node->member, &root); \
-} while (0)
-
 #endif
 
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 #define HOLE_SIZE(NODE) ((NODE)->hole_size)
 #define HOLE_ADDR(NODE) (__drm_mm_hole_node_start(NODE))
 
@@ -370,6 +345,11 @@ RB_DECLARE_CALLBACKS_MAX(static, augment_callbacks,
 
 static void insert_hole_addr(struct rb_root *root, struct drm_mm_node *node)
 {
+#ifdef __NetBSD__
+	struct drm_mm_node *collision __diagused;
+	collision = rb_tree_insert_node(&root->rbr_tree, node);
+	KASSERT(collision == node);
+#else
 	struct rb_node **link = &root->rb_node, *rb_parent = NULL;
 	u64 start = HOLE_ADDR(node), subtree_max_hole = node->subtree_max_hole;
 	struct drm_mm_node *parent;
@@ -387,6 +367,7 @@ static void insert_hole_addr(struct rb_root *root, struct drm_mm_node *node)
 
 	rb_link_node(&node->rb_hole_addr, rb_parent, link);
 	rb_insert_augmented(&node->rb_hole_addr, root, &augment_callbacks);
+#endif
 }
 
 static void add_hole(struct drm_mm_node *node)
@@ -399,17 +380,7 @@ static void add_hole(struct drm_mm_node *node)
 	DRM_MM_BUG_ON(!drm_mm_hole_follows(node));
 
 	insert_hole_size(&mm->holes_size, node);
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	struct drm_mm_node *collision __diagused;
-	collision = rb_tree_insert_node(&mm->holes_addr.rbr_tree, node);
-	KASSERT(collision == node);
-#else
-	RB_INSERT(mm->holes_addr, rb_hole_addr, HOLE_ADDR);
-#endif
-=======
 	insert_hole_addr(&mm->holes_addr, node);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	list_add(&node->hole_stack, &mm->hole_stack);
 }
@@ -575,25 +546,10 @@ next_hole(struct drm_mm *mm,
 #endif
 
 	case DRM_MM_INSERT_LOW:
-<<<<<<< HEAD
-#ifdef __NetBSD__
-		return RB_TREE_NEXT(&mm->holes_addr.rbr_tree, node);
-#else
-		return rb_hole_addr_to_node(rb_next(&node->rb_hole_addr));
-#endif
-
-	case DRM_MM_INSERT_HIGH:
-#ifdef __NetBSD__
-		return RB_TREE_PREV(&mm->holes_addr.rbr_tree, node);
-#else
-		return rb_hole_addr_to_node(rb_prev(&node->rb_hole_addr));
-#endif
-=======
 		return next_hole_low_addr(node, size);
 
 	case DRM_MM_INSERT_HIGH:
 		return next_hole_high_addr(node, size);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	case DRM_MM_INSERT_EVICT:
 		node = list_next_entry(node, hole_stack);
