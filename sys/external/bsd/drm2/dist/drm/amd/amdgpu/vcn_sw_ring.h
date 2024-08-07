@@ -1,4 +1,4 @@
-/*	$NetBSD: nouveau_nvkm_engine_disp_coreg94.c,v 1.3 2021/12/18 23:45:35 riastradh Exp $	*/
+/*	$NetBSD$	*/
 
 /*
  * Copyright 2022 Advanced Micro Devices, Inc.
@@ -22,11 +22,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/nouveau/nvkm/engine/disp/nouveau_nvkm_engine_disp_coreg94.c
-#include <sys/cdefs.h>
-__KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_engine_disp_coreg94.c,v 1.3 2021/12/18 23:45:35 riastradh Exp $");
-=======
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/amdgpu/vcn_sw_ring.h
 
 #ifndef __VCN_SW_RING_H__
 #define __VCN_SW_RING_H__
