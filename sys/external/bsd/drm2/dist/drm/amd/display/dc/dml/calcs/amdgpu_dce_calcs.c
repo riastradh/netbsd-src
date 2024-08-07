@@ -111,14 +111,8 @@ static void calculate_bandwidth(
 	bool lpt_enabled;
 	enum bw_defines sclk_message;
 	enum bw_defines yclk_message;
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/display/dc/calcs/amdgpu_dce_calcs.c
-	enum bw_defines v_filter_init_mode[maximum_number_of_surfaces] __unused;
-	enum bw_defines tiling_mode[maximum_number_of_surfaces];
-	enum bw_defines surface_type[maximum_number_of_surfaces];
-=======
 	enum bw_defines *tiling_mode;
 	enum bw_defines *surface_type;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/display/dc/dml/calcs/amdgpu_dce_calcs.c
 	enum bw_defines voltage;
 	enum bw_defines pipe_check;
 	enum bw_defines hsr_check;
@@ -3071,11 +3065,7 @@ bool bw_calcs(struct dc_context *ctx,
 		calcs_output->all_displays_in_sync = false;
 
 	if (data->number_of_displays != 0) {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/display/dc/calcs/amdgpu_dce_calcs.c
-		uint8_t yclk_lvl, sclk_lvl __unused;
-=======
 		uint8_t yclk_lvl;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/display/dc/dml/calcs/amdgpu_dce_calcs.c
 		struct bw_fixed high_sclk = vbios->high_sclk;
 		struct bw_fixed mid1_sclk = vbios->mid1_sclk;
 		struct bw_fixed mid2_sclk = vbios->mid2_sclk;
