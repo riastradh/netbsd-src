@@ -58,12 +58,10 @@ __KERNEL_RCSID(0, "$NetBSD: amdgpu_vega10_hwmgr.c,v 1.4 2021/12/19 12:37:54 rias
 #include "smuio/smuio_9_0_offset.h"
 #include "smuio/smuio_9_0_sh_mask.h"
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/hwmgr/amdgpu_vega10_hwmgr.c
 #include <linux/nbsd-namespace.h>
-=======
+
 #define smnPCIE_LC_SPEED_CNTL			0x11140290
 #define smnPCIE_LC_LINK_WIDTH_CNTL		0x11140288
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/hwmgr/amdgpu_vega10_hwmgr.c
 
 #define HBM_MEMORY_CHANNEL_WIDTH    128
 
@@ -3231,13 +3229,8 @@ static int vega10_get_pp_table_entry_callback_func(struct pp_hwmgr *hwmgr,
 static int vega10_get_pp_table_entry(struct pp_hwmgr *hwmgr,
 		unsigned long entry_index, struct pp_power_state *state)
 {
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/hwmgr/amdgpu_vega10_hwmgr.c
-	int result __unused;
-	struct vega10_power_state *ps;
-=======
 	int result;
 	struct vega10_power_state *vega10_ps;
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/hwmgr/amdgpu_vega10_hwmgr.c
 
 	state->hardware.magic = PhwVega10_Magic;
 
@@ -4586,13 +4579,8 @@ static int vega10_get_ppfeature_status(struct pp_hwmgr *hwmgr, char *buf)
 			"[EnableAllSmuFeatures] Failed to get enabled smc features!",
 			return ret);
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/amd/powerplay/hwmgr/amdgpu_vega10_hwmgr.c
-	size += sprintf(buf + size, "Current ppfeatures: 0x%016"PRIx64"\n", features_enabled);
-	size += sprintf(buf + size, "%-19s %-22s %s\n",
-=======
 	size += sysfs_emit_at(buf, size, "Current ppfeatures: 0x%016llx\n", features_enabled);
 	size += sysfs_emit_at(buf, size, "%-19s %-22s %s\n",
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/amd/pm/powerplay/hwmgr/amdgpu_vega10_hwmgr.c
 				output_title[0],
 				output_title[1],
 				output_title[2]);
