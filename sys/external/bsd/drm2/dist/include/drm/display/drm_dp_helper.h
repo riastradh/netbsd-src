@@ -27,6 +27,9 @@
 
 #include <linux/delay.h>
 #include <linux/i2c.h>
+#include <linux/mutex.h>
+#include <linux/types.h>
+#include <linux/workqueue.h>
 
 #include <drm/display/drm_dp.h>
 #include <drm/drm_connector.h>
@@ -34,6 +37,7 @@
 struct drm_device;
 struct drm_dp_aux;
 struct drm_panel;
+struct seq_file;
 
 bool drm_dp_channel_eq_ok(const u8 link_status[DP_LINK_STATUS_SIZE],
 			  int lane_count);
@@ -569,6 +573,7 @@ bool drm_dp_lttpr_pre_emphasis_level_3_supported(const u8 caps[DP_LTTPR_PHY_CAP_
 
 void drm_dp_remote_aux_init(struct drm_dp_aux *aux);
 void drm_dp_aux_init(struct drm_dp_aux *aux);
+void drm_dp_aux_fini(struct drm_dp_aux *aux);
 int drm_dp_aux_register(struct drm_dp_aux *aux);
 void drm_dp_aux_unregister(struct drm_dp_aux *aux);
 

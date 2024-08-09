@@ -26,9 +26,6 @@
 #define _DRM_DP_H_
 
 #include <linux/types.h>
-#include <linux/workqueue.h>
-
-struct seq_file;
 
 /*
  * Unless otherwise noted, all values are from the DP 1.1a spec.  Note that
@@ -1659,148 +1656,6 @@ enum dp_pixelformat {
  * @DP_COLORIMETRY_BT2020_CYCC: ITU-R BT.2020 Y'c C'bc C'rc colorimetry format
  * @DP_COLORIMETRY_BT2020_YCC: ITU-R BT.2020 Y' C'b C'r colorimetry format
  */
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/include/drm/drm_dp_helper.h
-struct drm_dp_aux {
-	const char *name;
-	struct i2c_adapter ddc;
-	struct device *dev;
-	struct drm_crtc *crtc;
-	struct mutex hw_mutex;
-	struct work_struct crc_work;
-	u8 crc_count;
-	ssize_t (*transfer)(struct drm_dp_aux *aux,
-			    struct drm_dp_aux_msg *msg);
-	/**
-	 * @i2c_nack_count: Counts I2C NACKs, used for DP validation.
-	 */
-	unsigned i2c_nack_count;
-	/**
-	 * @i2c_defer_count: Counts I2C DEFERs, used for DP validation.
-	 */
-	unsigned i2c_defer_count;
-	/**
-	 * @cec: struct containing fields used for CEC-Tunneling-over-AUX.
-	 */
-	struct drm_dp_aux_cec cec;
-	/**
-	 * @is_remote: Is this AUX CH actually using sideband messaging.
-	 */
-	bool is_remote;
-};
-
-ssize_t drm_dp_dpcd_read(struct drm_dp_aux *aux, unsigned int offset,
-			 void *buffer, size_t size);
-ssize_t drm_dp_dpcd_write(struct drm_dp_aux *aux, unsigned int offset,
-			  void *buffer, size_t size);
-
-/**
- * drm_dp_dpcd_readb() - read a single byte from the DPCD
- * @aux: DisplayPort AUX channel
- * @offset: address of the register to read
- * @valuep: location where the value of the register will be stored
- *
- * Returns the number of bytes transferred (1) on success, or a negative
- * error code on failure.
- */
-static inline ssize_t drm_dp_dpcd_readb(struct drm_dp_aux *aux,
-					unsigned int offset, u8 *valuep)
-{
-	return drm_dp_dpcd_read(aux, offset, valuep, 1);
-}
-
-/**
- * drm_dp_dpcd_writeb() - write a single byte to the DPCD
- * @aux: DisplayPort AUX channel
- * @offset: address of the register to write
- * @value: value to write to the register
- *
- * Returns the number of bytes transferred (1) on success, or a negative
- * error code on failure.
- */
-static inline ssize_t drm_dp_dpcd_writeb(struct drm_dp_aux *aux,
-					 unsigned int offset, u8 value)
-{
-	return drm_dp_dpcd_write(aux, offset, &value, 1);
-}
-
-int drm_dp_dpcd_read_link_status(struct drm_dp_aux *aux,
-				 u8 status[DP_LINK_STATUS_SIZE]);
-
-int drm_dp_downstream_max_clock(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
-				const u8 port_cap[4]);
-int drm_dp_downstream_max_bpc(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
-			      const u8 port_cap[4]);
-int drm_dp_downstream_id(struct drm_dp_aux *aux, char id[6]);
-void drm_dp_downstream_debug(struct seq_file *m, const u8 dpcd[DP_RECEIVER_CAP_SIZE],
-			     const u8 port_cap[4], struct drm_dp_aux *aux);
-
-void drm_dp_remote_aux_init(struct drm_dp_aux *aux);
-void drm_dp_aux_init(struct drm_dp_aux *aux);
-void drm_dp_aux_fini(struct drm_dp_aux *aux);
-int drm_dp_aux_register(struct drm_dp_aux *aux);
-void drm_dp_aux_unregister(struct drm_dp_aux *aux);
-
-int drm_dp_start_crc(struct drm_dp_aux *aux, struct drm_crtc *crtc);
-int drm_dp_stop_crc(struct drm_dp_aux *aux);
-
-struct drm_dp_dpcd_ident {
-	u8 oui[3];
-	u8 device_id[6];
-	u8 hw_rev;
-	u8 sw_major_rev;
-	u8 sw_minor_rev;
-} __packed;
-
-/**
- * struct drm_dp_desc - DP branch/sink device descriptor
- * @ident: DP device identification from DPCD 0x400 (sink) or 0x500 (branch).
- * @quirks: Quirks; use drm_dp_has_quirk() to query for the quirks.
- */
-struct drm_dp_desc {
-	struct drm_dp_dpcd_ident ident;
-	u32 quirks;
-};
-
-int drm_dp_read_desc(struct drm_dp_aux *aux, struct drm_dp_desc *desc,
-		     bool is_branch);
-
-/**
- * enum drm_dp_quirk - Display Port sink/branch device specific quirks
- *
- * Display Port sink and branch devices in the wild have a variety of bugs, try
- * to collect them here. The quirks are shared, but it's up to the drivers to
- * implement workarounds for them.
- */
-enum drm_dp_quirk {
-	/**
-	 * @DP_DPCD_QUIRK_CONSTANT_N:
-	 *
-	 * The device requires main link attributes Mvid and Nvid to be limited
-	 * to 16 bits. So will give a constant value (0x8000) for compatability.
-	 */
-	DP_DPCD_QUIRK_CONSTANT_N,
-	/**
-	 * @DP_DPCD_QUIRK_NO_PSR:
-	 *
-	 * The device does not support PSR even if reports that it supports or
-	 * driver still need to implement proper handling for such device.
-	 */
-	DP_DPCD_QUIRK_NO_PSR,
-	/**
-	 * @DP_DPCD_QUIRK_NO_SINK_COUNT:
-	 *
-	 * The device does not set SINK_COUNT to a non-zero value.
-	 * The driver should ignore SINK_COUNT during detection.
-	 */
-	DP_DPCD_QUIRK_NO_SINK_COUNT,
-	/**
-	 * @DP_DPCD_QUIRK_DSC_WITHOUT_VIRTUAL_DPCD:
-	 *
-	 * The device supports MST DSC despite not supporting Virtual DPCD.
-	 * The DSC caps can be read from the physical aux instead.
-	 */
-	DP_DPCD_QUIRK_DSC_WITHOUT_VIRTUAL_DPCD,
-=======
 enum dp_colorimetry {
 	DP_COLORIMETRY_DEFAULT = 0,
 	DP_COLORIMETRY_RGB_WIDE_FIXED = 0x1,
@@ -1816,7 +1671,6 @@ enum dp_colorimetry {
 	DP_COLORIMETRY_BT2020_RGB = 0x6,
 	DP_COLORIMETRY_BT2020_CYCC = 0x6,
 	DP_COLORIMETRY_BT2020_YCC = 0x7,
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/include/drm/display/drm_dp.h
 };
 
 /**
