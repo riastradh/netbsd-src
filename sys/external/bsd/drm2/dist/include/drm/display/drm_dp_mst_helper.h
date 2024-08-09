@@ -28,12 +28,9 @@
 #include <linux/list.h>
 #include <linux/mutex.h>
 #include <linux/types.h>
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/include/drm/drm_dp_mst_helper.h
 #include <linux/workqueue.h>
-#include <drm/drm_dp_helper.h>
-=======
+
 #include <drm/display/drm_dp_helper.h>
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/include/drm/display/drm_dp_mst_helper.h
 #include <drm/drm_atomic.h>
 
 #if IS_ENABLED(CONFIG_DRM_DEBUG_DP_MST_TOPOLOGY_REFS)
