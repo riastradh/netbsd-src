@@ -392,16 +392,6 @@ int drm_av_sync_delay(struct drm_connector *connector,
 #ifdef CONFIG_DRM_LOAD_EDID_FIRMWARE
 int __drm_set_edid_firmware_path(const char *path);
 int __drm_get_edid_firmware_path(char *buf, size_t bufsize);
-<<<<<<< HEAD
-#else
-#include <linux/err.h>
-static inline struct edid *
-drm_load_edid_firmware(struct drm_connector *connector)
-{
-	return ERR_PTR(-ENOENT);
-}
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 #endif
 
 bool drm_edid_are_equal(const struct edid *edid1, const struct edid *edid2);

@@ -130,15 +130,6 @@ struct displayid_detailed_timing_block {
 	struct displayid_detailed_timings_1 timings[];
 };
 
-<<<<<<< HEAD
-#define for_each_displayid_db(displayid, block, idx, length) \
-	for ((block) = (const struct displayid_block *)&(displayid)[idx]; \
-	     (idx) + sizeof(struct displayid_block) <= (length) && \
-	     (idx) + sizeof(struct displayid_block) + (block)->num_bytes <= (length) && \
-	     (block)->num_bytes > 0; \
-	     (idx) += (block)->num_bytes + sizeof(struct displayid_block), \
-	     (block) = (const struct displayid_block *)&(displayid)[idx])
-=======
 #define DISPLAYID_VESA_MSO_OVERLAP	GENMASK(3, 0)
 #define DISPLAYID_VESA_MSO_MODE		GENMASK(6, 5)
 
@@ -176,6 +167,5 @@ void displayid_iter_end(struct displayid_iter *iter);
 
 u8 displayid_version(const struct displayid_iter *iter);
 u8 displayid_primary_use(const struct displayid_iter *iter);
->>>>>>> vendor/linux-drm-v6.6.35
 
 #endif

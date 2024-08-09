@@ -37,11 +37,8 @@
 
 #include <linux/scatterlist.h>
 
-<<<<<<< HEAD
-struct page;
-=======
 struct iosys_map;
->>>>>>> vendor/linux-drm-v6.6.35
+struct page;
 
 void drm_clflush_pages(struct page *pages[], unsigned long num_pages);
 void drm_clflush_sg(struct sg_table *st);

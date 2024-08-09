@@ -444,13 +444,6 @@ static inline bool drm_is_render_client(const struct drm_file *file_priv)
 	return file_priv->minor->type == DRM_MINOR_RENDER;
 }
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-extern const struct fileops drm_fileops;
-int drm_open_file(struct drm_file *, void *, struct drm_minor *);
-void drm_close_file(struct drm_file *);
-#else
-=======
 /**
  * drm_is_accel_client - is this an open file of the compute acceleration node
  * @file_priv: DRM file
@@ -468,7 +461,11 @@ static inline bool drm_is_accel_client(const struct drm_file *file_priv)
 
 void drm_file_update_pid(struct drm_file *);
 
->>>>>>> vendor/linux-drm-v6.6.35
+#ifdef __NetBSD__
+extern const struct fileops drm_fileops;
+int drm_open_file(struct drm_file *, void *, struct drm_minor *);
+void drm_close_file(struct drm_file *);
+#else
 int drm_open(struct inode *inode, struct file *filp);
 int drm_open_helper(struct file *filp, struct drm_minor *minor);
 ssize_t drm_read(struct file *filp, char __user *buffer,
@@ -476,7 +473,7 @@ ssize_t drm_read(struct file *filp, char __user *buffer,
 int drm_release(struct inode *inode, struct file *filp);
 int drm_release_noglobal(struct inode *inode, struct file *filp);
 __poll_t drm_poll(struct file *filp, struct poll_table_struct *wait);
-#endif
+#endif	/* __NetBSD__ */
 int drm_event_reserve_init_locked(struct drm_device *dev,
 				  struct drm_file *file_priv,
 				  struct drm_pending_event *p,

@@ -288,160 +288,7 @@ struct drm_driver {
 	 */
 	void (*release) (struct drm_device *);
 
-	/**
 <<<<<<< HEAD
-	 * @get_vblank_counter:
-	 *
-	 * Driver callback for fetching a raw hardware vblank counter for the
-	 * CRTC specified with the pipe argument.  If a device doesn't have a
-	 * hardware counter, the driver can simply leave the hook as NULL.
-	 * The DRM core will account for missed vblank events while interrupts
-	 * where disabled based on system timestamps.
-	 *
-	 * Wraparound handling and loss of events due to modesetting is dealt
-	 * with in the DRM core code, as long as drivers call
-	 * drm_crtc_vblank_off() and drm_crtc_vblank_on() when disabling or
-	 * enabling a CRTC.
-	 *
-	 * This is deprecated and should not be used by new drivers.
-	 * Use &drm_crtc_funcs.get_vblank_counter instead.
-	 *
-	 * Returns:
-	 *
-	 * Raw vblank counter value.
-	 */
-	u32 (*get_vblank_counter) (struct drm_device *dev, unsigned int pipe);
-
-	/**
-	 * @enable_vblank:
-	 *
-	 * Enable vblank interrupts for the CRTC specified with the pipe
-	 * argument.
-	 *
-	 * This is deprecated and should not be used by new drivers.
-	 * Use &drm_crtc_funcs.enable_vblank instead.
-	 *
-	 * Returns:
-	 *
-	 * Zero on success, appropriate errno if the given @crtc's vblank
-	 * interrupt cannot be enabled.
-	 */
-	int (*enable_vblank) (struct drm_device *dev, unsigned int pipe);
-
-	/**
-	 * @disable_vblank:
-	 *
-	 * Disable vblank interrupts for the CRTC specified with the pipe
-	 * argument.
-	 *
-	 * This is deprecated and should not be used by new drivers.
-	 * Use &drm_crtc_funcs.disable_vblank instead.
-	 */
-	void (*disable_vblank) (struct drm_device *dev, unsigned int pipe);
-
-	/**
-	 * @get_scanout_position:
-	 *
-	 * Called by vblank timestamping code.
-	 *
-	 * Returns the current display scanout position from a crtc, and an
-	 * optional accurate ktime_get() timestamp of when position was
-	 * measured. Note that this is a helper callback which is only used if a
-	 * driver uses drm_calc_vbltimestamp_from_scanoutpos() for the
-	 * @get_vblank_timestamp callback.
-	 *
-	 * Parameters:
-	 *
-	 * dev:
-	 *     DRM device.
-	 * pipe:
-	 *     Id of the crtc to query.
-	 * in_vblank_irq:
-	 *     True when called from drm_crtc_handle_vblank().  Some drivers
-	 *     need to apply some workarounds for gpu-specific vblank irq quirks
-	 *     if flag is set.
-	 * vpos:
-	 *     Target location for current vertical scanout position.
-	 * hpos:
-	 *     Target location for current horizontal scanout position.
-	 * stime:
-	 *     Target location for timestamp taken immediately before
-	 *     scanout position query. Can be NULL to skip timestamp.
-	 * etime:
-	 *     Target location for timestamp taken immediately after
-	 *     scanout position query. Can be NULL to skip timestamp.
-	 * mode:
-	 *     Current display timings.
-	 *
-	 * Returns vpos as a positive number while in active scanout area.
-	 * Returns vpos as a negative number inside vblank, counting the number
-	 * of scanlines to go until end of vblank, e.g., -1 means "one scanline
-	 * until start of active scanout / end of vblank."
-	 *
-	 * Returns:
-	 *
-	 * True on success, false if a reliable scanout position counter could
-	 * not be read out.
-	 *
-	 * FIXME:
-	 *
-	 * Since this is a helper to implement @get_vblank_timestamp, we should
-	 * move it to &struct drm_crtc_helper_funcs, like all the other
-	 * helper-internal hooks.
-	 */
-	bool (*get_scanout_position) (struct drm_device *dev, unsigned int pipe,
-				      bool in_vblank_irq, int *vpos, int *hpos,
-				      ktime_t *stime, ktime_t *etime,
-				      const struct drm_display_mode *mode);
-
-	/**
-	 * @get_vblank_timestamp:
-	 *
-	 * Called by drm_get_last_vbltimestamp(). Should return a precise
-	 * timestamp when the most recent VBLANK interval ended or will end.
-	 *
-	 * Specifically, the timestamp in @vblank_time should correspond as
-	 * closely as possible to the time when the first video scanline of
-	 * the video frame after the end of VBLANK will start scanning out,
-	 * the time immediately after end of the VBLANK interval. If the
-	 * @crtc is currently inside VBLANK, this will be a time in the future.
-	 * If the @crtc is currently scanning out a frame, this will be the
-	 * past start time of the current scanout. This is meant to adhere
-	 * to the OpenML OML_sync_control extension specification.
-	 *
-	 * Paramters:
-	 *
-	 * dev:
-	 *     dev DRM device handle.
-	 * pipe:
-	 *     crtc for which timestamp should be returned.
-	 * max_error:
-	 *     Maximum allowable timestamp error in nanoseconds.
-	 *     Implementation should strive to provide timestamp
-	 *     with an error of at most max_error nanoseconds.
-	 *     Returns true upper bound on error for timestamp.
-	 * vblank_time:
-	 *     Target location for returned vblank timestamp.
-	 * in_vblank_irq:
-	 *     True when called from drm_crtc_handle_vblank().  Some drivers
-	 *     need to apply some workarounds for gpu-specific vblank irq quirks
-	 *     if flag is set.
-	 *
-	 * Returns:
-	 *
-	 * True on success, false on failure, which means the core should
-	 * fallback to a simple timestamp taken in drm_crtc_handle_vblank().
-	 *
-	 * FIXME:
-	 *
-	 * We should move this hook to &struct drm_crtc_funcs like all the other
-	 * vblank hooks.
-	 */
-	bool (*get_vblank_timestamp) (struct drm_device *dev, unsigned int pipe,
-				     int *max_error,
-				     ktime_t *vblank_time,
-				     bool in_vblank_irq);
-
 	/**
 	 * @irq_handler:
 	 *
@@ -482,24 +329,10 @@ struct drm_driver {
 	int (*request_irq)(struct drm_device *, int);
 	void (*free_irq)(struct drm_device *);
 #endif
-
-	/**
-	 * @master_create:
-	 *
-	 * Called whenever a new master is created. Only used by vmwgfx.
-	 */
-	int (*master_create)(struct drm_device *dev, struct drm_master *master);
-
-	/**
-	 * @master_destroy:
-	 *
-	 * Called whenever a master is destroyed. Only used by vmwgfx.
-	 */
-	void (*master_destroy)(struct drm_device *dev, struct drm_master *master);
-
-	/**
 =======
 >>>>>>> vendor/linux-drm-v6.6.35
+
+	/**
 	 * @master_set:
 	 *
 	 * Called whenever the minor master is set. Only used by vmwgfx.
@@ -564,42 +397,6 @@ struct drm_driver {
 				struct drm_device *dev,
 				struct dma_buf_attachment *attach,
 				struct sg_table *sgt);
-<<<<<<< HEAD
-	/**
-	 * @gem_prime_vmap:
-	 *
-	 * Deprecated vmap hook for GEM drivers. Please use
-	 * &drm_gem_object_funcs.vmap instead.
-	 */
-	void *(*gem_prime_vmap)(struct drm_gem_object *obj);
-
-	/**
-	 * @gem_prime_vunmap:
-	 *
-	 * Deprecated vunmap hook for GEM drivers. Please use
-	 * &drm_gem_object_funcs.vunmap instead.
-	 */
-	void (*gem_prime_vunmap)(struct drm_gem_object *obj, void *vaddr);
-
-	/**
-	 * @gem_prime_mmap:
-	 *
-	 * mmap hook for GEM drivers, used to implement dma-buf mmap in the
-	 * PRIME helpers.
-	 *
-	 * FIXME: There's way too much duplication going on here, and also moved
-	 * to &drm_gem_object_funcs.
-	 */
-#ifdef __NetBSD__
-	int (*gem_prime_mmap)(struct drm_gem_object *obj, off_t *offp,
-	    size_t len, int prot, int *flagsp, int *advicep,
-	    struct uvm_object **uobjp, int *maxprotp);
-#else
-	int (*gem_prime_mmap)(struct drm_gem_object *obj,
-				struct vm_area_struct *vma);
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/**
 	 * @dumb_create:
@@ -649,6 +446,8 @@ struct drm_driver {
 	 *
 	 * Print device specific fdinfo.  See Documentation/gpu/drm-usage-stats.rst.
 	 */
+	void (*show_fdinfo)(struct drm_printer *p, struct drm_file *f);
+
 <<<<<<< HEAD
 #ifdef __NetBSD__
 	int (*mmap_object)(struct drm_device *, off_t, size_t, int,
@@ -658,7 +457,6 @@ struct drm_driver {
 	const struct vm_operations_struct *gem_vm_ops;
 #endif
 =======
-	void (*show_fdinfo)(struct drm_printer *p, struct drm_file *f);
 >>>>>>> vendor/linux-drm-v6.6.35
 
 	/** @major: driver major number */
@@ -703,14 +501,11 @@ struct drm_driver {
 	 */
 	const struct file_operations *fops;
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	int (*ioctl_override)(struct file *, unsigned long, void *);
 #endif
 
-=======
 #ifdef CONFIG_DRM_LEGACY
->>>>>>> vendor/linux-drm-v6.6.35
 	/* Everything below here is for legacy driver, never use! */
 	/* private: */
 

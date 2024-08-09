@@ -61,6 +61,21 @@ struct drm_device {
 	/** @dev: Device structure of bus-device */
 	struct device *dev;
 
+#ifdef __NetBSD__
+	bus_dma_tag_t bus_dmat;	/* bus's full DMA tag, for internal use */
+	bus_dma_tag_t bus_dmat32;	/* bus's 32-bit DMA tag */
+	bus_dma_tag_t dmat;	/* DMA tag for driver, may be subregion */
+	bool dmat_subregion_p;
+	bus_addr_t dmat_subregion_min;
+	bus_addr_t dmat_subregion_max;
+	struct vmem *cma_pool;
+	struct sysmon_pswitch sc_monitor_hotplug;
+	struct mutex suspend_lock;
+	drm_waitqueue_t suspend_cv;
+	uint64_t active_ioctls;
+	struct lwp *suspender;
+#endif
+
 	/**
 	 * @managed:
 	 *
@@ -301,33 +316,6 @@ struct drm_device {
 	 */
 	spinlock_t event_lock;
 
-<<<<<<< HEAD
-	/** @agp: AGP data */
-	struct drm_agp_head *agp;
-
-	/** @pdev: PCI device structure */
-	struct pci_dev *pdev;
-
-#ifdef __alpha__
-	/** @hose: PCI hose, only used on ALPHA platforms. */
-	struct pci_controller *hose;
-#endif
-
-#ifdef __NetBSD__
-	bus_space_tag_t bst;
-	struct drm_bus_map *bus_maps;
-	unsigned bus_nmaps;
-	bus_dma_tag_t bus_dmat;	/* bus's full DMA tag, for internal use */
-	bus_dma_tag_t bus_dmat32;	/* bus's 32-bit DMA tag */
-	bus_dma_tag_t dmat;	/* DMA tag for driver, may be subregion */
-	bool dmat_subregion_p;
-	bus_addr_t dmat_subregion_min;
-	bus_addr_t dmat_subregion_max;
-	struct vmem *cma_pool;
-#endif
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	/** @num_crtcs: Number of CRTCs on this device */
 	unsigned int num_crtcs;
 
@@ -364,20 +352,6 @@ struct drm_device {
 	 */
 	struct drm_fb_helper *fb_helper;
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	struct sysmon_pswitch sc_monitor_hotplug;
-	struct mutex suspend_lock;
-	drm_waitqueue_t suspend_cv;
-	uint64_t active_ioctls;
-	struct lwp *suspender;
-#endif
-
-	/* Everything below here is for legacy driver, never use! */
-	/* private: */
-#if IS_ENABLED(CONFIG_DRM_LEGACY) || \
-    defined(__NetBSD__) /* XXX drm_vm.c / drm_cdevsw.c use this */
-=======
 	/**
 	 * @debugfs_mutex:
 	 *
@@ -395,9 +369,16 @@ struct drm_device {
 
 	/* Everything below here is for legacy driver, never use! */
 	/* private: */
-#if IS_ENABLED(CONFIG_DRM_LEGACY)
+#if IS_ENABLED(CONFIG_DRM_LEGACY) || \
+    defined(__NetBSD__) /* XXX drm_vm.c / drm_cdevsw.c use this */
 	/* List of devices per driver for stealth attach cleanup */
 	struct list_head legacy_dev_list;
+
+#ifdef __NetBSD__
+	bus_space_tag_t bst;
+	struct drm_bus_map *bus_maps;
+	unsigned bus_nmaps;
+#endif
 
 #ifdef __alpha__
 	/** @hose: PCI hose, only used on ALPHA platforms. */
@@ -407,7 +388,6 @@ struct drm_device {
 	/* AGP data */
 	struct drm_agp_head *agp;
 
->>>>>>> vendor/linux-drm-v6.6.35
 	/* Context handle management - linked list of context handles */
 	struct list_head ctxlist;
 

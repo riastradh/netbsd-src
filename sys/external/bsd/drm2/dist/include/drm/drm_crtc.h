@@ -29,17 +29,6 @@
 
 #include <linux/spinlock.h>
 #include <linux/types.h>
-<<<<<<< HEAD
-#include <linux/fb.h>
-#include <linux/hdmi.h>
-#include <linux/media-bus-format.h>
-#include <linux/kref.h>
-#include <linux/mutex.h>
-#include <linux/workqueue.h>
-#include <uapi/drm/drm_mode.h>
-#include <uapi/drm/drm_fourcc.h>
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 #include <drm/drm_modeset_lock.h>
 #include <drm/drm_mode_object.h>
 #include <drm/drm_modes.h>

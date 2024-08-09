@@ -120,7 +120,6 @@ struct drm_gem_object *drm_gem_prime_import(struct drm_device *dev,
 
 void drm_prime_gem_destroy(struct drm_gem_object *obj, struct sg_table *sg);
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 extern struct sg_table *drm_prime_bus_dmamem_to_sg(bus_dma_tag_t, const bus_dma_segment_t *, int);
 extern int drm_prime_sg_to_bus_dmamem(bus_dma_tag_t, bus_dma_segment_t *, int, int *, const struct sg_table *);
@@ -129,15 +128,10 @@ extern bus_size_t drm_prime_sg_size(struct sg_table *);
 extern void drm_prime_sg_free(struct sg_table *);
 extern bool drm_prime_sg_importable(bus_dma_tag_t, struct sg_table *);
 #else
-int drm_prime_sg_to_page_addr_arrays(struct sg_table *sgt, struct page **pages,
-				     dma_addr_t *addrs, int max_pages);
-#endif
-
-=======
 int drm_prime_sg_to_page_array(struct sg_table *sgt, struct page **pages,
 			       int max_pages);
 int drm_prime_sg_to_dma_addr_array(struct sg_table *sgt, dma_addr_t *addrs,
 				   int max_pages);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 #endif /* __DRM_PRIME_H__ */
