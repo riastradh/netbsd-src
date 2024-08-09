@@ -962,13 +962,6 @@ static inline int drm_panel_bridge_set_orientation(struct drm_connector *connect
 }
 #endif
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-extern void drm_bridge_init_lock(void);
-extern void drm_bridge_fini_lock(void);
-#endif
-
-=======
 #if defined(CONFIG_OF) && defined(CONFIG_DRM_PANEL_BRIDGE)
 struct drm_bridge *devm_drm_of_get_bridge(struct device *dev, struct device_node *node,
 					  u32 port, u32 endpoint);
@@ -994,5 +987,9 @@ static inline struct drm_bridge *drmm_of_get_bridge(struct drm_device *drm,
 
 void drm_bridge_debugfs_init(struct drm_minor *minor);
 
->>>>>>> vendor/linux-drm-v6.6.35
+#ifdef __NetBSD__
+extern void drm_bridge_init_lock(void);
+extern void drm_bridge_fini_lock(void);
+#endif
+
 #endif
