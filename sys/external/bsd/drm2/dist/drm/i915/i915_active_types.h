@@ -17,13 +17,8 @@
 #include <linux/rcupdate.h>
 #include <linux/workqueue.h>
 
-<<<<<<< HEAD
 #include <drm/drm_wait_netbsd.h> /* XXX */
 
-#include "i915_utils.h"
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 struct i915_active_fence {
 	struct dma_fence __rcu *fence;
 	struct dma_fence_cb cb;

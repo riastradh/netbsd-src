@@ -1986,8 +1986,13 @@ dp_to_lspcon(struct intel_dp *intel_dp)
 
 #define dp_to_i915(__intel_dp) to_i915(dp_to_dig_port(__intel_dp)->base.base.dev)
 
+/* PSR is disabled on NetBSD for now until we find what's wrong with it */
+#ifdef __NetBSD__
+#define CAN_PSR(intel_dp) 0
+#else
 #define CAN_PSR(intel_dp) ((intel_dp)->psr.sink_support && \
 			   (intel_dp)->psr.source_support)
+#endif
 
 static inline bool intel_encoder_can_psr(struct intel_encoder *encoder)
 {

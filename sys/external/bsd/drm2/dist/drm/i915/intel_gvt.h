@@ -30,10 +30,7 @@
 
 struct drm_i915_private;
 
-<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DRM_I915_GVT)
-=======
-#ifdef CONFIG_DRM_I915_GVT
 
 struct intel_gvt_mmio_table_iter {
 	struct drm_i915_private *i915;
@@ -42,7 +39,6 @@ struct intel_gvt_mmio_table_iter {
 			      u32 offset, u32 size);
 };
 
->>>>>>> vendor/linux-drm-v6.6.35
 int intel_gvt_init(struct drm_i915_private *dev_priv);
 void intel_gvt_driver_remove(struct drm_i915_private *dev_priv);
 int intel_gvt_init_host(void);

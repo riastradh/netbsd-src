@@ -19,11 +19,8 @@ struct drm_printer;
 
 void intel_rps_init_early(struct intel_rps *rps);
 void intel_rps_init(struct intel_rps *rps);
-<<<<<<< HEAD
 void intel_rps_fini(struct intel_rps *rps);
-=======
 void intel_rps_sanitize(struct intel_rps *rps);
->>>>>>> vendor/linux-drm-v6.6.35
 
 void intel_rps_driver_register(struct intel_rps *rps);
 void intel_rps_driver_unregister(struct intel_rps *rps);
@@ -74,9 +71,8 @@ void gen5_rps_irq_handler(struct intel_rps *rps);
 void gen6_rps_irq_handler(struct intel_rps *rps, u32 pm_iir);
 void gen11_rps_irq_handler(struct intel_rps *rps, u32 pm_iir);
 
-<<<<<<< HEAD
 extern spinlock_t mchdev_lock;
-=======
+
 static inline bool intel_rps_is_enabled(const struct intel_rps *rps)
 {
 	return test_bit(INTEL_RPS_ENABLED, &rps->flags);
@@ -136,6 +132,5 @@ static inline void intel_rps_clear_timer(struct intel_rps *rps)
 {
 	clear_bit(INTEL_RPS_TIMER, &rps->flags);
 }
->>>>>>> vendor/linux-drm-v6.6.35
 
 #endif /* INTEL_RPS_H */

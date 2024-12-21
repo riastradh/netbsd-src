@@ -353,15 +353,11 @@ bool intel_dpll_get_hw_state(struct drm_i915_private *i915,
 void intel_enable_shared_dpll(const struct intel_crtc_state *crtc_state);
 void intel_disable_shared_dpll(const struct intel_crtc_state *crtc_state);
 void intel_shared_dpll_swap_state(struct intel_atomic_state *state);
-<<<<<<< HEAD
-void intel_shared_dpll_init(struct drm_device *dev);
-void intel_shared_dpll_cleanup(struct drm_device *dev);
-=======
 void intel_shared_dpll_init(struct drm_i915_private *dev_priv);
+void intel_shared_dpll_cleanup(struct drm_device *dev);
 void intel_dpll_update_ref_clks(struct drm_i915_private *dev_priv);
 void intel_dpll_readout_hw_state(struct drm_i915_private *dev_priv);
 void intel_dpll_sanitize_state(struct drm_i915_private *dev_priv);
->>>>>>> vendor/linux-drm-v6.6.35
 
 void intel_dpll_dump_hw_state(struct drm_i915_private *dev_priv,
 			      const struct intel_dpll_hw_state *hw_state);

@@ -23,11 +23,6 @@ struct intel_encoder;
 struct intel_plane;
 struct intel_plane_state;
 
-<<<<<<< HEAD
-/* PSR is disabled on NetBSD for now until we find what's wrong with it */
-#define CAN_PSR(dev_priv) 0//(HAS_PSR(dev_priv) && dev_priv->psr.sink_support)
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 void intel_psr_init_dpcd(struct intel_dp *intel_dp);
 void intel_psr_pre_plane_update(struct intel_atomic_state *state,
 				struct intel_crtc *crtc);

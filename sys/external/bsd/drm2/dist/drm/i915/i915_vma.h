@@ -379,14 +379,9 @@ static inline bool i915_node_color_differs(const struct drm_mm_node *node,
 #  define	__iomem		__i915_vma_iomem
 #endif
 void __iomem *i915_vma_pin_iomap(struct i915_vma *vma);
-<<<<<<< HEAD
 #ifdef __NetBSD__
 #  undef	__iomem
 #endif
-
-#define IO_ERR_PTR(x) ((void __iomem *)ERR_PTR(x))
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 /**
  * i915_vma_unpin_iomap - unpins the mapping returned from i915_vma_iomap
@@ -399,19 +394,6 @@ void __iomem *i915_vma_pin_iomap(struct i915_vma *vma);
  */
 void i915_vma_unpin_iomap(struct i915_vma *vma);
 
-<<<<<<< HEAD
-static inline struct page *i915_vma_first_page(struct i915_vma *vma)
-{
-	GEM_BUG_ON(!vma->pages);
-#ifdef __NetBSD__
-	return vma->pages->sgl->sg_pgs[0];
-#else
-	return sg_page(vma->pages->sgl);
-#endif
-}
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 /**
  * i915_vma_pin_fence - pin fencing state
  * @vma: vma to pin fencing for

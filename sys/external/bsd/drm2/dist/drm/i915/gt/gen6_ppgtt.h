@@ -22,11 +22,8 @@ struct gen6_ppgtt {
 	bus_space_handle_t pd_bsh;
 #else
 	gen6_pte_t __iomem *pd_addr;
-<<<<<<< HEAD
 #endif
-=======
 	u32 pp_dir;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	atomic_t pin_count;
 
@@ -68,11 +65,7 @@ static inline struct gen6_ppgtt *to_gen6_ppgtt(struct i915_ppgtt *base)
 	for (iter = gen6_pde_index(start);				\
 	     length > 0 && iter < I915_PDES &&				\
 		     (pt = i915_pt_entry(pd, iter), true);		\
-<<<<<<< HEAD
 	     ({ u32 temp = round_up(start+1, 1 << GEN6_PDE_SHIFT);	\
-=======
-	     ({ u32 temp = ALIGN(start + 1, 1 << GEN6_PDE_SHIFT);	\
->>>>>>> vendor/linux-drm-v6.6.35
 		    temp = min(temp - start, length);			\
 		    start += temp; length -= temp; }), ++iter)
 

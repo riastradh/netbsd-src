@@ -9,19 +9,12 @@
 #define __INTEL_DP_H__
 
 #include <linux/types.h>
-
-<<<<<<< HEAD
-#include <drm/i915_drm.h>
 #include <drm/drm_dp_helper.h>
-
-#include "i915_reg.h"
 
 #include <sys/file.h>
 #define	pipe	pipe_drmhack	/* see intel_display.h */
 
-=======
 enum intel_output_format;
->>>>>>> vendor/linux-drm-v6.6.35
 enum pipe;
 enum port;
 struct drm_connector_state;
@@ -96,16 +89,8 @@ int intel_dp_rate_select(struct intel_dp *intel_dp, int rate);
 
 void intel_dp_compute_rate(struct intel_dp *intel_dp, int port_clock,
 			   u8 *link_bw, u8 *rate_select);
-<<<<<<< HEAD
-bool intel_dp_source_supports_hbr2(struct intel_dp *intel_dp);
-bool intel_dp_source_supports_hbr3(struct intel_dp *intel_dp);
-bool
-intel_dp_get_link_status(struct intel_dp *intel_dp, u8
-			 link_status[DP_LINK_STATUS_SIZE]);
-=======
 bool intel_dp_source_supports_tps3(struct drm_i915_private *i915);
 bool intel_dp_source_supports_tps4(struct drm_i915_private *i915);
->>>>>>> vendor/linux-drm-v6.6.35
 
 bool intel_dp_get_colorimetry_status(struct intel_dp *intel_dp);
 int intel_dp_link_required(int pixel_clock, int bpp);
