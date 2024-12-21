@@ -553,9 +553,6 @@ nouveau_accel_init(struct nouveau_drm *drm)
 	nouveau_bo_move_init(drm);
 }
 
-<<<<<<< HEAD
-int
-=======
 static void __printf(2, 3)
 nouveau_drm_errorf(struct nvif_object *object, const char *fmt, ...)
 {
@@ -591,7 +588,6 @@ nouveau_parent = {
 };
 
 static int
->>>>>>> vendor/linux-drm-v6.6.35
 nouveau_drm_device_init(struct drm_device *dev)
 {
 	struct nouveau_drm *drm;
@@ -729,9 +725,7 @@ nouveau_drm_device_fini(struct drm_device *dev)
 	nouveau_ttm_fini(drm);
 	nouveau_vga_fini(drm);
 
-<<<<<<< HEAD
 	spin_lock_destroy(&drm->tile.lock);
-=======
 	/*
 	 * There may be existing clients from as-yet unclosed files. For now,
 	 * clean them up here rather than deferring until the file is closed,
@@ -749,7 +743,6 @@ nouveau_drm_device_fini(struct drm_device *dev)
 		kfree(cli);
 	}
 	mutex_unlock(&drm->clients_lock);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	nouveau_cli_fini(&drm->client);
 	nouveau_cli_fini(&drm->master);
@@ -761,9 +754,6 @@ nouveau_drm_device_fini(struct drm_device *dev)
 	kfree(drm);
 }
 
-<<<<<<< HEAD
-#ifndef __NetBSD__
-=======
 /*
  * On some Intel PCIe bridge controllers doing a
  * D0 -> D3hot -> D3cold -> D0 sequence causes Nvidia GPUs to not reappear.
@@ -822,7 +812,7 @@ static void quirk_broken_nv_runpm(struct pci_dev *pdev)
 	}
 }
 
->>>>>>> vendor/linux-drm-v6.6.35
+#ifndef __NetBSD__
 static int nouveau_drm_probe(struct pci_dev *pdev,
 			     const struct pci_device_id *pent)
 {
@@ -1216,15 +1206,11 @@ nouveau_drm_open(struct drm_device *dev, struct drm_file *fpriv)
 
 #ifndef __NetBSD__
 	get_task_comm(tmpname, current);
-<<<<<<< HEAD
-	snprintf(name, sizeof(name), "%s[%d]", tmpname, pid_nr(fpriv->pid));
-#endif
-=======
 	rcu_read_lock();
 	snprintf(name, sizeof(name), "%s[%d]",
 		 tmpname, pid_nr(rcu_dereference(fpriv->pid)));
 	rcu_read_unlock();
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	if (!(cli = kzalloc(sizeof(*cli), GFP_KERNEL))) {
 		ret = -ENOMEM;

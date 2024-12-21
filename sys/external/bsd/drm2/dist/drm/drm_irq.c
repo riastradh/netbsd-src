@@ -71,58 +71,16 @@ __KERNEL_RCSID(0, "$NetBSD: drm_irq.c,v 1.18 2021/12/19 12:05:08 riastradh Exp $
 
 #include "drm_internal.h"
 
-<<<<<<< HEAD
 #ifdef __NetBSD__		/* XXX hurk -- selnotify &c. */
 #include <sys/poll.h>
 #include <sys/select.h>
 #endif
 
-
-/**
- * DOC: irq helpers
- *
- * The DRM core provides very simple support helpers to enable IRQ handling on a
- * device through the drm_irq_install() and drm_irq_uninstall() functions. This
- * only supports devices with a single interrupt on the main device stored in
- * &drm_device.dev and set as the device paramter in drm_dev_alloc().
- *
- * These IRQ helpers are strictly optional. Drivers which roll their own only
- * need to set &drm_device.irq_enabled to signal the DRM core that vblank
- * interrupts are working. Since these helpers don't automatically clean up the
- * requested interrupt like e.g. devm_request_irq() they're not really
- * recommended.
- */
-
-/**
- * drm_irq_install - install IRQ handler
- * @dev: DRM device
- * @irq: IRQ number to install the handler for
- *
- * Initializes the IRQ related data. Installs the handler, calling the driver
- * &drm_driver.irq_preinstall and &drm_driver.irq_postinstall functions before
- * and after the installation.
- *
- * This is the simplified helper interface provided for drivers with no special
- * needs. Drivers which need to install interrupt handlers for multiple
- * interrupts must instead set &drm_device.irq_enabled to signal the DRM core
- * that vblank interrupts are available.
- *
- * @irq must match the interrupt number that would be passed to request_irq(),
- * if called directly instead of using this helper function.
- *
- * &drm_driver.irq_handler is called to handle the registered interrupt.
- *
- * Returns:
- * Zero on success or a negative error code on failure.
- */
 #ifdef __NetBSD__
-int drm_irq_install(struct drm_device *dev)
+static int drm_legacy_irq_install(struct drm_device *dev)
 #else
-int drm_irq_install(struct drm_device *dev, int irq)
-#endif
-=======
 static int drm_legacy_irq_install(struct drm_device *dev, int irq)
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 {
 	int ret;
 	unsigned long sh_flags = 0;
@@ -167,14 +125,10 @@ static int drm_legacy_irq_install(struct drm_device *dev, int irq)
 	if (ret < 0) {
 		dev->irq_enabled = false;
 		if (drm_core_check_feature(dev, DRIVER_LEGACY))
-<<<<<<< HEAD
-			vga_client_register(dev->pdev, NULL, NULL, NULL);
+			vga_client_unregister(to_pci_dev(dev->dev));
 #ifdef __NetBSD__
 		(*dev->driver->free_irq)(dev);
 #else
-=======
-			vga_client_unregister(to_pci_dev(dev->dev));
->>>>>>> vendor/linux-drm-v6.6.35
 		free_irq(irq, dev);
 #endif
 	} else {
@@ -201,13 +155,8 @@ int drm_legacy_irq_uninstall(struct drm_device *dev)
 	 * vblank/irq handling. KMS drivers must ensure that vblanks are all
 	 * disabled when uninstalling the irq handler.
 	 */
-<<<<<<< HEAD
-	if (dev->num_crtcs) {
-		spin_lock_irqsave(&dev->event_lock, irqflags);
-=======
 	if (drm_dev_has_vblank(dev)) {
-		spin_lock_irqsave(&dev->vbl_lock, irqflags);
->>>>>>> vendor/linux-drm-v6.6.35
+		spin_lock_irqsave(&dev->event_lock, irqflags);
 		for (i = 0; i < dev->num_crtcs; i++) {
 			struct drm_vblank_crtc *vblank = &dev->vblank[i];
 
@@ -269,30 +218,22 @@ int drm_legacy_irq_control(struct drm_device *dev, void *data,
 
 	switch (ctl->func) {
 	case DRM_INST_HANDLER:
-<<<<<<< HEAD
+		pdev = to_pci_dev(dev->dev);
 #ifdef __NetBSD__
 		irq = ctl->irq;
 #else
-		irq = dev->pdev->irq;
-#endif
-=======
-		pdev = to_pci_dev(dev->dev);
 		irq = pdev->irq;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 		if (dev->if_version < DRM_IF_VERSION(1, 2) &&
 		    ctl->irq != irq)
 			return -EINVAL;
 		mutex_lock(&dev->struct_mutex);
-<<<<<<< HEAD
 #ifdef __NetBSD__
-		ret = drm_irq_install(dev);
+		ret = drm_legacy_irq_install(dev);
 #else
-		ret = drm_irq_install(dev, irq);
-#endif
-=======
 		ret = drm_legacy_irq_install(dev, irq);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 		mutex_unlock(&dev->struct_mutex);
 
 		return ret;

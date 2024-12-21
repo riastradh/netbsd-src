@@ -2931,16 +2931,12 @@ nvkm_device_del(struct nvkm_device **pdevice)
 	if (device) {
 		mutex_lock(&nv_devices_mutex);
 
-<<<<<<< HEAD
 		mutex_destroy(&device->mutex);
 
-		nvkm_event_fini(&device->event);
-=======
 		nvkm_intr_dtor(device);
 
 		list_for_each_entry_safe_reverse(subdev, subtmp, &device->subdev, head)
 			nvkm_subdev_del(&subdev);
->>>>>>> vendor/linux-drm-v6.6.35
 
 #ifdef __NetBSD__
 		if (device->mmiosz)
@@ -3005,19 +3001,13 @@ nvkm_device_ctor(const struct nvkm_device_func *func,
 {
 	struct nvkm_subdev *subdev;
 	u64 mmio_base, mmio_size;
-<<<<<<< HEAD
-	u32 boot0, strap;
 #ifdef __NetBSD__
 	bus_space_tag_t mmiot;
 	bus_space_handle_t mmioh;
-#else
-	void __iomem *map;
 #endif
-	int ret = -EEXIST, i;
-=======
+
 	u32 boot0, boot1, strap;
 	int ret = -EEXIST, j;
->>>>>>> vendor/linux-drm-v6.6.35
 	unsigned chipset;
 
 	mutex_lock(&nv_devices_mutex);
@@ -3046,47 +3036,31 @@ nvkm_device_ctor(const struct nvkm_device_func *func,
 	mmio_size = device->func->resource_size(device, 0);
 
 	if (detect || mmio) {
+#ifdef __NetBSD__
+		/* XXX errno NetBSD->Linux */
+		ret = -bus_space_map(mmiot, mmio_base, mmio_size,
+		    BUS_SPACE_MAP_LINEAR, &mmioh);
+		if (ret) {
+			nvdev_error(device, "unable to map PRI\n");
+			goto done;
+		}
+
+		device->mmiot = mmiot;
+		device->mmioh = mmioh;
+		device->mmioaddr = mmio_base;
+		device->mmiosz = mmio_size;
+#else
 		device->pri = ioremap(mmio_base, mmio_size);
 		if (device->pri == NULL) {
 			nvdev_error(device, "unable to map PRI\n");
 			ret = -ENOMEM;
 			goto done;
 		}
+#endif
 	}
 
 	/* identify the chipset, and determine classes of subdev/engines */
 	if (detect) {
-<<<<<<< HEAD
-#ifdef __NetBSD__
-		if (mmio_size < 0x102000) {
-			ret = -ENOMEM;
-			goto done;
-		}
-		/* XXX errno NetBSD->Linux */
-		ret = -bus_space_map(mmiot, mmio_base, 0x102000, 0, &mmioh);
-		if (ret)
-			goto done;
-#ifndef __BIG_ENDIAN
-		if (bus_space_read_stream_4(mmiot, mmioh, 4) != 0)
-#else
-		if (bus_space_read_stream_4(mmiot, mmioh, 4) == 0)
-#endif
-		{
-			bus_space_write_stream_4(mmiot, mmioh, 4, 0x01000001);
-			bus_space_read_stream_4(mmiot, mmioh, 0);
-		}
-
-		/* read boot0 and strapping information */
-		boot0 = bus_space_read_stream_4(mmiot, mmioh, 0x000000);
-		strap = bus_space_read_stream_4(mmiot, mmioh, 0x101000);
-		bus_space_unmap(mmiot, mmioh, 0x102000);
-#else
-		map = ioremap(mmio_base, 0x102000);
-		if (ret = -ENOMEM, map == NULL)
-			goto done;
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 		/* switch mmio to cpu's native endianness */
 		if (!nvkm_device_endianness(device)) {
 			nvdev_error(device,
@@ -3095,15 +3069,7 @@ nvkm_device_ctor(const struct nvkm_device_func *func,
 			goto done;
 		}
 
-<<<<<<< HEAD
-		/* read boot0 and strapping information */
-		boot0 = ioread32_native(map + 0x000000);
-		strap = ioread32_native(map + 0x101000);
-		iounmap(map);
-#endif
-=======
 		boot0 = nvkm_rd32(device, 0x000000);
->>>>>>> vendor/linux-drm-v6.6.35
 
 		/* chipset can be overridden for devel/testing purposes */
 		chipset = nvkm_longopt(device->cfgopt, "NvChipset", 0);
@@ -3310,32 +3276,6 @@ nvkm_device_ctor(const struct nvkm_device_func *func,
 	if (!device->name)
 		device->name = device->chip->name;
 
-<<<<<<< HEAD
-	if (mmio) {
-#ifdef __NetBSD__
-		/* XXX errno NetBSD->Linux */
-		ret = -bus_space_map(mmiot, mmio_base, mmio_size,
-		    BUS_SPACE_MAP_LINEAR, &mmioh);
-		if (ret) {
-			nvdev_error(device, "unable to map device registers\n");
-			goto done; /* XXX Linux leaks mutex */
-		}
-		device->mmiot = mmiot;
-		device->mmioh = mmioh;
-		device->mmioaddr = mmio_base;
-		device->mmiosz = mmio_size;
-#else
-		device->pri = ioremap(mmio_base, mmio_size);
-		if (!device->pri) {
-			nvdev_error(device, "unable to map PRI\n");
-			ret = -ENOMEM;
-			goto done;
-		}
-#endif
-	}
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	mutex_init(&device->mutex);
 	nvkm_intr_ctor(device);
 

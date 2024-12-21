@@ -806,14 +806,9 @@ nvkm_dp_init(struct nvkm_outp *outp)
 static void *
 nvkm_dp_dtor(struct nvkm_outp *outp)
 {
-<<<<<<< HEAD
 	struct nvkm_dp *dp = nvkm_dp(outp);
-	nvkm_notify_fini(&dp->hpd);
 	mutex_destroy(&dp->mutex);
-	return dp;
-=======
 	return outp;
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static const struct nvkm_outp_func

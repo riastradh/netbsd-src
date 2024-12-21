@@ -15,15 +15,6 @@ struct nvkm_pci {
 	const struct nvkm_pci_func *func;
 	struct nvkm_subdev subdev;
 	struct pci_dev *pdev;
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	pci_intr_handle_t *pci_ihp;
-	void *pci_intrcookie;
-#else
-	int irq;
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	struct {
 		struct agp_bridge_data *bridge;

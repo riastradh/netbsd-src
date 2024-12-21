@@ -31,29 +31,10 @@ static int
 acpi_read_bios(acpi_handle rom_handle, u8 *bios, u32 offset, u32 length)
 {
 #if defined(CONFIG_ACPI) && defined(CONFIG_X86)
-<<<<<<< HEAD
-int nouveau_acpi_get_bios_chunk(uint8_t *bios, int offset, int len);
-#ifdef __NetBSD__
-bool nouveau_acpi_rom_supported(struct acpi_devnode *);
-#else
-bool nouveau_acpi_rom_supported(struct device *);
-#endif
-#else
-static inline bool
-#ifdef __NetBSD__
-nouveau_acpi_rom_supported(struct acpi_devnode *dev)
-#else
-nouveau_acpi_rom_supported(struct device *dev)
-#endif
-{
-	return false;
-}
-=======
 	acpi_status status;
 	union acpi_object rom_arg_elements[2], *obj;
 	struct acpi_object_list rom_arg;
 	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL};
->>>>>>> vendor/linux-drm-v6.6.35
 
 	rom_arg.count = 2;
 	rom_arg.pointer = &rom_arg_elements[0];
@@ -128,16 +109,16 @@ acpi_read_slow(void *data, u32 offset, u32 length, struct nvkm_bios *bios)
 static void *
 acpi_init(struct nvkm_bios *bios, const char *name)
 {
-<<<<<<< HEAD
-	if (!nouveau_acpi_rom_supported(bios->subdev.device->acpidev))
-=======
 #if defined(CONFIG_ACPI) && defined(CONFIG_X86)
 	acpi_status status;
 	acpi_handle dhandle, rom_handle;
 
+#ifdef __NetBSD__
+	dhandle = (acpidev ? acpidev->ad_handle : NULL);
+#else
 	dhandle = ACPI_HANDLE(bios->subdev.device->dev);
+#endif
 	if (!dhandle)
->>>>>>> vendor/linux-drm-v6.6.35
 		return ERR_PTR(-ENODEV);
 
 	status = acpi_get_handle(dhandle, "_ROM", &rom_handle);

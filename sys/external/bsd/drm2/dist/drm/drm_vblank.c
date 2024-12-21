@@ -142,15 +142,13 @@ __KERNEL_RCSID(0, "$NetBSD: drm_vblank.c,v 1.16 2021/12/26 21:00:14 riastradh Ex
  * vblanks after a timer has expired, which can be configured through the
  * ``vblankoffdelay`` module parameter.
  *
-<<<<<<< HEAD
- * Lock order: event_lock -> vblank_time_lock
-=======
  * Drivers for hardware without support for vertical-blanking interrupts
  * must not call drm_vblank_init(). For such drivers, atomic helpers will
  * automatically generate fake vblank events as part of the display update.
  * This functionality also can be controlled by the driver by enabling and
  * disabling struct drm_crtc_state.no_vblank.
->>>>>>> vendor/linux-drm-v6.6.35
+ *
+ * Lock order: event_lock -> vblank_time_lock
  */
 
 /* Retry timestamp calculation up to 3 times to satisfy
@@ -359,17 +357,10 @@ static void drm_update_vblank_count(struct drm_device *dev, unsigned int pipe,
 		diff = 1;
 	}
 
-<<<<<<< HEAD
-	DRM_DEBUG_VBL("updating vblank count on crtc %u:"
-		      " current=%"PRIu64", diff=%u, hw=%u hw_last=%u\n",
-		      pipe, atomic64_read(&vblank->count), diff,
-		      cur_vblank, vblank->last);
-=======
 	drm_dbg_vbl(dev, "updating vblank count on crtc %u:"
 		    " current=%llu, diff=%u, hw=%u hw_last=%u\n",
 		    pipe, (unsigned long long)atomic64_read(&vblank->count),
 		    diff, cur_vblank, vblank->last);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (diff == 0) {
 		drm_WARN_ON_ONCE(dev, cur_vblank != vblank->last);
@@ -428,16 +419,10 @@ u64 drm_crtc_accurate_vblank_count(struct drm_crtc *crtc)
 	u64 vblank;
 	unsigned long flags;
 
-<<<<<<< HEAD
 	assert_spin_locked(&dev->event_lock);
-
-	WARN_ONCE(drm_debug_enabled(DRM_UT_VBL) && !dev->driver->get_vblank_timestamp,
-		  "This function requires support for accurate vblank timestamps.");
-=======
 	drm_WARN_ONCE(dev, drm_debug_enabled(DRM_UT_VBL) &&
 		      !crtc->funcs->get_vblank_timestamp,
 		      "This function requires support for accurate vblank timestamps.");
->>>>>>> vendor/linux-drm-v6.6.35
 
 	spin_lock_irqsave(&dev->vblank_time_lock, flags);
 
@@ -849,20 +834,12 @@ drm_crtc_vblank_helper_get_vblank_timestamp_internal(
 	ts_etime = ktime_to_timespec64(etime);
 	ts_vblank_time = ktime_to_timespec64(*vblank_time);
 
-<<<<<<< HEAD
-	DRM_DEBUG_VBL("crtc %u : v p(%d,%d)@ %"PRId64".%06ld -> %"PRId64".%06ld [e %d us, %d rep]\n",
-		      pipe, hpos, vpos,
-		      (u64)ts_etime.tv_sec, ts_etime.tv_nsec / 1000,
-		      (u64)ts_vblank_time.tv_sec, ts_vblank_time.tv_nsec / 1000,
-		      duration_ns / 1000, i);
-=======
 	drm_dbg_vbl(dev,
-		    "crtc %u : v p(%d,%d)@ %lld.%06ld -> %lld.%06ld [e %d us, %d rep]\n",
+		    "crtc %u : v p(%d,%d)@ %"PRId64".%06ld -> %"PRId64".%06ld [e %d us, %d rep]\n",
 		    pipe, hpos, vpos,
 		    (u64)ts_etime.tv_sec, ts_etime.tv_nsec / 1000,
 		    (u64)ts_vblank_time.tv_sec, ts_vblank_time.tv_nsec / 1000,
 		    duration_ns / 1000, i);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	return true;
 }
@@ -1265,22 +1242,13 @@ static int drm_vblank_enable(struct drm_device *dev, unsigned int pipe)
 	return ret;
 }
 
-<<<<<<< HEAD
-static int drm_vblank_get_locked(struct drm_device *dev, unsigned int pipe)
-=======
-int drm_vblank_get(struct drm_device *dev, unsigned int pipe)
->>>>>>> vendor/linux-drm-v6.6.35
+int drm_vblank_get_locked(struct drm_device *dev, unsigned int pipe)
 {
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	int ret = 0;
 
-<<<<<<< HEAD
 	assert_spin_locked(&dev->event_lock);
-
-	if (!dev->num_crtcs)
-=======
 	if (!drm_dev_has_vblank(dev))
->>>>>>> vendor/linux-drm-v6.6.35
 		return -EINVAL;
 
 	if (drm_WARN_ON(dev, pipe >= dev->num_crtcs))
@@ -1519,15 +1487,9 @@ void drm_crtc_vblank_off(struct drm_crtc *crtc)
 	list_for_each_entry_safe(e, t, &dev->vblank_event_list, base.link) {
 		if (e->pipe != pipe)
 			continue;
-<<<<<<< HEAD
-		DRM_DEBUG("Sending premature vblank event on disable: "
-			  "wanted %"PRIu64", current %"PRIu64"\n",
-			  e->sequence, seq);
-=======
 		drm_dbg_core(dev, "Sending premature vblank event on disable: "
-			     "wanted %llu, current %llu\n",
+			     "wanted %"PRIu64", current %"PRIu64"\n",
 			     e->sequence, seq);
->>>>>>> vendor/linux-drm-v6.6.35
 		list_del(&e->base.link);
 		drm_vblank_put(dev, pipe);
 		send_vblank_event(dev, e, seq, now);
@@ -1705,16 +1667,10 @@ static void drm_vblank_restore(struct drm_device *dev, unsigned int pipe)
 		diff = DIV_ROUND_CLOSEST_ULL(diff_ns, framedur_ns);
 
 
-<<<<<<< HEAD
-	DRM_DEBUG_VBL("missed %d vblanks in %"PRId64" ns, frame duration=%d ns, hw_diff=%d\n",
-		      diff, diff_ns, framedur_ns, cur_vblank - vblank->last);
-	store_vblank(dev, pipe, diff, t_vblank, cur_vblank);
-=======
 	drm_dbg_vbl(dev,
-		    "missed %d vblanks in %lld ns, frame duration=%d ns, hw_diff=%d\n",
+		    "missed %d vblanks in %"PRId64" ns, frame duration=%d ns, hw_diff=%d\n",
 		    diff, diff_ns, framedur_ns, cur_vblank - vblank->last);
 	vblank->last = (cur_vblank - diff) & max_vblank_count;
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**
@@ -1880,13 +1836,8 @@ static int drm_queue_vblank_event(struct drm_device *dev, unsigned int pipe,
 
 	seq = drm_vblank_count_and_time(dev, pipe, &now);
 
-<<<<<<< HEAD
-	DRM_DEBUG("event on vblank count %"PRIu64", current %"PRIu64", crtc %u\n",
-		  req_seq, seq, pipe);
-=======
-	drm_dbg_core(dev, "event on vblank count %llu, current %llu, crtc %u\n",
+	drm_dbg_core(dev, "event on vblank count %"PRIu64", current %"PRIu64", crtc %u\n",
 		     req_seq, seq, pipe);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	trace_drm_vblank_event_queued(file_priv, pipe, req_seq);
 
@@ -2137,13 +2088,8 @@ static void drm_handle_vblank_events(struct drm_device *dev, unsigned int pipe)
 		if (!drm_vblank_passed(seq, e->sequence))
 			continue;
 
-<<<<<<< HEAD
-		DRM_DEBUG("vblank event on %"PRIu64", current %"PRIu64"\n",
-			  e->sequence, seq);
-=======
-		drm_dbg_core(dev, "vblank event on %llu, current %llu\n",
+		drm_dbg_core(dev, "vblank event on %"PRIu64", current %"PRIu64"\n",
 			     e->sequence, seq);
->>>>>>> vendor/linux-drm-v6.6.35
 
 		list_del(&e->base.link);
 		drm_vblank_put(dev, pipe);

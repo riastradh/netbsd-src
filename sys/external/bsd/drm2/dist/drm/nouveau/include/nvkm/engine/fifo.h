@@ -18,21 +18,8 @@ struct nvkm_chan {
 
 	struct nvkm_gpuobj *inst;
 	struct nvkm_vmm *vmm;
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	bus_space_tag_t bst;
-	bus_space_handle_t bsh;
-	bool mapped;
-	bool subregion;
-#else
-	void __iomem *user;
-#endif
-	u64 addr;
-	u32 size;
-=======
 	struct nvkm_gpuobj *push;
 	int id;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	struct {
 		struct nvkm_memory *mem;

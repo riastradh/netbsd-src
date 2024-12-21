@@ -286,20 +286,14 @@ static int radeon_ttm_io_mem_reserve(struct ttm_device *bdev, struct ttm_resourc
 #if IS_ENABLED(CONFIG_AGP)
 		if (rdev->flags & RADEON_IS_AGP) {
 			/* RADEON_IS_AGP is set only if AGP is active */
-<<<<<<< HEAD
-			mem->bus.offset = mem->start << PAGE_SHIFT;
-			mem->bus.base = rdev->mc.agp_base;
-			mem->bus.is_iomem = !rdev->ddev->agp->cant_use_aperture;
-			KASSERTMSG((mem->bus.base & (PAGE_SIZE - 1)) == 0,
-			    "agp aperture is not page-aligned: %" PRIx64 "",
-			    (uint64_t)mem->bus.base);
-			KASSERT((mem->bus.offset & (PAGE_SIZE - 1)) == 0);
-=======
 			mem->bus.offset = (mem->start << PAGE_SHIFT) +
 				rdev->mc.agp_base;
 			mem->bus.is_iomem = !rdev->agp->cant_use_aperture;
 			mem->bus.caching = ttm_write_combined;
->>>>>>> vendor/linux-drm-v6.6.35
+			KASSERTMSG((mem->bus.base & (PAGE_SIZE - 1)) == 0,
+			    "agp aperture is not page-aligned: %" PRIx64 "",
+			    (uint64_t)mem->bus.base);
+			KASSERT((mem->bus.offset & (PAGE_SIZE - 1)) == 0);
 		}
 #endif
 		break;
@@ -310,11 +304,8 @@ static int radeon_ttm_io_mem_reserve(struct ttm_device *bdev, struct ttm_resourc
 			return -EINVAL;
 		mem->bus.offset += rdev->mc.aper_base;
 		mem->bus.is_iomem = true;
-<<<<<<< HEAD
-#ifndef __NetBSD__		/* alpha hose handled through bus_space(9) */
-=======
 		mem->bus.caching = ttm_write_combined;
->>>>>>> vendor/linux-drm-v6.6.35
+#ifndef __NetBSD__		/* alpha hose handled through bus_space(9) */
 #ifdef __alpha__
 		/*
 		 * Alpha: use bus.addr to hold the ioremap() return,
@@ -367,13 +358,9 @@ static int radeon_ttm_tt_pin_userptr(struct ttm_device *bdev, struct ttm_tt *ttm
 {
 	struct radeon_device *rdev = radeon_get_rdev(bdev);
 	struct radeon_ttm_tt *gtt = (void *)ttm;
-<<<<<<< HEAD
 #ifndef __NetBSD__
-	unsigned pinned = 0, nents;
-#endif
-=======
 	unsigned pinned = 0;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	int r;
 
 	int write = !(gtt->userflags & RADEON_GEM_USERPTR_READONLY);
@@ -514,7 +501,6 @@ release_pages:
 
 static void radeon_ttm_tt_unpin_userptr(struct ttm_device *bdev, struct ttm_tt *ttm)
 {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	struct radeon_device *rdev = radeon_get_rdev(ttm->bdev);
 	struct radeon_ttm_tt *gtt = (void *)ttm;
@@ -523,10 +509,7 @@ static void radeon_ttm_tt_unpin_userptr(struct ttm_device *bdev, struct ttm_tt *
 	uvm_vsunlock(gtt->usermm, (void *)(vaddr_t)gtt->userptr,
 	    ttm->num_pages << PAGE_SHIFT);
 #else
-	struct radeon_device *rdev = radeon_get_rdev(ttm->bdev);
-=======
 	struct radeon_device *rdev = radeon_get_rdev(bdev);
->>>>>>> vendor/linux-drm-v6.6.35
 	struct radeon_ttm_tt *gtt = (void *)ttm;
 	struct sg_page_iter sg_iter;
 
@@ -672,17 +655,11 @@ static int radeon_ttm_tt_populate(struct ttm_device *bdev,
 				  struct ttm_tt *ttm,
 				  struct ttm_operation_ctx *ctx)
 {
-<<<<<<< HEAD
-	struct radeon_ttm_tt *gtt = radeon_ttm_tt_to_gtt(ttm);
 #if !defined(__NetBSD__) || IS_ENABLED(CONFIG_AGP)
-	struct radeon_device *rdev;
-#endif
-	bool slave = !!(ttm->page_flags & TTM_PAGE_FLAG_SG);
-=======
 	struct radeon_device *rdev = radeon_get_rdev(bdev);
+#endif
 	struct radeon_ttm_tt *gtt = radeon_ttm_tt_to_gtt(rdev, ttm);
 	bool slave = !!(ttm->page_flags & TTM_TT_FLAG_EXTERNAL);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (gtt && gtt->userptr) {
 #ifdef __NetBSD__
@@ -746,19 +723,13 @@ static int radeon_ttm_tt_populate(struct ttm_device *bdev,
 
 static void radeon_ttm_tt_unpopulate(struct ttm_device *bdev, struct ttm_tt *ttm)
 {
-<<<<<<< HEAD
 #if !defined(__NetBSD__) || IS_ENABLED(CONFIG_AGP)
-	struct radeon_device *rdev;
-#endif
-	struct radeon_ttm_tt *gtt = radeon_ttm_tt_to_gtt(ttm);
-	bool slave = !!(ttm->page_flags & TTM_PAGE_FLAG_SG);
-=======
 	struct radeon_device *rdev = radeon_get_rdev(bdev);
+#endif
 	struct radeon_ttm_tt *gtt = radeon_ttm_tt_to_gtt(rdev, ttm);
 	bool slave = !!(ttm->page_flags & TTM_TT_FLAG_EXTERNAL);
 
 	radeon_ttm_tt_unbind(bdev, ttm);
->>>>>>> vendor/linux-drm-v6.6.35
 
 #ifdef __NetBSD__
 	if (slave && ttm->sg) {

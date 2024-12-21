@@ -1654,14 +1654,11 @@ nvkm_device_pci_func = {
 	.dtor = nvkm_device_pci_dtor,
 	.preinit = nvkm_device_pci_preinit,
 	.fini = nvkm_device_pci_fini,
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	.dma_tag = nvkm_device_pci_dma_tag,
 	.resource_tag = nvkm_device_pci_resource_tag,
 #endif
-=======
 	.irq = nvkm_device_pci_irq,
->>>>>>> vendor/linux-drm-v6.6.35
 	.resource_addr = nvkm_device_pci_resource_addr,
 	.resource_size = nvkm_device_pci_resource_size,
 #ifdef __NetBSD__

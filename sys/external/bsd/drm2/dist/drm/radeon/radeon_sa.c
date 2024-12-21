@@ -56,7 +56,27 @@ int radeon_sa_bo_manager_init(struct radeon_device *rdev,
 {
 	int r;
 
+<<<<<<< HEAD
+#ifdef __NetBSD__
+	spin_lock_init(&sa_manager->wq_lock);
+	DRM_INIT_WAITQUEUE(&sa_manager->wq, "radsabom");
+#else
+	init_waitqueue_head(&sa_manager->wq);
+#endif
+	sa_manager->bo = NULL;
+	sa_manager->size = size;
+	sa_manager->domain = domain;
+	sa_manager->align = align;
+	sa_manager->hole = &sa_manager->olist;
+	INIT_LIST_HEAD(&sa_manager->olist);
+	for (i = 0; i < RADEON_NUM_RINGS; ++i) {
+		INIT_LIST_HEAD(&sa_manager->flist[i]);
+	}
+
+	r = radeon_bo_create(rdev, size, align, true,
+=======
 	r = radeon_bo_create(rdev, size, RADEON_GPU_PAGE_SIZE, true,
+>>>>>>> vendor/linux-drm-v6.6.35
 			     domain, flags, NULL, NULL, &sa_manager->bo);
 	if (r) {
 		dev_err(rdev->dev, "(%d) failed to allocate bo for manager\n", r);
@@ -75,6 +95,14 @@ void radeon_sa_bo_manager_fini(struct radeon_device *rdev,
 {
 	drm_suballoc_manager_fini(&sa_manager->base);
 	radeon_bo_unref(&sa_manager->bo);
+<<<<<<< HEAD
+	sa_manager->size = 0;
+#ifdef __NetBSD__
+	DRM_DESTROY_WAITQUEUE(&sa_manager->wq);
+	spin_lock_destroy(&sa_manager->wq_lock);
+#endif
+=======
+>>>>>>> vendor/linux-drm-v6.6.35
 }
 
 int radeon_sa_bo_manager_start(struct radeon_device *rdev,

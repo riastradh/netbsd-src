@@ -340,13 +340,8 @@ nvkm_udevice_child_get(struct nvkm_object *object, int index,
 	const struct nvkm_device_oclass *sclass = NULL;
 	int i;
 
-<<<<<<< HEAD
 	for (; mask && !sclass && (i = __ffs64(mask), 1); mask &= ~(1ULL << i)) {
-		if (!(engine = nvkm_device_engine(device, i)) ||
-=======
-	for (; i = __ffs64(mask), mask && !sclass; mask &= ~(1ULL << i)) {
 		if (!(engine = nvkm_device_engine(device, i, 0)) ||
->>>>>>> vendor/linux-drm-v6.6.35
 		    !(engine->func->base.sclass))
 			continue;
 		oclass->engine = engine;

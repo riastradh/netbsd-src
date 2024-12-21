@@ -240,15 +240,10 @@ static const struct nvkm_device_func
 nvkm_device_tegra_func = {
 	.tegra = nvkm_device_tegra,
 	.dtor = nvkm_device_tegra_dtor,
-<<<<<<< HEAD
-	.init = nvkm_device_tegra_init,
-	.fini = nvkm_device_tegra_fini,
 #ifdef __NetBSD__
 	.resource_tag = nvkm_device_tegra_resource_tag,
 #endif
-=======
 	.irq = nvkm_device_tegra_irq,
->>>>>>> vendor/linux-drm-v6.6.35
 	.resource_addr = nvkm_device_tegra_resource_addr,
 	.resource_size = nvkm_device_tegra_resource_size,
 	.cpu_coherent = false,

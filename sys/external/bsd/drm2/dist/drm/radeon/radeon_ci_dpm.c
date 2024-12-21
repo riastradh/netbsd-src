@@ -1381,19 +1381,6 @@ static void ci_set_dpm_event_sources(struct radeon_device *rdev, u32 sources)
 	}
 
 	if (want_thermal_protection) {
-<<<<<<< HEAD
-#if 0
-		/* XXX: need to figure out how to handle this properly */
-		tmp = RREG32_SMC(CG_THERMAL_CTRL);
-		tmp &= DPM_EVENT_SRC_MASK;
-		tmp |= DPM_EVENT_SRC(dpm_event_src);
-		WREG32_SMC(CG_THERMAL_CTRL, tmp);
-#else
-		(void)dpm_event_src;
-#endif
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 		tmp = RREG32_SMC(GENERAL_PWRMGT);
 		if (pi->thermal_protection)
 			tmp &= ~THERMAL_PROTECTION_DIS;

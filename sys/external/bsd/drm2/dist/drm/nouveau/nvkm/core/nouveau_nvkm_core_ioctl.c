@@ -358,14 +358,7 @@ nvkm_ioctl_v0[] = {
 	{ 0x00, nvkm_ioctl_wr },
 	{ 0x00, nvkm_ioctl_map },
 	{ 0x00, nvkm_ioctl_unmap },
-<<<<<<< HEAD
-	{ 0x00, nvkm_ioctl_ntfy_new },
-	{ 0x00, nvkm_ioctl_ntfy_del },
-	{ 0x00, nvkm_ioctl_ntfy_get },
-	{ 0x00, nvkm_ioctl_ntfy_put },
-	{ 0x00, nvkm_ioctl_map_netbsd },
-=======
->>>>>>> vendor/linux-drm-v6.6.35
+	[NVIF_IOCTL_V0_MAP_NETBSD] = { 0x00, nvkm_ioctl_map_netbsd },
 };
 
 static int

@@ -26,24 +26,6 @@
 #ifndef __RADEON_PM_H__
 #define __RADEON_PM_H__
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/include/drm/drm_irq.h
-#ifdef __NetBSD__
-#include <drm/drm_irq_netbsd.h>
-#endif
-
-struct drm_device;
-
-#ifdef __NetBSD__
-int drm_irq_install(struct drm_device *dev);
-#else
-int drm_irq_install(struct drm_device *dev, int irq);
-#endif
-
-int drm_irq_uninstall(struct drm_device *dev);
-
-#endif
-=======
 void radeon_pm_acpi_event_handler(struct radeon_device *rdev);
 
 #endif				/* __RADEON_PM_H__ */
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/radeon/radeon_pm.h

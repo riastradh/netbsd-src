@@ -337,16 +337,6 @@ static void *
 nvkm_fifo_dtor(struct nvkm_engine *engine)
 {
 	struct nvkm_fifo *fifo = nvkm_fifo(engine);
-<<<<<<< HEAD
-	void *data = fifo;
-	if (fifo->func->dtor)
-		data = fifo->func->dtor(fifo);
-	nvkm_event_fini(&fifo->kevent);
-	nvkm_event_fini(&fifo->cevent);
-	nvkm_event_fini(&fifo->uevent);
-	spin_lock_destroy(&fifo->lock);
-	return data;
-=======
 	struct nvkm_runl *runl, *runt;
 	struct nvkm_runq *runq, *rtmp;
 
@@ -363,9 +353,9 @@ nvkm_fifo_dtor(struct nvkm_engine *engine)
 	nvkm_chid_unref(&fifo->chid);
 
 	nvkm_event_fini(&fifo->nonstall.event);
+	spin_lock_destroy(&fifo->lock);
 	mutex_destroy(&fifo->mutex);
 	return fifo;
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static const struct nvkm_engine_func

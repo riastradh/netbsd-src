@@ -30,14 +30,8 @@ __KERNEL_RCSID(0, "$NetBSD: nouveau_nvkm_core_subdev.c,v 1.5 2021/12/19 11:34:44
 #include <core/device.h>
 #include <core/option.h>
 #include <subdev/mc.h>
-
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-static struct lock_class_key nvkm_subdev_lock_class[NVKM_SUBDEV_NR];
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 const char *
 nvkm_subdev_type[NVKM_SUBDEV_NR] = {
 #define NVKM_LAYOUT_ONCE(type,data,ptr,...) [type] = #ptr,
@@ -151,14 +145,7 @@ nvkm_subdev_init_(struct nvkm_subdev *subdev)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
-		subdev->oneinit = true;
-		time = ktime_to_us(ktime_get()) - time;
-		nvkm_trace(subdev, "one-time init completed in %"PRId64"us\n", time);
-	}
-=======
 	subdev->use.enabled = true;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	if (subdev->func->init) {
 		ret = subdev->func->init(subdev);

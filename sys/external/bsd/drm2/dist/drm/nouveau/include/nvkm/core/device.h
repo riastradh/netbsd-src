@@ -78,7 +78,12 @@ struct nvkm_device {
 		struct list_head intr;
 		struct list_head prio[NVKM_INTR_PRIO_NR];
 		spinlock_t lock;
+#ifdef __NetBSD__
+		pci_intr_handle_t *pci_ihp;
+		void *pci_intrcookie;
+#else
 		int irq;
+#endif
 		bool alloc;
 		bool armed;
 		bool legacy_done;

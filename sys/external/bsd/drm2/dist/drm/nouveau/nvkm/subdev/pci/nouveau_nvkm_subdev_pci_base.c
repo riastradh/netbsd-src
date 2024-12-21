@@ -78,29 +78,6 @@ nvkm_pci_rom_shadow(struct nvkm_pci *pci, bool shadow)
 	nvkm_pci_wr32(pci, 0x0050, data);
 }
 
-<<<<<<< HEAD
-static irqreturn_t
-nvkm_pci_intr(DRM_IRQ_ARGS)
-{
-	struct nvkm_pci *pci = arg;
-	struct nvkm_device *device = pci->subdev.device;
-	bool handled = false;
-
-#ifndef __NetBSD__
-	if (pci->irq < 0)
-		return IRQ_HANDLED;
-#endif
-
-	nvkm_mc_intr_unarm(device);
-	if (pci->msi)
-		pci->func->msi_rearm(pci);
-	nvkm_mc_intr(device, &handled);
-	nvkm_mc_intr_rearm(device);
-	return handled ? IRQ_HANDLED : IRQ_NONE;
-}
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static int
 nvkm_pci_fini(struct nvkm_subdev *subdev, bool suspend)
 {

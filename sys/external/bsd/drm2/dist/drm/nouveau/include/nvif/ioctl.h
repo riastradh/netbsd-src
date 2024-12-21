@@ -19,6 +19,7 @@ struct nvif_ioctl_v0 {
 #define NVIF_IOCTL_V0_UNMAP                                                0x08
 #ifdef __NetBSD__
 /* XXX Kludge for NetBSD kernel-only use.  */
+/* Previously numbers 0x09 - 0x0c were NVIF_IOCTL_V0_NTFY_* deleted upstream */
 #define NVIF_IOCTL_V0_MAP_NETBSD                                           0x0d
 #endif
 	__u8  type;

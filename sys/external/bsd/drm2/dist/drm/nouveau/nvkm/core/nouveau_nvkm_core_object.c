@@ -38,15 +38,12 @@ nvkm_object_search(struct nvkm_client *client, u64 handle,
 	unsigned long flags;
 
 	if (handle) {
-<<<<<<< HEAD
+		spin_lock_irqsave(&client->obj_lock, flags);
 #ifdef __NetBSD__
 		object = rb_tree_find_node(&client->objtree, &handle);
 		if (object)
 			goto done;
 #else
-=======
-		spin_lock_irqsave(&client->obj_lock, flags);
->>>>>>> vendor/linux-drm-v6.6.35
 		struct rb_node *node = client->objroot.rb_node;
 		while (node) {
 			object = rb_entry(node, typeof(*object), node);
@@ -60,11 +57,8 @@ nvkm_object_search(struct nvkm_client *client, u64 handle,
 				goto done;
 			}
 		}
-<<<<<<< HEAD
 #endif
-=======
 		spin_unlock_irqrestore(&client->obj_lock, flags);
->>>>>>> vendor/linux-drm-v6.6.35
 		return ERR_PTR(-ENOENT);
 	} else {
 		object = &client->object;
@@ -79,7 +73,9 @@ done:
 void
 nvkm_object_remove(struct nvkm_object *object)
 {
-<<<<<<< HEAD
+	unsigned long flags;
+
+	spin_lock_irqsave(&object->client->obj_lock, flags);
 #ifdef __NetBSD__
 	if (object->on_tree) {
 		rb_tree_remove_node(&object->client->objtree, object);
@@ -89,34 +85,28 @@ nvkm_object_remove(struct nvkm_object *object)
 	if (!RB_EMPTY_NODE(&object->node))
 		rb_erase(&object->node, &object->client->objroot);
 #endif
-=======
-	unsigned long flags;
-
-	spin_lock_irqsave(&object->client->obj_lock, flags);
-	if (!RB_EMPTY_NODE(&object->node))
-		rb_erase(&object->node, &object->client->objroot);
 	spin_unlock_irqrestore(&object->client->obj_lock, flags);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 bool
 nvkm_object_insert(struct nvkm_object *object)
 {
-<<<<<<< HEAD
 #ifdef __NetBSD__
+	spin_lock_irqsave(&object->client->obj_lock, flags);
+
 	struct nvkm_object *collision =
 	    rb_tree_insert_node(&object->client->objtree, object);
 
-	if (collision != object)
+	if (collision != object) {
+		spin_unlock_irqrestore(&object->client->obj_lock, flags);
 		return false;	/* EEXIST */
+	}
 
 	object->on_tree = true;
+	spin_unlock_irqrestore(&object->client->obj_lock, flags);
 	return true;
 #else
-	struct rb_node **ptr = &object->client->objroot.rb_node;
-=======
 	struct rb_node **ptr;
->>>>>>> vendor/linux-drm-v6.6.35
 	struct rb_node *parent = NULL;
 	unsigned long flags;
 

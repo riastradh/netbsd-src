@@ -601,15 +601,10 @@ void
 nouveau_bo_sync_for_device(struct nouveau_bo *nvbo)
 {
 	struct nouveau_drm *drm = nouveau_bdev(nvbo->bo.bdev);
-<<<<<<< HEAD
-	struct ttm_dma_tt *ttm_dma = (struct ttm_dma_tt *)nvbo->bo.ttm;
-#ifndef __NetBSD__
-	int i;
-#endif
-=======
 	struct ttm_tt *ttm_dma = (struct ttm_tt *)nvbo->bo.ttm;
+#ifndef __NetBSD__
 	int i, j;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	if (!ttm_dma || !ttm_dma->dma_address)
 		return;
@@ -622,19 +617,12 @@ nouveau_bo_sync_for_device(struct nouveau_bo *nvbo)
 	if (nvbo->force_coherent)
 		return;
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	bus_dma_tag_t dmat = drm->dev->dmat;
 	bus_dmamap_sync(dmat, ttm_dma->dma_address, 0,
 	    PAGE_SIZE*ttm_dma->ttm.num_pages,
 	    BUS_DMASYNC_PREREAD|BUS_DMASYNC_PREWRITE);
 #else
-	for (i = 0; i < ttm_dma->ttm.num_pages; i++)
-		dma_sync_single_for_device(drm->dev->dev,
-					   ttm_dma->dma_address[i],
-					   PAGE_SIZE, DMA_TO_DEVICE);
-#endif
-=======
 	i = 0;
 	while (i < ttm_dma->num_pages) {
 		struct page *p = ttm_dma->pages[i];
@@ -651,22 +639,17 @@ nouveau_bo_sync_for_device(struct nouveau_bo *nvbo)
 					   num_pages * PAGE_SIZE, DMA_TO_DEVICE);
 		i += num_pages;
 	}
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 void
 nouveau_bo_sync_for_cpu(struct nouveau_bo *nvbo)
 {
 	struct nouveau_drm *drm = nouveau_bdev(nvbo->bo.bdev);
-<<<<<<< HEAD
-	struct ttm_dma_tt *ttm_dma = (struct ttm_dma_tt *)nvbo->bo.ttm;
-#ifndef __NetBSD__
-	int i;
-#endif
-=======
 	struct ttm_tt *ttm_dma = (struct ttm_tt *)nvbo->bo.ttm;
+#ifndef __NetBSD__
 	int i, j;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	if (!ttm_dma || !ttm_dma->dma_address)
 		return;
@@ -679,18 +662,12 @@ nouveau_bo_sync_for_cpu(struct nouveau_bo *nvbo)
 	if (nvbo->force_coherent)
 		return;
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	bus_dma_tag_t dmat = drm->dev->dmat;
 	bus_dmamap_sync(dmat, ttm_dma->dma_address, 0,
 	    PAGE_SIZE*ttm_dma->ttm.num_pages,
 	    BUS_DMASYNC_POSTREAD|BUS_DMASYNC_POSTWRITE);
 #else
-	for (i = 0; i < ttm_dma->ttm.num_pages; i++)
-		dma_sync_single_for_cpu(drm->dev->dev, ttm_dma->dma_address[i],
-					PAGE_SIZE, DMA_FROM_DEVICE);
-#endif
-=======
 	i = 0;
 	while (i < ttm_dma->num_pages) {
 		struct page *p = ttm_dma->pages[i];
@@ -707,6 +684,7 @@ nouveau_bo_sync_for_cpu(struct nouveau_bo *nvbo)
 					num_pages * PAGE_SIZE, DMA_FROM_DEVICE);
 		i += num_pages;
 	}
+#endif
 }
 
 void nouveau_bo_add_io_reserve_lru(struct ttm_buffer_object *bo)
@@ -727,7 +705,6 @@ void nouveau_bo_del_io_reserve_lru(struct ttm_buffer_object *bo)
 	mutex_lock(&drm->ttm.io_reserve_mutex);
 	list_del_init(&nvbo->io_reserve_lru);
 	mutex_unlock(&drm->ttm.io_reserve_mutex);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 int
@@ -1242,16 +1219,6 @@ static void
 nouveau_ttm_io_mem_free_locked(struct nouveau_drm *drm,
 			       struct ttm_resource *reg)
 {
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	struct drm_file *file = filp->f_data;
-#else
-	struct drm_file *file = filp->private_data;
-#endif
-	struct nouveau_bo *nvbo = nouveau_bo(bo);
-
-	return drm_vma_node_verify_access(&nvbo->bo.base.vma_node, file);
-=======
 	struct nouveau_mem *mem = nouveau_mem(reg);
 
 	if (drm->client.mem->oclass >= NVIF_CLASS_MEM_NV50) {
@@ -1267,7 +1234,6 @@ nouveau_ttm_io_mem_free_locked(struct nouveau_drm *drm,
 			break;
 		}
 	}
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static int
@@ -1420,93 +1386,9 @@ vm_fault_t nouveau_ttm_fault_reserve_notify(struct ttm_buffer_object *bo)
 		    bo->resource->start + PFN_UP(bo->resource->size) < mappable)
 			return 0;
 
-<<<<<<< HEAD
-	for (i = 0; i < nvbo->placement.num_placement; ++i) {
-		nvbo->placements[i].fpfn = 0;
-		nvbo->placements[i].lpfn = mappable;
-	}
-
-	for (i = 0; i < nvbo->placement.num_busy_placement; ++i) {
-		nvbo->busy_placements[i].fpfn = 0;
-		nvbo->busy_placements[i].lpfn = mappable;
-	}
-
-	nouveau_bo_placement_set(nvbo, TTM_PL_FLAG_VRAM, 0);
-	return nouveau_bo_validate(nvbo, false, false);
-}
-
-static int
-nouveau_ttm_tt_populate(struct ttm_tt *ttm, struct ttm_operation_ctx *ctx)
-{
-	struct ttm_dma_tt *ttm_dma = (void *)ttm;
-	struct nouveau_drm *drm;
-	struct device *dev;
-	unsigned i;
-	int r;
-	bool slave = !!(ttm->page_flags & TTM_PAGE_FLAG_SG);
-
-	if (ttm->state != tt_unpopulated)
-		return 0;
-
-	if (slave && ttm->sg) {
-		/* make userspace faulting work */
-#ifdef __NetBSD__
-		r = drm_prime_bus_dmamap_load_sgt(ttm->bdev->dmat,
-		    ttm_dma->dma_address, ttm->sg);
-		if (r)
-			return r;
-#else
-		drm_prime_sg_to_page_addr_arrays(ttm->sg, ttm->pages,
-						 ttm_dma->dma_address, ttm->num_pages);
-#endif
-		ttm->state = tt_unbound;
-		return 0;
-	}
-
-	drm = nouveau_bdev(ttm->bdev);
-	dev = drm->dev->dev;
-
-#if IS_ENABLED(CONFIG_AGP)
-	if (drm->agp.bridge) {
-		return ttm_agp_tt_populate(ttm, ctx);
-	}
-#endif
-
-#ifdef __NetBSD__
-	__USE(i);
-	__USE(dev);
-	return ttm_bus_dma_populate(ttm_dma);
-#else
-#if IS_ENABLED(CONFIG_SWIOTLB) && IS_ENABLED(CONFIG_X86)
-	if (swiotlb_nr_tbl()) {
-		return ttm_dma_populate((void *)ttm, dev, ctx);
-	}
-#endif
-
-	r = ttm_pool_populate(ttm, ctx);
-	if (r) {
-		return r;
-	}
-
-	for (i = 0; i < ttm->num_pages; i++) {
-		dma_addr_t addr;
-
-		addr = dma_map_page(dev, ttm->pages[i], 0, PAGE_SIZE,
-				    DMA_BIDIRECTIONAL);
-
-		if (dma_mapping_error(dev, addr)) {
-			while (i--) {
-				dma_unmap_page(dev, ttm_dma->dma_address[i],
-					       PAGE_SIZE, DMA_BIDIRECTIONAL);
-				ttm_dma->dma_address[i] = 0;
-			}
-			ttm_pool_unpopulate(ttm);
-			return -EFAULT;
-=======
 		for (i = 0; i < nvbo->placement.num_placement; ++i) {
 			nvbo->placements[i].fpfn = 0;
 			nvbo->placements[i].lpfn = mappable;
->>>>>>> vendor/linux-drm-v6.6.35
 		}
 
 		for (i = 0; i < nvbo->placement.num_busy_placement; ++i) {
@@ -1540,8 +1422,15 @@ nouveau_ttm_tt_populate(struct ttm_device *bdev,
 		return 0;
 
 	if (slave && ttm->sg) {
+#ifdef __NetBSD__
+		r = drm_prime_bus_dmamap_load_sgt(ttm->bdev->dmat,
+		    ttm_dma->dma_address, ttm->sg);
+		if (r)
+			return r;
+#else
 		drm_prime_sg_to_dma_addr_array(ttm->sg, ttm_dma->dma_address,
 					       ttm->num_pages);
+#endif
 		return 0;
 	}
 
@@ -1578,32 +1467,7 @@ nouveau_ttm_tt_destroy(struct ttm_device *bdev,
 		return;
 	}
 #endif
-<<<<<<< HEAD
-
-#ifdef __NetBSD__
-	__USE(i);
-	__USE(dev);
-	ttm_bus_dma_unpopulate(ttm_dma);
-#else
-#if IS_ENABLED(CONFIG_SWIOTLB) && IS_ENABLED(CONFIG_X86)
-	if (swiotlb_nr_tbl()) {
-		ttm_dma_unpopulate((void *)ttm, dev);
-#endif
-		return;
-	}
-
-	for (i = 0; i < ttm->num_pages; i++) {
-		if (ttm_dma->dma_address[i]) {
-			dma_unmap_page(dev, ttm_dma->dma_address[i], PAGE_SIZE,
-				       DMA_BIDIRECTIONAL);
-		}
-	}
-
-	ttm_pool_unpopulate(ttm);
-#endif
-=======
 	nouveau_sgdma_destroy(bdev, ttm);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 #ifdef __NetBSD__
@@ -1628,7 +1492,6 @@ nouveau_bo_fence(struct nouveau_bo *nvbo, struct nouveau_fence *fence, bool excl
 			   DMA_RESV_USAGE_WRITE : DMA_RESV_USAGE_READ);
 }
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 static const struct uvm_pagerops nouveau_uvm_ops = {
 	.pgo_reference = &ttm_bo_uvm_reference,
@@ -1637,17 +1500,6 @@ static const struct uvm_pagerops nouveau_uvm_ops = {
 };
 #endif
 
-struct ttm_bo_driver nouveau_bo_driver = {
-	.ttm_tt_create = &nouveau_ttm_tt_create,
-	.ttm_tt_populate = &nouveau_ttm_tt_populate,
-	.ttm_tt_unpopulate = &nouveau_ttm_tt_unpopulate,
-#ifdef __NetBSD__
-	.ttm_tt_swapout = &nouveau_ttm_tt_swapout,
-	.ttm_uvm_ops = &nouveau_uvm_ops,
-#endif
-	.invalidate_caches = nouveau_bo_invalidate_caches,
-	.init_mem_type = nouveau_bo_init_mem_type,
-=======
 static void
 nouveau_bo_delete_mem_notify(struct ttm_buffer_object *bo)
 {
@@ -1658,8 +1510,11 @@ struct ttm_device_funcs nouveau_bo_driver = {
 	.ttm_tt_create = &nouveau_ttm_tt_create,
 	.ttm_tt_populate = &nouveau_ttm_tt_populate,
 	.ttm_tt_unpopulate = &nouveau_ttm_tt_unpopulate,
+#ifdef __NetBSD__
+	.ttm_tt_swapout = &nouveau_ttm_tt_swapout,
+	.ttm_uvm_ops = &nouveau_uvm_ops,
+#endif
 	.ttm_tt_destroy = &nouveau_ttm_tt_destroy,
->>>>>>> vendor/linux-drm-v6.6.35
 	.eviction_valuable = ttm_bo_eviction_valuable,
 	.evict_flags = nouveau_bo_evict_flags,
 	.delete_mem_notify = nouveau_bo_delete_mem_notify,
