@@ -583,20 +583,12 @@ static inline int intel_uncore_write_and_verify(struct intel_uncore *uncore,
 	return (reg_val & mask) != expected_val ? -EINVAL : 0;
 }
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-#define	raw_reg_read(uncore, reg)					      \
-	bus_space_read_4((uncore)->regs_bst, (uncore)->regs_bsh,	      \
-	    i915_mmio_reg_offset(reg))
-#define	raw_reg_write(uncore, reg, value)				      \
-	bus_space_write_4((uncore)->regs_bst, (uncore)->regs_bsh,	      \
-	    i915_mmio_reg_offset(reg), (value))
-#else
-=======
+#ifndef __NetBSD__
 static inline void __iomem *intel_uncore_regs(struct intel_uncore *uncore)
 {
 	return uncore->regs;
 }
+#endif
 
 /*
  * The raw_reg_{read,write} macros are intended as a micro-optimization for
@@ -610,7 +602,14 @@ static inline void __iomem *intel_uncore_regs(struct intel_uncore *uncore)
  * to use these macros on a GSI register is responsible for adding the
  * appropriate GSI offset to the 'base' parameter.
  */
->>>>>>> vendor/linux-drm-v6.6.35
+#ifdef __NetBSD__
+#define	raw_reg_read(uncore, reg)					      \
+	bus_space_read_4((uncore)->regs_bst, (uncore)->regs_bsh,	      \
+	    i915_mmio_reg_offset(reg))
+#define	raw_reg_write(uncore, reg, value)				      \
+	bus_space_write_4((uncore)->regs_bst, (uncore)->regs_bsh,	      \
+	    i915_mmio_reg_offset(reg), (value))
+#else
 #define raw_reg_read(base, reg) \
 	readl(base + i915_mmio_reg_offset(reg))
 #define raw_reg_write(base, reg, value) \
