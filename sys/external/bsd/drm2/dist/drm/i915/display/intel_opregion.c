@@ -880,11 +880,7 @@ static int intel_load_vbt_firmware(struct drm_i915_private *dev_priv)
 	if (!name || !*name)
 		return -ENOENT;
 
-<<<<<<< HEAD
 	ret = request_firmware(&fw, name, pci_dev_dev(dev_priv->drm.pdev));
-=======
-	ret = request_firmware(&fw, name, dev_priv->drm.dev);
->>>>>>> vendor/linux-drm-v6.6.35
 	if (ret) {
 		drm_err(&dev_priv->drm,
 			"Requesting VBT firmware \"%s\" failed (%d)\n",
@@ -1046,16 +1042,12 @@ int intel_opregion_setup(struct drm_i915_private *dev_priv)
 			opregion->vbt_size = vbt_size;
 			goto out;
 		} else {
-<<<<<<< HEAD
-			DRM_DEBUG_KMS("Invalid VBT in ACPI OpRegion (RVDA)\n");
+			drm_dbg_kms(&dev_priv->drm,
+				    "Invalid VBT in ACPI OpRegion (RVDA)\n");
 #ifdef __NetBSD__
 			AcpiOsUnmapMemory(opregion->rvda,
 			    opregion->asle->rvds);
 #else
-=======
-			drm_dbg_kms(&dev_priv->drm,
-				    "Invalid VBT in ACPI OpRegion (RVDA)\n");
->>>>>>> vendor/linux-drm-v6.6.35
 			memunmap(opregion->rvda);
 #endif
 			opregion->rvda = NULL;
@@ -1308,9 +1300,7 @@ void intel_opregion_unregister(struct drm_i915_private *i915)
 		unregister_acpi_notifier(&opregion->acpi_notifier);
 		opregion->acpi_notifier.notifier_call = NULL;
 	}
-<<<<<<< HEAD
 #endif
-=======
 }
 
 void intel_opregion_cleanup(struct drm_i915_private *i915)
@@ -1319,7 +1309,6 @@ void intel_opregion_cleanup(struct drm_i915_private *i915)
 
 	if (!opregion->header)
 		return;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* just clear all opregion memory pointers now */
 #ifdef __NetBSD__

@@ -8,11 +8,8 @@
 #ifndef __INTEL_ACPI_H__
 #define __INTEL_ACPI_H__
 
-<<<<<<< HEAD
 #include <linux/acpi.h>
 
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 struct drm_i915_private;
 
 #ifdef CONFIG_ACPI

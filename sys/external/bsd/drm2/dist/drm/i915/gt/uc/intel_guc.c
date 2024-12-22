@@ -468,15 +468,9 @@ void intel_guc_fini(struct intel_guc *guc)
 	intel_guc_capture_destroy(guc);
 	intel_guc_log_destroy(&guc->log);
 	intel_uc_fw_fini(&guc->fw);
-<<<<<<< HEAD
-	intel_uc_fw_cleanup_fetch(&guc->fw);
-
-	intel_uc_fw_change_status(&guc->fw, INTEL_UC_FIRMWARE_DISABLED);
 
 	spin_lock_destroy(&guc->irq_lock);
 	mutex_destroy(&guc->send_mutex);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /*

@@ -54,20 +54,9 @@ struct intel_crtc_state *
 intel_atomic_get_crtc_state(struct drm_atomic_state *state,
 			    struct intel_crtc *crtc);
 
-<<<<<<< HEAD
-int intel_atomic_setup_scalers(struct drm_i915_private *dev_priv,
-			       struct intel_crtc *intel_crtc,
-			       struct intel_crtc_state *crtc_state);
-
-int intel_atomic_lock_global_state(struct intel_atomic_state *state);
-
-int intel_atomic_serialize_global_state(struct intel_atomic_state *state);
-
 #include "i915_sw_fence.h"
 int __i915_sw_fence_call
 intel_atomic_commit_ready(struct i915_sw_fence *fence,
 			  enum i915_sw_fence_notify notify);
 
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 #endif /* __INTEL_ATOMIC_H__ */

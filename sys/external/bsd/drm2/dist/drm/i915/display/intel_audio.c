@@ -908,11 +908,7 @@ void intel_audio_cdclk_change_post(struct drm_i915_private *i915)
 	}
 }
 
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX intel audio */
-
-static void glk_force_audio_cdclk(struct drm_i915_private *dev_priv,
-=======
 static int glk_force_audio_cdclk_commit(struct intel_atomic_state *state,
 					struct intel_crtc *crtc,
 					bool enable)
@@ -935,7 +931,6 @@ static int glk_force_audio_cdclk_commit(struct intel_atomic_state *state,
 }
 
 static void glk_force_audio_cdclk(struct drm_i915_private *i915,
->>>>>>> vendor/linux-drm-v6.6.35
 				  bool enable)
 {
 	struct drm_modeset_acquire_ctx ctx;
@@ -1233,10 +1228,8 @@ static const struct component_ops i915_audio_component_bind_ops = {
 	.bind	= i915_audio_component_bind,
 	.unbind	= i915_audio_component_unbind,
 };
-
-<<<<<<< HEAD
 #endif	/* __NetBSD__ */
-=======
+
 #define AUD_FREQ_TMODE_SHIFT	14
 #define AUD_FREQ_4T		0
 #define AUD_FREQ_8T		(2 << AUD_FREQ_TMODE_SHIFT)
@@ -1245,7 +1238,6 @@ static const struct component_ops i915_audio_component_bind_ops = {
 
 #define AUD_FREQ_GEN12          (AUD_FREQ_8T | AUD_FREQ_PULLCLKS(0) | AUD_FREQ_BCLK_96M)
 #define AUD_FREQ_TGL_BROKEN     (AUD_FREQ_8T | AUD_FREQ_PULLCLKS(2) | AUD_FREQ_BCLK_96M)
->>>>>>> vendor/linux-drm-v6.6.35
 
 /**
  * i915_audio_component_init - initialize and register the audio component
@@ -1321,15 +1313,10 @@ static void i915_audio_component_cleanup(struct drm_i915_private *i915)
 	if (!i915->display.audio.component_registered)
 		return;
 
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX intel audio */
-	component_del(dev_priv->drm.dev, &i915_audio_component_bind_ops);
-#endif
-	dev_priv->audio_component_registered = false;
-=======
 	component_del(i915->drm.dev, &i915_audio_component_bind_ops);
+#endif
 	i915->display.audio.component_registered = false;
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**

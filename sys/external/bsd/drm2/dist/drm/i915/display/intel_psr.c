@@ -2437,13 +2437,8 @@ int intel_psr_debug_set(struct intel_dp *intel_dp, u64 val)
 	int ret;
 
 	if (val & ~(I915_PSR_DEBUG_IRQ | I915_PSR_DEBUG_MODE_MASK) ||
-<<<<<<< HEAD
-	    mode > I915_PSR_DEBUG_FORCE_PSR1) {
-		DRM_DEBUG_KMS("Invalid debug mask %"PRIx64"\n", val);
-=======
 	    mode > I915_PSR_DEBUG_ENABLE_SEL_FETCH) {
-		drm_dbg_kms(&dev_priv->drm, "Invalid debug mask %llx\n", val);
->>>>>>> vendor/linux-drm-v6.6.35
+		drm_dbg_kms(&dev_priv->drm, "Invalid debug mask %"PRIx64"\n", val);
 		return -EINVAL;
 	}
 

@@ -10,13 +10,6 @@
 
 #include <linux/types.h>
 
-<<<<<<< HEAD
-#include <sys/file.h>
-#define	pipe	pipe_drmhack	/* see intel_display.h */
-
-enum pipe;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 enum port;
 enum transcoder;
 struct drm_i915_private;

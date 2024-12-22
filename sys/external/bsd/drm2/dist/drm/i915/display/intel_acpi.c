@@ -36,17 +36,13 @@ static const guid_t intel_dsm_guid =
 	GUID_INIT(0x7ed873d3, 0xc2d0, 0x4e4f,
 		  0xa8, 0x54, 0x0f, 0x13, 0x17, 0xb0, 0x1c, 0x2c);
 
-<<<<<<< HEAD
-static const char *intel_dsm_port_name(u8 id)
-=======
 #define INTEL_DSM_FN_GET_BIOS_DATA_FUNCS_SUPPORTED 0 /* No args */
 
 static const guid_t intel_dsm_guid2 =
 	GUID_INIT(0x3e5b41c6, 0xeb1d, 0x4260,
 		  0x9d, 0x15, 0xc7, 0x1f, 0xba, 0xda, 0xe4, 0x14);
 
-static char *intel_dsm_port_name(u8 id)
->>>>>>> vendor/linux-drm-v6.6.35
+static const char *intel_dsm_port_name(u8 id)
 {
 	switch (id) {
 	case 0:

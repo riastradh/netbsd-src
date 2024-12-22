@@ -542,22 +542,14 @@ static bool rc6_supported(struct intel_rc6 *rc6)
 static void rpm_get(struct intel_rc6 *rc6)
 {
 	GEM_BUG_ON(rc6->wakeref);
-<<<<<<< HEAD
 	pm_runtime_get_sync(pci_dev_dev(rc6_to_i915(rc6)->drm.pdev));
-=======
-	pm_runtime_get_sync(rc6_to_i915(rc6)->drm.dev);
->>>>>>> vendor/linux-drm-v6.6.35
 	rc6->wakeref = true;
 }
 
 static void rpm_put(struct intel_rc6 *rc6)
 {
 	GEM_BUG_ON(!rc6->wakeref);
-<<<<<<< HEAD
 	pm_runtime_put(pci_dev_dev(rc6_to_i915(rc6)->drm.pdev));
-=======
-	pm_runtime_put(rc6_to_i915(rc6)->drm.dev);
->>>>>>> vendor/linux-drm-v6.6.35
 	rc6->wakeref = false;
 }
 

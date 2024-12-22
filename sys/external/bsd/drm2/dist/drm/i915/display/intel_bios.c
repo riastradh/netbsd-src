@@ -580,26 +580,7 @@ get_lvds_dvo_timing(const struct bdb_lvds_lfp_data *data,
 		    const struct bdb_lvds_lfp_data_ptrs *ptrs,
 		    int index)
 {
-<<<<<<< HEAD
-	/*
-	 * the size of fp_timing varies on the different platform.
-	 * So calculate the DVO timing relative offset in LVDS data
-	 * entry to get the DVO timing entry
-	 */
-
-	int lfp_data_size =
-		lvds_lfp_data_ptrs->ptr[1].dvo_timing_offset -
-		lvds_lfp_data_ptrs->ptr[0].dvo_timing_offset;
-	int dvo_timing_offset =
-		lvds_lfp_data_ptrs->ptr[0].dvo_timing_offset -
-		lvds_lfp_data_ptrs->ptr[0].fp_timing_offset;
-	const char *entry = (const char *)lvds_lfp_data->data +
-	    lfp_data_size * index;
-
-	return (const struct lvds_dvo_timing *)(entry + dvo_timing_offset);
-=======
 	return (const void *)data + ptrs->ptr[index].dvo_timing.offset;
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static const struct lvds_fp_timing *
@@ -1984,15 +1965,9 @@ static void vlv_fixup_mipi_sequences(struct drm_i915_private *i915,
 		    "Using init OTP fragment to deassert reset\n");
 
 	/* Copy the fragment, update seq byte and terminate it */
-<<<<<<< HEAD
-	init_otp = (u8 *)__UNCONST(dev_priv->vbt.dsi.sequence[MIPI_SEQ_INIT_OTP]);
-	dev_priv->vbt.dsi.deassert_seq = kmemdup(init_otp, len + 1, GFP_KERNEL);
-	if (!dev_priv->vbt.dsi.deassert_seq)
-=======
-	init_otp = (u8 *)panel->vbt.dsi.sequence[MIPI_SEQ_INIT_OTP];
+	init_otp = (u8 *)__UNCONST(panel->vbt.dsi.sequence[MIPI_SEQ_INIT_OTP]);
 	panel->vbt.dsi.deassert_seq = kmemdup(init_otp, len + 1, GFP_KERNEL);
 	if (!panel->vbt.dsi.deassert_seq)
->>>>>>> vendor/linux-drm-v6.6.35
 		return;
 	panel->vbt.dsi.deassert_seq[0] = MIPI_SEQ_DEASSERT_RESET;
 	panel->vbt.dsi.deassert_seq[len] = MIPI_SEQ_ELEM_END;
@@ -2964,7 +2939,6 @@ bool intel_bios_is_valid_vbt(const void *buf, size_t size)
 	return vbt;
 }
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 #  define	__iomem	__pci_rom_iomem
 #  define	ioread16	fake_ioread16
@@ -2991,10 +2965,7 @@ fake_ioread32(const void __iomem *p)
 }
 #endif
 
-static struct vbt_header *oprom_get_vbt(struct drm_i915_private *dev_priv)
-=======
 static u32 intel_spi_read(struct intel_uncore *uncore, u32 offset)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	intel_uncore_write(uncore, PRIMARY_SPI_ADDRESS, offset);
 

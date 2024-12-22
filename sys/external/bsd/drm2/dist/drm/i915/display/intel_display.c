@@ -126,81 +126,9 @@ __KERNEL_RCSID(0, "$NetBSD: intel_display.c,v 1.12 2021/12/19 12:37:17 riastradh
 #include "vlv_dsi_regs.h"
 #include "vlv_sideband.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-/* Primary plane formats for gen <= 3 */
-static const u32 i8xx_primary_formats[] = {
-	DRM_FORMAT_C8,
-	DRM_FORMAT_XRGB1555,
-	DRM_FORMAT_RGB565,
-	DRM_FORMAT_XRGB8888,
-};
-
-/* Primary plane formats for ivb (no fp16 due to hw issue) */
-static const u32 ivb_primary_formats[] = {
-	DRM_FORMAT_C8,
-	DRM_FORMAT_RGB565,
-	DRM_FORMAT_XRGB8888,
-	DRM_FORMAT_XBGR8888,
-	DRM_FORMAT_XRGB2101010,
-	DRM_FORMAT_XBGR2101010,
-};
-
-/* Primary plane formats for gen >= 4, except ivb */
-static const u32 i965_primary_formats[] = {
-	DRM_FORMAT_C8,
-	DRM_FORMAT_RGB565,
-	DRM_FORMAT_XRGB8888,
-	DRM_FORMAT_XBGR8888,
-	DRM_FORMAT_XRGB2101010,
-	DRM_FORMAT_XBGR2101010,
-	DRM_FORMAT_XBGR16161616F,
-};
-
-/* Primary plane formats for vlv/chv */
-static const u32 vlv_primary_formats[] = {
-	DRM_FORMAT_C8,
-	DRM_FORMAT_RGB565,
-	DRM_FORMAT_XRGB8888,
-	DRM_FORMAT_XBGR8888,
-	DRM_FORMAT_ARGB8888,
-	DRM_FORMAT_ABGR8888,
-	DRM_FORMAT_XRGB2101010,
-	DRM_FORMAT_XBGR2101010,
-	DRM_FORMAT_ARGB2101010,
-	DRM_FORMAT_ABGR2101010,
-	DRM_FORMAT_XBGR16161616F,
-};
-
-static const u64 i9xx_format_modifiers[] = {
-	I915_FORMAT_MOD_X_TILED,
-	DRM_FORMAT_MOD_LINEAR,
-	DRM_FORMAT_MOD_INVALID
-};
-
-/* Cursor formats */
-static const u32 intel_cursor_formats[] = {
-	DRM_FORMAT_ARGB8888,
-};
-
-static const u64 cursor_format_modifiers[] = {
-	DRM_FORMAT_MOD_LINEAR,
-	DRM_FORMAT_MOD_INVALID
-};
-
-static void i9xx_crtc_clock_get(struct intel_crtc *crtc,
-				struct intel_crtc_state *pipe_config);
-static void ilk_pch_clock_get(struct intel_crtc *crtc,
-			      struct intel_crtc_state *pipe_config);
-
-static int intel_framebuffer_init(struct intel_framebuffer *ifb,
-				  struct drm_i915_gem_object *obj,
-				  struct drm_mode_fb_cmd2 *mode_cmd);
-static void intel_set_pipe_timings(const struct intel_crtc_state *crtc_state);
-=======
 static void intel_set_transcoder_timings(const struct intel_crtc_state *crtc_state);
->>>>>>> vendor/linux-drm-v6.6.35
 static void intel_set_pipe_src_size(const struct intel_crtc_state *crtc_state);
 static void hsw_set_transconf(const struct intel_crtc_state *crtc_state);
 static void bdw_set_pipe_misc(const struct intel_crtc_state *crtc_state);

@@ -2145,15 +2145,9 @@ static const struct component_ops i915_hdcp_ops = {
 	.bind   = i915_hdcp_component_bind,
 	.unbind = i915_hdcp_component_unbind,
 };
-
-<<<<<<< HEAD
 #endif
 
-static inline
-enum mei_fw_ddi intel_get_mei_fw_ddi_index(enum port port)
-=======
 static enum hdcp_ddi intel_get_hdcp_ddi_index(enum port port)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	switch (port) {
 	case PORT_A:
@@ -2240,23 +2234,16 @@ void intel_hdcp_component_init(struct drm_i915_private *i915)
 
 	i915->display.hdcp.comp_added = true;
 	mutex_unlock(&i915->display.hdcp.hdcp_mutex);
+#ifdef __NetBSD__		/* XXX i915 hdmi audio */
+	ret = 0;
+#else
 	if (intel_hdcp_gsc_cs_required(i915))
 		ret = intel_hdcp_gsc_init(i915);
 	else
 		ret = component_add_typed(i915->drm.dev, &i915_hdcp_ops,
 					  I915_COMPONENT_HDCP);
-
-<<<<<<< HEAD
-	dev_priv->hdcp_comp_added = true;
-	mutex_unlock(&dev_priv->hdcp_comp_mutex);
-#ifdef __NetBSD__		/* XXX i915 hdmi audio */
-	ret = 0;
-#else
-	ret = component_add_typed(dev_priv->drm.dev, &i915_hdcp_component_ops,
-				  I915_COMPONENT_HDCP);
 #endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
+
 	if (ret < 0) {
 		drm_dbg_kms(&i915->drm, "Failed at fw component add(%d)\n",
 			    ret);
@@ -2543,16 +2530,12 @@ void intel_hdcp_component_fini(struct drm_i915_private *i915)
 	i915->display.hdcp.comp_added = false;
 	mutex_unlock(&i915->display.hdcp.hdcp_mutex);
 
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX i915 hdmi audio */
-	component_del(dev_priv->drm.dev, &i915_hdcp_component_ops);
-#endif
-=======
 	if (intel_hdcp_gsc_cs_required(i915))
 		intel_hdcp_gsc_fini(i915);
 	else
 		component_del(i915->drm.dev, &i915_hdcp_ops);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 void intel_hdcp_cleanup(struct intel_connector *connector)

@@ -732,11 +732,7 @@ skl_next_plane_to_commit(struct intel_atomic_state *state,
 {
 	struct intel_crtc_state *crtc_state =
 		intel_atomic_get_new_crtc_state(state, crtc);
-<<<<<<< HEAD
-	struct intel_plane_state *plane_state __unused;
-=======
 	struct intel_plane_state __maybe_unused *plane_state;
->>>>>>> vendor/linux-drm-v6.6.35
 	struct intel_plane *plane;
 	int i;
 
