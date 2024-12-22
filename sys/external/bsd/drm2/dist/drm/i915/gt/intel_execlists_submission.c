@@ -139,6 +139,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_workarounds.h"
 #include "shmem_utils.h"
 
+#include <linux/nbsd-namespace.h>
+
 #define RING_EXECLIST_QFULL		(1 << 0x2)
 #define RING_EXECLIST1_VALID		(1 << 0x3)
 #define RING_EXECLIST0_VALID		(1 << 0x4)
@@ -196,12 +198,53 @@ struct virtual_engine {
 	struct ve_node {
 		struct rb_node rb;
 		int prio;
+		uint64_t order;
+		bool inserted;
 	} nodes[I915_NUM_ENGINES];
+	uint64_t order;
 
 	/* And finally, which physical engines this virtual engine maps onto. */
 	unsigned int num_siblings;
 	struct intel_engine_cs *siblings[];
 };
+
+#ifdef __NetBSD__
+static int
+compare_ve_nodes(void *cookie, const void *va, const void *vb)
+{
+	const struct ve_node *na = va;
+	const struct ve_node *nb = vb;
+
+	if (na->prio < nb->prio)
+		return -1;
+	if (na->prio > nb->prio)
+		return +1;
+	if (na->order < nb->order)
+		return -1;
+	if (na->order > nb->order)
+		return +1;
+	return 0;
+}
+
+static int
+compare_ve_node_key(void *cookie, const void *vn, const void *vk)
+{
+	const struct ve_node *n = vn;
+	const int *k = vk;
+
+	if (n->prio < *k)
+		return -1;
+	if (n->prio > *k)
+		return +1;
+	return 0;
+}
+
+static const rb_tree_ops_t ve_tree_ops = {
+	.rbto_compare_nodes = compare_ve_nodes,
+	.rbto_compare_key = compare_ve_node_key,
+	.rbto_node_offset = offsetof(struct ve_node, rb),
+};
+#endif
 
 static struct virtual_engine *to_virtual_engine(struct intel_engine_cs *engine)
 {
@@ -730,6 +773,15 @@ static u64 execlists_update_context(struct i915_request *rq)
 
 static void write_desc(struct intel_engine_execlists *execlists, u64 desc, u32 port)
 {
+#ifdef __NetBSD__
+	if (execlists->ctrl_reg) {
+		bus_space_write_4(execlists->bst, execlists->bsh, execlists->submit_reg + port * 2, lower_32_bits(desc));
+		bus_space_write_4(execlists->bst, execlists->bsh, execlists->submit_reg + port * 2 + 1, upper_32_bits(desc));
+	} else {
+		bus_space_write_4(execlists->bst, execlists->bsh, execlists->submit_reg, upper_32_bits(desc));
+		bus_space_write_4(execlists->bst, execlists->bsh, execlists->submit_reg, lower_32_bits(desc));
+	}
+#else
 	if (execlists->ctrl_reg) {
 		writel(lower_32_bits(desc), execlists->submit_reg + port * 2);
 		writel(upper_32_bits(desc), execlists->submit_reg + port * 2 + 1);
@@ -737,6 +789,7 @@ static void write_desc(struct intel_engine_execlists *execlists, u64 desc, u32 p
 		writel(upper_32_bits(desc), execlists->submit_reg);
 		writel(lower_32_bits(desc), execlists->submit_reg);
 	}
+#endif
 }
 
 static __maybe_unused char *
@@ -763,7 +816,7 @@ trace_ports(const struct intel_engine_execlists *execlists,
 	    struct i915_request * const *ports)
 {
 	const struct intel_engine_cs *engine =
-		container_of(execlists, typeof(*engine), execlists);
+		const_container_of(execlists, typeof(*engine), execlists);
 	char __maybe_unused p0[40], p1[40];
 
 	if (!ports[0])
@@ -943,7 +996,11 @@ static void execlists_submit_ports(struct intel_engine_cs *engine)
 
 	/* we need to manually load the submit queue */
 	if (execlists->ctrl_reg)
+#ifdef __NetBSD__
+		bus_space_write_4(execlists->bst, execlists->bsh, execlists->ctrl_reg, EL_CTRL_LOAD);
+#else
 		writel(EL_CTRL_LOAD, execlists->ctrl_reg);
+#endif
 }
 
 static bool ctx_single_port_submission(const struct intel_context *ce)
@@ -1040,7 +1097,8 @@ first_virtual_engine(struct intel_engine_cs *engine)
 		/* lazily cleanup after another engine handled rq */
 		if (!rq || !virtual_matches(ve, rq, engine)) {
 			rb_erase_cached(rb, &el->virtual);
-			RB_CLEAR_NODE(rb);
+			container_of(rb, struct ve_node, rb)->inserted =
+			    false;
 			rb = rb_first_cached(&el->virtual);
 			continue;
 		}
@@ -1452,7 +1510,8 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 
 		rb = &ve->nodes[engine->id].rb;
 		rb_erase_cached(rb, &execlists->virtual);
-		RB_CLEAR_NODE(rb);
+		container_of(rb, struct ve_node, rb)->inserted =
+			    false;
 
 		GEM_BUG_ON(!(rq->execution_mask & engine->mask));
 		WRITE_ONCE(rq->engine, engine);
@@ -1624,9 +1683,17 @@ done:
 
 static void execlists_dequeue_irq(struct intel_engine_cs *engine)
 {
+#ifdef __NetBSD__
+	int s = splsoftserial(); /* block tasklets=softints */
+#else
 	local_irq_disable(); /* Suspend interrupts across request submission */
+#endif
 	execlists_dequeue(engine);
+#ifdef __NetBSD__
+	splx(s);
+#else
 	local_irq_enable(); /* flush irq_work (e.g. breadcrumb enabling) */
+#endif
 }
 
 static void clear_ports(struct i915_request **ports, int count)
@@ -3208,7 +3275,8 @@ static void execlists_reset_cancel(struct intel_engine_cs *engine)
 			rb_entry(rb, typeof(*ve), nodes[engine->id].rb);
 
 		rb_erase_cached(rb, &execlists->virtual);
-		RB_CLEAR_NODE(rb);
+		container_of(rb, struct ve_node, rb)->inserted =
+		    false;
 
 		spin_lock(&ve->base.sched_engine->lock);
 		rq = fetch_and_zero(&ve->request);
@@ -3228,7 +3296,12 @@ static void execlists_reset_cancel(struct intel_engine_cs *engine)
 	/* Remaining _unready_ requests will be nop'ed when submitted */
 
 	sched_engine->queue_priority_hint = INT_MIN;
+#ifdef __NetBSD__
+	i915_sched_init(sched_engine);
+	rb_tree_init(&sched_engine->virtual.rb_root.rbr_tree, &ve_tree_ops);
+#else
 	sched_engine->queue = RB_ROOT_CACHED;
+#endif
 
 	GEM_BUG_ON(__tasklet_is_enabled(&engine->sched_engine->tasklet));
 	engine->sched_engine->tasklet.callback = nop_submission_tasklet;
@@ -3549,6 +3622,8 @@ int intel_execlists_submission_setup(struct intel_engine_cs *engine)
 	struct intel_uncore *uncore = engine->uncore;
 	u32 base = engine->mmio_base;
 
+	i915_sched_init(&engine->execlists);
+
 	tasklet_setup(&engine->sched_engine->tasklet, execlists_submission_tasklet);
 	timer_setup(&engine->execlists.timer, execlists_timeslice, 0);
 	timer_setup(&engine->execlists.preempt, execlists_preempt, 0);
@@ -3564,6 +3639,12 @@ int intel_execlists_submission_setup(struct intel_engine_cs *engine)
 	lrc_init_wa_ctx(engine);
 
 	if (HAS_LOGICAL_RING_ELSQ(i915)) {
+#ifdef __NetBSD__
+		execlists->submit_reg = i915_mmio_reg_offset(RING_EXECLIST_SQ_CONTENTS(base));
+		execlists->ctrl_reg = i915_mmio_reg_offset(RING_EXECLIST_CONTROL(base));
+		execlists->bsh = uncore->regs_bsh;
+		execlists->bst = uncore->regs_bst;
+#else
 		execlists->submit_reg = intel_uncore_regs(uncore) +
 			i915_mmio_reg_offset(RING_EXECLIST_SQ_CONTENTS(base));
 		execlists->ctrl_reg = intel_uncore_regs(uncore) +
@@ -3572,9 +3653,16 @@ int intel_execlists_submission_setup(struct intel_engine_cs *engine)
 		engine->fw_domain = intel_uncore_forcewake_for_reg(engine->uncore,
 				    RING_EXECLIST_CONTROL(engine->mmio_base),
 				    FW_REG_WRITE);
+#endif
 	} else {
+#ifdef __NetBSD__
+		execlists->submit_reg = i915_mmio_reg_offset(RING_ELSP(base));
+		execlists->bsh = uncore->regs_bsh;
+		execlists->bst = uncore->regs_bst;
+#else
 		execlists->submit_reg = intel_uncore_regs(uncore) +
 			i915_mmio_reg_offset(RING_ELSP(base));
+#endif
 	}
 
 	execlists->csb_status =
@@ -3645,14 +3733,16 @@ static void rcu_virtual_context_destroy(struct work_struct *wrk)
 		struct intel_engine_cs *sibling = ve->siblings[n];
 		struct rb_node *node = &ve->nodes[sibling->id].rb;
 
-		if (RB_EMPTY_NODE(node))
+		if (!ve->nodes[sibling->id].inserted)
 			continue;
 
 		spin_lock_irq(&sibling->sched_engine->lock);
 
 		/* Detachment is lazily performed in the sched_engine->tasklet */
-		if (!RB_EMPTY_NODE(node))
+		if (ve->nodes[sibling->id].inserted) {
 			rb_erase_cached(node, &sibling->execlists.virtual);
+			ve->nodes[sibling->id].inserted = false;
+		}
 
 		spin_unlock_irq(&sibling->sched_engine->lock);
 	}
@@ -3667,6 +3757,9 @@ static void rcu_virtual_context_destroy(struct work_struct *wrk)
 	if (ve->base.sched_engine)
 		i915_sched_engine_put(ve->base.sched_engine);
 	intel_engine_free_request_pool(&ve->base);
+
+	intel_engine_fini_breadcrumbs(&ve->base);
+	spin_lock_destroy(&ve->base.active.lock);
 
 	kfree(ve);
 }
@@ -3843,16 +3936,16 @@ static void virtual_submission_tasklet(struct tasklet_struct *t)
 		spin_lock_irq(&sibling->sched_engine->lock);
 
 		if (unlikely(!(mask & sibling->mask))) {
-			if (!RB_EMPTY_NODE(&node->rb)) {
+			if (node->inserted) {
 				rb_erase_cached(&node->rb,
 						&sibling->execlists.virtual);
-				RB_CLEAR_NODE(&node->rb);
+				node->inserted = false;
 			}
 
 			goto unlock_engine;
 		}
 
-		if (unlikely(!RB_EMPTY_NODE(&node->rb))) {
+		if (unlikely(node->inserted)) {
 			/*
 			 * Cheat and avoid rebalancing the tree if we can
 			 * reuse this node in situ.
@@ -3863,8 +3956,24 @@ static void virtual_submission_tasklet(struct tasklet_struct *t)
 				goto submit_engine;
 
 			rb_erase_cached(&node->rb, &sibling->execlists.virtual);
+			node->inserted = false;
 		}
 
+#ifdef __NetBSD__
+		__USE(parent);
+		__USE(rb);
+		struct ve_node *collision __diagused;
+		/* XXX kludge to get insertion order */
+		node->order = ve->order++;
+		collision = rb_tree_insert_node(
+			&sibling->execlists.virtual.rb_root.rbr_tree,
+			node);
+		KASSERT(collision == node);
+		node->inserted = true;
+		first = rb_tree_find_node_geq(
+			&sibling->execlists.virtual.rb_root.rbr_tree,
+			&node->prio) == node;
+#else
 		rb = NULL;
 		first = true;
 		parent = &sibling->execlists.virtual.rb_root.rb_node;
@@ -3885,9 +3994,10 @@ static void virtual_submission_tasklet(struct tasklet_struct *t)
 		rb_insert_color_cached(&node->rb,
 				       &sibling->execlists.virtual,
 				       first);
+#endif
 
 submit_engine:
-		GEM_BUG_ON(RB_EMPTY_NODE(&node->rb));
+		GEM_BUG_ON(!node->inserted);
 		node->prio = prio;
 		if (first && prio > sibling->sched_engine->queue_priority_hint)
 			tasklet_hi_schedule(&sibling->sched_engine->tasklet);
@@ -4029,8 +4139,8 @@ execlists_create_virtual(struct intel_engine_cs **siblings, unsigned int count,
 			goto err_put;
 		}
 
-		GEM_BUG_ON(RB_EMPTY_NODE(&ve->nodes[sibling->id].rb));
-		RB_CLEAR_NODE(&ve->nodes[sibling->id].rb);
+		GEM_BUG_ON(!ve->nodes[sibling->id].inserted);
+		ve->nodes[sibling->id].inserted = false;
 
 		ve->siblings[ve->num_siblings++] = sibling;
 		ve->base.mask |= sibling->mask;
@@ -4122,7 +4232,10 @@ void intel_execlists_show_requests(struct intel_engine_cs *engine,
 
 	last = NULL;
 	count = 0;
-	for (rb = rb_first_cached(&sched_engine->queue); rb; rb = rb_next(rb)) {
+	// XXX MERGE execlists->sched_queue
+	for (rb = rb_first_cached(&sched_engine->queue);
+	     rb;
+	     rb = rb_next2(&execlists->virtual.rb_root, rb)) {
 		struct i915_priolist *p = rb_entry(rb, typeof(*p), node);
 
 		priolist_for_each_request(rq, p) {
@@ -4143,7 +4256,10 @@ void intel_execlists_show_requests(struct intel_engine_cs *engine,
 
 	last = NULL;
 	count = 0;
-	for (rb = rb_first_cached(&execlists->virtual); rb; rb = rb_next(rb)) {
+	// XXX MERGE execlists->virtual
+	for (rb = rb_first_cached(&execlists->virtual);
+	     rb;
+	     rb = rb_next2(&execlists->virtual.rb_root, rb)) {
 		struct virtual_engine *ve =
 			rb_entry(rb, typeof(*ve), nodes[engine->id].rb);
 		struct i915_request *rq = READ_ONCE(ve->request);
