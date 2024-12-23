@@ -128,9 +128,6 @@ static struct drm_driver driver_platform;
 struct drm_driver *const nouveau_drm_driver_stub = &driver_stub;
 struct drm_driver *const nouveau_drm_driver_pci = &driver_pci;
 struct drm_driver *const nouveau_drm_driver_platform = &driver_platform;
-
-/* XXX Kludge for the non-GEM GEM that nouveau uses.  */
-static const struct uvm_pagerops nouveau_gem_uvm_ops;
 #endif
 
 static u64
@@ -1386,7 +1383,6 @@ driver_stub = {
 #ifdef __NetBSD__
 	.fops = NULL,
 	.mmap_object = &nouveau_ttm_mmap_object,
-	.gem_uvm_ops = &nouveau_gem_uvm_ops,
 	.ioctl_override = nouveau_ioctl_override,
 #else
 	.fops = &nouveau_driver_fops,

@@ -264,10 +264,8 @@ struct drm_driver *const radeon_drm_driver = &kms_driver;
 const struct pci_device_id *const radeon_device_ids = pciidlist;
 const size_t radeon_n_device_ids = __arraycount(pciidlist);
 
-/* XXX Kludge for the non-GEM GEM that radeon uses.  */
-static const struct uvm_pagerops radeon_gem_uvm_ops;
-
 #else
+
 static const struct drm_driver kms_driver;
 
 static int radeon_pci_probe(struct pci_dev *pdev,
@@ -536,6 +534,7 @@ static const struct file_operations radeon_driver_kms_fops = {
 	.compat_ioctl = radeon_kms_compat_ioctl,
 #endif
 };
+
 #endif	/* __NetBSD__ */
 
 static const struct drm_ioctl_desc radeon_ioctls_kms[] = {
@@ -596,7 +595,6 @@ static const struct drm_driver kms_driver = {
 #ifdef __NetBSD__
 	.fops = NULL,
 	.mmap_object = &radeon_mmap_object,
-	.gem_uvm_ops = &radeon_gem_uvm_ops,
 #else
 	.fops = &radeon_driver_kms_fops,
 #endif

@@ -2772,11 +2772,6 @@ static const struct file_operations amdgpu_driver_kms_fops = {
 };
 #endif	/* __NetBSD__ */
 
-#ifdef __NetBSD__
-/* XXX Kludge for the non-GEM GEM that amdgpu uses.  */
-static const struct uvm_pagerops amdgpu_gem_uvm_ops;
-#endif
-
 int amdgpu_file_to_fpriv(struct file *filp, struct amdgpu_fpriv **fpriv)
 {
 	struct drm_file *file;
@@ -2840,7 +2835,6 @@ static const struct drm_driver amdgpu_kms_driver = {
 #ifdef __NetBSD__
 	.fops = NULL,
 	.mmap_object = &amdgpu_mmap_object,
-	.gem_uvm_ops = &amdgpu_gem_uvm_ops,
 #else
 	.fops = &amdgpu_driver_kms_fops,
 #endif
