@@ -44,6 +44,11 @@ __KERNEL_RCSID(0, "$NetBSD: ttm_module.c,v 1.3 2021/12/18 23:45:44 riastradh Exp
 
 #include "ttm_module.h"
 
+#ifdef __NetBSD__		/* PMAP_* caching flags for ttm_io_prot */
+#include <uvm/uvm_pmap.h>
+#include <linux/nbsd-namespace.h>
+#endif
+
 /**
  * DOC: TTM
  *
@@ -70,6 +75,13 @@ pgprot_t ttm_prot_from_caching(enum ttm_caching caching, pgprot_t tmp)
 	if (caching == ttm_cached)
 		return tmp;
 
+#ifdef __NetBSD__
+	tmp &= ~PMAP_CACHE_MASK;
+	if (caching == ttm_write_combined)
+		tmp |= PMAP_WRITE_COMBINE;
+	else
+		tmp |= PMAP_NOCACHE;
+#else
 #if defined(__i386__) || defined(__x86_64__)
 	if (caching == ttm_write_combined)
 		tmp = pgprot_writecombine(tmp);
@@ -87,6 +99,7 @@ pgprot_t ttm_prot_from_caching(enum ttm_caching caching, pgprot_t tmp)
 #endif
 #if defined(__sparc__)
 	tmp = pgprot_noncached(tmp);
+#endif
 #endif
 	return tmp;
 }

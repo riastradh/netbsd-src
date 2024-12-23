@@ -486,8 +486,8 @@ void ttm_resource_manager_debug(struct ttm_resource_manager *man,
 {
 	drm_printf(p, "  use_type: %d\n", man->use_type);
 	drm_printf(p, "  use_tt: %d\n", man->use_tt);
-	drm_printf(p, "  size: %llu\n", man->size);
-	drm_printf(p, "  usage: %llu\n", ttm_resource_manager_usage(man));
+	drm_printf(p, "  size: %"PRIu64"\n", man->size);
+	drm_printf(p, "  usage: %"PRIu64"\n", ttm_resource_manager_usage(man));
 	if (man->func->debug)
 		man->func->debug(man, p);
 }

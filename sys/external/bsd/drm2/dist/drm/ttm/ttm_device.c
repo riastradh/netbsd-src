@@ -44,7 +44,11 @@ __KERNEL_RCSID(0, "$NetBSD$");
 /*
  * ttm_global_mutex - protecting the global state
  */
+#ifdef __NetBSD__
+struct mutex ttm_global_mutex;	/* XXX ttm_module.c */
+#else
 static DEFINE_MUTEX(ttm_global_mutex);
+#endif
 static unsigned ttm_glob_use_count;
 struct ttm_global ttm_glob;
 EXPORT_SYMBOL(ttm_glob);
@@ -63,6 +67,7 @@ static void ttm_global_release(void)
 	debugfs_remove(ttm_debugfs_root);
 
 	__free_page(glob->dummy_read_page);
+#endif
 	memset(glob, 0, sizeof(*glob));
 out:
 	mutex_unlock(&ttm_global_mutex);
@@ -100,12 +105,18 @@ static int ttm_global_init(void)
 	ttm_pool_mgr_init(num_pages);
 	ttm_tt_mgr_init(num_pages, num_dma32);
 
+#ifdef __NetBSD__
+	/* Only used by agp back end, will fix there.  */
+	/* XXX Fix agp back end to DTRT.  */
+	glob->dummy_read_page = NULL;
+#else
 	glob->dummy_read_page = alloc_page(__GFP_ZERO | GFP_DMA32);
 
 	if (unlikely(glob->dummy_read_page == NULL)) {
 		ret = -ENOMEM;
 		goto out;
 	}
+#endif
 
 	INIT_LIST_HEAD(&glob->device_list);
 	atomic_set(&glob->bo_count, 0);
@@ -195,7 +206,11 @@ EXPORT_SYMBOL(ttm_device_swapout);
  * !0: Failure.
  */
 int ttm_device_init(struct ttm_device *bdev, const struct ttm_device_funcs *funcs,
+#ifdef __NetBSD__
+		    bus_space_tag_t memt, bus_dma_tag_t dmat,
+#else
 		    struct device *dev, struct address_space *mapping,
+#endif
 		    struct drm_vma_offset_manager *vma_manager,
 		    bool use_dma_alloc, bool use_dma32)
 {
@@ -218,12 +233,22 @@ int ttm_device_init(struct ttm_device *bdev, const struct ttm_device_funcs *func
 	bdev->funcs = funcs;
 
 	ttm_sys_man_init(bdev);
+#ifdef __NetBSD__
+	__USE(use_dma_alloc);
+	__USE(use_dma32);
+#else
 	ttm_pool_init(&bdev->pool, dev, NUMA_NO_NODE, use_dma_alloc, use_dma32);
+#endif
 
 	bdev->vma_manager = vma_manager;
 	spin_lock_init(&bdev->lru_lock);
 	INIT_LIST_HEAD(&bdev->pinned);
+#ifdef
+	bdev->memt = memt;
+	bdev->dmat = dmat;
+#else
 	bdev->dev_mapping = mapping;
+#endif
 	mutex_lock(&ttm_global_mutex);
 	list_add_tail(&bdev->device_list, &glob->device_list);
 	mutex_unlock(&ttm_global_mutex);
@@ -255,6 +280,7 @@ void ttm_device_fini(struct ttm_device *bdev)
 	spin_unlock(&bdev->lru_lock);
 
 	ttm_pool_fini(&bdev->pool);
+	spin_lock_destroy(&bdev->lru_lock);
 	ttm_global_release();
 }
 EXPORT_SYMBOL(ttm_device_fini);

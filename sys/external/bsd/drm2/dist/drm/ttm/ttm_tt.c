@@ -42,18 +42,11 @@ __KERNEL_RCSID(0, "$NetBSD: ttm_tt.c,v 1.19 2022/06/26 17:53:06 riastradh Exp $"
 #include <linux/file.h>
 #include <linux/module.h>
 #include <drm/drm_cache.h>
-<<<<<<< HEAD
-#include <drm/drm_mem_util.h>
-#include <drm/ttm/ttm_bo_driver.h>
-#include <drm/ttm/ttm_page_alloc.h>
-#include <drm/bus_dma_hacks.h>
-#include <drm/ttm/ttm_set_memory.h>
-=======
 #include <drm/drm_device.h>
 #include <drm/drm_util.h>
 #include <drm/ttm/ttm_bo.h>
 #include <drm/ttm/ttm_tt.h>
->>>>>>> vendor/linux-drm-v6.6.35
+#include <drm/bus_dma_hacks.h>
 
 #include "ttm_module.h"
 
@@ -130,42 +123,32 @@ static int ttm_tt_alloc_page_directory(struct ttm_tt *ttm)
 	return 0;
 }
 
-<<<<<<< HEAD
-static int ttm_sg_tt_alloc_page_directory(struct ttm_dma_tt *);
+static int ttm_sg_tt_alloc_page_directory(struct ttm_tt *);
 
-static int ttm_dma_tt_alloc_page_directory(struct ttm_dma_tt *ttm)
+static int ttm_dma_tt_alloc_page_directory(struct ttm_tt *ttm)
 {
 #ifdef __NetBSD__
 	int r;
 
-	/* Create array of pages at ttm->ttm.pages.  */
-	r = ttm_tt_alloc_page_directory(&ttm->ttm);
+	/* Create array of pages at ttm->pages.  */
+	r = ttm_tt_alloc_page_directory(ttm);
 	if (r)
 		return r;
 
 	/* Create bus DMA map at ttm->dma_address.  */
 	r = ttm_sg_tt_alloc_page_directory(ttm);
 	if (r) {
-		kvfree(ttm->ttm.pages);
-		ttm->ttm.pages = NULL;
+		kvfree(ttm->pages);
+		ttm->pages = NULL;
 		return r;
 	}
 
 	/* Success!  */
 	return 0;
 #else
-	ttm->ttm.pages = kvmalloc_array(ttm->ttm.num_pages,
-					  sizeof(*ttm->ttm.pages) +
-					  sizeof(*ttm->dma_address),
-					  GFP_KERNEL | __GFP_ZERO);
-	if (!ttm->ttm.pages)
-=======
-static int ttm_dma_tt_alloc_page_directory(struct ttm_tt *ttm)
-{
 	ttm->pages = kvcalloc(ttm->num_pages, sizeof(*ttm->pages) +
 			      sizeof(*ttm->dma_address), GFP_KERNEL);
 	if (!ttm->pages)
->>>>>>> vendor/linux-drm-v6.6.35
 		return -ENOMEM;
 
 	ttm->dma_address = (void *)(ttm->pages + ttm->num_pages);
@@ -175,136 +158,25 @@ static int ttm_dma_tt_alloc_page_directory(struct ttm_tt *ttm)
 
 static int ttm_sg_tt_alloc_page_directory(struct ttm_tt *ttm)
 {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	ttm->dma_address = NULL;
 	/* XXX errno NetBSD->Linux */
-	return -bus_dmamap_create(ttm->ttm.bdev->dmat,
-	    ttm->ttm.num_pages << PAGE_SHIFT, ttm->ttm.num_pages, PAGE_SIZE, 0,
+	return -bus_dmamap_create(ttm->bdev->dmat,
+	    ttm->num_pages << PAGE_SHIFT, ttm->num_pages, PAGE_SIZE, 0,
 	    BUS_DMA_WAITOK, &ttm->dma_address);
 #else
-	ttm->dma_address = kvmalloc_array(ttm->ttm.num_pages,
-					  sizeof(*ttm->dma_address),
-					  GFP_KERNEL | __GFP_ZERO);
-	if (!ttm->dma_address)
-		return -ENOMEM;
-	return 0;
-#endif
-}
-
-static int ttm_tt_set_page_caching(struct page *p,
-				   enum ttm_caching_state c_old,
-				   enum ttm_caching_state c_new)
-{
-#ifdef __NetBSD__
-	return 0;
-#else
-	int ret = 0;
-
-	if (PageHighMem(p))
-		return 0;
-
-	if (c_old != tt_cached) {
-		/* p isn't in the default caching state, set it to
-		 * writeback first to free its current memtype. */
-
-		ret = ttm_set_pages_wb(p, 1);
-		if (ret)
-			return ret;
-	}
-
-	if (c_new == tt_wc)
-		ret = ttm_set_pages_wc(p, 1);
-	else if (c_new == tt_uncached)
-		ret = ttm_set_pages_uc(p, 1);
-
-	return ret;
-#endif
-}
-
-/*
- * Change caching policy for the linear kernel map
- * for range of pages in a ttm.
- */
-
-static int ttm_tt_set_caching(struct ttm_tt *ttm,
-			      enum ttm_caching_state c_state)
-{
-	int i, j;
-	struct page *cur_page;
-	int ret;
-
-	if (ttm->caching_state == c_state)
-		return 0;
-
-	if (ttm->state == tt_unpopulated) {
-		/* Change caching but don't populate */
-		ttm->caching_state = c_state;
-		return 0;
-	}
-
-	if (ttm->caching_state == tt_cached)
-		drm_clflush_pages(ttm->pages, ttm->num_pages);
-
-	for (i = 0; i < ttm->num_pages; ++i) {
-		cur_page = ttm->pages[i];
-		if (likely(cur_page != NULL)) {
-			ret = ttm_tt_set_page_caching(cur_page,
-						      ttm->caching_state,
-						      c_state);
-			if (unlikely(ret != 0))
-				goto out_err;
-		}
-	}
-
-	ttm->caching_state = c_state;
-=======
 	ttm->dma_address = kvcalloc(ttm->num_pages, sizeof(*ttm->dma_address),
 				    GFP_KERNEL);
 	if (!ttm->dma_address)
 		return -ENOMEM;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	return 0;
+#endif
 }
 
 void ttm_tt_destroy(struct ttm_device *bdev, struct ttm_tt *ttm)
 {
-<<<<<<< HEAD
-	enum ttm_caching_state state;
-
-	if (placement & TTM_PL_FLAG_WC)
-		state = tt_wc;
-	else if (placement & TTM_PL_FLAG_UNCACHED)
-		state = tt_uncached;
-	else
-		state = tt_cached;
-
-	return ttm_tt_set_caching(ttm, state);
-}
-EXPORT_SYMBOL(ttm_tt_set_placement_caching);
-
-void ttm_tt_destroy(struct ttm_tt *ttm)
-{
-	if (ttm == NULL)
-		return;
-
-	ttm_tt_unbind(ttm);
-
-	if (ttm->state == tt_unbound)
-		ttm_tt_unpopulate(ttm);
-
-#ifndef __NetBSD__
-	if (!(ttm->page_flags & TTM_PAGE_FLAG_PERSISTENT_SWAP) &&
-	    ttm->swap_storage)
-		fput(ttm->swap_storage);
-
-	ttm->swap_storage = NULL;
-#endif
-	ttm->func->destroy(ttm);
-=======
 	bdev->funcs->ttm_tt_destroy(bdev, ttm);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static void ttm_tt_init_fields(struct ttm_tt *ttm,
@@ -315,8 +187,7 @@ static void ttm_tt_init_fields(struct ttm_tt *ttm,
 {
 	ttm->num_pages = (PAGE_ALIGN(bo->base.size) >> PAGE_SHIFT) + extra_pages;
 	ttm->page_flags = page_flags;
-<<<<<<< HEAD
-	ttm->state = tt_unpopulated;
+	ttm->dma_address = NULL;
 #ifdef __NetBSD__
 	WARN(bo->num_pages == 0,
 	    "zero-size allocation in %s, please file a NetBSD PR",
@@ -324,9 +195,6 @@ static void ttm_tt_init_fields(struct ttm_tt *ttm,
 	ttm->swap_storage = uao_create(PAGE_SIZE * MAX(1, bo->num_pages), 0);
 	uao_set_pgfl(ttm->swap_storage, bus_dmamem_pgfl(ttm->bdev->dmat));
 #else
-=======
-	ttm->dma_address = NULL;
->>>>>>> vendor/linux-drm-v6.6.35
 	ttm->swap_storage = NULL;
 #endif
 	ttm->sg = bo->sg;
@@ -355,19 +223,21 @@ void ttm_tt_fini(struct ttm_tt *ttm)
 		fput(ttm->swap_storage);
 	ttm->swap_storage = NULL;
 
+#ifdef __NetBSD__
+	if (ttm->dma_address) {
+		bus_dmamap_destroy(ttm->bdev->dmat, ttm->dma_address);
+		ttm->dma_address = NULL;
+	}
+	uao_detach(ttm->swap_storage);
+	ttm->swap_storage = NULL;
+#else
 	if (ttm->pages)
 		kvfree(ttm->pages);
 	else
 		kvfree(ttm->dma_address);
 	ttm->pages = NULL;
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	uao_detach(ttm->swap_storage);
-	ttm->swap_storage = NULL;
-#endif
-=======
 	ttm->dma_address = NULL;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 EXPORT_SYMBOL(ttm_tt_fini);
 
@@ -389,64 +259,6 @@ int ttm_sg_tt_init(struct ttm_tt *ttm, struct ttm_buffer_object *bo,
 	return 0;
 }
 EXPORT_SYMBOL(ttm_sg_tt_init);
-
-<<<<<<< HEAD
-void ttm_dma_tt_fini(struct ttm_dma_tt *ttm_dma)
-{
-	struct ttm_tt *ttm = &ttm_dma->ttm;
-
-#ifdef __NetBSD__
-	if (ttm_dma->dma_address) {
-		bus_dmamap_destroy(ttm->bdev->dmat, ttm_dma->dma_address);
-		ttm_dma->dma_address = NULL;
-	}
-	ttm_tt_fini(ttm);
-#else
-	if (ttm->pages)
-		kvfree(ttm->pages);
-	else
-		kvfree(ttm_dma->dma_address);
-	ttm->pages = NULL;
-	ttm_dma->dma_address = NULL;
-#endif
-}
-EXPORT_SYMBOL(ttm_dma_tt_fini);
-
-void ttm_tt_unbind(struct ttm_tt *ttm)
-{
-	int ret __diagused;
-
-	if (ttm->state == tt_bound) {
-		ret = ttm->func->unbind(ttm);
-		BUG_ON(ret);
-		ttm->state = tt_unbound;
-	}
-}
-
-int ttm_tt_bind(struct ttm_tt *ttm, struct ttm_mem_reg *bo_mem,
-		struct ttm_operation_ctx *ctx)
-{
-	int ret = 0;
-
-	if (!ttm)
-		return -EINVAL;
-
-	if (ttm->state == tt_bound)
-		return 0;
-
-	ret = ttm_tt_populate(ttm, ctx);
-	if (ret)
-		return ret;
-
-	ret = ttm->func->bind(ttm, bo_mem);
-	if (unlikely(ret != 0))
-		return ret;
-
-	ttm->state = tt_bound;
-
-	return 0;
-}
-EXPORT_SYMBOL(ttm_tt_bind);
 
 #ifdef __NetBSD__
 /*
@@ -515,8 +327,6 @@ ttm_tt_unwire(struct ttm_tt *ttm)
 #endif
 
 #ifndef __NetBSD__
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 int ttm_tt_swapin(struct ttm_tt *ttm)
 {
 	struct address_space *swap_space;
@@ -573,7 +383,6 @@ out_err:
 int ttm_tt_swapout(struct ttm_device *bdev, struct ttm_tt *ttm,
 		   gfp_t gfp_flags)
 {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 
 	KASSERTMSG((ttm->state == tt_unpopulated || ttm->state == tt_unbound),
@@ -588,9 +397,7 @@ int ttm_tt_swapout(struct ttm_device *bdev, struct ttm_tt *ttm,
 	ttm->bdev->driver->ttm_tt_swapout(ttm);
 	return 0;
 #else
-=======
 	loff_t size = (loff_t)ttm->num_pages << PAGE_SHIFT;
->>>>>>> vendor/linux-drm-v6.6.35
 	struct address_space *swap_space;
 	struct file *swap_storage;
 	struct page *from_page;
@@ -635,25 +442,8 @@ out_err:
 #endif
 }
 
-<<<<<<< HEAD
-static void ttm_tt_add_mapping(struct ttm_tt *ttm)
-{
-#ifndef __NetBSD__
-	pgoff_t i;
-
-	if (ttm->page_flags & TTM_PAGE_FLAG_SG)
-		return;
-
-	for (i = 0; i < ttm->num_pages; ++i)
-		ttm->pages[i]->mapping = ttm->bdev->dev_mapping;
-#endif
-}
-
-int ttm_tt_populate(struct ttm_tt *ttm, struct ttm_operation_ctx *ctx)
-=======
 int ttm_tt_populate(struct ttm_device *bdev,
 		    struct ttm_tt *ttm, struct ttm_operation_ctx *ctx)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	int ret;
 
@@ -684,20 +474,18 @@ int ttm_tt_populate(struct ttm_device *bdev,
 	if (bdev->funcs->ttm_tt_populate)
 		ret = bdev->funcs->ttm_tt_populate(bdev, ttm, ctx);
 	else
-<<<<<<< HEAD
 #ifdef __NetBSD__
 		panic("no ttm population");
 #else
-		ret = ttm_pool_populate(ttm, ctx);
-#endif
-	if (!ret)
-		ttm_tt_add_mapping(ttm);
-=======
 		ret = ttm_pool_alloc(&bdev->pool, ttm, ctx);
+#endif
 	if (ret)
 		goto error;
 
 	ttm->page_flags |= TTM_TT_FLAG_PRIV_POPULATED;
+#ifdef __NetBSD__
+	/* XXX dynamic swapin/swapout with page daemon? */
+#else
 	if (unlikely(ttm->page_flags & TTM_TT_FLAG_SWAPPED)) {
 		ret = ttm_tt_swapin(ttm);
 		if (unlikely(ret != 0)) {
@@ -705,6 +493,7 @@ int ttm_tt_populate(struct ttm_device *bdev,
 			return ret;
 		}
 	}
+#endif
 
 	return 0;
 
@@ -715,50 +504,23 @@ error:
 			atomic_long_sub(ttm->num_pages,
 					&ttm_dma32_pages_allocated);
 	}
->>>>>>> vendor/linux-drm-v6.6.35
 	return ret;
 }
 EXPORT_SYMBOL(ttm_tt_populate);
 
 void ttm_tt_unpopulate(struct ttm_device *bdev, struct ttm_tt *ttm)
 {
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	pgoff_t i;
-	struct page **page = ttm->pages;
-
-	if (ttm->page_flags & TTM_PAGE_FLAG_SG)
-		return;
-
-	for (i = 0; i < ttm->num_pages; ++i) {
-		(*page)->mapping = NULL;
-		(*page++)->index = 0;
-	}
-#endif
-}
-
-void ttm_tt_unpopulate(struct ttm_tt *ttm)
-{
-	if (ttm->state == tt_unpopulated)
-		return;
-
-	ttm_tt_clear_mapping(ttm);
-	if (ttm->bdev->driver->ttm_tt_unpopulate)
-		ttm->bdev->driver->ttm_tt_unpopulate(ttm);
-	else
-#ifdef __NetBSD__
-		panic("no ttm pool unpopulation");
-#else
-		ttm_pool_unpopulate(ttm);
-#endif
-=======
 	if (!ttm_tt_is_populated(ttm))
 		return;
 
 	if (bdev->funcs->ttm_tt_unpopulate)
 		bdev->funcs->ttm_tt_unpopulate(bdev, ttm);
 	else
+#ifdef __NetBSD__
+		panic("no ttm pool unpopulation");
+#else
 		ttm_pool_free(&bdev->pool, ttm);
+#endif
 
 	if (!(ttm->page_flags & TTM_TT_FLAG_EXTERNAL)) {
 		atomic_long_sub(ttm->num_pages, &ttm_pages_allocated);
@@ -768,7 +530,6 @@ void ttm_tt_unpopulate(struct ttm_tt *ttm)
 	}
 
 	ttm->page_flags &= ~TTM_TT_FLAG_PRIV_POPULATED;
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 #ifdef CONFIG_DEBUG_FS

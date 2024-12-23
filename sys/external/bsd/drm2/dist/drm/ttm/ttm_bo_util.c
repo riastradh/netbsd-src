@@ -47,17 +47,8 @@ struct ttm_transfer_obj {
 	struct ttm_buffer_object *bo;
 };
 
-<<<<<<< HEAD
-#ifdef __NetBSD__		/* PMAP_* caching flags for ttm_io_prot */
-#include <uvm/uvm_pmap.h>
-#include <linux/nbsd-namespace.h>
-#endif
-
-void ttm_bo_free_old_node(struct ttm_buffer_object *bo)
-=======
 int ttm_mem_io_reserve(struct ttm_device *bdev,
 		       struct ttm_resource *mem)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	if (mem->bus.offset || mem->bus.addr)
 		return 0;
@@ -109,81 +100,20 @@ void ttm_move_memcpy(bool clear,
 	if (dst_ops->maps_tt && src_ops->maps_tt)
 		return;
 
-<<<<<<< HEAD
-		ret = ttm_mem_io_reserve(bo->bdev, mem);
-		if (unlikely(ret != 0))
-			return ret;
-		mem->bus.io_reserved_vm = true;
-		if (man->use_io_reserve_lru)
-			list_add_tail(&bo->io_reserve_lru,
-				      &man->io_reserve_lru);
-	}
-	return 0;
-}
-
-void ttm_mem_io_free_vm(struct ttm_buffer_object *bo)
-{
-	struct ttm_mem_reg *mem = &bo->mem;
-
-	if (mem->bus.io_reserved_vm) {
-		mem->bus.io_reserved_vm = false;
-		list_del_init(&bo->io_reserve_lru);
-		ttm_mem_io_free(bo->bdev, mem);
-	}
-}
-
-static int ttm_mem_reg_ioremap(struct ttm_bo_device *bdev, struct ttm_mem_reg *mem,
-			void **virtual)
-{
-	struct ttm_mem_type_manager *man = &bdev->man[mem->mem_type];
-	int ret;
-	void *addr;
-
-	*virtual = NULL;
-	(void) ttm_mem_io_lock(man, false);
-	ret = ttm_mem_io_reserve(bdev, mem);
-	ttm_mem_io_unlock(man);
-	if (ret || !mem->bus.is_iomem)
-		return ret;
-
-	if (mem->bus.addr) {
-		addr = mem->bus.addr;
-	} else {
-#ifdef __NetBSD__
-		const bus_addr_t bus_addr = (mem->bus.base + mem->bus.offset);
-		int flags = BUS_SPACE_MAP_LINEAR;
-
-		if (ISSET(mem->placement, TTM_PL_FLAG_WC))
-			flags |= BUS_SPACE_MAP_PREFETCHABLE;
-		/* XXX errno NetBSD->Linux */
-		ret = -bus_space_map(bdev->memt, bus_addr, mem->bus.size,
-		    flags, &mem->bus.memh);
-		if (ret) {
-			(void) ttm_mem_io_lock(man, false);
-			ttm_mem_io_free(bdev, mem);
-			ttm_mem_io_unlock(man);
-			return ret;
-		}
-		addr = bus_space_vaddr(bdev->memt, mem->bus.memh);
-#else
-		if (mem->placement & TTM_PL_FLAG_WC)
-			addr = ioremap_wc(mem->bus.base + mem->bus.offset, mem->bus.size);
-		else
-			addr = ioremap(mem->bus.base + mem->bus.offset, mem->bus.size);
-		if (!addr) {
-			(void) ttm_mem_io_lock(man, false);
-			ttm_mem_io_free(bdev, mem);
-			ttm_mem_io_unlock(man);
-			return -ENOMEM;
-		}
-#endif
-=======
 	/* Don't move nonexistent data. Clear destination instead. */
 	if (clear) {
 		for (i = 0; i < num_pages; ++i) {
 			dst_ops->map_local(dst_iter, &dst_map, i);
 			if (dst_map.is_iomem)
-				memset_io(dst_map.vaddr_iomem, 0, PAGE_SIZE);
+#ifdef __NetBSD__
+			{
+				bus_size_t j = 0;
+				for (j = 0; j < PAGE_SIZE; j++) {
+					bus_space_write_1(dst_map.bst,
+					    dst_map.bsh, j, 0);
+				}
+			}
+#endif
 			else
 				memset(dst_map.vaddr, 0, PAGE_SIZE);
 			if (dst_ops->unmap_local)
@@ -202,82 +132,9 @@ static int ttm_mem_reg_ioremap(struct ttm_bo_device *bdev, struct ttm_mem_reg *m
 			src_ops->unmap_local(src_iter, &src_map);
 		if (dst_ops->unmap_local)
 			dst_ops->unmap_local(dst_iter, &dst_map);
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 }
-<<<<<<< HEAD
-
-static void ttm_mem_reg_iounmap(struct ttm_bo_device *bdev, struct ttm_mem_reg *mem,
-			 void *virtual)
-{
-	struct ttm_mem_type_manager *man;
-
-	man = &bdev->man[mem->mem_type];
-
-	if (virtual && mem->bus.addr == NULL)
-#ifdef __NetBSD__
-		bus_space_unmap(bdev->memt, mem->bus.memh, mem->bus.size);
-#else
-		iounmap(virtual);
-#endif
-	(void) ttm_mem_io_lock(man, false);
-	ttm_mem_io_free(bdev, mem);
-	ttm_mem_io_unlock(man);
-}
-
-#ifdef __NetBSD__
-#  define	ioread32	fake_ioread32
-#  define	iowrite32	fake_iowrite32
-
-static inline uint32_t
-ioread32(const volatile uint32_t *p)
-{
-	uint32_t v;
-
-	v = *p;
-	__insn_barrier();	/* XXX ttm io barrier */
-
-	return v;		/* XXX ttm byte order */
-}
-
-static inline void
-iowrite32(uint32_t v, volatile uint32_t *p)
-{
-
-	__insn_barrier();	/* XXX ttm io barrier */
-	*p = v;			/* XXX ttm byte order */
-}
-#endif
-
-static int ttm_copy_io_page(void *dst, void *src, unsigned long page)
-{
-	uint32_t *dstP =
-	    (uint32_t *) ((unsigned long)dst + (page << PAGE_SHIFT));
-	uint32_t *srcP =
-	    (uint32_t *) ((unsigned long)src + (page << PAGE_SHIFT));
-
-	int i;
-	for (i = 0; i < PAGE_SIZE / sizeof(uint32_t); ++i)
-		iowrite32(ioread32(srcP++), dstP++);
-	return 0;
-}
-
-#ifdef __NetBSD__
-#  undef	ioread32
-#  undef	iowrite32
-#endif
-
-#ifdef CONFIG_X86
-#define __ttm_kmap_atomic_prot(__page, __prot) kmap_atomic_prot(__page, __prot)
-#define __ttm_kunmap_atomic(__addr) kunmap_atomic(__addr)
-#else
-#define __ttm_kmap_atomic_prot(__page, __prot) vmap(&__page, 1, 0,  __prot)
-#define __ttm_kunmap_atomic(__addr) vunmap(__addr, 1)
-#endif
-
-=======
 EXPORT_SYMBOL(ttm_move_memcpy);
->>>>>>> vendor/linux-drm-v6.6.35
 
 /**
  * ttm_bo_move_memcpy
@@ -408,22 +265,13 @@ static int ttm_buffer_object_transfer(struct ttm_buffer_object *bo,
 	 * TODO: Explicit member copy would probably be better here.
 	 */
 
-<<<<<<< HEAD
-	atomic_inc(&ttm_bo_glob.bo_count);
-	INIT_LIST_HEAD(&fbo->base.ddestroy);
-	INIT_LIST_HEAD(&fbo->base.lru);
-	INIT_LIST_HEAD(&fbo->base.swap);
-	INIT_LIST_HEAD(&fbo->base.io_reserve_lru);
-	fbo->base.moving = NULL;
+	atomic_inc(&ttm_glob.bo_count);
 #ifdef __NetBSD__
 	drm_vma_node_init(&fbo->base.base.vma_node);
 	uvm_obj_init(&fbo->base.uvmobj, bo->bdev->driver->ttm_uvm_ops, true, 1);
 	rw_obj_hold(bo->uvmobj.vmobjlock);
 	uvm_obj_setlock(&fbo->base.uvmobj, bo->uvmobj.vmobjlock);
 #else
-=======
-	atomic_inc(&ttm_glob.bo_count);
->>>>>>> vendor/linux-drm-v6.6.35
 	drm_vma_node_reset(&fbo->base.base.vma_node);
 #endif
 
@@ -477,33 +325,6 @@ pgprot_t ttm_io_prot(struct ttm_buffer_object *bo, struct ttm_resource *res,
 	struct ttm_resource_manager *man;
 	enum ttm_caching caching;
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	tmp &= ~PMAP_CACHE_MASK;
-	if (caching_flags & TTM_PL_FLAG_WC)
-		return (tmp | PMAP_WRITE_COMBINE);
-	else
-		return (tmp | PMAP_NOCACHE);
-#else
-#if defined(__i386__) || defined(__x86_64__)
-	if (caching_flags & TTM_PL_FLAG_WC)
-		tmp = pgprot_writecombine(tmp);
-	else if (boot_cpu_data.x86 > 3)
-		tmp = pgprot_noncached(tmp);
-#endif
-#if defined(__ia64__) || defined(__arm__) || defined(__aarch64__) || \
-    defined(__powerpc__) || defined(__mips__)
-	if (caching_flags & TTM_PL_FLAG_WC)
-		tmp = pgprot_writecombine(tmp);
-	else
-		tmp = pgprot_noncached(tmp);
-#endif
-#if defined(__sparc__)
-	tmp = pgprot_noncached(tmp);
-#endif
-	return tmp;
-#endif
-=======
 	man = ttm_manager_type(bo->bdev, res->mem_type);
 	if (man->use_tt) {
 		caching = bo->ttm->caching;
@@ -514,7 +335,6 @@ pgprot_t ttm_io_prot(struct ttm_buffer_object *bo, struct ttm_resource *res,
 	}
 
 	return ttm_prot_from_caching(caching, tmp);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 EXPORT_SYMBOL(ttm_io_prot);
 
@@ -532,33 +352,25 @@ static int ttm_bo_ioremap(struct ttm_buffer_object *bo,
 		resource_size_t res = bo->resource->bus.offset + offset;
 
 		map->bo_kmap_type = ttm_bo_map_iomap;
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	    {
-		bus_addr_t addr;
 		int flags = BUS_SPACE_MAP_LINEAR;
 		int ret;
 
-		addr = (bo->mem.bus.base + bo->mem.bus.offset + offset);
-		if (ISSET(mem->placement, TTM_PL_FLAG_WC))
+		if (mem->bus.caching == ttm_write_combined)
 			flags |= BUS_SPACE_MAP_PREFETCHABLE;
+		else if (mem->bus.caching == ttm_cached)
+			flags |= BUS_SPACE_MAP_CACHEABLE;
 		/* XXX errno NetBSD->Linux */
-		ret = -bus_space_map(bo->bdev->memt, addr, size, flags,
+		ret = -bus_space_map(bo->bdev->memt, res, size, flags,
 		    &map->u.io.memh);
 		if (ret)
 			return ret;
 		map->u.io.size = size;
 		map->virtual = bus_space_vaddr(bo->bdev->memt, map->u.io.memh);
+		KASSERT(map->virtual != NULL);
 	    }
 #else
-		if (mem->placement & TTM_PL_FLAG_WC)
-			map->virtual = ioremap_wc(bo->mem.bus.base + bo->mem.bus.offset + offset,
-						  size);
-		else
-			map->virtual = ioremap(bo->mem.bus.base + bo->mem.bus.offset + offset,
-						       size);
-#endif
-=======
 		if (mem->bus.caching == ttm_write_combined)
 			map->virtual = ioremap_wc(res, size);
 #ifdef CONFIG_X86
@@ -567,7 +379,7 @@ static int ttm_bo_ioremap(struct ttm_buffer_object *bo,
 #endif
 		else
 			map->virtual = ioremap(res, size);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	}
 	return (!map->virtual) ? -ENOMEM : 0;
 }
