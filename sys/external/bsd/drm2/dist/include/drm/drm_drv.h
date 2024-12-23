@@ -288,49 +288,10 @@ struct drm_driver {
 	 */
 	void (*release) (struct drm_device *);
 
-<<<<<<< HEAD
-	/**
-	 * @irq_handler:
-	 *
-	 * Interrupt handler called when using drm_irq_install(). Not used by
-	 * drivers which implement their own interrupt handling.
-	 */
-	irqreturn_t(*irq_handler) (DRM_IRQ_ARGS);
-
-	/**
-	 * @irq_preinstall:
-	 *
-	 * Optional callback used by drm_irq_install() which is called before
-	 * the interrupt handler is registered. This should be used to clear out
-	 * any pending interrupts (from e.g. firmware based drives) and reset
-	 * the interrupt handling registers.
-	 */
-	void (*irq_preinstall) (struct drm_device *dev);
-
-	/**
-	 * @irq_postinstall:
-	 *
-	 * Optional callback used by drm_irq_install() which is called after
-	 * the interrupt handler is registered. This should be used to enable
-	 * interrupt generation in the hardware.
-	 */
-	int (*irq_postinstall) (struct drm_device *dev);
-
-	/**
-	 * @irq_uninstall:
-	 *
-	 * Optional callback used by drm_irq_uninstall() which is called before
-	 * the interrupt handler is unregistered. This should be used to disable
-	 * interrupt generation in the hardware.
-	 */
-	void (*irq_uninstall) (struct drm_device *dev);
-
 #ifdef __NetBSD__
 	int (*request_irq)(struct drm_device *, int);
 	void (*free_irq)(struct drm_device *);
 #endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/**
 	 * @master_set:
@@ -448,16 +409,10 @@ struct drm_driver {
 	 */
 	void (*show_fdinfo)(struct drm_printer *p, struct drm_file *f);
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	int (*mmap_object)(struct drm_device *, off_t, size_t, int,
 	    struct uvm_object **, voff_t *, struct file *);
-	const struct uvm_pagerops *gem_uvm_ops;
-#else
-	const struct vm_operations_struct *gem_vm_ops;
 #endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/** @major: driver major number */
 	int major;

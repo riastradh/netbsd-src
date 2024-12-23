@@ -224,26 +224,6 @@ struct drm_device {
 	struct list_head clientlist;
 
 	/**
-<<<<<<< HEAD
-	 * @irq_enabled:
-	 *
-	 * Indicates that interrupt handling is enabled, specifically vblank
-	 * handling. Drivers which don't use drm_irq_install() need to set this
-	 * to true manually.
-	 */
-	bool irq_enabled;
-
-	/**
-	 * @irq: Used by the drm_irq_install() and drm_irq_unistall() helpers.
-	 */
-	int irq;
-#ifdef __NetBSD__
-	struct drm_bus_irq_cookie *irq_cookie;
-#endif
-
-	/**
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	 * @vblank_disable_immediate:
 	 *
 	 * If true, vblank interrupt will be disabled immediately when the
@@ -437,7 +417,11 @@ struct drm_device {
 
 	/* IRQs */
 	bool irq_enabled;
+#ifdef __NetBSD__
+	struct drm_bus_irq_cookie *irq_cookie;
+#else
 	int irq;
+#endif
 #endif
 };
 

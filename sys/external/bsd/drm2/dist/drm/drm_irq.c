@@ -71,11 +71,6 @@ __KERNEL_RCSID(0, "$NetBSD: drm_irq.c,v 1.18 2021/12/19 12:05:08 riastradh Exp $
 
 #include "drm_internal.h"
 
-#ifdef __NetBSD__		/* XXX hurk -- selnotify &c. */
-#include <sys/poll.h>
-#include <sys/select.h>
-#endif
-
 #ifdef __NetBSD__
 static int drm_legacy_irq_install(struct drm_device *dev)
 #else
@@ -179,7 +174,9 @@ int drm_legacy_irq_uninstall(struct drm_device *dev)
 	if (!irq_enabled)
 		return -EINVAL;
 
+#ifndef __NetBSD__
 	DRM_DEBUG("irq=%d\n", dev->irq);
+#endif
 
 	if (drm_core_check_feature(dev, DRIVER_LEGACY))
 		vga_client_unregister(to_pci_dev(dev->dev));
@@ -220,7 +217,8 @@ int drm_legacy_irq_control(struct drm_device *dev, void *data,
 	case DRM_INST_HANDLER:
 		pdev = to_pci_dev(dev->dev);
 #ifdef __NetBSD__
-		irq = ctl->irq;
+		__USE(pdev);
+		irq = ctl->irq;	/* XXX consider validating this */
 #else
 		irq = pdev->irq;
 #endif

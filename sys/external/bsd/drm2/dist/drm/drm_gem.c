@@ -188,8 +188,8 @@ void drm_gem_private_object_init(struct drm_device *dev,
 #ifdef __NetBSD__
 	obj->filp = NULL;
 	KASSERT(drm_core_check_feature(dev, DRIVER_GEM));
-	KASSERT(dev->driver->gem_uvm_ops != NULL);
-	uvm_obj_init(&obj->gemo_uvmobj, dev->driver->gem_uvm_ops,
+	KASSERT(obj->funcs->uvm_ops != NULL, "obj->funcs=%p", obj->funcs);
+	uvm_obj_init(&obj->gemo_uvmobj, obj->funcs->uvm_ops,
 	    /*allocate lock*/true, /*nrefs*/1);
 #else
 	obj->filp = NULL;
