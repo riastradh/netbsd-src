@@ -662,13 +662,9 @@ err:
 
 void intel_guc_log_destroy(struct intel_guc_log *log)
 {
-<<<<<<< HEAD
-	i915_vma_unpin_and_release(&log->vma, 0);
-	mutex_destroy(&log->relay.lock);
-=======
 	log->buf_addr = NULL;
 	i915_vma_unpin_and_release(&log->vma, I915_VMA_RELEASE_MAP);
->>>>>>> vendor/linux-drm-v6.6.35
+	mutex_destroy(&log->relay.lock);
 }
 
 int intel_guc_log_set_level(struct intel_guc_log *log, u32 level)

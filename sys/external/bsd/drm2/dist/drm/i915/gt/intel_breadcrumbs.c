@@ -21,13 +21,9 @@ __KERNEL_RCSID(0, "$NetBSD: intel_breadcrumbs.c,v 1.5 2021/12/19 12:32:15 riastr
 #include "intel_gt_pm.h"
 #include "intel_gt_requests.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-static void irq_enable(struct intel_engine_cs *engine)
-=======
 static bool irq_enable(struct intel_breadcrumbs *b)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	return intel_engine_irq_enable(b->irq_engine);
 }
@@ -258,19 +254,15 @@ static void signal_irq_work(struct irq_work *work)
 
 	llist_for_each_safe(signal, sn, signal) {
 		struct i915_request *rq =
-<<<<<<< HEAD
-			list_entry(pos, typeof(*rq), signal_link);
-#ifdef __NetBSD__
-		__dma_fence_signal_wake(&rq->fence, timestamp);
-#else
-=======
 			llist_entry(signal, typeof(*rq), signal_node);
->>>>>>> vendor/linux-drm-v6.6.35
 		struct list_head cb_list;
 
 		if (rq->engine->sched_engine->retire_inflight_request_prio)
 			rq->engine->sched_engine->retire_inflight_request_prio(rq);
 
+#ifdef __NetBSD__
+		__dma_fence_signal_wake(&rq->fence, timestamp);
+#else
 		spin_lock(&rq->lock);
 		list_replace(&rq->fence.cb_list, &cb_list);
 		__dma_fence_signal__timestamp(&rq->fence, timestamp);
@@ -334,17 +326,15 @@ void intel_breadcrumbs_reset(struct intel_breadcrumbs *b)
 
 void __intel_breadcrumbs_park(struct intel_breadcrumbs *b)
 {
-<<<<<<< HEAD
 	struct intel_breadcrumbs *b = &engine->breadcrumbs;
 
 	spin_lock_destroy(&b->irq_lock);
-=======
+
 	if (!READ_ONCE(b->irq_armed))
 		return;
 
 	/* Kick the work once more to drain the signalers, and disarm the irq */
 	irq_work_queue(&b->irq_work);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 void intel_breadcrumbs_free(struct kref *kref)
@@ -542,25 +532,7 @@ void intel_engine_print_breadcrumbs(struct intel_engine_cs *engine,
 	if (!b)
 		return;
 
-<<<<<<< HEAD
-	drm_printf(p, "Signals:\n");
-
-	spin_lock_irq(&b->irq_lock);
-	list_for_each_entry(ce, &b->signalers, signal_link) {
-		list_for_each_entry(rq, &ce->signals, signal_link) {
-			drm_printf(p, "\t[%"PRIx64":%"PRIx64"%s] @ %dms\n",
-				   (uint64_t)rq->fence.context,
-				   (uint64_t)rq->fence.seqno,
-				   i915_request_completed(rq) ? "!" :
-				   i915_request_started(rq) ? "*" :
-				   "",
-				   jiffies_to_msecs(jiffies - rq->emitted_jiffies));
-		}
-	}
-	spin_unlock_irq(&b->irq_lock);
-=======
 	drm_printf(p, "IRQ: %s\n", str_enabled_disabled(b->irq_armed));
 	if (!list_empty(&b->signalers))
 		print_signals(b, p);
->>>>>>> vendor/linux-drm-v6.6.35
 }

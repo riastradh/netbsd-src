@@ -29,16 +29,12 @@ static void gen6_write_pde(const struct gen6_ppgtt *ppgtt,
 	dma_addr_t addr = pt ? px_dma(pt) : px_dma(ppgtt->base.vm.scratch[1]);
 
 	/* Caller needs to make sure the write completes if necessary */
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	CTASSERT(sizeof(gen6_pte_t) == 4);
 	bus_space_write_4(ppgtt->pd_bst, ppgtt->pd_bsh, pde*sizeof(gen6_pte_t),
-	    GEN6_PDE_ADDR_ENCODE(px_dma(pt)) | GEN6_PDE_VALID);
+	    GEN6_PDE_ADDR_ENCODE(addr) | GEN6_PDE_VALID);
 #else
-	iowrite32(GEN6_PDE_ADDR_ENCODE(px_dma(pt)) | GEN6_PDE_VALID,
-=======
 	iowrite32(GEN6_PDE_ADDR_ENCODE(addr) | GEN6_PDE_VALID,
->>>>>>> vendor/linux-drm-v6.6.35
 		  ppgtt->pd_addr + pde);
 #endif
 }

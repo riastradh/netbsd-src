@@ -19,16 +19,9 @@ __KERNEL_RCSID(0, "$NetBSD: intel_context.c,v 1.3 2021/12/19 11:38:04 riastradh 
 #include "intel_engine_pm.h"
 #include "intel_ring.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-static struct i915_global_context {
-	struct i915_global base;
-	struct kmem_cache *slab_ce;
-} global;
-=======
 static struct kmem_cache *slab_ce;
->>>>>>> vendor/linux-drm-v6.6.35
 
 static struct intel_context *intel_context_alloc(void)
 {
