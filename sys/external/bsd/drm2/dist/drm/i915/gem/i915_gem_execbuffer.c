@@ -613,17 +613,6 @@ eb_add_vma(struct i915_execbuffer *eb,
 			return -EINVAL;
 		}
 
-<<<<<<< HEAD
-		list_add_tail(&vma->exec_link, &eb->unbound);
-		if (drm_mm_node_allocated(&vma->node))
-			err = i915_vma_unbind(vma);
-		if (unlikely(err)) {
-			vma->exec_flags = NULL;
-			if (i == batch_idx)
-				eb->batch = NULL;
-			eb->vma[i] = NULL;
-		}
-=======
 		if (range_overflows_t(u64,
 				      eb->batch_start_offset,
 				      eb->args->batch_len,
@@ -643,7 +632,6 @@ eb_add_vma(struct i915_execbuffer *eb,
 		}
 
 		++*current_batch;
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 
 	return 0;
@@ -1560,12 +1548,7 @@ static int eb_relocate_vma(struct i915_execbuffer *eb, struct eb_vma *ev)
 		u64_to_user_ptr(entry->relocs_ptr);
 	unsigned long remain = entry->relocation_count;
 
-<<<<<<< HEAD
-	urelocs = u64_to_user_ptr(entry->relocs_ptr);
-	remain = entry->relocation_count;
 #ifndef _LP64		/* XXX why, gcc, do you make it hard to be safe */
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	if (unlikely(remain > N_RELOC(ULONG_MAX)))
 		return -EINVAL;
 #endif
@@ -1885,17 +1868,11 @@ repeat_validate:
 
 	list_for_each_entry(ev, &eb->relocs, reloc_link) {
 		if (!have_copy) {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 			err = -EFAULT;
 #else
-			pagefault_disable();
-			err = eb_relocate_vma(eb, vma);
-			pagefault_enable();
-#endif
-=======
 			err = eb_relocate_vma(eb, ev);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 			if (err)
 				break;
 		} else {
@@ -2203,17 +2180,6 @@ static int eb_move_to_gpu(struct i915_execbuffer *eb)
 			if (!eb->requests[j])
 				continue;
 
-<<<<<<< HEAD
-		i915_vma_unlock(vma);
-
-		__eb_unreserve_vma(vma, flags);
-		vma->exec_flags = NULL;
-		if (err)
-			eb->vma[i] = NULL;
-
-		if (unlikely(flags & __EXEC_OBJECT_HAS_REF))
-			i915_vma_put(vma);
-=======
 			err = _i915_vma_move_to_active(vma, eb->requests[j],
 						       j ? NULL :
 						       eb->composite_fence ?
@@ -2222,7 +2188,6 @@ static int eb_move_to_gpu(struct i915_execbuffer *eb)
 						       flags | __EXEC_OBJECT_NO_RESERVE |
 						       __EXEC_OBJECT_NO_REQUEST_AWAIT);
 		}
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 
 #ifdef CONFIG_MMU_NOTIFIER
@@ -3272,7 +3237,12 @@ static void eb_requests_put(struct i915_execbuffer *eb)
 }
 
 static struct sync_file *
+#ifdef __NetBSD__
+eb_composite_fence_create(struct i915_execbuffer *eb, int out_fence_fd,
+    struct file *fp)
+#else
 eb_composite_fence_create(struct i915_execbuffer *eb, int out_fence_fd)
+#endif
 {
 	struct sync_file *out_fence = NULL;
 	struct dma_fence_array *fence_array;
@@ -3306,7 +3276,11 @@ eb_composite_fence_create(struct i915_execbuffer *eb, int out_fence_fd)
 		dma_fence_get(fences[i]);
 
 	if (out_fence_fd != -1) {
+#ifdef __NetBSD__
+		out_fence = sync_file_create(&fence_array->base, fp);
+#else
 		out_fence = sync_file_create(&fence_array->base);
+#endif
 		/* sync_file now owns fence_arry, drop creation ref */
 		dma_fence_put(&fence_array->base);
 		if (!out_fence)
@@ -3319,8 +3293,13 @@ eb_composite_fence_create(struct i915_execbuffer *eb, int out_fence_fd)
 }
 
 static struct sync_file *
+#ifdef __NetBSD__
+eb_fences_add(struct i915_execbuffer *eb, struct i915_request *rq,
+	      struct dma_fence *in_fence, int out_fence_fd, struct file *fp)
+#else
 eb_fences_add(struct i915_execbuffer *eb, struct i915_request *rq,
 	      struct dma_fence *in_fence, int out_fence_fd)
+#endif
 {
 	struct sync_file *out_fence = NULL;
 	int err;
@@ -3351,11 +3330,19 @@ eb_fences_add(struct i915_execbuffer *eb, struct i915_request *rq,
 	}
 
 	if (intel_context_is_parallel(eb->context)) {
+#ifdef __NetBSD__
+		out_fence = eb_composite_fence_create(eb, out_fence_fd, fp);
+#else
 		out_fence = eb_composite_fence_create(eb, out_fence_fd);
+#endif
 		if (IS_ERR(out_fence))
 			return ERR_PTR(-ENOMEM);
 	} else if (out_fence_fd != -1) {
+#ifdef __NetBSD__
+		out_fence = sync_file_create(&rq->fence, fp);
+#else
 		out_fence = sync_file_create(&rq->fence);
+#endif
 		if (!out_fence)
 			return ERR_PTR(-ENOMEM);
 	}
@@ -3381,8 +3368,13 @@ eb_find_context(struct i915_execbuffer *eb, unsigned int context_number)
 }
 
 static struct sync_file *
+#ifdef __NetBSD__
+eb_requests_create(struct i915_execbuffer *eb, struct dma_fence *in_fence,
+		   int out_fence_fd, struct file *fp)
+#else
 eb_requests_create(struct i915_execbuffer *eb, struct dma_fence *in_fence,
 		   int out_fence_fd)
+#endif
 {
 	struct sync_file *out_fence = NULL;
 	unsigned int i;
@@ -3402,8 +3394,13 @@ eb_requests_create(struct i915_execbuffer *eb, struct dma_fence *in_fence,
 		 * will have fences inserted inbetween them.
 		 */
 		if (i + 1 == eb->num_batches) {
+#ifef __NetBSD__
+			out_fence = eb_fences_add(eb, eb->requests[i],
+						  in_fence, out_fence_fd, fp);
+#else
 			out_fence = eb_fences_add(eb, eb->requests[i],
 						  in_fence, out_fence_fd);
+#endif
 			if (IS_ERR(out_fence))
 				return out_fence;
 		}
@@ -3565,7 +3562,11 @@ i915_gem_do_execbuffer(struct drm_device *dev,
 	if (err)
 		goto err_vma;
 
+#ifdef __NetBSD__
+	out_fence = eb_requests_create(&eb, in_fence, out_fence_fd, fp);
+#else
 	out_fence = eb_requests_create(&eb, in_fence, out_fence_fd);
+#endif
 	if (IS_ERR(out_fence)) {
 		err = PTR_ERR(out_fence);
 		out_fence = NULL;
@@ -3575,62 +3576,6 @@ i915_gem_do_execbuffer(struct drm_device *dev,
 			goto err_vma;
 	}
 
-<<<<<<< HEAD
-	/* All GPU relocation batches must be submitted prior to the user rq */
-	GEM_BUG_ON(eb.reloc_cache.rq);
-
-	/* Allocate a request for this batch buffer nice and early. */
-	eb.request = i915_request_create(eb.context);
-	if (IS_ERR(eb.request)) {
-		err = PTR_ERR(eb.request);
-		goto err_batch_unpin;
-	}
-
-	if (in_fence) {
-		err = i915_request_await_dma_fence(eb.request, in_fence);
-		if (err < 0)
-			goto err_request;
-	}
-
-	if (exec_fence) {
-		err = i915_request_await_execution(eb.request, exec_fence,
-						   eb.engine->bond_execute);
-		if (err < 0)
-			goto err_request;
-	}
-
-	if (fences) {
-		err = await_fence_array(&eb, fences);
-		if (err)
-			goto err_request;
-	}
-
-	if (out_fence_fd != -1) {
-#ifdef __NetBSD__
-		out_fence = sync_file_create(&eb.request->fence, fp);
-#else
-		out_fence = sync_file_create(&eb.request->fence);
-#endif
-		if (!out_fence) {
-			err = -ENOMEM;
-			goto err_request;
-		}
-	}
-
-	/*
-	 * Whilst this request exists, batch_obj will be on the
-	 * active_list, and so will hold the active reference. Only when this
-	 * request is retired will the the batch_obj be moved onto the
-	 * inactive_list and lose its active reference. Hence we do not need
-	 * to explicitly hold another reference here.
-	 */
-	eb.request->batch = eb.batch;
-	if (eb.batch->private)
-		intel_engine_pool_mark_active(eb.batch->private, eb.request);
-
-	trace_i915_request_queue(eb.request, eb.batch_flags);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	err = eb_submit(&eb);
 
 err_request:
@@ -3694,12 +3639,7 @@ err_out_fence:
 		fd_abort(curproc, fp, out_fence_fd);
 #else
 		put_unused_fd(out_fence_fd);
-<<<<<<< HEAD
 #endif
-err_exec_fence:
-	dma_fence_put(exec_fence);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 err_in_fence:
 	dma_fence_put(in_fence);
 err_ext:

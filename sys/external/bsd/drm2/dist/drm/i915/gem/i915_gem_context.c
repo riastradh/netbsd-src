@@ -73,14 +73,10 @@ __KERNEL_RCSID(0, "$NetBSD: i915_gem_context.c,v 1.7 2022/09/01 11:49:23 riastra
 #include <linux/log2.h>
 #include <linux/nospec.h>
 
-<<<<<<< HEAD
 #include <asm/uaccess.h>
 
-#include <drm/i915_drm.h>
-=======
 #include <drm/drm_cache.h>
 #include <drm/drm_syncobj.h>
->>>>>>> vendor/linux-drm-v6.6.35
 
 #include "gt/gen6_ppgtt.h"
 #include "gt/intel_context.h"
@@ -1715,67 +1711,29 @@ static void gem_context_register(struct i915_gem_context *ctx,
 				 struct drm_i915_file_private *fpriv,
 				 u32 id)
 {
-<<<<<<< HEAD
-	flush_work(&i915->gem.contexts.free_work);
-	spin_lock_destroy(&i915->gem.contexts.lock);
-}
-
-static int vm_idr_cleanup(int id, void *p, void *data)
-{
-	i915_vm_put(p);
-	return 0;
-}
-
-static int gem_context_register(struct i915_gem_context *ctx,
-				struct drm_i915_file_private *fpriv,
-				u32 *id)
-{
-	struct i915_address_space *vm;
-	int ret;
+	struct drm_i915_private *i915 = ctx->i915;
+	void *old;
 
 	ctx->file_priv = fpriv;
-
-	mutex_lock(&ctx->mutex);
-	vm = i915_gem_context_vm(ctx);
-	if (vm)
-		WRITE_ONCE(vm->file, fpriv); /* XXX */
-	mutex_unlock(&ctx->mutex);
 
 #ifdef __NetBSD__
 	ctx->pid = NULL;
 #else
 	ctx->pid = get_task_pid(current, PIDTYPE_PID);
 #endif
+	ctx->client = i915_drm_client_get(fpriv->client);
+
 #ifdef __NetBSD__
 	snprintf(ctx->name, sizeof(ctx->name), "%s[%d]",
 		 curproc->p_comm, (int)curproc->p_pid);
 #else
-=======
-	struct drm_i915_private *i915 = ctx->i915;
-	void *old;
-
-	ctx->file_priv = fpriv;
-
-	ctx->pid = get_task_pid(current, PIDTYPE_PID);
-	ctx->client = i915_drm_client_get(fpriv->client);
-
->>>>>>> vendor/linux-drm-v6.6.35
 	snprintf(ctx->name, sizeof(ctx->name), "%s[%d]",
 		 current->comm, pid_nr(ctx->pid));
 #endif
 
-<<<<<<< HEAD
-	/* And finally expose ourselves to userspace via the idr */
-	ret = xa_alloc(&fpriv->context_xa, id, ctx, xa_limit_32b, GFP_KERNEL);
-#ifndef __NetBSD__
-	if (ret)
-		put_pid(fetch_and_zero(&ctx->pid));
-#endif
-=======
 	spin_lock(&ctx->client->ctx_lock);
 	list_add_tail_rcu(&ctx->client_link, &ctx->client->ctx_list);
 	spin_unlock(&ctx->client->ctx_lock);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	spin_lock(&i915->gem.contexts.lock);
 	list_add_tail(&ctx->link, &i915->gem.contexts.list);
@@ -1878,28 +1836,6 @@ int i915_gem_vm_create_ioctl(struct drm_device *dev, void *data,
 			goto err_put;
 	}
 
-<<<<<<< HEAD
-	idr_preload(GFP_KERNEL);
-	err = mutex_lock_interruptible(&file_priv->vm_idr_lock);
-	if (err)
-		goto err_put;
-
-	err = idr_alloc(&file_priv->vm_idr, &ppgtt->vm, 0, 0, GFP_KERNEL);
-	if (err < 0)
-		goto err_unlock;
-
-	GEM_BUG_ON(err == 0); /* reserved for invalid/unassigned ppgtt */
-
-	mutex_unlock(&file_priv->vm_idr_lock);
-	idr_preload_end();
-
-	args->vm_id = err;
-	return 0;
-
-err_unlock:
-	mutex_unlock(&file_priv->vm_idr_lock);
-	idr_preload_end();
-=======
 	err = xa_alloc(&file_priv->vm_xa, &id, &ppgtt->vm,
 		       xa_limit_32b, GFP_KERNEL);
 	if (err)
@@ -1909,7 +1845,6 @@ err_unlock:
 	args->vm_id = id;
 	return 0;
 
->>>>>>> vendor/linux-drm-v6.6.35
 err_put:
 	i915_vm_put(&ppgtt->vm);
 	return err;
@@ -1941,129 +1876,6 @@ static int get_ppgtt(struct drm_i915_file_private *file_priv,
 		     struct drm_i915_gem_context_param *args)
 {
 	struct i915_address_space *vm;
-<<<<<<< HEAD
-	int ret;
-
-	if (!rcu_access_pointer(ctx->vm))
-		return -ENODEV;
-
-	rcu_read_lock();
-	vm = context_get_vm_rcu(ctx);
-	rcu_read_unlock();
-
-	idr_preload(GFP_KERNEL);
-	ret = mutex_lock_interruptible(&file_priv->vm_idr_lock);
-	if (ret)
-		goto err_put;
-
-	ret = idr_alloc(&file_priv->vm_idr, vm, 0, 0, GFP_KERNEL);
-	GEM_BUG_ON(!ret);
-	if (ret < 0)
-		goto err_unlock;
-
-	i915_vm_open(vm);
-
-	args->size = 0;
-	args->value = ret;
-
-	ret = 0;
-err_unlock:
-	mutex_unlock(&file_priv->vm_idr_lock);
-	idr_preload_end();
-err_put:
-	i915_vm_put(vm);
-	return ret;
-}
-
-static void set_ppgtt_barrier(void *data)
-{
-	struct i915_address_space *old = data;
-
-	if (INTEL_GEN(old->i915) < 8)
-		gen6_ppgtt_unpin_all(i915_vm_to_ppgtt(old));
-
-	i915_vm_close(old);
-}
-
-static int emit_ppgtt_update(struct i915_request *rq, void *data)
-{
-	struct i915_address_space *vm = rq->context->vm;
-	struct intel_engine_cs *engine = rq->engine;
-	u32 base = engine->mmio_base;
-	u32 *cs;
-	int i;
-
-	if (i915_vm_is_4lvl(vm)) {
-		struct i915_ppgtt *ppgtt = i915_vm_to_ppgtt(vm);
-		const dma_addr_t pd_daddr = px_dma(ppgtt->pd);
-
-		cs = intel_ring_begin(rq, 6);
-		if (IS_ERR(cs))
-			return PTR_ERR(cs);
-
-		*cs++ = MI_LOAD_REGISTER_IMM(2);
-
-		*cs++ = i915_mmio_reg_offset(GEN8_RING_PDP_UDW(base, 0));
-		*cs++ = upper_32_bits(pd_daddr);
-		*cs++ = i915_mmio_reg_offset(GEN8_RING_PDP_LDW(base, 0));
-		*cs++ = lower_32_bits(pd_daddr);
-
-		*cs++ = MI_NOOP;
-		intel_ring_advance(rq, cs);
-	} else if (HAS_LOGICAL_RING_CONTEXTS(engine->i915)) {
-		struct i915_ppgtt *ppgtt = i915_vm_to_ppgtt(vm);
-		int err;
-
-		/* Magic required to prevent forcewake errors! */
-		err = engine->emit_flush(rq, EMIT_INVALIDATE);
-		if (err)
-			return err;
-
-		cs = intel_ring_begin(rq, 4 * GEN8_3LVL_PDPES + 2);
-		if (IS_ERR(cs))
-			return PTR_ERR(cs);
-
-		*cs++ = MI_LOAD_REGISTER_IMM(2 * GEN8_3LVL_PDPES) | MI_LRI_FORCE_POSTED;
-		for (i = GEN8_3LVL_PDPES; i--; ) {
-			const dma_addr_t pd_daddr = i915_page_dir_dma_addr(ppgtt, i);
-
-			*cs++ = i915_mmio_reg_offset(GEN8_RING_PDP_UDW(base, i));
-			*cs++ = upper_32_bits(pd_daddr);
-			*cs++ = i915_mmio_reg_offset(GEN8_RING_PDP_LDW(base, i));
-			*cs++ = lower_32_bits(pd_daddr);
-		}
-		*cs++ = MI_NOOP;
-		intel_ring_advance(rq, cs);
-	}
-
-	return 0;
-}
-
-static bool skip_ppgtt_update(struct intel_context *ce, void *data)
-{
-	if (!test_bit(CONTEXT_ALLOC_BIT, &ce->flags))
-		return true;
-
-	if (HAS_LOGICAL_RING_CONTEXTS(ce->engine->i915))
-		return false;
-
-	if (!atomic_read(&ce->pin_count))
-		return true;
-
-	/* ppGTT is not part of the legacy context image */
-	if (gen6_ppgtt_pin(i915_vm_to_ppgtt(ce->vm)))
-		return true;
-
-	return false;
-}
-
-static int set_ppgtt(struct drm_i915_file_private *file_priv,
-		     struct i915_gem_context *ctx,
-		     struct drm_i915_gem_context_param *args)
-{
-	struct i915_address_space *vm, *old;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	int err;
 	u32 id;
 
@@ -2487,19 +2299,15 @@ int i915_gem_context_create_ioctl(struct drm_device *dev, void *data,
 
 	ext_data.fpriv = file->driver_priv;
 	if (client_is_banned(ext_data.fpriv)) {
-<<<<<<< HEAD
 #ifdef __NetBSD__
-		DRM_DEBUG("client %s[%d] banned from creating ctx\n",
-			  curproc->p_comm, (int)curproc->p_pid);
+		drm_dbg(&i915->drm,
+			"client %s[%d] banned from creating ctx\n",
+			curproc->p_comm, (int)curproc->p_pid);
 #else
-		DRM_DEBUG("client %s[%d] banned from creating ctx\n",
-			  current->comm, task_pid_nr(current));
-#endif
-=======
 		drm_dbg(&i915->drm,
 			"client %s[%d] banned from creating ctx\n",
 			current->comm, task_pid_nr(current));
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 		return -EIO;
 	}
 

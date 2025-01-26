@@ -68,15 +68,8 @@ __busy_set_if_active(struct dma_fence *fence, u32 (*flag)(u16 id))
 		struct dma_fence **child = array->fences;
 		unsigned int nchild = array->num_fences;
 
-<<<<<<< HEAD
-	/* opencode to_request() in order to avoid const warnings */
-	rq = const_container_of(fence, struct i915_request, fence);
-	if (i915_request_completed(rq))
-		return 0;
-=======
 		do {
 			struct dma_fence *current_fence = *child++;
->>>>>>> vendor/linux-drm-v6.6.35
 
 			/* Not an i915 fence, can't be busy per above */
 			if (!dma_fence_is_i915(current_fence) ||
@@ -160,16 +153,11 @@ i915_gem_busy_ioctl(struct drm_device *dev, void *data,
 		if (dma_resv_iter_is_restarted(&cursor))
 			args->busy = 0;
 
-<<<<<<< HEAD
-			if (read_seqcount_retry(&obj->base.resv->seq, seq))
-				goto retry;
-=======
 		if (dma_resv_iter_usage(&cursor) <= DMA_RESV_USAGE_WRITE)
 			/* Translate the write fences to the READ *and* WRITE engine */
 			args->busy |= busy_check_writer(fence);
 		else
 			/* Translate read fences to READ set of engines */
->>>>>>> vendor/linux-drm-v6.6.35
 			args->busy |= busy_check_reader(fence);
 	}
 	dma_resv_iter_end(&cursor);

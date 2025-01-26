@@ -54,7 +54,6 @@ static struct sg_table *i915_gem_map_dma_buf(struct dma_buf_attachment *attach,
 	if (ret)
 		goto err_free;
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	__USE(i);
 	__USE(src);
@@ -62,14 +61,8 @@ static struct sg_table *i915_gem_map_dma_buf(struct dma_buf_attachment *attach,
 	memcpy(st->sgl->sg_pgs, obj->mm.pages->sgl->sg_pgs,
 	    obj->mm.pages->nents * sizeof(st->sgl->sg_pgs[0]));
 #else
-
-	src = obj->mm.pages->sgl;
-	dst = st->sgl;
-	for (i = 0; i < obj->mm.pages->nents; i++) {
-=======
 	dst = sgt->sgl;
 	for_each_sg(obj->mm.pages->sgl, src, obj->mm.pages->orig_nents, i) {
->>>>>>> vendor/linux-drm-v6.6.35
 		sg_set_page(dst, sg_page(src), src->length, 0);
 		dst = sg_next(dst);
 	}
@@ -149,13 +142,8 @@ static int i915_gem_dmabuf_mmap(struct dma_buf *dma_buf, struct vm_area_struct *
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
-	fput(vma->vm_file);
-	vma->vm_file = get_file(obj->base.filp);
-#endif
-=======
 	vma_set_file(vma, obj->base.filp);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	return 0;
 }

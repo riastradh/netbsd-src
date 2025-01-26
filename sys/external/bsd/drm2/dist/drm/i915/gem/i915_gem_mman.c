@@ -14,11 +14,7 @@ __KERNEL_RCSID(0, "$NetBSD: i915_gem_mman.c,v 1.27 2024/06/23 19:37:11 riastradh
 #include <linux/pfn_t.h>
 #include <linux/sizes.h>
 
-<<<<<<< HEAD
-#include "drm/drm_gem.h"
-=======
 #include <drm/drm_cache.h>
->>>>>>> vendor/linux-drm-v6.6.35
 
 #include "gt/intel_gt.h"
 #include "gt/intel_gt_requests.h"
@@ -436,39 +432,23 @@ static vm_fault_t vm_fault_gtt(struct vm_fault *vmf)
 	struct drm_device *dev = obj->base.dev;
 	struct drm_i915_private *i915 = to_i915(dev);
 	struct intel_runtime_pm *rpm = &i915->runtime_pm;
-<<<<<<< HEAD
-	struct i915_ggtt *ggtt = &i915->ggtt;
+	struct i915_ggtt *ggtt = to_gt(i915)->ggtt;
 #ifdef __NetBSD__
 	bool write = ufi->entry->protection & VM_PROT_WRITE;
 #else
 	bool write = area->vm_flags & VM_WRITE;
 #endif
-=======
-	struct i915_ggtt *ggtt = to_gt(i915)->ggtt;
-	bool write = area->vm_flags & VM_WRITE;
 	struct i915_gem_ww_ctx ww;
->>>>>>> vendor/linux-drm-v6.6.35
 	intel_wakeref_t wakeref;
 	struct i915_vma *vma;
 	pgoff_t page_offset;
 	int srcu;
 	int ret;
 
-<<<<<<< HEAD
-	/* Sanity check that we allow writing into this object */
-	if (i915_gem_object_is_readonly(obj) && write)
-#ifdef __NetBSD__
-		return EINVAL;	/* SIGBUS */
-#else
-		return VM_FAULT_SIGBUS;
-#endif
-
 #ifdef __NetBSD__
 	page_offset = (ufi->entry->offset + (vaddr - ufi->entry->start))
 	    >> PAGE_SHIFT;
 #else
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	/* We don't use vmf->pgoff since that has the fake offset */
 	page_offset = (vmf->address - area->vm_start) >> PAGE_SHIFT;
 #endif
@@ -635,7 +615,6 @@ err_rpm:
 	return i915_error_to_vmf_fault(ret);
 }
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 
 static int
@@ -687,9 +666,8 @@ i915_gem_fault(struct uvm_faultinfo *ufi, vaddr_t vaddr, struct vm_page **pps,
 	return error;
 }
 
-#endif
+#else
 
-=======
 static int
 vm_access(struct vm_area_struct *area, unsigned long addr,
 	  void *buf, int len, int write)
@@ -742,7 +720,8 @@ out:
 	return len;
 }
 
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
+
 void __i915_gem_object_release_mmap_gtt(struct drm_i915_gem_object *obj)
 {
 	struct i915_vma *vma;
@@ -1402,9 +1381,8 @@ i915_gem_object_mmap(struct drm_i915_gem_object *obj,
 	return 0;
 }
 
-<<<<<<< HEAD
 #endif	/* __NetBSD__ */
-=======
+
 /*
  * This overcomes the limitation in drm_gem_mmap's assignment of a
  * drm_gem_object as the vma->vm_private_data. Since we need to
@@ -1489,7 +1467,6 @@ int i915_gem_fb_mmap(struct drm_i915_gem_object *obj, struct vm_area_struct *vma
 	obj = i915_gem_object_get(obj);
 	return i915_gem_object_mmap(obj, mmo, vma);
 }
->>>>>>> vendor/linux-drm-v6.6.35
 
 #if IS_ENABLED(CONFIG_DRM_I915_SELFTEST)
 #include "selftests/i915_gem_mman.c"
