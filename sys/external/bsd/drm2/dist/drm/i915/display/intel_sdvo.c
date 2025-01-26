@@ -1507,15 +1507,9 @@ static void intel_sdvo_pre_enable(struct intel_atomic_state *state,
 	struct intel_crtc *crtc = to_intel_crtc(crtc_state->uapi.crtc);
 	const struct drm_display_mode *adjusted_mode = &crtc_state->hw.adjusted_mode;
 	const struct intel_sdvo_connector_state *sdvo_state =
-<<<<<<< HEAD
 		const_container_of(conn_state, struct intel_sdvo_connector_state, base.base);
 	const struct intel_sdvo_connector *intel_sdvo_connector =
 		const_container_of(conn_state->connector, struct intel_sdvo_connector, base.base);
-=======
-		to_intel_sdvo_connector_state(conn_state);
-	struct intel_sdvo_connector *intel_sdvo_connector =
-		to_intel_sdvo_connector(conn_state->connector);
->>>>>>> vendor/linux-drm-v6.6.35
 	const struct drm_display_mode *mode = &crtc_state->hw.mode;
 	struct intel_sdvo *intel_sdvo = to_sdvo(intel_encoder);
 	u32 sdvox;

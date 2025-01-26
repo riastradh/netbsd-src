@@ -540,10 +540,10 @@ void intel_pipe_update_start(struct intel_atomic_state *state,
 		intel_atomic_get_new_crtc_state(state, crtc);
 	long timeout = msecs_to_jiffies_timeout(1);
 	int scanline, min, max, vblank_start;
-	wait_queue_head_t *wq = drm_crtc_vblank_waitqueue(&crtc->base);
+	drm_waitqueue_t *wq = drm_crtc_vblank_waitqueue(&crtc->base);
+	int ret;
 	bool need_vlv_dsi_wa = (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv)) &&
 		intel_crtc_has_type(new_crtc_state, INTEL_OUTPUT_DSI);
-	DEFINE_WAIT(wait);
 
 	intel_psr_lock(new_crtc_state);
 
@@ -567,41 +567,22 @@ void intel_pipe_update_start(struct intel_atomic_state *state,
 	 */
 	intel_psr_wait_for_idle_locked(new_crtc_state);
 
-	local_irq_disable();
+	spin_lock(&crtc->base.dev->event_lock);
 
 	crtc->debug.min_vbl = min;
 	crtc->debug.max_vbl = max;
 	trace_intel_pipe_update_start(crtc);
 
-	for (;;) {
-		/*
-		 * prepare_to_wait() has a memory barrier, which guarantees
-		 * other CPUs can see the task state update by the time we
-		 * read the scanline.
-		 */
-		prepare_to_wait(wq, &wait, TASK_UNINTERRUPTIBLE);
-
-		scanline = intel_get_crtc_scanline(crtc);
-		if (scanline < min || scanline > max)
-			break;
-
-		if (!timeout) {
-			drm_err(&dev_priv->drm,
-				"Potential atomic update failure on pipe %c\n",
-				pipe_name(crtc->pipe));
-			break;
-		}
-
-		local_irq_enable();
-
-		timeout = schedule_timeout(timeout);
-
-		local_irq_disable();
+	DRM_SPIN_TIMED_WAIT_NOINTR_UNTIL(ret, wq, &crtc->base.dev->event_lock,
+	    timeout,
+	    (scanline = intel_get_crtc_scanline(crtc),
+		scanline < min || scanline > max));
+	if (ret <= 0) {
+		drm_err(&dev_priv->drm,
+		    "Potential atomic update failure on pipe %c\n",
+		    pipe_name(crtc->pipe));
 	}
-
-	finish_wait(wq, &wait);
-
-	drm_crtc_vblank_put(&crtc->base);
+	drm_crtc_vblank_put_locked(&crtc->base);
 
 	/*
 	 * On VLV/CHV DSI the scanline counter would appear to
@@ -629,7 +610,7 @@ void intel_pipe_update_start(struct intel_atomic_state *state,
 	return;
 
 irq_disable:
-	local_irq_disable();
+	spin_lock(&crtc->base.dev->event_lock);
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_VBLANK_EVADE)
@@ -687,6 +668,8 @@ void intel_pipe_update_end(struct intel_atomic_state *state,
 	if (new_crtc_state->do_async_flip)
 		return;
 
+	BUG_ON(!spin_is_locked(&crtc->base.dev->event_lock));
+
 	trace_intel_pipe_update_end(crtc, end_vbl_count, scanline_end);
 
 	/*
@@ -707,12 +690,10 @@ void intel_pipe_update_end(struct intel_atomic_state *state,
 					 false);
 	} else if (new_crtc_state->uapi.event) {
 		drm_WARN_ON(&dev_priv->drm,
-			    drm_crtc_vblank_get(&crtc->base) != 0);
+			    drm_crtc_vblank_get_locked(&crtc->base) != 0);
 
-		spin_lock(&crtc->base.dev->event_lock);
 		drm_crtc_arm_vblank_event(&crtc->base,
 					  new_crtc_state->uapi.event);
-		spin_unlock(&crtc->base.dev->event_lock);
 
 		new_crtc_state->uapi.event = NULL;
 	}
@@ -733,7 +714,7 @@ void intel_pipe_update_end(struct intel_atomic_state *state,
 	 */
 	intel_vrr_send_push(new_crtc_state);
 
-	local_irq_enable();
+	spin_unlock(&crtc->base.dev->event_lock);
 
 	if (intel_vgpu_active(dev_priv))
 		return;
