@@ -138,17 +138,13 @@ void intel_engine_fini_retire(struct intel_engine_cs *engine)
 	GEM_BUG_ON(engine->retire);
 }
 
-<<<<<<< HEAD
 static void
 null_release(struct kref *kref)
 {
 }
 
-long intel_gt_retire_requests_timeout(struct intel_gt *gt, long timeout)
-=======
 long intel_gt_retire_requests_timeout(struct intel_gt *gt, long timeout,
 				      long *remaining_timeout)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct intel_gt_timelines *timelines = &gt->timelines;
 	struct intel_timeline *tl, *tn;

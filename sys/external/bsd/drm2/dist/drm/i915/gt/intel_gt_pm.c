@@ -340,12 +340,9 @@ void intel_gt_suspend_late(struct intel_gt *gt)
 
 	GEM_BUG_ON(gt->awake);
 
-<<<<<<< HEAD
-#ifndef __NetBSD__
-=======
 	intel_uc_suspend(&gt->uc);
 
->>>>>>> vendor/linux-drm-v6.6.35
+#ifndef __NetBSD__
 	/*
 	 * On disabling the device, we want to turn off HW access to memory
 	 * that we no longer own.

@@ -36,10 +36,6 @@ static u32
 gen11_gt_engine_identity(struct intel_gt *gt,
 			 const unsigned int bank, const unsigned int bit)
 {
-<<<<<<< HEAD
-=======
-	void __iomem * const regs = intel_uncore_regs(gt->uncore);
->>>>>>> vendor/linux-drm-v6.6.35
 	u32 timeout_ts;
 	u32 ident;
 
@@ -156,10 +152,6 @@ gen11_gt_identity_handler(struct intel_gt *gt, const u32 identity)
 static void
 gen11_gt_bank_handler(struct intel_gt *gt, const unsigned int bank)
 {
-<<<<<<< HEAD
-=======
-	void __iomem * const regs = intel_uncore_regs(gt->uncore);
->>>>>>> vendor/linux-drm-v6.6.35
 	unsigned long intr_dw;
 	unsigned int bit;
 
@@ -194,10 +186,6 @@ void gen11_gt_irq_handler(struct intel_gt *gt, const u32 master_ctl)
 bool gen11_gt_reset_one_iir(struct intel_gt *gt,
 			    const unsigned int bank, const unsigned int bit)
 {
-<<<<<<< HEAD
-=======
-	void __iomem * const regs = intel_uncore_regs(gt->uncore);
->>>>>>> vendor/linux-drm-v6.6.35
 	u32 dw;
 
 	lockdep_assert_held(gt->irq_lock);
@@ -418,94 +406,45 @@ void gen6_gt_irq_handler(struct intel_gt *gt, u32 gt_iir)
 
 void gen8_gt_irq_handler(struct intel_gt *gt, u32 master_ctl)
 {
-<<<<<<< HEAD
-
-	if (master_ctl & (GEN8_GT_RCS_IRQ | GEN8_GT_BCS_IRQ)) {
-		gt_iir[0] = raw_reg_read(gt->uncore, GEN8_GT_IIR(0));
-		if (likely(gt_iir[0]))
-			raw_reg_write(gt->uncore, GEN8_GT_IIR(0), gt_iir[0]);
-	}
-
-	if (master_ctl & (GEN8_GT_VCS0_IRQ | GEN8_GT_VCS1_IRQ)) {
-		gt_iir[1] = raw_reg_read(gt->uncore, GEN8_GT_IIR(1));
-		if (likely(gt_iir[1]))
-			raw_reg_write(gt->uncore, GEN8_GT_IIR(1), gt_iir[1]);
-	}
-
-	if (master_ctl & (GEN8_GT_PM_IRQ | GEN8_GT_GUC_IRQ)) {
-		gt_iir[2] = raw_reg_read(gt->uncore, GEN8_GT_IIR(2));
-		if (likely(gt_iir[2]))
-			raw_reg_write(gt->uncore, GEN8_GT_IIR(2), gt_iir[2]);
-	}
-
-	if (master_ctl & GEN8_GT_VECS_IRQ) {
-		gt_iir[3] = raw_reg_read(gt->uncore, GEN8_GT_IIR(3));
-		if (likely(gt_iir[3]))
-			raw_reg_write(gt->uncore, GEN8_GT_IIR(3), gt_iir[3]);
-	}
-}
-
-void gen8_gt_irq_handler(struct intel_gt *gt, u32 master_ctl, u32 gt_iir[4])
-{
-	if (master_ctl & (GEN8_GT_RCS_IRQ | GEN8_GT_BCS_IRQ)) {
-		cs_irq_handler(gt->engine_class[RENDER_CLASS][0],
-			       gt_iir[0] >> GEN8_RCS_IRQ_SHIFT);
-		cs_irq_handler(gt->engine_class[COPY_ENGINE_CLASS][0],
-			       gt_iir[0] >> GEN8_BCS_IRQ_SHIFT);
-	}
-
-	if (master_ctl & (GEN8_GT_VCS0_IRQ | GEN8_GT_VCS1_IRQ)) {
-		cs_irq_handler(gt->engine_class[VIDEO_DECODE_CLASS][0],
-			       gt_iir[1] >> GEN8_VCS0_IRQ_SHIFT);
-		cs_irq_handler(gt->engine_class[VIDEO_DECODE_CLASS][1],
-			       gt_iir[1] >> GEN8_VCS1_IRQ_SHIFT);
-	}
-
-	if (master_ctl & GEN8_GT_VECS_IRQ) {
-		cs_irq_handler(gt->engine_class[VIDEO_ENHANCEMENT_CLASS][0],
-			       gt_iir[3] >> GEN8_VECS_IRQ_SHIFT);
-=======
-	void __iomem * const regs = intel_uncore_regs(gt->uncore);
 	u32 iir;
 
 	if (master_ctl & (GEN8_GT_RCS_IRQ | GEN8_GT_BCS_IRQ)) {
-		iir = raw_reg_read(regs, GEN8_GT_IIR(0));
+		iir = raw_reg_read(gt->uncore, GEN8_GT_IIR(0));
 		if (likely(iir)) {
 			intel_engine_cs_irq(gt->engine_class[RENDER_CLASS][0],
 					    iir >> GEN8_RCS_IRQ_SHIFT);
 			intel_engine_cs_irq(gt->engine_class[COPY_ENGINE_CLASS][0],
 					    iir >> GEN8_BCS_IRQ_SHIFT);
-			raw_reg_write(regs, GEN8_GT_IIR(0), iir);
+			raw_reg_write(gt->uncore, GEN8_GT_IIR(0), iir);
 		}
 	}
 
 	if (master_ctl & (GEN8_GT_VCS0_IRQ | GEN8_GT_VCS1_IRQ)) {
-		iir = raw_reg_read(regs, GEN8_GT_IIR(1));
+		iir = raw_reg_read(gt->uncore, GEN8_GT_IIR(1));
 		if (likely(iir)) {
 			intel_engine_cs_irq(gt->engine_class[VIDEO_DECODE_CLASS][0],
 					    iir >> GEN8_VCS0_IRQ_SHIFT);
 			intel_engine_cs_irq(gt->engine_class[VIDEO_DECODE_CLASS][1],
 					    iir >> GEN8_VCS1_IRQ_SHIFT);
-			raw_reg_write(regs, GEN8_GT_IIR(1), iir);
+			raw_reg_write(gt->uncore, GEN8_GT_IIR(1), iir);
 		}
 	}
 
 	if (master_ctl & GEN8_GT_VECS_IRQ) {
-		iir = raw_reg_read(regs, GEN8_GT_IIR(3));
+		iir = raw_reg_read(gt->uncore, GEN8_GT_IIR(3));
 		if (likely(iir)) {
 			intel_engine_cs_irq(gt->engine_class[VIDEO_ENHANCEMENT_CLASS][0],
 					    iir >> GEN8_VECS_IRQ_SHIFT);
-			raw_reg_write(regs, GEN8_GT_IIR(3), iir);
+			raw_reg_write(gt->uncore, GEN8_GT_IIR(3), iir);
 		}
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 
 	if (master_ctl & (GEN8_GT_PM_IRQ | GEN8_GT_GUC_IRQ)) {
-		iir = raw_reg_read(regs, GEN8_GT_IIR(2));
+		iir = raw_reg_read(gt->uncore, GEN8_GT_IIR(2));
 		if (likely(iir)) {
 			gen6_rps_irq_handler(&gt->rps, iir);
 			guc_irq_handler(&gt->uc.guc, iir >> 16);
-			raw_reg_write(regs, GEN8_GT_IIR(2), iir);
+			raw_reg_write(gt->uncore, GEN8_GT_IIR(2), iir);
 		}
 	}
 }

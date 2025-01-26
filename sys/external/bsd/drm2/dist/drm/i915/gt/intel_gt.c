@@ -8,20 +8,13 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: intel_gt.c,v 1.3 2021/12/19 11:39:55 riastradh Exp $");
 
-<<<<<<< HEAD
 #include <linux/kernel.h>
-
-#if IS_ENABLED(CONFIG_DEBUGFS)
-#include "debugfs_gt.h"
-#endif
-=======
 #include <drm/drm_managed.h>
 #include <drm/intel-gtt.h>
 
 #include "gem/i915_gem_internal.h"
 #include "gem/i915_gem_lmem.h"
 
->>>>>>> vendor/linux-drm-v6.6.35
 #include "i915_drv.h"
 #include "i915_perf_oa_regs.h"
 #include "i915_reg.h"
@@ -32,7 +25,9 @@ __KERNEL_RCSID(0, "$NetBSD: intel_gt.c,v 1.3 2021/12/19 11:39:55 riastradh Exp $
 #include "intel_gt.h"
 #include "intel_gt_buffer_pool.h"
 #include "intel_gt_clock_utils.h"
+#if IS_ENABLED(CONFIG_DEBUGFS)
 #include "intel_gt_debugfs.h"
+#endif
 #include "intel_gt_mcr.h"
 #include "intel_gt_pm.h"
 #include "intel_gt_print.h"
@@ -45,7 +40,9 @@ __KERNEL_RCSID(0, "$NetBSD: intel_gt.c,v 1.3 2021/12/19 11:39:55 riastradh Exp $
 #include "intel_renderstate.h"
 #include "intel_rps.h"
 #include "intel_sa_media.h"
+#if IS_ENABLED(CONFIG_SYSFS)
 #include "intel_gt_sysfs.h"
+#endif
 #include "intel_tlb.h"
 #include "intel_uncore.h"
 #include "shmem_utils.h"
@@ -303,20 +300,8 @@ static void gen6_check_faults(struct intel_gt *gt)
 	for_each_engine(engine, gt, id) {
 		fault = GEN6_RING_FAULT_REG_READ(engine);
 		if (fault & RING_FAULT_VALID) {
-<<<<<<< HEAD
-			DRM_DEBUG_DRIVER("Unexpected fault\n"
-					 "\tAddr: 0x%08"PRIx32"\n"
-					 "\tAddress space: %s\n"
-					 "\tSource ID: %d\n"
-					 "\tType: %d\n",
-					 fault & PAGE_MASK,
-					 fault & RING_FAULT_GTTSEL_MASK ?
-					 "GGTT" : "PPGTT",
-					 RING_FAULT_SRCID(fault),
-					 RING_FAULT_FAULT_TYPE(fault));
-=======
 			gt_dbg(gt, "Unexpected fault\n"
-			       "\tAddr: 0x%08lx\n"
+			       "\tAddr: 0x%08"PRIx32"\n"
 			       "\tAddress space: %s\n"
 			       "\tSource ID: %d\n"
 			       "\tType: %d\n",
@@ -325,7 +310,6 @@ static void gen6_check_faults(struct intel_gt *gt)
 			       "GGTT" : "PPGTT",
 			       RING_FAULT_SRCID(fault),
 			       RING_FAULT_FAULT_TYPE(fault));
->>>>>>> vendor/linux-drm-v6.6.35
 		}
 	}
 }
@@ -478,14 +462,12 @@ void intel_gt_driver_register(struct intel_gt *gt)
 
 	intel_rps_driver_register(&gt->rps);
 
-<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DEBUGFS)
-	debugfs_gt_register(gt);
-#endif
-=======
 	intel_gt_debugfs_register(gt);
+#endif
+#if IS_ENABLED(CONFIG_SYSFS)
 	intel_gt_sysfs_register(gt);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 static int intel_gt_init_scratch(struct intel_gt *gt, unsigned int size)
