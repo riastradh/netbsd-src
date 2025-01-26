@@ -25,9 +25,8 @@ __KERNEL_RCSID(0, "$NetBSD: intel_tc.c,v 1.3 2021/12/19 11:49:11 riastradh Exp $
 #include "intel_modeset_lock.h"
 #include "intel_tc.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
-=======
+
 #define DP_PIN_ASSIGNMENT_C	0x3
 #define DP_PIN_ASSIGNMENT_D	0x4
 #define DP_PIN_ASSIGNMENT_E	0x5
@@ -79,7 +78,6 @@ static u32 tc_phy_hpd_live_status(struct intel_tc_port *tc);
 static bool tc_phy_is_ready(struct intel_tc_port *tc);
 static bool tc_phy_wait_for_ready(struct intel_tc_port *tc);
 static enum tc_port_mode tc_phy_get_current_mode(struct intel_tc_port *tc);
->>>>>>> vendor/linux-drm-v6.6.35
 
 static const char *tc_port_mode_name(enum tc_port_mode mode)
 {

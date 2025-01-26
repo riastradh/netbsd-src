@@ -37,7 +37,9 @@ void intel_vga_disable(struct drm_i915_private *dev_priv)
 	i915_reg_t vga_reg = intel_vga_cntrl_reg(dev_priv);
 	u8 sr1;
 
-<<<<<<< HEAD
+	if (intel_de_read(dev_priv, vga_reg) & VGA_DISP_DISABLE)
+		return;
+
 #ifdef __NetBSD__
     {
 	const bus_addr_t vgabase = 0x3c0;
@@ -60,11 +62,6 @@ void intel_vga_disable(struct drm_i915_private *dev_priv)
 	}
     }
 #else
-=======
-	if (intel_de_read(dev_priv, vga_reg) & VGA_DISP_DISABLE)
-		return;
-
->>>>>>> vendor/linux-drm-v6.6.35
 	/* WaEnableVGAAccessThroughIOPort:ctg,elk,ilk,snb,ivb,vlv,hsw */
 	vga_get_uninterruptible(pdev, VGA_RSRC_LEGACY_IO);
 	outb(0x01, VGA_SEQ_I);
@@ -151,37 +148,6 @@ void intel_vga_reset_io_mem(struct drm_i915_private *i915)
 #endif
 }
 
-<<<<<<< HEAD
-#ifndef __NetBSD__
-static int
-intel_vga_set_state(struct drm_i915_private *i915, bool enable_decode)
-{
-	unsigned int reg = INTEL_GEN(i915) >= 6 ? SNB_GMCH_CTRL : INTEL_GMCH_CTRL;
-	u16 gmch_ctrl;
-
-	if (pci_read_config_word(i915->bridge_dev, reg, &gmch_ctrl)) {
-		DRM_ERROR("failed to read control word\n");
-		return -EIO;
-	}
-
-	if (!!(gmch_ctrl & INTEL_GMCH_VGA_DISABLE) == !enable_decode)
-		return 0;
-
-	if (enable_decode)
-		gmch_ctrl &= ~INTEL_GMCH_VGA_DISABLE;
-	else
-		gmch_ctrl |= INTEL_GMCH_VGA_DISABLE;
-
-	if (pci_write_config_word(i915->bridge_dev, reg, gmch_ctrl)) {
-		DRM_ERROR("failed to write control word\n");
-		return -EIO;
-	}
-
-	return 0;
-}
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 static unsigned int
 intel_vga_set_decode(struct pci_dev *pdev, bool enable_decode)
 {
@@ -199,13 +165,9 @@ intel_vga_set_decode(struct pci_dev *pdev, bool enable_decode)
 
 int intel_vga_register(struct drm_i915_private *i915)
 {
-<<<<<<< HEAD
 #ifndef __NetBSD__
-	struct pci_dev *pdev = i915->drm.pdev;
-=======
 
 	struct pci_dev *pdev = to_pci_dev(i915->drm.dev);
->>>>>>> vendor/linux-drm-v6.6.35
 	int ret;
 
 	/*
@@ -226,15 +188,9 @@ int intel_vga_register(struct drm_i915_private *i915)
 
 void intel_vga_unregister(struct drm_i915_private *i915)
 {
-<<<<<<< HEAD
 #ifndef __NetBSD__
-	struct pci_dev *pdev = i915->drm.pdev;
-
-	vga_client_register(pdev, NULL, NULL, NULL);
-#endif	/* __NetBSD__ */
-=======
 	struct pci_dev *pdev = to_pci_dev(i915->drm.dev);
 
 	vga_client_unregister(pdev);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif	/* __NetBSD__ */
 }
