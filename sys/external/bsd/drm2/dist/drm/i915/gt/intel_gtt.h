@@ -186,35 +186,6 @@ struct intel_gt;
 #define for_each_sgt_daddr(__dp, __iter, __sgt) \
 	__for_each_sgt_daddr(__dp, __iter, __sgt, I915_GTT_PAGE_SIZE)
 
-<<<<<<< HEAD
-struct i915_page_dma {
-	struct page *page;
-#ifdef __NetBSD__
-	union {
-		bus_dma_segment_t seg;
-		uint32_t ggtt_offset;
-	};
-	bus_dmamap_t map;
-#else
-	union {
-		dma_addr_t daddr;
-
-		/*
-		 * For gen6/gen7 only. This is the offset in the GGTT
-		 * where the page directory entries for PPGTT begin
-		 */
-		u32 ggtt_offset;
-	};
-#endif
-};
-
-struct i915_page_scratch {
-	struct i915_page_dma base;
-	u64 encode;
-};
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 struct i915_page_table {
 	struct drm_i915_gem_object *base;
 	union {
@@ -238,18 +209,6 @@ struct i915_page_directory {
 	other)
 
 #define px_base(px) \
-<<<<<<< HEAD
-	__px_choose_expr(px, struct i915_page_dma *, __x, \
-	__px_choose_expr(px, struct i915_page_scratch *, &__x->base, \
-	__px_choose_expr(px, struct i915_page_table *, &__x->base, \
-	__px_choose_expr(px, struct i915_page_directory *, &__x->pt.base, \
-	(void)0))))
-#ifdef __NetBSD__
-#define px_dma(px) (px_base(px)->map->dm_segs[0].ds_addr)
-#else
-#define px_dma(px) (px_base(px)->daddr)
-#endif
-=======
 	__px_choose_expr(px, struct drm_i915_gem_object *, __x, \
 	__px_choose_expr(px, struct i915_page_table *, __x->base, \
 	__px_choose_expr(px, struct i915_page_directory *, __x->pt.base, \
@@ -261,7 +220,6 @@ dma_addr_t __px_dma(struct drm_i915_gem_object *p);
 
 void *__px_vaddr(struct drm_i915_gem_object *p);
 #define px_vaddr(px) (__px_vaddr(px_base(px)))
->>>>>>> vendor/linux-drm-v6.6.35
 
 #define px_pt(px) \
 	__px_choose_expr(px, struct i915_page_table *, __x, \
@@ -298,18 +256,6 @@ struct i915_vma_ops {
 
 };
 
-<<<<<<< HEAD
-struct pagestash {
-#ifndef __NetBSD__
-	spinlock_t lock;
-	struct pagevec pvec;
-#endif
-};
-
-void stash_init(struct pagestash *stash);
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 struct i915_address_space {
 	struct kref ref;
 	struct work_struct release_work;
@@ -321,21 +267,7 @@ struct i915_address_space {
 	bus_dma_tag_t dmat;
 #else
 	struct device *dma;
-<<<<<<< HEAD
 #endif
-
-	/*
-	 * Every address space belongs to a struct file - except for the global
-	 * GTT that is owned by the driver (and so @file is set to NULL). In
-	 * principle, no information should leak from one context to another
-	 * (or between files/processes etc) unless explicitly shared by the
-	 * owner. Tracking the owner is important in order to free up per-file
-	 * objects along with the file, to aide resource tracking, and to
-	 * assign blame.
-	 */
-	struct drm_i915_file_private *file;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	u64 total;		/* size addr space maps (ex. 2GB for ggtt) */
 	u64 reserved;		/* size addr space reserved */
 	u64 min_alignment[INTEL_MEMORY_STOLEN_LOCAL + 1];
@@ -356,16 +288,10 @@ struct i915_address_space {
 	 */
 	struct list_head bound_list;
 
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	struct pagestash free_pages;
-#endif
-=======
 	/**
 	 * List of vmas not yet bound or evicted.
 	 */
 	struct list_head unbound_list;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* Global GTT */
 	bool is_ggtt:1;
@@ -741,7 +667,7 @@ int map_pt_dma_locked(struct i915_address_space *vm, struct drm_i915_gem_object 
 void free_px(struct i915_address_space *vm,
 	     struct i915_page_table *pt, int lvl);
 #define free_pt(vm, px) free_px(vm, px, 0)
-#define free_pd(vm, px) free_px(vm, px_pt(px), 1)
+#define free_pd(vm, px) (spin_lock_destroy((px)->lock), free_px(vm, px_pt(px), 1))
 
 void
 __set_pd_entry(struct i915_page_directory * const pd,

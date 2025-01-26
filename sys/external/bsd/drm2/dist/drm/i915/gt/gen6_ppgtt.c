@@ -137,7 +137,6 @@ static void gen6_ppgtt_insert_entries(struct i915_address_space *vm,
 
 	vaddr = px_vaddr(i915_pt_entry(pd, act_pt));
 	do {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 		KASSERT(iter.seg < iter.map->dm_nsegs);
 		KASSERT((iter.off & (PAGE_SIZE - 1)) == 0);
@@ -157,10 +156,7 @@ static void gen6_ppgtt_insert_entries(struct i915_address_space *vm,
 			}
 		}
 #else
-		GEM_BUG_ON(iter.sg->length < I915_GTT_PAGE_SIZE);
-=======
 		GEM_BUG_ON(sg_dma_len(iter.sg) < I915_GTT_PAGE_SIZE);
->>>>>>> vendor/linux-drm-v6.6.35
 		vaddr[act_pte] = pte_encode | GEN6_PTE_ADDR_ENCODE(iter.dma);
 
 		iter.dma += I915_GTT_PAGE_SIZE;
@@ -315,12 +311,6 @@ static void gen6_ppgtt_cleanup(struct i915_address_space *vm)
 		free_pd(&ppgtt->base.vm, ppgtt->base.pd);
 
 	mutex_destroy(&ppgtt->flush);
-<<<<<<< HEAD
-	mutex_destroy(&ppgtt->pin_mutex);
-	spin_lock_destroy(&ppgtt->base.pd->lock);
-	kfree(ppgtt->base.pd);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static void pd_vma_bind(struct i915_address_space *vm,
@@ -333,23 +323,7 @@ static void pd_vma_bind(struct i915_address_space *vm,
 	struct gen6_ppgtt *ppgtt = vma_res->private;
 	u32 ggtt_offset = vma_res->start / I915_GTT_PAGE_SIZE;
 
-<<<<<<< HEAD
-static void pd_vma_clear_pages(struct i915_vma *vma)
-{
-	GEM_BUG_ON(!vma->pages);
-
-	vma->pages = NULL;
-}
-
-static int pd_vma_bind(struct i915_vma *vma,
-		       enum i915_cache_level cache_level,
-		       u32 unused)
-{
-	struct i915_ggtt *ggtt = i915_vm_to_ggtt(vma->vm);
-	struct gen6_ppgtt *ppgtt = vma->private;
-	u32 ggtt_offset = i915_ggtt_offset(vma) / I915_GTT_PAGE_SIZE;
-
-	px_base(ppgtt->base.pd)->ggtt_offset = ggtt_offset * sizeof(gen6_pte_t);
+	ppgtt->pp_dir = ggtt_offset * sizeof(gen6_pte_t) << 10;
 #ifdef __NetBSD__
     {
 	bus_size_t npgs = vma->size >> PAGE_SHIFT;
@@ -376,9 +350,6 @@ static int pd_vma_bind(struct i915_vma *vma,
 	ppgtt->pd_bst = ggtt->gsmt;
     }
 #else
-=======
-	ppgtt->pp_dir = ggtt_offset * sizeof(gen6_pte_t) << 10;
->>>>>>> vendor/linux-drm-v6.6.35
 	ppgtt->pd_addr = (gen6_pte_t __iomem *)ggtt->gsm + ggtt_offset;
 #endif
 
@@ -555,18 +526,7 @@ struct i915_ppgtt *gen6_ppgtt_create(struct intel_gt *gt)
 
 	return &ppgtt->base;
 
-<<<<<<< HEAD
-err_scratch:
-	free_scratch(&ppgtt->base.vm);
-err_pd:
-	spin_lock_destroy(&ppgtt->base.pd->lock);
-	kfree(ppgtt->base.pd);
-err_free:
-	mutex_destroy(&ppgtt->pin_mutex);
-	kfree(ppgtt);
-=======
 err_put:
 	i915_vm_put(&ppgtt->base.vm);
->>>>>>> vendor/linux-drm-v6.6.35
 	return ERR_PTR(err);
 }

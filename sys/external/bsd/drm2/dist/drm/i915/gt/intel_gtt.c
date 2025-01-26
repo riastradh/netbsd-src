@@ -26,15 +26,10 @@ __KERNEL_RCSID(0, "$NetBSD: intel_gtt.c,v 1.9 2021/12/19 12:10:42 riastradh Exp 
 #include "intel_gt_regs.h"
 #include "intel_gtt.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-#ifndef __NetBSD__
-void stash_init(struct pagestash *stash)
-=======
 
 static bool intel_ggtt_update_needs_vtd_wa(struct drm_i915_private *i915)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	return IS_BROXTON(i915) && i915_vtd_active(i915);
 }
@@ -191,17 +186,6 @@ int i915_vm_lock_objects(struct i915_address_space *vm,
 
 void i915_address_space_fini(struct i915_address_space *vm)
 {
-<<<<<<< HEAD
-#ifndef __NetBSD__
-	spin_lock(&vm->free_pages.lock);
-	if (pagevec_count(&vm->free_pages.pvec))
-		vm_free_pages_release(vm, true);
-	GEM_BUG_ON(pagevec_count(&vm->free_pages.pvec));
-	spin_unlock(&vm->free_pages.lock);
-#endif
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	drm_mm_takedown(&vm->mm);
 }
 
@@ -303,15 +287,6 @@ void i915_address_space_init(struct i915_address_space *vm, int subclass)
 
 	vm->mm.head_node.color = I915_COLOR_UNEVICTABLE;
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	vm->dmat = vm->i915->drm.dmat;
-#else
-	stash_init(&vm->free_pages);
-#endif
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	INIT_LIST_HEAD(&vm->bound_list);
 	INIT_LIST_HEAD(&vm->unbound_list);
 }
@@ -326,89 +301,18 @@ void *__px_vaddr(struct drm_i915_gem_object *p)
 
 dma_addr_t __px_dma(struct drm_i915_gem_object *p)
 {
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	int busdmaflags = 0;
-	int error;
-	int nseg = 1;
-
-	if (gfp & __GFP_WAIT)
-		busdmaflags |= BUS_DMA_WAITOK;
-	else
-		busdmaflags |= BUS_DMA_NOWAIT;
-
-	error = bus_dmamem_alloc(vm->dmat, PAGE_SIZE, PAGE_SIZE, 0, &p->seg,
-	    nseg, &nseg, busdmaflags);
-	if (error) {
-fail0:		p->map = NULL;
-		return -error;	/* XXX errno NetBSD->Linux */
-	}
-	KASSERT(nseg == 1);
-	error = bus_dmamap_create(vm->dmat, PAGE_SIZE, 1, PAGE_SIZE, 0,
-	    busdmaflags, &p->map);
-	if (error) {
-fail1:		bus_dmamem_free(vm->dmat, &p->seg, 1);
-		goto fail0;
-	}
-	error = bus_dmamap_load_raw(vm->dmat, p->map, &p->seg, 1, PAGE_SIZE,
-	    busdmaflags);
-	if (error) {
-fail2: __unused
-		bus_dmamap_destroy(vm->dmat, p->map);
-		goto fail1;
-	}
-
-	p->page = container_of(PHYS_TO_VM_PAGE(p->seg.ds_addr), struct page,
-	    p_vmp);
-
-	if (gfp & __GFP_ZERO) {
-		void *va = kmap_atomic(p->page);
-		memset(va, 0, PAGE_SIZE);
-		kunmap_atomic(va);
-	}
-#else
-	p->page = vm_alloc_page(vm, gfp | I915_GFP_ALLOW_FAIL);
-	if (unlikely(!p->page))
-		return -ENOMEM;
-
-	p->daddr = dma_map_page_attrs(vm->dma,
-				      p->page, 0, PAGE_SIZE,
-				      PCI_DMA_BIDIRECTIONAL,
-				      DMA_ATTR_SKIP_CPU_SYNC |
-				      DMA_ATTR_NO_WARN);
-	if (unlikely(dma_mapping_error(vm->dma, p->daddr))) {
-		vm_free_page(vm, p->page);
-		return -ENOMEM;
-	}
-#endif
-
-	return 0;
-=======
 	GEM_BUG_ON(!i915_gem_object_has_pages(p));
 	return sg_dma_address(p->mm.pages->sgl);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 struct page *__px_page(struct drm_i915_gem_object *p)
 {
-<<<<<<< HEAD
-	return __setup_page_dma(vm, p, __GFP_HIGHMEM);
-}
-
-void cleanup_page_dma(struct i915_address_space *vm, struct i915_page_dma *p)
-{
-#ifdef __NetBSD__
-	bus_dmamap_unload(vm->dmat, p->map);
-	bus_dmamap_destroy(vm->dmat, p->map);
-	bus_dmamem_free(vm->dmat, &p->seg, 1);
-#else
-	dma_unmap_page(vm->dma, p->daddr, PAGE_SIZE, PCI_DMA_BIDIRECTIONAL);
-	vm_free_page(vm, p->page);
-#endif
-=======
 	GEM_BUG_ON(!i915_gem_object_has_pages(p));
+#ifdef __NetBSD__		/* XXX sg_page */
+	return p->mm.pages->sgl->sg_pgs[0];
+#else
 	return sg_page(p->mm.pages->sgl);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 void
@@ -455,57 +359,7 @@ int setup_scratch_page(struct i915_address_space *vm)
 		size = I915_GTT_PAGE_SIZE_64K;
 
 	do {
-<<<<<<< HEAD
-		unsigned int order = get_order(size);
-#ifdef __NetBSD__
-		struct vm_page *vm_page;
-		void *kva;
-		int nseg;
-		int ret;
-
-		/* Allocate a scratch page.  */
-		/* XXX errno NetBSD->Linux */
-		ret = -bus_dmamem_alloc(vm->dmat, size, size, 0,
-		    &vm->scratch[0].base.seg, 1, &nseg, BUS_DMA_NOWAIT);
-		if (ret)
-			goto skip;
-		KASSERT(nseg == 1);
-		KASSERT(vm->scratch[0].base.seg.ds_len == size);
-
-		/* Create a DMA map.  */
-		ret = -bus_dmamap_create(vm->dmat, size, 1, size, 0,
-		    BUS_DMA_NOWAIT, &vm->scratch[0].base.map);
-		if (ret)
-			goto free_dmamem;
-
-		/* Load the segment into the DMA map.  */
-		ret = -bus_dmamap_load_raw(vm->dmat, vm->scratch[0].base.map,
-		    &vm->scratch[0].base.seg, 1, size, BUS_DMA_NOWAIT);
-		if (ret)
-			goto destroy_dmamap;
-		KASSERT(vm->scratch[0].base.map->dm_nsegs == 1);
-		KASSERT(vm->scratch[0].base.map->dm_segs[0].ds_len == size);
-
-		/* Zero the page.  */
-		ret = -bus_dmamem_map(vm->dmat, &vm->scratch[0].base.seg, 1,
-		    size, &kva, BUS_DMA_NOWAIT|BUS_DMA_NOCACHE);
-		if (ret)
-			goto unload_dmamap;
-		memset(kva, 0, size);
-		bus_dmamap_sync(vm->dmat, vm->scratch[0].base.map, 0, size,
-		    BUS_DMASYNC_PREREAD|BUS_DMASYNC_PREWRITE);
-		bus_dmamem_unmap(vm->dmat, kva, size);
-
-		/* XXX Is this page guaranteed to work as a huge page?  */
-		vm_page = PHYS_TO_VM_PAGE(vm->scratch[0].base.seg.ds_addr);
-		vm->scratch[0].base.page = container_of(vm_page, struct page,
-		    p_vmp);
-#else
-		struct page *page;
-		dma_addr_t addr;
-=======
 		struct drm_i915_gem_object *obj;
->>>>>>> vendor/linux-drm-v6.6.35
 
 		obj = vm->alloc_scratch_dma(vm, size);
 		if (IS_ERR(obj))
@@ -518,25 +372,6 @@ int setup_scratch_page(struct i915_address_space *vm)
 		if (obj->mm.page_sizes.sg < size)
 			goto skip_obj;
 
-<<<<<<< HEAD
-		vm->scratch[0].base.page = page;
-		vm->scratch[0].base.daddr = addr;
-#endif
-		vm->scratch_order = order;
-		return 0;
-
-#ifdef __NetBSD__
-unload_dmamap:	bus_dmamap_unload(vm->dmat, vm->scratch[0].base.map);
-destroy_dmamap:	bus_dmamap_destroy(vm->dmat, vm->scratch[0].base.map);
-		vm->scratch[0].base.map = NULL; /* paranoia */
-free_dmamem:	bus_dmamem_free(vm->dmat, &vm->scratch[0].base.seg, 1);
-#else
-unmap_page:
-		dma_unmap_page(vm->dma, addr, size, PCI_DMA_BIDIRECTIONAL);
-free_page:
-		__free_pages(page, order);
-#endif
-=======
 		/* And it needs to be correspondingly aligned */
 		if (__px_dma(obj) & (size - 1))
 			goto skip_obj;
@@ -558,7 +393,6 @@ free_page:
 
 skip_obj:
 		i915_gem_object_put(obj);
->>>>>>> vendor/linux-drm-v6.6.35
 skip:
 		if (size == I915_GTT_PAGE_SIZE_4K)
 			return -ENOMEM;
@@ -567,26 +401,6 @@ skip:
 	} while (1);
 }
 
-<<<<<<< HEAD
-void cleanup_scratch_page(struct i915_address_space *vm)
-{
-	struct i915_page_dma *p = px_base(&vm->scratch[0]);
-#ifdef __NetBSD__
-	bus_dmamap_unload(vm->dmat, p->map);
-	bus_dmamap_destroy(vm->dmat, p->map);
-	vm->scratch[0].base.map = NULL; /* paranoia */
-	bus_dmamem_free(vm->dmat, &p->seg, 1);
-#else
-	unsigned int order = vm->scratch_order;
-
-	dma_unmap_page(vm->dma, p->daddr, BIT(order) << PAGE_SHIFT,
-		       PCI_DMA_BIDIRECTIONAL);
-	__free_pages(p->page, order);
-#endif
-}
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 void free_scratch(struct i915_address_space *vm)
 {
 	int i;

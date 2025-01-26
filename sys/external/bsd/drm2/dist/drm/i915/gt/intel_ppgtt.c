@@ -63,14 +63,10 @@ struct i915_page_directory *alloc_pd(struct i915_address_space *vm)
 	if (unlikely(!pd))
 		return ERR_PTR(-ENOMEM);
 
-<<<<<<< HEAD
-	if (unlikely(setup_page_dma(vm, px_base(pd)))) {
-		spin_lock_destroy(&pd->lock);
-=======
 	pd->pt.base = vm->alloc_pt_dma(vm, I915_GTT_PAGE_SIZE_4K);
 	if (IS_ERR(pd->pt.base)) {
 		kfree(pd->entry);
->>>>>>> vendor/linux-drm-v6.6.35
+		spin_lock_destroy(&pd->lock);
 		kfree(pd);
 		return ERR_PTR(-ENOMEM);
 	}
@@ -116,15 +112,7 @@ __set_pd_entry(struct i915_page_directory * const pd,
 
 	atomic_inc(px_used(pd));
 	pd->entry[idx] = to;
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	write_dma_entry(px_base(pd), idx, encode(to->map->dm_segs[0].ds_addr, I915_CACHE_LLC));
-#else
-	write_dma_entry(px_base(pd), idx, encode(to->daddr, I915_CACHE_LLC));
-#endif
-=======
 	write_dma_entry(px_base(pd), idx, encode(px_dma(to), I915_CACHE_LLC));
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 void
@@ -329,18 +317,13 @@ void ppgtt_init(struct i915_ppgtt *ppgtt, struct intel_gt *gt,
 
 	ppgtt->vm.gt = gt;
 	ppgtt->vm.i915 = i915;
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	ppgtt->vm.dmat = i915->drm.dmat;
 #else
-	ppgtt->vm.dma = &i915->drm.pdev->dev;
-#endif
-	ppgtt->vm.total = BIT_ULL(INTEL_INFO(i915)->ppgtt_size);
-=======
 	ppgtt->vm.dma = i915->drm.dev;
+#endif
 	ppgtt->vm.total = BIT_ULL(RUNTIME_INFO(i915)->ppgtt_size);
 	ppgtt->vm.lmem_pt_obj_flags = lmem_pt_obj_flags;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	dma_resv_init(&ppgtt->vm._resv);
 	i915_address_space_init(&ppgtt->vm, VM_CLASS_PPGTT);
