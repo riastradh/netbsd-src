@@ -324,14 +324,10 @@ int intel_gvt_create_vgpu(struct intel_vgpu *vgpu,
 			BYTES_TO_MB(conf->low_mm), BYTES_TO_MB(conf->high_mm),
 			conf->fence);
 
-<<<<<<< HEAD
 	idr_preload(GFP_KERNEL);
-=======
 	mutex_lock(&gvt->lock);
->>>>>>> vendor/linux-drm-v6.6.35
 	ret = idr_alloc(&gvt->vgpu_idr, vgpu, IDLE_VGPU_IDR + 1, GVT_MAX_VGPU,
 		GFP_KERNEL);
-	idr_preload_end();
 	if (ret < 0)
 		goto out_unlock;
 
@@ -390,6 +386,7 @@ int intel_gvt_create_vgpu(struct intel_vgpu *vgpu,
 
 	intel_gvt_update_reg_whitelist(vgpu);
 	mutex_unlock(&gvt->lock);
+	idr_preload_end();
 	return 0;
 
 out_clean_sched_policy:
@@ -410,6 +407,7 @@ out_clean_idr:
 	idr_remove(&gvt->vgpu_idr, vgpu->id);
 out_unlock:
 	mutex_unlock(&gvt->lock);
+	idr_preload_end();
 	return ret;
 }
 
