@@ -1315,16 +1315,7 @@ void intel_uc_fw_cleanup_fetch(struct intel_uc_fw *uc_fw)
  */
 size_t intel_uc_fw_copy_rsa(struct intel_uc_fw *uc_fw, void *dst, u32 max_len)
 {
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	struct iovec iov;
-	struct uio uio;
-#else
-	struct sg_table *pages = uc_fw->obj->mm.pages;
-#endif
-=======
 	struct intel_memory_region *mr = uc_fw->obj->mm.region;
->>>>>>> vendor/linux-drm-v6.6.35
 	u32 size = min_t(u32, uc_fw->rsa_size, max_len);
 	u32 offset = uc_fw->dma_start_offset + sizeof(struct uc_css_header) + uc_fw->ucode_size;
 	struct sgt_iter iter;
@@ -1334,8 +1325,11 @@ size_t intel_uc_fw_copy_rsa(struct intel_uc_fw *uc_fw, void *dst, u32 max_len)
 	/* Called during reset handling, must be atomic [no fs_reclaim] */
 	GEM_BUG_ON(!intel_uc_fw_is_available(uc_fw));
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
+	struct iovec iov;
+	struct uio uio;
+
+	__USE(mr);
 	iov.iov_base = dst;
 	iov.iov_len = size;
 	uio.uio_iov = &iov;
@@ -1348,9 +1342,6 @@ size_t intel_uc_fw_copy_rsa(struct intel_uc_fw *uc_fw, void *dst, u32 max_len)
 	return -ubc_uiomove(uc_fw->obj->base.filp, &uio, size, UVM_ADV_NORMAL,
 	    UBC_READ);
 #else
-	return sg_pcopy_to_buffer(pages->sgl, pages->nents, dst, size, offset);
-#endif
-=======
 	idx = offset >> PAGE_SHIFT;
 	offset = offset_in_page(offset);
 	if (i915_gem_object_has_struct_page(uc_fw->obj)) {
@@ -1403,7 +1394,7 @@ size_t intel_uc_fw_copy_rsa(struct intel_uc_fw *uc_fw, void *dst, u32 max_len)
 	}
 
 	return count;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 /**

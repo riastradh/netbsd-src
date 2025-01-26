@@ -296,11 +296,8 @@ void intel_guc_ct_fini(struct intel_guc_ct *ct)
 
 	tasklet_kill(&ct->receive_tasklet);
 	i915_vma_unpin_and_release(&ct->vma, I915_VMA_RELEASE_MAP);
-<<<<<<< HEAD
-	spin_lock_destroy(&ct->requests.lock);
-=======
 	memset(ct, 0, sizeof(*ct));
->>>>>>> vendor/linux-drm-v6.6.35
+	spin_lock_destroy(&ct->requests.lock);
 }
 
 /**
@@ -483,28 +480,7 @@ static int ct_write(struct intel_guc_ct *ct,
 	 * make sure H2G buffer update and LRC tail update (if this triggering a
 	 * submission) are visible before updating the descriptor tail
 	 */
-<<<<<<< HEAD
-#define done (READ_ONCE(desc->fence) == fence)
-#ifdef __NetBSD__
-	int timo = 10;
-	err = 0;
-	while (!done) {
-		if (--timo == 0) {
-			kpause("intelguc", false, mstohz(10), NULL);
-			if (!done)
-				err = -ETIMEDOUT;
-			break;
-		}
-	}
-#else
-	err = wait_for_us(done, 10);
-	if (err)
-		err = wait_for(done, 10);
-#endif
-#undef done
-=======
 	intel_guc_write_barrier(ct_to_guc(ct));
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* update local copies */
 	ctb->tail = tail;
@@ -551,8 +527,12 @@ static int wait_for_ct_request_update(struct intel_guc_ct *ct, struct ct_request
 	 * commands can be inflight at time, so use a 1s timeout on the slower
 	 * sleep-wait loop.
 	 */
-<<<<<<< HEAD
-#define done INTEL_GUC_MSG_IS_RESPONSE(READ_ONCE(req->status))
+#define GUC_CTB_RESPONSE_TIMEOUT_SHORT_MS 10
+#define GUC_CTB_RESPONSE_TIMEOUT_LONG_MS 1000
+#define done \
+	(!(ct_enabled = intel_guc_ct_enabled(ct)) || \
+	 FIELD_GET(GUC_HXG_MSG_0_ORIGIN, READ_ONCE(req->status)) == \
+	 GUC_HXG_ORIGIN_GUC)
 #ifdef __NetBSD__
 	int timo = 10;
 	err = 0;
@@ -565,21 +545,10 @@ static int wait_for_ct_request_update(struct intel_guc_ct *ct, struct ct_request
 		}
 	}
 #else
-	err = wait_for_us(done, 10);
-	if (err)
-		err = wait_for(done, 10);
-#endif
-=======
-#define GUC_CTB_RESPONSE_TIMEOUT_SHORT_MS 10
-#define GUC_CTB_RESPONSE_TIMEOUT_LONG_MS 1000
-#define done \
-	(!(ct_enabled = intel_guc_ct_enabled(ct)) || \
-	 FIELD_GET(GUC_HXG_MSG_0_ORIGIN, READ_ONCE(req->status)) == \
-	 GUC_HXG_ORIGIN_GUC)
 	err = wait_for_us(done, GUC_CTB_RESPONSE_TIMEOUT_SHORT_MS);
 	if (err)
 		err = wait_for(done, GUC_CTB_RESPONSE_TIMEOUT_LONG_MS);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 #undef done
 	if (!ct_enabled)
 		err = -ENODEV;

@@ -1893,13 +1893,9 @@ guc_cancel_sched_engine_requests(struct i915_sched_engine *sched_engine)
 
 	/* Remaining _unready_ requests will be nop'ed when submitted */
 
-<<<<<<< HEAD
-	execlists->queue_priority_hint = INT_MIN;
-	i915_sched_init(execlists);
-=======
 	sched_engine->queue_priority_hint = INT_MIN;
-	sched_engine->queue = RB_ROOT_CACHED;
->>>>>>> vendor/linux-drm-v6.6.35
+	GEM_BUG_ON(RB_TREE_MIN(&sched_engine->queue.rb_root.rbr_tree) != NULL);
+	i915_sched_engine_init_queue(sched_engine);
 
 	spin_unlock_irqrestore(&sched_engine->lock, flags);
 }
@@ -1997,13 +1993,6 @@ destroy_pool:
 
 void intel_guc_submission_fini(struct intel_guc *guc)
 {
-<<<<<<< HEAD
-	spin_lock_destroy(&guc->wq_lock);
-	if (guc->stage_desc_pool) {
-		guc_proc_desc_destroy(guc);
-		guc_workqueue_destroy(guc);
-		guc_stage_desc_pool_destroy(guc);
-=======
 	if (!guc->submission_initialized)
 		return;
 
@@ -2011,6 +2000,7 @@ void intel_guc_submission_fini(struct intel_guc *guc)
 	guc_lrc_desc_pool_destroy_v69(guc);
 	i915_sched_engine_put(guc->sched_engine);
 	bitmap_free(guc->submission_state.guc_ids_bitmap);
+	spin_lock_destroy(&guc->wq_lock);
 	guc->submission_initialized = false;
 }
 
@@ -2170,7 +2160,6 @@ static int steal_guc_id(struct intel_guc *guc, struct intel_context *ce)
 		return 0;
 	} else {
 		return -EAGAIN;
->>>>>>> vendor/linux-drm-v6.6.35
 	}
 }
 

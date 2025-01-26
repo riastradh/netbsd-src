@@ -515,6 +515,17 @@ static bool default_disabled(struct i915_sched_engine *sched_engine)
 	return false;
 }
 
+void
+i915_sched_engine_init_queue(struct i915_sched_engine *sched_engine)
+{
+#ifdef __NetBSD__
+	rb_tree_init(&sched_engine->queue.rb_root.rbr_tree,
+	    &i915_priolist_rb_ops);
+#else
+	sched_engine->queue = RB_ROOT_CACHED;
+#endif
+}
+
 struct i915_sched_engine *
 i915_sched_engine_create(unsigned int subclass)
 {
@@ -526,12 +537,7 @@ i915_sched_engine_create(unsigned int subclass)
 
 	kref_init(&sched_engine->ref);
 
-#ifdef __NetBSD__
-	rb_tree_init(&sched_engine->queue.rb_root.rbr_tree,
-	    &i915_priolist_rb_ops);
-#else
-	sched_engine->queue = RB_ROOT_CACHED;
-#endif
+	i915_sched_engine_init_tree(sched_engine);
 	sched_engine->queue_priority_hint = INT_MIN;
 	sched_engine->destroy = default_destroy;
 	sched_engine->disabled = default_disabled;
