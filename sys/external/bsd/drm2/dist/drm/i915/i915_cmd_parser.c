@@ -1208,18 +1208,13 @@ static u32 *copy_batch(struct drm_i915_gem_object *dst_obj,
 		 * We don't care about copying too much here as we only
 		 * validate up to the end of the batch.
 		 */
-<<<<<<< HEAD
-		if (!(dst_obj->cache_coherent & I915_BO_CACHE_COHERENT_FOR_READ)) {
-#ifdef __NetBSD__
-			length = round_up(length,
-					  cpu_info_primary.ci_cflush_lsize);
-#else
-			length = round_up(length,
-=======
 		remain = length;
 		if (dst_needs_clflush & CLFLUSH_BEFORE)
+#ifdef __NetBSD__
 			remain = round_up(remain,
->>>>>>> vendor/linux-drm-v6.6.35
+					  cpu_info_primary.ci_cflush_lsize);
+#else
+			remain = round_up(remain,
 					  boot_cpu_data.x86_clflush_size);
 #endif
 		}

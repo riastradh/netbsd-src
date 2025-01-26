@@ -94,7 +94,7 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 
 #ifdef __NetBSD__
 	struct drm_i915_private *i915 = to_i915(obj->base.dev);
-	if (i915->quirks & QUIRK_NETBSD_VERSION_CALLED)
+	if (intel_has_quirk(i915, QUIRK_NETBSD_VERSION_CALLED))
 		args->flags = 0;
 #endif
 

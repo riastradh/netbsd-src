@@ -19,6 +19,10 @@ enum intel_quirk_id {
 	QUIRK_INVERT_BRIGHTNESS,
 	QUIRK_LVDS_SSC_DISABLE,
 	QUIRK_NO_PPS_BACKLIGHT_POWER_HOOK,
+#ifdef __NetBSD__
+	/* NetBSD hack to note version was called and thus mmap flags valid. */
+	QUIRK_NETBSD_VERSION_CALLED,
+#endif
 };
 
 void intel_init_quirks(struct drm_i915_private *i915);

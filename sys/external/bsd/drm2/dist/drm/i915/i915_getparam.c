@@ -132,7 +132,7 @@ int i915_getparam_ioctl(struct drm_device *dev, void *data,
 	case I915_PARAM_MMAP_VERSION:
 		/* Remember to bump this if the version changes! */
 #ifdef __NetBSD__
-		i915->quirks |= QUIRK_NETBSD_VERSION_CALLED;
+		atomic_store_release(&i915->mmap_version_called, true);
 #endif
 		/* FALLTHROUGH */
 	case I915_PARAM_HAS_GEM:
