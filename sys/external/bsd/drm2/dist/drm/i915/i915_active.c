@@ -172,7 +172,7 @@ static const rb_tree_ops_t active_rb_ops = {
 static void
 __active_retire(struct i915_active *ref)
 {
-	struct rb_root root = RB_ROOT;
+	struct rb_root root;
 	struct active_node *it, *n;
 	unsigned long flags;
 
@@ -185,16 +185,6 @@ __active_retire(struct i915_active *ref)
 	GEM_BUG_ON(rcu_access_pointer(ref->excl.fence));
 	debug_active_deactivate(ref);
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	rb_move(&root, &ref->tree);
-	rb_tree_init(&ref->tree.rbr_tree, &active_rb_ops);
-#else
-	root = ref->tree;
-	ref->tree = RB_ROOT;
-#endif
-	ref->cache = NULL;
-=======
 	/* Even if we have not used the cache, we may still have a barrier */
 	if (!ref->cache)
 		ref->cache = fetch_node(ref->tree.rb_node);
@@ -203,17 +193,33 @@ __active_retire(struct i915_active *ref)
 	if (ref->cache) {
 		/* Discard all other nodes in the tree */
 		rb_erase(&ref->cache->node, &ref->tree);
+#ifdef __NetBSD__
+		rb_move(&root, &ref->tree);
+		rb_tree_init(&ref->tree.rbr_tree, &active_rb_ops);
+#else
 		root = ref->tree;
+#endif
 
 		/* Rebuild the tree with only the cached node */
+#ifdef __NetBSD__
+		struct active_node *collision __diagused =
+		    rb_tree_insert_node(&ref->tree.rbr_tree, ref->cache);
+		GEM_BUG_ON(collision != ref->cache);
+#else
 		rb_link_node(&ref->cache->node, NULL, &ref->tree.rb_node);
 		rb_insert_color(&ref->cache->node, &ref->tree);
 		GEM_BUG_ON(ref->tree.rb_node != &ref->cache->node);
+#endif
 
 		/* Make the cached node available for reuse with any timeline */
 		ref->cache->timeline = 0; /* needs cmpxchg(u64) */
+	} else {
+#ifdef __NetBSD__
+		rb_tree_init(&root.rbr_tree, &active_rb_ops);
+#else
+		root = RB_ROOT;
+#endif
 	}
->>>>>>> vendor/linux-drm-v6.6.35
 
 	DRM_SPIN_WAKEUP_ALL(&ref->tree_wq, &ref->tree_lock);
 
@@ -305,13 +311,6 @@ static struct active_node *__active_lookup(struct i915_active *ref, u64 idx)
 	if (it) {
 		u64 cached = READ_ONCE(it->timeline);
 
-<<<<<<< HEAD
-	/* Preallocate a replacement, just in case */
-	prealloc = kmem_cache_alloc(global.slab_cache, GFP_KERNEL);
-	if (!prealloc)
-		return NULL;
-	memset(prealloc, 0, sizeof(*prealloc));
-=======
 		/* Once claimed, this slot will only belong to this idx */
 		if (cached == idx)
 			return it;
@@ -360,7 +359,6 @@ active_instance(struct i915_active *ref, u64 idx)
 	node = __active_lookup(ref, idx);
 	if (likely(node))
 		return &node->base;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	spin_lock_irq(&ref->tree_lock);
 	GEM_BUG_ON(i915_active_is_idle(ref));
@@ -390,10 +388,6 @@ active_instance(struct i915_active *ref, u64 idx)
 	}
 #endif
 
-<<<<<<< HEAD
-	node = prealloc;
-	prealloc = NULL;
-=======
 	/*
 	 * XXX: We should preallocate this before i915_active_ref() is ever
 	 *  called, but we cannot call into fs_reclaim() anyway, so use GFP_ATOMIC.
@@ -401,8 +395,8 @@ active_instance(struct i915_active *ref, u64 idx)
 	node = kmem_cache_alloc(slab_cache, GFP_ATOMIC);
 	if (!node)
 		goto out;
+	memset(node, 0, sizeof(*node);
 
->>>>>>> vendor/linux-drm-v6.6.35
 	__i915_active_fence_init(&node->base, NULL, node_retire);
 	node->ref = ref;
 	node->timeline = idx;
@@ -420,15 +414,6 @@ out:
 	WRITE_ONCE(ref->cache, node);
 	spin_unlock_irq(&ref->tree_lock);
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	if (prealloc)
-		kmem_cache_free(global.slab_cache, prealloc);
-#endif
-
-	BUILD_BUG_ON(offsetof(typeof(*node), base));
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	return &node->base;
 }
 
@@ -696,49 +681,10 @@ static int flush_lazy_signals(struct i915_active *ref)
 
 		enable_signaling(&it->base);
 	}
-<<<<<<< HEAD
-	/* Any fence added after the wait begins will not be auto-signaled */
-
-	i915_active_release(ref);
-	if (err)
-		return err;
-
-	spin_lock(&ref->tree_lock);
-	DRM_SPIN_WAIT_UNTIL(err, &ref->tree_wq, &ref->tree_lock,
-	    i915_active_is_idle(ref));
-	spin_unlock(&ref->tree_lock);
-	if (err)
-		return err;
-
-	flush_work(&ref->work);
-	return 0;
-}
-
-int i915_request_await_active(struct i915_request *rq, struct i915_active *ref)
-{
-	int err = 0;
-
-	if (rcu_access_pointer(ref->excl.fence)) {
-		struct dma_fence *fence;
-
-		rcu_read_lock();
-		fence = dma_fence_get_rcu_safe(&ref->excl.fence);
-		rcu_read_unlock();
-		if (fence) {
-			err = i915_request_await_dma_fence(rq, fence);
-			dma_fence_put(fence);
-		}
-	}
-
-	/* In the future we may choose to await on all fences */
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 
 	return err;
 }
 
-<<<<<<< HEAD
-=======
 int __i915_active_wait(struct i915_active *ref, int state)
 {
 	might_sleep();
@@ -752,9 +698,12 @@ int __i915_active_wait(struct i915_active *ref, int state)
 		if (err)
 			return err;
 
-		if (___wait_var_event(ref, i915_active_is_idle(ref),
-				      state, 0, 0, schedule()))
-			return -EINTR;
+		spin_lock(&ref->tree_lock);
+		DRM_SPIN_WAIT_UNTIL(err, &ref->tree_wq, &ref->tree_lock,
+		    i915_active_is_idle(ref));
+		spin_unlock(&ref->tree_lock);
+		if (err)
+			return err;
 	}
 
 	/*
@@ -896,20 +845,16 @@ int i915_sw_fence_await_active(struct i915_sw_fence *fence,
 	return await_active(ref, flags, sw_await_fence, fence, fence);
 }
 
->>>>>>> vendor/linux-drm-v6.6.35
 void i915_active_fini(struct i915_active *ref)
 {
 	debug_active_fini(ref);
 	GEM_BUG_ON(atomic_read(&ref->count));
 	GEM_BUG_ON(work_pending(&ref->work));
 	mutex_destroy(&ref->mutex);
-<<<<<<< HEAD
 	spin_lock_destroy(&ref->tree_lock);
-=======
 
 	if (ref->cache)
 		kmem_cache_free(slab_cache, ref->cache);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static inline bool is_idle_barrier(struct active_node *node, u64 idx)
@@ -1067,13 +1012,8 @@ int i915_active_acquire_preallocate_barrier(struct i915_active *ref,
 			 * for our tracking of the pending barrier.
 			 */
 			RCU_INIT_POINTER(node->base.fence, ERR_PTR(-EAGAIN));
-<<<<<<< HEAD
 			node->engine = engine;
-			atomic_inc(&ref->count);
-=======
-			node->base.cb.node.prev = (void *)engine;
 			__i915_active_acquire(ref);
->>>>>>> vendor/linux-drm-v6.6.35
 		}
 		GEM_BUG_ON(rcu_access_pointer(node->base.fence) != ERR_PTR(-EAGAIN));
 
@@ -1260,19 +1200,6 @@ __i915_active_fence_set(struct i915_active_fence *active,
 	spin_lock_irqsave(fence->lock, flags);
 	if (prev)
 		spin_lock_nested(prev->lock, SINGLE_DEPTH_NESTING);
-<<<<<<< HEAD
-#ifdef __NetBSD__
-		/* XXX ugh bletch */
-		KASSERT(active->cb.func == node_retire ||
-		    active->cb.func == excl_retire ||
-		    active->cb.func == i915_active_noop);
-		if (active->cb.fcb_onqueue) {
-			TAILQ_REMOVE(&prev->f_callbacks, &active->cb,
-			    fcb_entry);
-			active->cb.fcb_onqueue = false;
-		}
-#else
-=======
 
 	/*
 	 * A does the cmpxchg first, and so it sees C or NULL, as before, or
@@ -1312,21 +1239,27 @@ __i915_active_fence_set(struct i915_active_fence *active,
 	 * itself -- remembering that it needs to wait on A before executing.
 	 */
 	if (prev) {
->>>>>>> vendor/linux-drm-v6.6.35
+#ifdef __NetBSD__
+		/* XXX ugh bletch */
+		KASSERT(active->cb.func == node_retire ||
+		    active->cb.func == excl_retire ||
+		    active->cb.func == i915_active_noop);
+		if (active->cb.fcb_onqueue) {
+			TAILQ_REMOVE(&prev->f_callbacks, &active->cb,
+			    fcb_entry);
+			active->cb.fcb_onqueue = false;
+		}
+#else
 		__list_del_entry(&active->cb.node);
 #endif
 		spin_unlock(prev->lock); /* serialise with prev->cb_list */
 	}
-<<<<<<< HEAD
-	GEM_BUG_ON(rcu_access_pointer(active->fence) != fence);
 #ifdef __NetBSD__
 	/* XXX ugh bletch */
 	KASSERT(!active->cb.fcb_onqueue);
 	active->cb.fcb_onqueue = true;
 	TAILQ_INSERT_TAIL(&fence->f_callbacks, &active->cb, fcb_entry);
 #else
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	list_add_tail(&active->cb.node, &fence->cb_list);
 #endif
 	spin_unlock_irqrestore(fence->lock, flags);
