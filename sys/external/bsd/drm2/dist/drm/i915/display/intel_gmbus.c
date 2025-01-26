@@ -387,17 +387,16 @@ static int gmbus_wait(struct drm_i915_private *i915, u32 status, u32 irq_en)
 		irq_en = 0;
 #endif
 
-<<<<<<< HEAD
-	spin_lock(&dev_priv->gmbus_wait_lock);
-	I915_WRITE_FW(GMBUS4, irq_en);
+	spin_lock(&i915->gmbus.wait_lock);
+	intel_de_write_fw(i915, GMBUS4(i915), irq_en);
 
 	status |= GMBUS_SATOER;
 	if (!irq_en) {
 		unsigned timeout = 50*1000;
 
 		ret = 0;
-		while (((gmbus2 = intel_uncore_read_fw(&dev_priv->uncore,
-				GMBUS2)) & status) == 0) {
+		while (((gmbus2 = intel_de_read_fw(i915, GMBUS2(i915)))
+			& status) == 0) {
 			if (--timeout == 0) {
 				ret = -ETIMEDOUT;
 				break;
@@ -406,11 +405,10 @@ static int gmbus_wait(struct drm_i915_private *i915, u32 status, u32 irq_en)
 		}
 	} else {
 		DRM_SPIN_TIMED_WAIT_NOINTR_UNTIL(ret,
-		    &dev_priv->gmbus_wait_queue,
-		    &dev_priv->gmbus_wait_lock,
+		    &i915->gmbus.wait_queue,
+		    &i915->gmbus.wait_lock,
 		    msecs_to_jiffies_timeout(50),
-		    (((gmbus2 = intel_uncore_read_fw(&dev_priv->uncore,
-				GMBUS2))
+		    (((gmbus2 = intel_de_read_fw(i915, GMBUS2(i915)))
 			    & status)
 			!= 0));
 		/*
@@ -430,22 +428,8 @@ static int gmbus_wait(struct drm_i915_private *i915, u32 status, u32 irq_en)
 		}
 	}
 
-	I915_WRITE_FW(GMBUS4, 0);
-	spin_unlock(&dev_priv->gmbus_wait_lock);
-=======
-	add_wait_queue(&i915->display.gmbus.wait_queue, &wait);
-	intel_de_write_fw(i915, GMBUS4(i915), irq_en);
-
-	status |= GMBUS_SATOER;
-	ret = wait_for_us((gmbus2 = intel_de_read_fw(i915, GMBUS2(i915))) & status,
-			  2);
-	if (ret)
-		ret = wait_for((gmbus2 = intel_de_read_fw(i915, GMBUS2(i915))) & status,
-			       50);
-
 	intel_de_write_fw(i915, GMBUS4(i915), 0);
-	remove_wait_queue(&i915->display.gmbus.wait_queue, &wait);
->>>>>>> vendor/linux-drm-v6.6.35
+	spin_unlock(&i915->gmbus.wait_lock);
 
 	if (gmbus2 & GMBUS_SATOER)
 		return -ENXIO;
@@ -468,16 +452,14 @@ gmbus_wait_idle(struct drm_i915_private *i915)
 		irq_enable = 0;
 #endif
 
-<<<<<<< HEAD
-	spin_lock(&dev_priv->gmbus_wait_lock);
-	I915_WRITE_FW(GMBUS4, irq_enable);
+	spin_lock(&i915->gmbus.wait_lock);
+	intel_de_write_fw(i915, GMBUS4(i915), irq_enable);
 
 	if (!irq_enable) {
 		unsigned timeout = 10*1000;
 
 		ret = 0;
-		while (intel_uncore_read_fw(&dev_priv->uncore, GMBUS2)
-		    & GMBUS_ACTIVE) {
+		while (intel_de_read_fw(i915, GMBUS2(i915)) & GMBUS_ACTIVE) {
 			if (--timeout == 0) {
 				ret = -ETIMEDOUT;
 				break;
@@ -486,11 +468,10 @@ gmbus_wait_idle(struct drm_i915_private *i915)
 		}
 	} else {
 		DRM_SPIN_TIMED_WAIT_NOINTR_UNTIL(ret,
-		    &dev_priv->gmbus_wait_queue,
-		    &dev_priv->gmbus_wait_lock,
+		    &i915->gmbus.wait_queue,
+		    &i915->gmbus.wait_lock,
 		    msecs_to_jiffies_timeout(10),
-		    ((intel_uncore_read_fw(&dev_priv->uncore, GMBUS2)
-			    & GMBUS_ACTIVE)
+		    ((intel_de_read_fw(i915, GMBUS2(i915)) & GMBUS_ACTIVE)
 			== 0));
 		/*
 		 * After DRM_SPIN_TIMED_WAIT_NOINTR_UNTIL, ret<0 on
@@ -509,17 +490,8 @@ gmbus_wait_idle(struct drm_i915_private *i915)
 		}
 	}
 
-	I915_WRITE_FW(GMBUS4, 0);
-	spin_unlock(&dev_priv->gmbus_wait_lock);
-=======
-	add_wait_queue(&i915->display.gmbus.wait_queue, &wait);
-	intel_de_write_fw(i915, GMBUS4(i915), irq_enable);
-
-	ret = intel_de_wait_for_register_fw(i915, GMBUS2(i915), GMBUS_ACTIVE, 0, 10);
-
 	intel_de_write_fw(i915, GMBUS4(i915), 0);
-	remove_wait_queue(&i915->display.gmbus.wait_queue, &wait);
->>>>>>> vendor/linux-drm-v6.6.35
+	spin_unlock(&i915->gmbus.wait_lock);
 
 	return ret;
 }
@@ -970,11 +942,7 @@ static const struct i2c_lock_operations gmbus_lock_ops = {
  */
 int intel_gmbus_setup(struct drm_i915_private *i915)
 {
-<<<<<<< HEAD
-	struct intel_gmbus *bus;
-=======
 	struct pci_dev *pdev = to_pci_dev(i915->drm.dev);
->>>>>>> vendor/linux-drm-v6.6.35
 	unsigned int pin;
 	int ret;
 
@@ -987,15 +955,10 @@ int intel_gmbus_setup(struct drm_i915_private *i915)
 		 */
 		i915->display.gmbus.mmio_base = PCH_DISPLAY_BASE;
 
-<<<<<<< HEAD
-	mutex_init(&dev_priv->gmbus_mutex);
-
-	spin_lock_init(&dev_priv->gmbus_wait_lock);
-	DRM_INIT_WAITQUEUE(&dev_priv->gmbus_wait_queue, "i915i2c");
-=======
 	mutex_init(&i915->display.gmbus.mutex);
-	init_waitqueue_head(&i915->display.gmbus.wait_queue);
->>>>>>> vendor/linux-drm-v6.6.35
+
+	spin_lock_init(&i915->gmbus.wait_lock);
+	DRM_INIT_WAITQUEUE(&i915->gmbus.wait_queue, "i915i2c");
 
 	for (pin = 0; pin < ARRAY_SIZE(i915->display.gmbus.bus); pin++) {
 		const struct gmbus_pin *gmbus_pin;
@@ -1017,13 +980,9 @@ int intel_gmbus_setup(struct drm_i915_private *i915)
 			 sizeof(bus->adapter.name),
 			 "i915 gmbus %s", gmbus_pin->name);
 
-<<<<<<< HEAD
-		bus->adapter.dev.parent = dev_priv->drm.dev;
-		bus->dev_priv = dev_priv;
-=======
-		bus->adapter.dev.parent = &pdev->dev;
+		__USE(pdev);
+		bus->adapter.dev.parent = i915->drm.dev;
 		bus->i915 = i915;
->>>>>>> vendor/linux-drm-v6.6.35
 
 		bus->adapter.algo = &gmbus_algorithm;
 		bus->adapter.lock_ops = &gmbus_lock_ops;
@@ -1112,12 +1071,14 @@ void intel_gmbus_teardown(struct drm_i915_private *i915)
 		i915->display.gmbus.bus[pin] = NULL;
 	}
 
-	DRM_DESTROY_WAITQUEUE(&dev_priv->gmbus_wait_queue);
-	spin_lock_destroy(&dev_priv->gmbus_wait_lock);
-	mutex_destroy(&dev_priv->gmbus_mutex);
+	DRM_DESTROY_WAITQUEUE(&i915->gmbus.wait_queue);
+	spin_lock_destroy(&i915->gmbus.wait_lock);
+	mutex_destroy(&i915->gmbus.mutex);
 }
 
 void intel_gmbus_irq_handler(struct drm_i915_private *i915)
 {
-	wake_up_all(&i915->display.gmbus.wait_queue);
+	spin_lock(&i915->gmbus.wait_lock);
+	DRM_SPIN_WAKEUP_ALL(&i915->gmbus.wait_queue, &i915->gmbus.wait_lock);
+	spin_unlock(&i915->gmbus.wait_lock);
 }
