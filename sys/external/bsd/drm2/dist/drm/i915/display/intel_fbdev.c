@@ -58,6 +58,11 @@ __KERNEL_RCSID(0, "$NetBSD: intel_fbdev.c,v 1.10 2021/12/20 20:34:58 chs Exp $")
 #include "intel_fbdev.h"
 #include "intel_frontbuffer.h"
 
+#ifdef __NetBSD__
+#include "intelfb.h"
+#include <linux/nbsd-namespace.h>
+#endif
+
 struct intel_fbdev {
 	struct drm_fb_helper helper;
 	struct intel_framebuffer *fb;
@@ -90,19 +95,12 @@ static void intel_fbdev_invalidate(struct intel_fbdev *ifbdev)
 	intel_frontbuffer_invalidate(to_frontbuffer(ifbdev), ORIGIN_CPU);
 }
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-#include "intelfb.h"
-#include <linux/nbsd-namespace.h>
-#endif
-
 #ifndef __NetBSD__
-=======
 FB_GEN_DEFAULT_DEFERRED_IOMEM_OPS(intel_fbdev,
 				  drm_fb_helper_damage_range,
 				  drm_fb_helper_damage_area)
 
->>>>>>> vendor/linux-drm-v6.6.35
+
 static int intel_fbdev_set_par(struct fb_info *info)
 {
 	struct intel_fbdev *ifbdev = to_intel_fbdev(info->par);
@@ -292,9 +290,6 @@ static int intelfb_create(struct drm_fb_helper *helper,
 		goto out_unlock;
 	}
 
-<<<<<<< HEAD
-	intel_frontbuffer_flush(to_frontbuffer(ifbdev), ORIGIN_DIRTYFB);
-
 #ifdef __NetBSD__
     {
 	static const struct intelfb_attach_args zero_ifa;
@@ -334,10 +329,7 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	ifbdev->helper.fb = &ifbdev->fb->base;
     }
 #else
-	info = drm_fb_helper_alloc_fbi(helper);
-=======
 	info = drm_fb_helper_alloc_info(helper);
->>>>>>> vendor/linux-drm-v6.6.35
 	if (IS_ERR(info)) {
 		drm_err(&dev_priv->drm, "Failed to allocate fb_info (%pe)\n", info);
 		ret = PTR_ERR(info);
@@ -397,15 +389,9 @@ static int intelfb_create(struct drm_fb_helper *helper,
 
 	/* Use default scratch pixmap (info->pixmap.flags = FB_PIXMAP_SYSTEM) */
 
-<<<<<<< HEAD
-	DRM_DEBUG_KMS("allocated %dx%d fb: 0x%08"PRIx32"\n",
-		      ifbdev->fb->base.width, ifbdev->fb->base.height,
-		      i915_ggtt_offset(vma));
-=======
 	drm_dbg_kms(&dev_priv->drm, "allocated %dx%d fb: 0x%08x\n",
 		    ifbdev->fb->base.width, ifbdev->fb->base.height,
 		    i915_ggtt_offset(vma));
->>>>>>> vendor/linux-drm-v6.6.35
 	ifbdev->vma = vma;
 	ifbdev->vma_flags = flags;
 
@@ -422,11 +408,10 @@ out_unlock:
 	return ret;
 }
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 #  undef	__iomem
 #endif
-=======
+
 static int intelfb_dirty(struct drm_fb_helper *helper, struct drm_clip_rect *clip)
 {
 	if (!(clip->x1 < clip->x2 && clip->y1 < clip->y2))
@@ -437,7 +422,6 @@ static int intelfb_dirty(struct drm_fb_helper *helper, struct drm_clip_rect *cli
 
 	return 0;
 }
->>>>>>> vendor/linux-drm-v6.6.35
 
 static const struct drm_fb_helper_funcs intel_fb_helper_funcs = {
 	.fb_probe = intelfb_create,
@@ -459,12 +443,9 @@ static void intel_fbdev_destroy(struct intel_fbdev *ifbdev)
 	if (ifbdev->fb)
 		drm_framebuffer_remove(&ifbdev->fb->base);
 
-<<<<<<< HEAD
+	drm_fb_helper_unprepare(&ifbdev->helper);
 	mutex_destroy(&ifbdev->hpd_lock);
 
-=======
-	drm_fb_helper_unprepare(&ifbdev->helper);
->>>>>>> vendor/linux-drm-v6.6.35
 	kfree(ifbdev);
 }
 
@@ -702,13 +683,11 @@ void intel_fbdev_unregister(struct drm_i915_private *dev_priv)
 	if (!ifbdev)
 		return;
 
-<<<<<<< HEAD
-	cancel_work_sync(&dev_priv->fbdev_suspend_work);
-#ifndef __NetBSD__		/* XXX fb async */
-=======
+#ifndef __NetBSD__		/* XXX fb suspend */
 	intel_fbdev_set_suspend(&dev_priv->drm, FBINFO_STATE_SUSPENDED, true);
+#endif
 
->>>>>>> vendor/linux-drm-v6.6.35
+#ifndef __NetBSD__		/* XXX fb async */
 	if (!current_is_async())
 #endif
 		intel_fbdev_sync(ifbdev);
@@ -730,12 +709,8 @@ void intel_fbdev_fini(struct drm_i915_private *dev_priv)
  * processing, fbdev will perform a full connector reprobe if a hotplug event
  * was received while HPD was suspended.
  */
-<<<<<<< HEAD
 #ifndef __NetBSD__		/* XXX fb suspend */
-static void intel_fbdev_hpd_set_suspend(struct intel_fbdev *ifbdev, int state)
-=======
 static void intel_fbdev_hpd_set_suspend(struct drm_i915_private *i915, int state)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct intel_fbdev *ifbdev = i915->display.fbdev.fbdev;
 	bool send_hpd = false;
@@ -811,13 +786,9 @@ void intel_fbdev_set_suspend(struct drm_device *dev, int state, bool synchronous
 	drm_fb_helper_set_suspend(&ifbdev->helper, state);
 	console_unlock();
 
-<<<<<<< HEAD
-	intel_fbdev_hpd_set_suspend(ifbdev, state);
-#endif
-=======
 set_suspend:
 	intel_fbdev_hpd_set_suspend(dev_priv, state);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 void intel_fbdev_output_poll_changed(struct drm_device *dev)

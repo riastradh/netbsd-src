@@ -11,17 +11,14 @@ __KERNEL_RCSID(0, "$NetBSD: intel_dsb.c,v 1.3 2021/12/19 11:38:26 riastradh Exp 
 
 #include "gem/i915_gem_internal.h"
 
-<<<<<<< HEAD
-#include <linux/nbsd-namespace.h>
-
-#define DSB_BUF_SIZE    (2 * PAGE_SIZE)
-=======
 #include "i915_drv.h"
 #include "i915_reg.h"
 #include "intel_de.h"
 #include "intel_display_types.h"
 #include "intel_dsb.h"
 #include "intel_dsb_regs.h"
+
+#include <linux/nbsd-namespace.h>
 
 struct i915_vma;
 
@@ -58,7 +55,6 @@ struct intel_dsb {
 	 */
 	unsigned int ins_start_offset;
 };
->>>>>>> vendor/linux-drm-v6.6.35
 
 /**
  * DOC: DSB

@@ -60,11 +60,8 @@ __KERNEL_RCSID(0, "$NetBSD: intel_fbc.c,v 1.3 2021/12/19 12:32:15 riastradh Exp 
 #include "intel_fbc.h"
 #include "intel_frontbuffer.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-static inline bool fbc_supported(struct drm_i915_private *dev_priv)
-=======
 #define for_each_fbc_id(__dev_priv, __fbc_id) \
 	for ((__fbc_id) = INTEL_FBC_A; (__fbc_id) < I915_MAX_FBCS; (__fbc_id)++) \
 		for_each_if(DISPLAY_RUNTIME_INFO(__dev_priv)->fbc_mask & BIT(__fbc_id))
@@ -133,7 +130,6 @@ struct intel_fbc {
 
 /* plane stride in pixels */
 static unsigned int intel_fbc_plane_stride(const struct intel_plane_state *plane_state)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	const struct drm_framebuffer *fb = plane_state->hw.fb;
 	unsigned int stride;
@@ -774,41 +770,6 @@ static int find_compression_limit(struct intel_fbc *fbc,
 			return limit;
 	}
 
-<<<<<<< HEAD
-	fbc->threshold = ret;
-
-	if (INTEL_GEN(dev_priv) >= 5)
-		I915_WRITE(ILK_DPFC_CB_BASE, fbc->compressed_fb.start);
-	else if (IS_GM45(dev_priv)) {
-		I915_WRITE(DPFC_CB_BASE, fbc->compressed_fb.start);
-	} else {
-		compressed_llb = kzalloc(sizeof(*compressed_llb), GFP_KERNEL);
-		if (!compressed_llb)
-			goto err_fb;
-
-		ret = i915_gem_stolen_insert_node(dev_priv, compressed_llb,
-						  4096, 4096);
-		if (ret)
-			goto err_fb;
-
-		fbc->compressed_llb = compressed_llb;
-
-		GEM_BUG_ON(range_overflows_t(u64, dev_priv->dsm.start,
-					     fbc->compressed_fb.start,
-					     U32_MAX));
-		GEM_BUG_ON(range_overflows_t(u64, dev_priv->dsm.start,
-					     fbc->compressed_llb->start,
-					     U32_MAX));
-		I915_WRITE(FBC_CFB_BASE,
-			   dev_priv->dsm.start + fbc->compressed_fb.start);
-		I915_WRITE(FBC_LL_BASE,
-			   dev_priv->dsm.start + compressed_llb->start);
-	}
-
-	DRM_DEBUG_KMS("reserved %"PRIu64" bytes of contiguous stolen space for FBC, threshold: %d\n",
-		      fbc->compressed_fb.size, fbc->threshold);
-
-=======
 	return 0;
 }
 
@@ -840,9 +801,8 @@ static int intel_fbc_alloc_cfb(struct intel_fbc *fbc,
 	fbc->limit = ret;
 
 	drm_dbg_kms(&i915->drm,
-		    "reserved %llu bytes of contiguous stolen space for FBC, limit: %d\n",
+		    "reserved %"PRIu64" bytes of contiguous stolen space for FBC, limit: %d\n",
 		    i915_gem_stolen_node_size(&fbc->compressed_fb), fbc->limit);
->>>>>>> vendor/linux-drm-v6.6.35
 	return 0;
 
 err_llb:
