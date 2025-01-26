@@ -8,12 +8,8 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: i915_gem_fence_reg.c,v 1.6 2021/12/19 11:33:49 riastradh Exp $");
 
-<<<<<<< HEAD:sys/external/bsd/drm2/dist/drm/i915/i915_gem_fence_reg.c
 #include <linux/bitmap.h>
-#include <drm/i915_drm.h>
-=======
 #include <linux/highmem.h>
->>>>>>> vendor/linux-drm-v6.6.35:sys/external/bsd/drm2/dist/drm/i915/gt/intel_ggtt_fencing.c
 
 #include "display/intel_display.h"
 #include "i915_drv.h"
