@@ -765,16 +765,7 @@ static void err_print_gt_global(struct drm_i915_error_state_buf *m,
 		err_printf(m, "DONE_REG: 0x%08x\n", gt->done_reg);
 	}
 
-<<<<<<< HEAD
-	err_printf(m, "%s\n", error->error_msg);
-	err_printf(m, "Time: %"PRIdMAX" s %ld us\n", (intmax_t)error->time.tv_sec,
-		   (long)error->time.tv_usec);
-	err_printf(m, "Kernel: %d\n", __NetBSD_Version__);
-
-	if (INTEL_GEN(m->i915) >= 8)
-=======
 	if (GRAPHICS_VER(m->i915) >= 8)
->>>>>>> vendor/linux-drm-v6.6.35
 		err_printf(m, "FAULT_TLB_DATA: 0x%08x 0x%08x\n",
 			   gt->fault_data1, gt->fault_data0);
 
@@ -853,18 +844,22 @@ static void __err_print_to_sgl(struct drm_i915_error_state_buf *m,
 
 	if (*error->error_msg)
 		err_printf(m, "%s\n", error->error_msg);
+#ifdef __NetBSD__
+	err_printf(m, "Kernel: %d\n" __NetBSD_Version__);
+#else
 	err_printf(m, "Kernel: %s %s\n",
 		   init_utsname()->release,
 		   init_utsname()->machine);
+#endif
 	err_printf(m, "Driver: %s\n", DRIVER_DATE);
 	ts = ktime_to_timespec64(error->time);
-	err_printf(m, "Time: %lld s %ld us\n",
+	err_printf(m, "Time: %"PRId64" s %ld us\n",
 		   (s64)ts.tv_sec, ts.tv_nsec / NSEC_PER_USEC);
 	ts = ktime_to_timespec64(error->boottime);
-	err_printf(m, "Boottime: %lld s %ld us\n",
+	err_printf(m, "Boottime: %"PRId64" s %ld us\n",
 		   (s64)ts.tv_sec, ts.tv_nsec / NSEC_PER_USEC);
 	ts = ktime_to_timespec64(error->uptime);
-	err_printf(m, "Uptime: %lld s %ld us\n",
+	err_printf(m, "Uptime: %"PRId64" s %ld us\n",
 		   (s64)ts.tv_sec, ts.tv_nsec / NSEC_PER_USEC);
 	err_printf(m, "Capture: %lu jiffies; %d ms ago\n",
 		   error->capture, jiffies_to_msecs(jiffies - error->capture));
@@ -1161,14 +1156,11 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 			io_mapping_unmap_atomic(dev_priv->gtt.mappable, s);
 #else
 			io_mapping_unmap(s);
-<<<<<<< HEAD
 #endif
-=======
 
 			mb();
 			ggtt->vm.clear_range(&ggtt->vm, slot, PAGE_SIZE);
 			mutex_unlock(&ggtt->error_mutex);
->>>>>>> vendor/linux-drm-v6.6.35
 			if (ret)
 				break;
 		}
@@ -1673,7 +1665,7 @@ capture_engine(struct intel_engine_cs *engine,
 
 	intel_engine_get_hung_entity(engine, &ce, &rq);
 	if (rq && !i915_request_started(rq))
-		drm_info(&engine->gt->i915->drm, "Got hung context on %s with active request %lld:%lld [0x%04X] not yet started\n",
+		drm_info(&engine->gt->i915->drm, "Got hung context on %s with active request %"PRId64":%"PRId64" [0x%04X] not yet started\n",
 			 engine->name, rq->fence.context, rq->fence.seqno, ce->guc_id.id);
 
 	if (rq) {

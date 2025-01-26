@@ -218,139 +218,6 @@ try_again:
 }
 
 static int
-<<<<<<< HEAD
-i915_gem_phys_pwrite(struct drm_i915_gem_object *obj,
-		     struct drm_i915_gem_pwrite *args,
-		     struct drm_file *file)
-{
-#ifdef __NetBSD__
-	void *vaddr = obj->mm.u.phys.kva + args->offset;
-#else
-	void *vaddr = sg_page(obj->mm.pages->sgl) + args->offset;
-#endif
-	char __user *user_data = u64_to_user_ptr(args->data_ptr);
-
-	/*
-	 * We manually control the domain here and pretend that it
-	 * remains coherent i.e. in the GTT domain, like shmem_pwrite.
-	 */
-	i915_gem_object_invalidate_frontbuffer(obj, ORIGIN_CPU);
-
-	if (copy_from_user(vaddr, user_data, args->size))
-		return -EFAULT;
-
-	drm_clflush_virt_range(vaddr, args->size);
-	intel_gt_chipset_flush(&to_i915(obj->base.dev)->gt);
-
-	i915_gem_object_flush_frontbuffer(obj, ORIGIN_CPU);
-	return 0;
-}
-
-static int
-i915_gem_create(struct drm_file *file,
-		struct intel_memory_region *mr,
-		u64 *size_p,
-		u32 *handle_p)
-{
-	struct drm_i915_gem_object *obj;
-	u32 handle;
-	u64 size;
-	int ret;
-
-	GEM_BUG_ON(!is_power_of_2(mr->min_page_size));
-	size = ALIGN(*size_p, mr->min_page_size);
-	if (size == 0)
-		return -EINVAL;
-
-	/* For most of the ABI (e.g. mmap) we think in system pages */
-	GEM_BUG_ON(!IS_ALIGNED(size, PAGE_SIZE));
-
-	/* Allocate the new object */
-	obj = i915_gem_object_create_region(mr, size, 0);
-	if (IS_ERR(obj))
-		return PTR_ERR(obj);
-
-	ret = drm_gem_handle_create(file, &obj->base, &handle);
-	/* drop reference from allocate - handle holds it now */
-	i915_gem_object_put(obj);
-	if (ret)
-		return ret;
-
-	*handle_p = handle;
-	*size_p = size;
-	return 0;
-}
-
-int
-i915_gem_dumb_create(struct drm_file *file,
-		     struct drm_device *dev,
-		     struct drm_mode_create_dumb *args)
-{
-	enum intel_memory_type mem_type;
-	int cpp = DIV_ROUND_UP(args->bpp, 8);
-	u32 format;
-
-	switch (cpp) {
-	case 1:
-		format = DRM_FORMAT_C8;
-		break;
-	case 2:
-		format = DRM_FORMAT_RGB565;
-		break;
-	case 4:
-		format = DRM_FORMAT_XRGB8888;
-		break;
-	default:
-		return -EINVAL;
-	}
-
-	/* have to work out size/pitch and return them */
-	args->pitch = ALIGN(args->width * cpp, 64);
-
-	/* align stride to page size so that we can remap */
-	if (args->pitch > intel_plane_fb_max_stride(to_i915(dev), format,
-						    DRM_FORMAT_MOD_LINEAR))
-		args->pitch = ALIGN(args->pitch, 4096);
-
-	if (args->pitch < args->width)
-		return -EINVAL;
-
-	args->size = mul_u32_u32(args->pitch, args->height);
-
-	mem_type = INTEL_MEMORY_SYSTEM;
-	if (HAS_LMEM(to_i915(dev)))
-		mem_type = INTEL_MEMORY_LOCAL;
-
-	return i915_gem_create(file,
-			       intel_memory_region_by_type(to_i915(dev),
-							   mem_type),
-			       &args->size, &args->handle);
-}
-
-/**
- * Creates a new mm object and returns a handle to it.
- * @dev: drm device pointer
- * @data: ioctl data blob
- * @file: drm file pointer
- */
-int
-i915_gem_create_ioctl(struct drm_device *dev, void *data,
-		      struct drm_file *file)
-{
-	struct drm_i915_private *i915 = to_i915(dev);
-	struct drm_i915_gem_create *args = data;
-
-	i915_gem_flush_free_objects(i915);
-
-	return i915_gem_create(file,
-			       intel_memory_region_by_type(i915,
-							   INTEL_MEMORY_SYSTEM),
-			       &args->size, &args->handle);
-}
-
-static int
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 shmem_pread(struct page *page, int offset, int len, char __user *user_data,
 	    bool needs_clflush)
 {
@@ -1434,13 +1301,9 @@ void i915_gem_driver_remove(struct drm_i915_private *dev_priv)
 	unsigned int i;
 
 	i915_gem_suspend_late(dev_priv);
-<<<<<<< HEAD
-	intel_gt_driver_remove(&dev_priv->gt);
-#ifndef __NetBSD__		/* XXX uabi_engines */
-=======
 	for_each_gt(gt, dev_priv, i)
 		intel_gt_driver_remove(gt);
->>>>>>> vendor/linux-drm-v6.6.35
+#ifndef __NetBSD__		/* XXX uabi_engines */
 	dev_priv->uabi_engines = RB_ROOT;
 #endif
 
@@ -1462,6 +1325,8 @@ void i915_gem_driver_release(struct drm_i915_private *dev_priv)
 	i915_gem_drain_workqueue(dev_priv);
 
 	drm_WARN_ON(&dev_priv->drm, !list_empty(&dev_priv->gem.contexts.list));
+
+	spin_lock_destroy(&i915->gem.contexts.lock);
 }
 
 static void i915_gem_init__mm(struct drm_i915_private *i915)
@@ -1489,80 +1354,9 @@ void i915_gem_cleanup_early(struct drm_i915_private *dev_priv)
 	i915_gem_drain_workqueue(dev_priv);
 	GEM_BUG_ON(!llist_empty(&dev_priv->mm.free_list));
 	GEM_BUG_ON(atomic_read(&dev_priv->mm.free_count));
-<<<<<<< HEAD
-	WARN_ON(dev_priv->mm.shrink_count);
+	drm_WARN_ON(&dev_priv->drm, dev_priv->mm.shrink_count);
 	spin_lock_destroy(&dev_priv->fb_tracking.lock);
 	spin_lock_destroy(&dev_priv->mm.obj_lock);
-}
-
-int i915_gem_freeze(struct drm_i915_private *dev_priv)
-{
-	/* Discard all purgeable objects, let userspace recover those as
-	 * required after resuming.
-	 */
-	i915_gem_shrink_all(dev_priv);
-
-	return 0;
-}
-
-int i915_gem_freeze_late(struct drm_i915_private *i915)
-{
-	struct drm_i915_gem_object *obj;
-	intel_wakeref_t wakeref;
-
-	/*
-	 * Called just before we write the hibernation image.
-	 *
-	 * We need to update the domain tracking to reflect that the CPU
-	 * will be accessing all the pages to create and restore from the
-	 * hibernation, and so upon restoration those pages will be in the
-	 * CPU domain.
-	 *
-	 * To make sure the hibernation image contains the latest state,
-	 * we update that state just before writing out the image.
-	 *
-	 * To try and reduce the hibernation image, we manually shrink
-	 * the objects as well, see i915_gem_freeze()
-	 */
-
-	wakeref = intel_runtime_pm_get(&i915->runtime_pm);
-
-	i915_gem_shrink(i915, -1UL, NULL, ~0);
-	i915_gem_drain_freed_objects(i915);
-
-	list_for_each_entry(obj, &i915->mm.shrink_list, mm.link) {
-		i915_gem_object_lock(obj);
-		WARN_ON(i915_gem_object_set_to_cpu_domain(obj, true));
-		i915_gem_object_unlock(obj);
-	}
-
-	intel_runtime_pm_put(&i915->runtime_pm, wakeref);
-
-	return 0;
-}
-
-void i915_gem_release(struct drm_device *dev, struct drm_file *file)
-{
-	struct drm_i915_file_private *file_priv = file->driver_priv;
-	struct i915_request *request;
-
-	/* Clean up our request list when the client is going away, so that
-	 * later retire_requests won't dereference our soon-to-be-gone
-	 * file_priv.
-	 */
-	spin_lock(&file_priv->mm.lock);
-	list_for_each_entry(request, &file_priv->mm.request_list, client_link)
-		request->file_priv = NULL;
-	spin_unlock(&file_priv->mm.lock);
-
-	/*
-	 * XXX This is probably too early -- need to defer with
-	 * callrcu; caller already defers free with kfree_rcu.
-	 */
-	spin_lock_destroy(&file_priv->mm.lock);
-=======
-	drm_WARN_ON(&dev_priv->drm, dev_priv->mm.shrink_count);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 int i915_gem_open(struct drm_i915_private *i915, struct drm_file *file)

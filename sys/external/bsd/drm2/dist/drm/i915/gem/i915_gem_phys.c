@@ -333,7 +333,11 @@ i915_gem_object_put_pages_phys(struct drm_i915_gem_object *obj,
 int i915_gem_object_pwrite_phys(struct drm_i915_gem_object *obj,
 				const struct drm_i915_gem_pwrite *args)
 {
+#ifdef __NetBSD__
+	void *vaddr = obj->mm.u.phys.kva + args->offset;
+#else
 	void *vaddr = sg_page(obj->mm.pages->sgl) + args->offset;
+#endif
 	char __user *user_data = u64_to_user_ptr(args->data_ptr);
 	struct drm_i915_private *i915 = to_i915(obj->base.dev);
 	int err;
@@ -364,7 +368,11 @@ int i915_gem_object_pwrite_phys(struct drm_i915_gem_object *obj,
 int i915_gem_object_pread_phys(struct drm_i915_gem_object *obj,
 			       const struct drm_i915_gem_pread *args)
 {
+#ifdef __NetBSD__
+	void *vaddr = obj->mm.u.phys.kva + args->offset;
+#else
 	void *vaddr = sg_page(obj->mm.pages->sgl) + args->offset;
+#endif
 	char __user *user_data = u64_to_user_ptr(args->data_ptr);
 	int err;
 

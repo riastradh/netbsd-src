@@ -44,7 +44,6 @@ int i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
 			       struct sg_table *pages)
 {
 	do {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 		if (dma_map_sg_attrs(obj->base.dev->dmat,
 				     pages->sgl, pages->nents,
@@ -52,10 +51,7 @@ int i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
 				     DMA_ATTR_NO_WARN))
 			return 0;
 #else
-		if (dma_map_sg_attrs(&obj->base.dev->pdev->dev,
-=======
 		if (dma_map_sg_attrs(obj->base.dev->dev,
->>>>>>> vendor/linux-drm-v6.6.35
 				     pages->sgl, pages->nents,
 				     DMA_BIDIRECTIONAL,
 				     DMA_ATTR_SKIP_CPU_SYNC |
@@ -83,26 +79,21 @@ int i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
 void i915_gem_gtt_finish_pages(struct drm_i915_gem_object *obj,
 			       struct sg_table *pages)
 {
-<<<<<<< HEAD
-	struct drm_i915_private *dev_priv = to_i915(obj->base.dev);
-#ifdef __NetBSD__
-	bus_dma_tag_t kdev = dev_priv->drm.dmat;
-#else
-	struct device *kdev = &dev_priv->drm.pdev->dev;
-#endif
-	struct i915_ggtt *ggtt = &dev_priv->ggtt;
-=======
 	struct drm_i915_private *i915 = to_i915(obj->base.dev);
 	struct i915_ggtt *ggtt = to_gt(i915)->ggtt;
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* XXX This does not prevent more requests being submitted! */
 	if (unlikely(ggtt->do_idle_maps))
 		/* Wait a bit, in the hope it avoids the hang */
 		usleep_range(100, 250);
 
+#ifdef __NetBSD__
+	dma_unmap_sg(i915->drm.dmat, pages->sgl, pages->nents,
+		     DMA_BIDIRECTIONAL);
+#else
 	dma_unmap_sg(i915->drm.dev, pages->sgl, pages->nents,
 		     DMA_BIDIRECTIONAL);
+#endif
 }
 
 /**
