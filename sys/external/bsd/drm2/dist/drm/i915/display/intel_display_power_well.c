@@ -190,8 +190,10 @@ int intel_power_well_refcount(struct i915_power_well *power_well)
 static void hsw_power_well_post_enable(struct drm_i915_private *dev_priv,
 				       u8 irq_pipe_mask, bool has_vga)
 {
+#ifndef __NetBSD__	/* XXX We wait until intelfb is ready.  */
 	if (has_vga)
 		intel_vga_reset_io_mem(dev_priv);
+#endif
 
 	if (irq_pipe_mask)
 		gen8_irq_power_well_post_enable(dev_priv, irq_pipe_mask);
@@ -1247,7 +1249,11 @@ static void vlv_display_power_well_deinit(struct drm_i915_private *dev_priv)
 	intel_pps_reset_all(dev_priv);
 
 	/* Prevent us from re-enabling polling on accident in late suspend */
+#ifdef __NetBSD__
+	if (device_activation(dev_priv->drm.dev, DEVACT_LEVEL_FULL))
+#else
 	if (!dev_priv->drm.dev->power.is_suspended)
+#endif
 		intel_hpd_poll_enable(dev_priv);
 }
 

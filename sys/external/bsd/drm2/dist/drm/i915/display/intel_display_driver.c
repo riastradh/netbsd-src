@@ -60,6 +60,8 @@ __KERNEL_RCSID(0, "$NetBSD$");
 #include "intel_wm.h"
 #include "skl_watermark.h"
 
+#include <linux/nbsd-namespace.h>
+
 bool intel_display_driver_probe_defer(struct pci_dev *pdev)
 {
 	struct drm_privacy_screen *privacy_screen;
@@ -228,9 +230,14 @@ int intel_display_driver_probe_noirq(struct drm_i915_private *i915)
 
 	intel_dmc_init(i915);
 
+	mutex_init(&i915->drrs.mutex);
+
 	i915->display.wq.modeset = alloc_ordered_workqueue("i915_modeset", 0);
 	i915->display.wq.flip = alloc_workqueue("i915_flip", WQ_HIGHPRI |
 						WQ_UNBOUND, WQ_UNBOUND_MAX_ACTIVE);
+
+	spin_lock_init(&i915->atomic_commit_lock);
+	DRM_INIT_WAITQUEUE(&i915->atomic_commit_wq, "i915cmit");
 
 	intel_mode_config_init(i915);
 
@@ -322,7 +329,9 @@ int intel_display_driver_probe_nogem(struct drm_i915_private *i915)
 	intel_hti_init(i915);
 
 	/* Just disable it once at startup */
+#ifndef __NetBSD__		/* XXX We wait until intelfb is ready.  */
 	intel_vga_disable(i915);
+#endif
 	intel_setup_outputs(i915);
 
 	drm_modeset_lock_all(dev);
@@ -459,12 +468,18 @@ void intel_display_driver_remove_noirq(struct drm_i915_private *i915)
 
 	intel_overlay_cleanup(i915);
 
+	intel_shared_dpll_cleanup(&i915->drm);
+
 	intel_gmbus_teardown(i915);
 
 	destroy_workqueue(i915->display.wq.flip);
 	destroy_workqueue(i915->display.wq.modeset);
 
 	intel_fbc_cleanup(i915);
+
+	DRM_DESTROY_WAITQUEUE(&i915->atomic_commit_wq);
+	spin_lock_destroy(&i915->atomic_commit_lock);
+	mutex_destroy(&i915->drrs.mutex);
 }
 
 /* part #3: call after gem init */
