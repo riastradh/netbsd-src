@@ -220,11 +220,8 @@ enum i915_mmap_type {
 	I915_MMAP_TYPE_WC,
 	I915_MMAP_TYPE_WB,
 	I915_MMAP_TYPE_UC,
-<<<<<<< HEAD
-	I915_MMAP_NTYPES
-=======
 	I915_MMAP_TYPE_FIXED,
->>>>>>> vendor/linux-drm-v6.6.35
+	I915_MMAP_NTYPES
 };
 
 struct i915_mmap_offset {
@@ -663,7 +660,6 @@ struct drm_i915_gem_object {
 		 */
 		struct list_head region_link;
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 		/* internal objects */
 		union {
@@ -679,9 +675,7 @@ struct drm_i915_gem_object {
 		} u;
 #endif
 
-=======
 		struct i915_refct_sgt *rsgt;
->>>>>>> vendor/linux-drm-v6.6.35
 		struct sg_table *pages;
 		void *mapping;
 

@@ -27,11 +27,8 @@
 #include <sys/cdefs.h>
 __KERNEL_RCSID(0, "$NetBSD: i915_gem_object.c,v 1.9 2021/12/19 12:12:31 riastradh Exp $");
 
-<<<<<<< HEAD
 #include <linux/bitmap.h>
-=======
 #include <linux/highmem.h>
->>>>>>> vendor/linux-drm-v6.6.35
 #include <linux/sched/mm.h>
 
 #include <drm/drm_cache.h>
@@ -50,14 +47,8 @@ __KERNEL_RCSID(0, "$NetBSD: i915_gem_object.c,v 1.9 2021/12/19 12:12:31 riastrad
 #include "i915_memcpy.h"
 #include "i915_trace.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-static struct i915_global_object {
-	struct i915_global base;
-	struct kmem_cache *slab_objects;
-} global;
-=======
 static struct kmem_cache *slab_objects;
 
 static const struct drm_gem_object_funcs i915_gem_object_funcs;
@@ -88,7 +79,6 @@ bool i915_gem_object_has_cache_level(const struct drm_i915_gem_object *obj,
 	 */
 	return obj->pat_index == i915_gem_get_pat_index(obj_to_i915(obj), lvl);
 }
->>>>>>> vendor/linux-drm-v6.6.35
 
 struct drm_i915_gem_object *i915_gem_object_alloc(void)
 {
@@ -142,14 +132,8 @@ void i915_gem_object_init(struct drm_i915_gem_object *obj,
 
 	obj->mm.madv = I915_MADV_WILLNEED;
 #ifndef __NetBSD__
-	INIT_RADIX_TREE(&obj->mm.get_page.radix, GFP_KERNEL | __GFP_NOWARN);
-	mutex_init(&obj->mm.get_page.lock);
-<<<<<<< HEAD
-#endif
-=======
 	INIT_RADIX_TREE(&obj->mm.get_dma_page.radix, GFP_KERNEL | __GFP_NOWARN);
 	mutex_init(&obj->mm.get_dma_page.lock);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**
@@ -329,16 +313,12 @@ void __i915_gem_free_object_rcu(struct rcu_head *head)
 		container_of(head, typeof(*obj), rcu);
 	struct drm_i915_private *i915 = to_i915(obj->base.dev);
 
-<<<<<<< HEAD
 	/* i915_gem_object_init */
 	spin_lock_destroy(&obj->mmo.lock);
 	spin_lock_destroy(&obj->vma.lock);
 	mutex_destroy(&obj->mm.lock);
 
-	dma_resv_fini(&obj->base._resv);
 	drm_vma_node_destroy(&obj->base.vma_node);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	i915_gem_object_free(obj);
 
 	GEM_BUG_ON(!atomic_read(&i915->mm.free_count));
@@ -377,12 +357,9 @@ static void __i915_gem_object_free_mmaps(struct drm_i915_gem_object *obj)
 			kfree(mmo);
 		}
 		obj->mmo.offsets = RB_ROOT;
-<<<<<<< HEAD
 #endif
-=======
 	}
 }
->>>>>>> vendor/linux-drm-v6.6.35
 
 /**
  * __i915_gem_object_pages_fini - Clean up pages use of a gem object

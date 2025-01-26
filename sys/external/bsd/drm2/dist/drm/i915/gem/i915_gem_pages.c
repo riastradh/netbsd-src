@@ -62,12 +62,9 @@ void __i915_gem_object_set_pages(struct drm_i915_gem_object *obj,
 
 	obj->mm.get_page.sg_pos = pages->sgl;
 	obj->mm.get_page.sg_idx = 0;
-<<<<<<< HEAD
-#endif
-=======
 	obj->mm.get_dma_page.sg_pos = pages->sgl;
 	obj->mm.get_dma_page.sg_idx = 0;
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	obj->mm.pages = pages;
 
@@ -220,11 +217,6 @@ static void unmap_object(struct drm_i915_gem_object *obj, void *ptr)
 #else
 	if (is_vmalloc_addr(ptr))
 		vunmap(ptr);
-<<<<<<< HEAD
-	else
-		kunmap(kmap_to_page(ptr));
-#endif
-=======
 }
 
 static void flush_tlb_invalidate(struct drm_i915_gem_object *obj)
@@ -240,7 +232,6 @@ static void flush_tlb_invalidate(struct drm_i915_gem_object *obj)
 		intel_gt_invalidate_tlb_full(gt, obj->mm.tlb[id]);
 		obj->mm.tlb[id] = 0;
 	}
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 struct sg_table *
@@ -301,31 +292,13 @@ int __i915_gem_object_put_pages(struct drm_i915_gem_object *obj)
 	if (!IS_ERR_OR_NULL(pages))
 		obj->ops->put_pages(obj, pages);
 
-<<<<<<< HEAD
-	err = 0;
-unlock:
-	mutex_unlock(&obj->mm.lock);
-
-	return err;
-}
-
-#ifndef __NetBSD__
-static inline pte_t iomap_pte(resource_size_t base,
-			      dma_addr_t offset,
-			      pgprot_t prot)
-{
-	return pte_mkspecial(pfn_pte((base + offset) >> PAGE_SHIFT, prot));
-=======
 	return 0;
->>>>>>> vendor/linux-drm-v6.6.35
 }
-#endif
 
 /* The 'mapping' part of i915_gem_object_pin_map() below */
 static void *i915_gem_object_map_page(struct drm_i915_gem_object *obj,
 				      enum i915_map_type type)
 {
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	vaddr_t va;
 	struct page *page;
@@ -374,15 +347,9 @@ static void *i915_gem_object_map_page(struct drm_i915_gem_object *obj,
 
 	return (void *)va;
 #else
-	unsigned long n_pte = obj->base.size >> PAGE_SHIFT;
-	struct sg_table *sgt = obj->mm.pages;
-	pte_t *stack[32], **mem;
-	struct vm_struct *area;
-=======
 	unsigned long n_pages = obj->base.size >> PAGE_SHIFT, i;
 	struct page *stack[32], **pages = stack, *page;
 	struct sgt_iter iter;
->>>>>>> vendor/linux-drm-v6.6.35
 	pgprot_t pgprot;
 	void *vaddr;
 
@@ -431,11 +398,8 @@ static void *i915_gem_object_map_page(struct drm_i915_gem_object *obj,
 	if (pages != stack)
 		kvfree(pages);
 
-<<<<<<< HEAD
-	return area->addr;
-#endif
-=======
 	return vaddr ?: ERR_PTR(-ENOMEM);
+#endif
 }
 
 static void *i915_gem_object_map_pfn(struct drm_i915_gem_object *obj,
@@ -466,7 +430,6 @@ static void *i915_gem_object_map_pfn(struct drm_i915_gem_object *obj,
 		kvfree(pfns);
 
 	return vaddr ?: ERR_PTR(-ENOMEM);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /* get, pin, and map the pages of the object into kernel space */
@@ -611,15 +574,7 @@ void __i915_gem_object_flush_map(struct drm_i915_gem_object *obj,
 	}
 }
 
-<<<<<<< HEAD
-#ifndef __NetBSD__
-struct scatterlist *
-i915_gem_object_get_sg(struct drm_i915_gem_object *obj,
-		       unsigned int n,
-		       unsigned int *offset)
-=======
 void __i915_gem_object_release_map(struct drm_i915_gem_object *obj)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	GEM_BUG_ON(!obj->mm.mapping);
 
@@ -634,6 +589,7 @@ void __i915_gem_object_release_map(struct drm_i915_gem_object *obj)
 	i915_gem_object_unpin_map(obj);
 }
 
+#ifndef __NetBSD__
 struct scatterlist *
 __i915_gem_object_page_iter_get_sg(struct drm_i915_gem_object *obj,
 				   struct i915_gem_object_page_iter *iter,
