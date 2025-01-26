@@ -542,11 +542,7 @@ void hsw_read_infoframe(struct intel_encoder *encoder,
 {
 	struct drm_i915_private *dev_priv = to_i915(encoder->base.dev);
 	enum transcoder cpu_transcoder = crtc_state->cpu_transcoder;
-<<<<<<< HEAD
-	u32 val __unused, *data = frame;
-=======
 	u32 *data = frame;
->>>>>>> vendor/linux-drm-v6.6.35
 	int i;
 
 	for (i = 0; i < len; i += 4)
@@ -2580,11 +2576,8 @@ intel_hdmi_get_i2c_adapter(struct drm_connector *connector)
 
 static void intel_hdmi_create_i2c_symlink(struct drm_connector *connector)
 {
-<<<<<<< HEAD
 #ifndef __NetBSD__ /* XXX i915 hdmi sysfs */
-=======
 	struct drm_i915_private *i915 = to_i915(connector->dev);
->>>>>>> vendor/linux-drm-v6.6.35
 	struct i2c_adapter *adapter = intel_hdmi_get_i2c_adapter(connector);
 	struct kobject *i2c_kobj = &adapter->dev.kobj;
 	struct kobject *connector_kobj = &connector->kdev->kobj;
@@ -2592,12 +2585,8 @@ static void intel_hdmi_create_i2c_symlink(struct drm_connector *connector)
 
 	ret = sysfs_create_link(connector_kobj, i2c_kobj, i2c_kobj->name);
 	if (ret)
-<<<<<<< HEAD
-		DRM_ERROR("Failed to create i2c symlink (%d)\n", ret);
-#endif
-=======
 		drm_err(&i915->drm, "Failed to create i2c symlink (%d)\n", ret);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 }
 
 static void intel_hdmi_remove_i2c_symlink(struct drm_connector *connector)

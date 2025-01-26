@@ -197,6 +197,7 @@ static u32 bxt_get_backlight(struct intel_connector *connector, enum pipe unused
 	return intel_de_read(i915, BXT_BLC_PWM_DUTY(panel->backlight.controller));
 }
 
+#ifndef __NetBSD__		/* XXX mipi */
 static u32 ext_pwm_get_backlight(struct intel_connector *connector, enum pipe unused)
 {
 	struct intel_panel *panel = &connector->panel;
@@ -205,6 +206,7 @@ static u32 ext_pwm_get_backlight(struct intel_connector *connector, enum pipe un
 	pwm_get_state(panel->backlight.pwm, &state);
 	return pwm_get_relative_duty_cycle(&state, 100);
 }
+#endif
 
 static void lpt_set_backlight(const struct drm_connector_state *conn_state, u32 level)
 {
@@ -274,6 +276,7 @@ static void bxt_set_backlight(const struct drm_connector_state *conn_state, u32 
 	intel_de_write(i915, BXT_BLC_PWM_DUTY(panel->backlight.controller), level);
 }
 
+#ifndef __NetBSD__		/* XXX mipi */
 static void ext_pwm_set_backlight(const struct drm_connector_state *conn_state, u32 level)
 {
 	struct intel_panel *panel = &to_intel_connector(conn_state->connector)->panel;
@@ -281,6 +284,7 @@ static void ext_pwm_set_backlight(const struct drm_connector_state *conn_state, 
 	pwm_set_relative_duty_cycle(&panel->backlight.pwm_state, level, 100);
 	pwm_apply_might_sleep(panel->backlight.pwm, &panel->backlight.pwm_state);
 }
+#endif
 
 static void
 intel_panel_actually_set_backlight(const struct drm_connector_state *conn_state, u32 level)
@@ -322,11 +326,13 @@ void intel_backlight_set_acpi(const struct drm_connector_state *conn_state,
 	hw_level = clamp_user_to_hw(connector, user_level, user_max);
 	panel->backlight.level = hw_level;
 
+#ifndef __NetBSD__		/* XXX backlight */
 	if (panel->backlight.device)
 		panel->backlight.device->props.brightness =
 			scale_hw_to_user(connector,
 					 panel->backlight.level,
 					 panel->backlight.device->props.max_brightness);
+#endif
 
 	if (panel->backlight.enabled)
 		intel_panel_actually_set_backlight(conn_state, hw_level);
@@ -424,6 +430,7 @@ static void cnp_disable_backlight(const struct drm_connector_state *old_conn_sta
 		     BXT_BLC_PWM_ENABLE, 0);
 }
 
+#ifndef __NetBSD__		/* XXX mipi */
 static void ext_pwm_disable_backlight(const struct drm_connector_state *old_conn_state, u32 level)
 {
 	struct intel_connector *connector = to_intel_connector(old_conn_state->connector);
@@ -434,6 +441,7 @@ static void ext_pwm_disable_backlight(const struct drm_connector_state *old_conn
 	panel->backlight.pwm_state.enabled = false;
 	pwm_apply_might_sleep(panel->backlight.pwm, &panel->backlight.pwm_state);
 }
+#endif
 
 void intel_backlight_disable(const struct drm_connector_state *old_conn_state)
 {
@@ -458,8 +466,10 @@ void intel_backlight_disable(const struct drm_connector_state *old_conn_state)
 
 	mutex_lock(&i915->display.backlight.lock);
 
+#ifndef __NetBSD__		/* XXX backlight */
 	if (panel->backlight.device)
 		panel->backlight.device->props.power = FB_BLANK_POWERDOWN;
+#endif
 	panel->backlight.enabled = false;
 	panel->backlight.funcs->disable(old_conn_state, 0);
 
@@ -746,6 +756,7 @@ static void cnp_enable_backlight(const struct intel_crtc_state *crtc_state,
 		       pwm_ctl | BXT_BLC_PWM_ENABLE);
 }
 
+#ifndef __NetBSD__		/* XXX mipi */
 static void ext_pwm_enable_backlight(const struct intel_crtc_state *crtc_state,
 				     const struct drm_connector_state *conn_state, u32 level)
 {
@@ -756,6 +767,7 @@ static void ext_pwm_enable_backlight(const struct intel_crtc_state *crtc_state,
 	panel->backlight.pwm_state.enabled = true;
 	pwm_apply_might_sleep(panel->backlight.pwm, &panel->backlight.pwm_state);
 }
+#endif
 
 static void __intel_backlight_enable(const struct intel_crtc_state *crtc_state,
 				     const struct drm_connector_state *conn_state)
@@ -767,17 +779,21 @@ static void __intel_backlight_enable(const struct intel_crtc_state *crtc_state,
 
 	if (panel->backlight.level <= panel->backlight.min) {
 		panel->backlight.level = panel->backlight.max;
+#ifndef __NetBSD__		/* XXX backlight */
 		if (panel->backlight.device)
 			panel->backlight.device->props.brightness =
 				scale_hw_to_user(connector,
 						 panel->backlight.level,
 						 panel->backlight.device->props.max_brightness);
+#endif
 	}
 
 	panel->backlight.funcs->enable(crtc_state, conn_state, panel->backlight.level);
 	panel->backlight.enabled = true;
+#ifndef __NetBSD__		/* XXX backlight */
 	if (panel->backlight.device)
 		panel->backlight.device->props.power = FB_BLANK_UNBLANK;
+#endif
 }
 
 void intel_backlight_enable(const struct intel_crtc_state *crtc_state,
@@ -1744,6 +1760,7 @@ static const struct intel_panel_bl_funcs pch_pwm_funcs = {
 	.hz_to_pwm = pch_hz_to_pwm,
 };
 
+#ifndef __NetBSD__		/* XXX mipi */
 static const struct intel_panel_bl_funcs ext_pwm_funcs = {
 	.setup = ext_pwm_setup_backlight,
 	.enable = ext_pwm_enable_backlight,
@@ -1751,6 +1768,7 @@ static const struct intel_panel_bl_funcs ext_pwm_funcs = {
 	.set = ext_pwm_set_backlight,
 	.get = ext_pwm_get_backlight,
 };
+#endif
 
 static const struct intel_panel_bl_funcs vlv_pwm_funcs = {
 	.setup = vlv_setup_backlight,
@@ -1811,7 +1829,11 @@ void intel_backlight_init_funcs(struct intel_panel *panel)
 		panel->backlight.pwm_funcs = &pch_pwm_funcs;
 	} else if (IS_VALLEYVIEW(i915) || IS_CHERRYVIEW(i915)) {
 		if (connector->base.connector_type == DRM_MODE_CONNECTOR_DSI) {
+#ifdef __NetBSD__
+			panic("no muppets supported, sorry");
+#else
 			panel->backlight.pwm_funcs = &ext_pwm_funcs;
+#endif
 		} else {
 			panel->backlight.pwm_funcs = &vlv_pwm_funcs;
 		}

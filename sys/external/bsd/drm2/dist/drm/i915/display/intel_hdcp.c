@@ -2545,13 +2545,6 @@ void intel_hdcp_cleanup(struct intel_connector *connector)
 	if (!hdcp->shim)
 		return;
 
-<<<<<<< HEAD
-	mutex_lock(&connector->hdcp.mutex);
-	kfree(connector->hdcp.port_data.streams);
-	mutex_unlock(&connector->hdcp.mutex);
-
-	mutex_destroy(&connector->hdcp.mutex);
-=======
 	/*
 	 * If the connector is registered, it's possible userspace could kick
 	 * off another HDCP enable, which would re-spawn the workers.
@@ -2579,7 +2572,8 @@ void intel_hdcp_cleanup(struct intel_connector *connector)
 	mutex_lock(&hdcp->mutex);
 	hdcp->shim = NULL;
 	mutex_unlock(&hdcp->mutex);
->>>>>>> vendor/linux-drm-v6.6.35
+
+	mutex_destroy(&hdcp->mutex);
 }
 
 void intel_hdcp_atomic_check(struct drm_connector *connector,
