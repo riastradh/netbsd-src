@@ -15,18 +15,10 @@ __KERNEL_RCSID(0, "$NetBSD: i915_scheduler.c,v 1.8 2021/12/21 12:06:29 tnn Exp $
 #include "i915_request.h"
 #include "i915_scheduler.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-static struct i915_global_scheduler {
-	struct i915_global base;
-	struct kmem_cache *slab_dependencies;
-	struct kmem_cache *slab_priorities;
-} global;
-=======
 static struct kmem_cache *slab_dependencies;
 static struct kmem_cache *slab_priorities;
->>>>>>> vendor/linux-drm-v6.6.35
 
 #ifdef __NetBSD__
 static spinlock_t schedule_lock;
@@ -67,15 +59,10 @@ static void assert_priolists(struct i915_sched_engine * const sched_engine)
 	GEM_BUG_ON(rb_first_cached(&sched_engine->queue) !=
 		   rb_first(&sched_engine->queue.rb_root));
 
-<<<<<<< HEAD
-	last_prio = (INT_MAX >> I915_USER_PRIORITY_SHIFT) + 1;
-	for (rb = rb_first_cached(&execlists->queue);
-	     rb;
-	     rb = rb_next2(&execlists->queue.rb_root, rb)) {
-=======
 	last_prio = INT_MAX;
-	for (rb = rb_first_cached(&sched_engine->queue); rb; rb = rb_next(rb)) {
->>>>>>> vendor/linux-drm-v6.6.35
+	for (rb = rb_first_cached(&sched_engine->queue);
+	     rb;
+	     rb = rb_next2(&sched_engine->queue.rb_root, rb)) {
 		const struct i915_priolist *p = to_priolist(rb);
 
 		GEM_BUG_ON(p->priority > last_prio);
@@ -118,18 +105,6 @@ static const rb_tree_ops_t i915_priolist_rb_ops = {
 };
 
 #endif
-
-void
-i915_sched_init(struct intel_engine_execlists *execlists)
-{
-
-#ifdef __NetBSD__
-	rb_tree_init(&execlists->queue.rb_root.rbr_tree,
-	    &i915_priolist_rb_ops);
-#else
-	execlists->queue = RB_ROOT_CACHED;
-#endif
-}
 
 struct list_head *
 i915_sched_lookup_priolist(struct i915_sched_engine *sched_engine, int prio)
@@ -193,25 +168,17 @@ find_priolist:
 	}
 
 	p->priority = prio;
-<<<<<<< HEAD
-	for (i = 0; i < ARRAY_SIZE(p->requests); i++)
-		INIT_LIST_HEAD(&p->requests[i]);
+	INIT_LIST_HEAD(&p->requests);
+
 #ifdef __NetBSD__
 	struct i915_priolist *collision __diagused;
-	collision = rb_tree_insert_node(&execlists->queue.rb_root.rbr_tree,
+	collision = rb_tree_insert_node(&sched_engine->queue.rb_root.rbr_tree,
 	    p);
 	KASSERT(collision == p);
 #else
 	rb_link_node(&p->node, rb, parent);
-	rb_insert_color_cached(&p->node, &execlists->queue, first);
-#endif
-	p->used = 0;
-=======
-	INIT_LIST_HEAD(&p->requests);
->>>>>>> vendor/linux-drm-v6.6.35
-
-	rb_link_node(&p->node, rb, parent);
 	rb_insert_color_cached(&p->node, &sched_engine->queue, first);
+#endif
 
 	return &p->requests;
 }
@@ -559,7 +526,12 @@ i915_sched_engine_create(unsigned int subclass)
 
 	kref_init(&sched_engine->ref);
 
+#ifdef __NetBSD__
+	rb_tree_init(&sched_engine->queue.rb_root.rbr_tree,
+	    &i915_priolist_rb_ops);
+#else
 	sched_engine->queue = RB_ROOT_CACHED;
+#endif
 	sched_engine->queue_priority_hint = INT_MIN;
 	sched_engine->destroy = default_destroy;
 	sched_engine->disabled = default_disabled;

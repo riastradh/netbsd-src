@@ -51,9 +51,6 @@ static inline void i915_priolist_free(struct i915_priolist *p)
 		__i915_priolist_free(p);
 }
 
-<<<<<<< HEAD
-void i915_sched_init(struct intel_engine_execlists *);
-=======
 struct i915_sched_engine *
 i915_sched_engine_create(unsigned int subclass);
 
@@ -83,18 +80,38 @@ i915_sched_engine_reset_on_empty(struct i915_sched_engine *sched_engine)
 		sched_engine->no_priolist = false;
 }
 
+#ifdef __NetBSD__
 static inline void
+#else
+static inline int
+#endif
 i915_sched_engine_active_lock_bh(struct i915_sched_engine *sched_engine)
 {
+#ifdef __NetBSD__
+	int s = splsoftserial();
+#else
 	local_bh_disable(); /* prevent local softirq and lock recursion */
+#endif
 	tasklet_lock(&sched_engine->tasklet);
+#ifdef __NetBSD__
+	return s;
+#endif
 }
 
 static inline void
+#ifdef __NetBSD__
+i915_sched_engine_active_unlock_bh(struct i915_sched_engine *sched_engine,
+    int s)
+#else
 i915_sched_engine_active_unlock_bh(struct i915_sched_engine *sched_engine)
+#endif
 {
 	tasklet_unlock(&sched_engine->tasklet);
+#ifdef __NetBSD__
+	splx(s);
+#else
 	local_bh_enable(); /* restore softirq, and kick ksoftirqd! */
+#endif
 }
 
 void i915_request_show_with_schedule(struct drm_printer *m,
@@ -110,6 +127,5 @@ i915_sched_engine_disabled(struct i915_sched_engine *sched_engine)
 
 void i915_scheduler_module_exit(void);
 int i915_scheduler_module_init(void);
->>>>>>> vendor/linux-drm-v6.6.35
 
 #endif /* _I915_SCHEDULER_H_ */

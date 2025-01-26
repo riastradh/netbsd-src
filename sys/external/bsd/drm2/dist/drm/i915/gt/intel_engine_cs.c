@@ -719,11 +719,7 @@ void intel_engines_free(struct intel_gt *gt)
 	rcu_barrier();
 
 	for_each_engine(engine, gt, id) {
-<<<<<<< HEAD
-		seqlock_destroy(&engine->stats.lock);
-=======
 		intel_engine_free_request_pool(engine);
->>>>>>> vendor/linux-drm-v6.6.35
 		kfree(engine);
 		gt->engine[id] = NULL;
 	}
@@ -1065,12 +1061,6 @@ void intel_engine_init_execlists(struct intel_engine_cs *engine)
 	memset(execlists->pending, 0, sizeof(execlists->pending));
 	execlists->active =
 		memset(execlists->inflight, 0, sizeof(execlists->inflight));
-<<<<<<< HEAD
-
-	execlists->queue_priority_hint = INT_MIN;
-	i915_sched_init(execlists);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static void cleanup_status_page(struct intel_engine_cs *engine)
@@ -1567,12 +1557,7 @@ void intel_engine_cleanup_common(struct intel_engine_cs *engine)
 	intel_breadcrumbs_put(engine->breadcrumbs);
 
 	intel_engine_fini_retire(engine);
-<<<<<<< HEAD
 	intel_engine_fini__pm(engine);
-	intel_engine_pool_fini(&engine->pool);
-	intel_engine_fini_breadcrumbs(engine);
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	intel_engine_cleanup_cmd_parser(engine);
 
 	if (engine->default_state)
@@ -1587,8 +1572,6 @@ void intel_engine_cleanup_common(struct intel_engine_cs *engine)
 	intel_wa_list_free(&engine->ctx_wa_list);
 	intel_wa_list_free(&engine->wa_list);
 	intel_wa_list_free(&engine->whitelist);
-
-	spin_lock_destroy(&engine->active.lock);
 }
 
 /**
@@ -1893,37 +1876,25 @@ void __intel_engine_flush_submission(struct intel_engine_cs *engine, bool sync)
 {
 	struct tasklet_struct *t = &engine->sched_engine->tasklet;
 
-<<<<<<< HEAD
-	if (__tasklet_is_scheduled(t)) {
-#ifdef __NetBSD__
-		int s = splsoftserial();
-#else
-		local_bh_disable();
-#endif
-		if (tasklet_trylock(t)) {
-			/* Must wait for any GPU reset in progress. */
-			if (__tasklet_is_enabled(t))
-				t->func(t->data);
-			tasklet_unlock(t);
-		}
-#ifdef __NetBSD__
-		splx(s);
-#else
-		local_bh_enable();
-#endif
-=======
 	if (!t->callback)
 		return;
 
+#ifdef __NetBSD__
+	const int s = splsoftserial();
+#else
 	local_bh_disable();
+#endif
 	if (tasklet_trylock(t)) {
 		/* Must wait for any GPU reset in progress. */
 		if (__tasklet_is_enabled(t))
 			t->callback(t);
 		tasklet_unlock(t);
->>>>>>> vendor/linux-drm-v6.6.35
 	}
+#ifdef __NetBSD__
+	splx(s);
+#else
 	local_bh_enable();
+#endif
 
 	/* Synchronise and wait for the tasklet on another CPU */
 	if (sync)
@@ -1947,23 +1918,8 @@ bool intel_engine_is_idle(struct intel_engine_cs *engine)
 		return true;
 
 	/* Waiting to drain ELSP? */
-<<<<<<< HEAD
-	if (execlists_active(&engine->execlists)) {
-#ifdef __NetBSD__
-		xc_barrier(XC_HIGHPRI);
-#else
-		synchronize_hardirq(engine->i915->drm.pdev->irq);
-#endif
-
-		intel_engine_flush_submission(engine);
-
-		if (execlists_active(&engine->execlists))
-			return false;
-	}
-=======
 	intel_synchronize_hardirq(engine->i915);
 	intel_engine_flush_submission(engine);
->>>>>>> vendor/linux-drm-v6.6.35
 
 	/* ELSP is empty, but there are ready requests? E.g. after reset */
 	if (!i915_sched_engine_is_empty(engine->sched_engine))
@@ -2079,22 +2035,6 @@ static int print_ring(char *buf, int sz, struct i915_request *rq)
 	if (!i915_request_signaled(rq)) {
 		struct intel_timeline *tl = get_timeline(rq);
 
-<<<<<<< HEAD
-	drm_printf(m, "%s %"PRIx64":%"PRIx64"%s%s %s @ %dms: %s\n",
-		   prefix,
-		   (uint64_t)rq->fence.context, (uint64_t)rq->fence.seqno,
-		   i915_request_completed(rq) ? "!" :
-		   i915_request_started(rq) ? "*" :
-		   "",
-		   test_bit(DMA_FENCE_FLAG_SIGNALED_BIT,
-			    &rq->fence.flags) ? "+" :
-		   test_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT,
-			    &rq->fence.flags) ? "-" :
-		   "",
-		   buf,
-		   jiffies_to_msecs(jiffies - rq->emitted_jiffies),
-		   name);
-=======
 		len = scnprintf(buf, sz,
 				"ring:{start:%08x, hwsp:%08x, seqno:%08x, runtime:%llums}, ",
 				i915_ggtt_offset(rq->ring->vma),
@@ -2108,7 +2048,6 @@ static int print_ring(char *buf, int sz, struct i915_request *rq)
 	}
 
 	return len;
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 #define	hexdump	intel_hexdump
@@ -2235,19 +2174,13 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 		u8 read, write;
 
 		drm_printf(m, "\tExeclist tasklet queued? %s (%s), preempt? %s, timeslice? %s\n",
-<<<<<<< HEAD
 #ifdef __NetBSD__		/* XXX sigh */
 			   "<abstraction violation>",
 			   "<abstraction violation>",
 #else
-			   yesno(test_bit(TASKLET_STATE_SCHED,
-					  &engine->execlists.tasklet.state)),
-			   enableddisabled(!atomic_read(&engine->execlists.tasklet.count)),
-#endif
-=======
 			   str_yes_no(test_bit(TASKLET_STATE_SCHED, &engine->sched_engine->tasklet.state)),
 			   str_enabled_disabled(!atomic_read(&engine->sched_engine->tasklet.count)),
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 			   repr_timer(&engine->execlists.preempt),
 			   repr_timer(&engine->execlists.timer));
 
@@ -2271,15 +2204,11 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 				   idx, hws[idx * 2], hws[idx * 2 + 1]);
 		}
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
-		int s = execlists_active_lock_bh(execlists);
+		int s = i915_sched_engine_active_lock_bh(engine->sched_engine);
 #else
-		execlists_active_lock_bh(execlists);
-#endif
-=======
 		i915_sched_engine_active_lock_bh(engine->sched_engine);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 		rcu_read_lock();
 		for (port = execlists->active; (rq = *port); port++) {
 			char hdr[160];
@@ -2310,17 +2239,12 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 			i915_request_show(m, rq, hdr, 0);
 		}
 		rcu_read_unlock();
-<<<<<<< HEAD
 #ifdef __NetBSD__
-		execlists_active_unlock_bh(execlists, s);
+		i915_sched_engine_active_unlock_bh(engine->sched_engine, s);
 #else
-		execlists_active_unlock_bh(execlists);
-#endif
-	} else if (INTEL_GEN(dev_priv) > 6) {
-=======
 		i915_sched_engine_active_unlock_bh(engine->sched_engine);
+#endif
 	} else if (GRAPHICS_VER(i915) > 6) {
->>>>>>> vendor/linux-drm-v6.6.35
 		drm_printf(m, "\tPP_DIR_BASE: 0x%08x\n",
 			   ENGINE_READ(engine, RING_PP_DIR_BASE));
 		drm_printf(m, "\tPP_DIR_BASE_READ: 0x%08x\n",
@@ -2551,84 +2475,6 @@ void intel_engine_dump(struct intel_engine_cs *engine,
 }
 
 /**
-<<<<<<< HEAD
- * intel_enable_engine_stats() - Enable engine busy tracking on engine
- * @engine: engine to enable stats collection
- *
- * Start collecting the engine busyness data for @engine.
- *
- * Returns 0 on success or a negative error code.
- */
-int intel_enable_engine_stats(struct intel_engine_cs *engine)
-{
-	struct intel_engine_execlists *execlists = &engine->execlists;
-	unsigned long flags;
-	int err = 0;
-
-	if (!intel_engine_supports_stats(engine))
-		return -ENODEV;
-
-#ifdef __NetBSD__
-	int s = execlists_active_lock_bh(execlists);
-#else
-	execlists_active_lock_bh(execlists);
-#endif
-	write_seqlock_irqsave(&engine->stats.lock, flags);
-
-	if (unlikely(engine->stats.enabled == ~0)) {
-		err = -EBUSY;
-		goto unlock;
-	}
-
-	if (engine->stats.enabled++ == 0) {
-		struct i915_request * const *port;
-		struct i915_request *rq;
-
-		engine->stats.enabled_at = ktime_get();
-
-		/* XXX submission method oblivious? */
-		for (port = execlists->active; (rq = *port); port++)
-			engine->stats.active++;
-
-		for (port = execlists->pending; (rq = *port); port++) {
-			/* Exclude any contexts already counted in active */
-			if (!intel_context_inflight_count(rq->context))
-				engine->stats.active++;
-		}
-
-		if (engine->stats.active)
-			engine->stats.start = engine->stats.enabled_at;
-	}
-
-unlock:
-	write_sequnlock_irqrestore(&engine->stats.lock, flags);
-#ifdef __NetBSD__
-	execlists_active_unlock_bh(execlists, s);
-#else
-	execlists_active_unlock_bh(execlists);
-#endif
-
-	return err;
-}
-
-static ktime_t __intel_engine_get_busy_time(struct intel_engine_cs *engine)
-{
-	ktime_t total = engine->stats.total;
-
-	/*
-	 * If the engine is executing something at the moment
-	 * add it to the total.
-	 */
-	if (engine->stats.active)
-		total = ktime_add(total,
-				  ktime_sub(ktime_get(), engine->stats.start));
-
-	return total;
-}
-
-/**
-=======
->>>>>>> vendor/linux-drm-v6.6.35
  * intel_engine_get_busy_time() - Return current accumulated engine busyness
  * @engine: engine to report on
  * @now: monotonic timestamp of sampling
