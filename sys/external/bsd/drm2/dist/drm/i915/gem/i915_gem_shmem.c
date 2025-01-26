@@ -27,48 +27,21 @@ __KERNEL_RCSID(0, "$NetBSD: i915_gem_shmem.c,v 1.12 2021/12/24 15:07:47 riastrad
  * Move folios to appropriate lru and release the batch, decrementing the
  * ref count of those folios.
  */
-<<<<<<< HEAD
 #ifndef __NetBSD__
-static void check_release_pagevec(struct pagevec *pvec)
-=======
 static void check_release_folio_batch(struct folio_batch *fbatch)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	check_move_unevictable_folios(fbatch);
 	__folio_batch_release(fbatch);
 	cond_resched();
 }
-#endif
 
-void shmem_sg_free_table(struct sg_table *st, struct address_space *mapping,
+void shmem_sg_free_table(struct sg_table *st, struct uvm_object *mapping,
 			 bool dirty, bool backup)
 {
-<<<<<<< HEAD
-	struct drm_i915_private *i915 = to_i915(obj->base.dev);
-	struct intel_memory_region *mem = obj->mm.region;
-	const unsigned long page_count = obj->base.size / PAGE_SIZE;
-	unsigned long i;
-#ifdef __NetBSD__
-	struct uvm_object *mapping;
-#else
-	struct address_space *mapping;
-#endif
-	struct sg_table *st;
-	struct scatterlist *sg;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	struct sgt_iter sgt_iter;
 	struct folio_batch fbatch;
 	struct folio *last = NULL;
 	struct page *page;
-<<<<<<< HEAD
-	unsigned long last_pfn = 0;	/* suppress gcc warning */
-	unsigned int max_segment = i915_sg_segment_size();
-	unsigned int sg_page_sizes;
-#ifndef __NetBSD__
-	struct pagevec pvec;
-#endif
-=======
 
 	mapping_clear_unevictable(mapping);
 
@@ -92,17 +65,21 @@ void shmem_sg_free_table(struct sg_table *st, struct address_space *mapping,
 
 	sg_free_table(st);
 }
+#endif
 
 int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 			 size_t size, struct intel_memory_region *mr,
+#ifdef __NetBSD__
+			 struct uvm_object *mapping,
+#else
 			 struct address_space *mapping,
+#endif
 			 unsigned int max_segment)
 {
 	unsigned int page_count; /* restricted by sg_alloc_table */
 	unsigned long i;
 	struct scatterlist *sg;
 	unsigned long next_pfn = 0;	/* suppress gcc warning */
->>>>>>> vendor/linux-drm-v6.6.35
 	gfp_t noreclaim;
 	int ret;
 
@@ -126,14 +103,9 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 	 *
 	 * Fail silently without starting the shrinker
 	 */
-<<<<<<< HEAD
 #ifdef __NetBSD__
-	mapping = obj->base.filp;
-	noreclaim = GFP_KERNEL;
+	reclaim = GFP_KERNEL;
 #else
-	mapping = obj->base.filp->f_mapping;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	mapping_set_unevictable(mapping);
 	noreclaim = mapping_gfp_constraint(mapping, ~__GFP_RECLAIM);
 #endif
@@ -196,17 +168,14 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 #endif
 		} while (1);
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
 		__USE(last_pfn);
 		KASSERT(st->nents == i);
 		sg->sg_pgs[st->nents++] = page;
 		sg_page_sizes |= PAGE_SIZE; /* XXX compress contiguous pages */
 #else
-=======
 		nr_pages = min_t(unsigned long,
 				folio_nr_pages(folio), page_count - i);
->>>>>>> vendor/linux-drm-v6.6.35
 		if (!i ||
 		    sg->length >= max_segment ||
 		    folio_pfn(folio) != next_pfn) {
@@ -223,90 +192,31 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 		i += nr_pages - 1;
 
 		/* Check that the i965g/gm workaround works. */
-<<<<<<< HEAD
-		WARN_ON((gfp & __GFP_DMA32) && (last_pfn >= 0x00100000UL));
+		GEM_BUG_ON(gfp & __GFP_DMA32 && next_pfn >= 0x00100000UL);
 #endif
 	}
 #ifndef __NetBSD__
-	if (sg) { /* loop terminated early; short sg table */
-		sg_page_sizes |= sg->length;
-		sg_mark_end(sg);
-	}
-#endif
-=======
-		GEM_BUG_ON(gfp & __GFP_DMA32 && next_pfn >= 0x00100000UL);
-	}
 	if (sg) /* loop terminated early; short sg table */
 		sg_mark_end(sg);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	/* Trim unused sg entries to avoid wasting memory. */
 	i915_sg_trim(st);
 
-<<<<<<< HEAD
-	ret = i915_gem_gtt_prepare_pages(obj, st);
-	if (ret) {
-		/*
-		 * DMA remapping failed? One possible cause is that
-		 * it could not reserve enough large entries, asking
-		 * for PAGE_SIZE chunks instead may be helpful.
-		 */
-		if (max_segment > PAGE_SIZE) {
-#ifdef __NetBSD__
-			__USE(sgt_iter);
-			uvm_obj_unwirepages(mapping, 0, obj->base.size);
-#else
-			for_each_sgt_page(page, sgt_iter, st)
-				put_page(page);
-#endif
-			sg_free_table(st);
-
-			max_segment = PAGE_SIZE;
-			goto rebuild_st;
-		} else {
-			dev_warn(i915->drm.dev,
-				 "Failed to DMA remap %lu pages\n",
-				 page_count);
-			goto err_pages;
-		}
-	}
-
-	if (i915_gem_object_needs_bit17_swizzle(obj))
-		i915_gem_object_do_bit_17_swizzle(obj, st);
-
-	__i915_gem_object_set_pages(obj, st, sg_page_sizes);
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	return 0;
 err_sg:
-#ifndef __NetBSD__
-	sg_mark_end(sg);
-<<<<<<< HEAD
-#endif
-err_pages:
 #ifdef __NetBSD__
 	uvm_obj_unwirepages(mapping, 0, obj->base.size);
-#else
-	mapping_clear_unevictable(mapping);
-	pagevec_init(&pvec);
-	for_each_sgt_page(page, sgt_iter, st) {
-		if (!pagevec_add(&pvec, page))
-			check_release_pagevec(&pvec);
-	}
-	if (pagevec_count(&pvec))
-		check_release_pagevec(&pvec);
-#endif
 	sg_free_table(st);
-	kfree(st);
-=======
+#else
+	sg_mark_end(sg);
 	if (sg != st->sgl) {
 		shmem_sg_free_table(st, mapping, false, false);
 	} else {
 		mapping_clear_unevictable(mapping);
 		sg_free_table(st);
 	}
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 
 	/*
 	 * shmemfs first checks if there is enough memory to allocate the page
@@ -327,7 +237,11 @@ static int shmem_get_pages(struct drm_i915_gem_object *obj)
 {
 	struct drm_i915_private *i915 = to_i915(obj->base.dev);
 	struct intel_memory_region *mem = obj->mm.region;
+#ifdef __NetBSD__
+	struct uvm_object *mapping = obj->base.filp;
+#else
 	struct address_space *mapping = obj->base.filp->f_mapping;
+#endif
 	unsigned int max_segment = i915_sg_segment_size(i915->drm.dev);
 	struct sg_table *st;
 	struct sgt_iter sgt_iter;
@@ -360,8 +274,13 @@ rebuild_st:
 		 * for PAGE_SIZE chunks instead may be helpful.
 		 */
 		if (max_segment > PAGE_SIZE) {
+#ifdef __NetBSD__
+			__USE(sgt_iter);
+			uvm_obj_unwirepages(mapping, 0, obj->base.size);
+#else
 			for_each_sgt_page(page, sgt_iter, st)
 				put_page(page);
+#endif
 			sg_free_table(st);
 			kfree(st);
 
@@ -386,7 +305,12 @@ rebuild_st:
 	return 0;
 
 err_pages:
+#ifdef __NetBSD__
+	uvm_obj_unwirepages(mapping, 0, obj->base.size);
+	sg_free_table(st);
+#else
 	shmem_sg_free_table(st, mapping, false, false);
+#endif
 	/*
 	 * shmemfs first checks if there is enough memory to allocate the page
 	 * and reports ENOSPC should there be insufficient, along with the usual
@@ -423,11 +347,7 @@ shmem_truncate(struct drm_i915_gem_object *obj)
 
 void __shmem_writeback(size_t size, struct address_space *mapping)
 {
-<<<<<<< HEAD
 #ifndef __NetBSD__
-	struct address_space *mapping;
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	struct writeback_control wbc = {
 		.sync_mode = WB_SYNC_NONE,
 		.nr_to_write = SWAP_CLUSTER_MAX,
@@ -522,15 +442,6 @@ __i915_gem_object_release_shmem(struct drm_i915_gem_object *obj,
 
 void i915_gem_object_put_pages_shmem(struct drm_i915_gem_object *obj, struct sg_table *pages)
 {
-<<<<<<< HEAD
-	struct sgt_iter sgt_iter;
-#ifndef __NetBSD__
-	struct pagevec pvec;
-	struct page *page;
-#endif
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	__i915_gem_object_release_shmem(obj, pages, true);
 
 	i915_gem_gtt_finish_pages(obj, pages);
@@ -538,44 +449,24 @@ void i915_gem_object_put_pages_shmem(struct drm_i915_gem_object *obj, struct sg_
 	if (i915_gem_object_needs_bit17_swizzle(obj))
 		i915_gem_object_save_bit_17_swizzle(obj, pages);
 
-<<<<<<< HEAD
 #ifdef __NetBSD__
-	__USE(sgt_iter);
 	if (obj->mm.dirty) {
 		unsigned i;
 
 		rw_enter(obj->base.filp->vmobjlock, RW_WRITER);
 		for (i = 0; i < pages->sgl->sg_npgs; i++) {
+			/* XXX MADV_WILLNEED? */
 			uvm_pagemarkdirty(&pages->sgl->sg_pgs[i]->p_vmp,
 			    UVM_PAGE_STATUS_DIRTY);
 		}
 		rw_exit(obj->base.filp->vmobjlock);
 	}
 	uvm_obj_unwirepages(obj->base.filp, 0, obj->base.size);
-#else
-	mapping_clear_unevictable(file_inode(obj->base.filp)->i_mapping);
-
-	pagevec_init(&pvec);
-	for_each_sgt_page(page, sgt_iter, pages) {
-		if (obj->mm.dirty)
-			set_page_dirty(page);
-
-		if (obj->mm.madv == I915_MADV_WILLNEED)
-			mark_page_accessed(page);
-
-		if (!pagevec_add(&pvec, page))
-			check_release_pagevec(&pvec);
-	}
-	if (pagevec_count(&pvec))
-		check_release_pagevec(&pvec);
-#endif
-	obj->mm.dirty = false;
-
 	sg_free_table(pages);
-=======
+#else
 	shmem_sg_free_table(pages, file_inode(obj->base.filp)->i_mapping,
 			    obj->mm.dirty, obj->mm.madv == I915_MADV_WILLNEED);
->>>>>>> vendor/linux-drm-v6.6.35
+#endif
 	kfree(pages);
 	obj->mm.dirty = false;
 }
@@ -597,11 +488,8 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 	struct uvm_object *mapping = obj->base.filp;
 #else
 	struct address_space *mapping = obj->base.filp->f_mapping;
-<<<<<<< HEAD
 #endif
-=======
 	const struct address_space_operations *aops = mapping->a_ops;
->>>>>>> vendor/linux-drm-v6.6.35
 	char __user *user_data = u64_to_user_ptr(arg->data_ptr);
 	u64 remain, offset;
 	unsigned int pg;
