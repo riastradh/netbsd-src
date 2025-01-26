@@ -454,12 +454,7 @@ void i915_gem_driver_unregister__shrinker(struct drm_i915_private *i915)
 void i915_gem_shrinker_taints_mutex(struct drm_i915_private *i915,
 				    struct mutex *mutex)
 {
-<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_LOCKDEP)
-	bool unlock = false;
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	if (!IS_ENABLED(CONFIG_LOCKDEP))
 		return;
 
@@ -469,13 +464,7 @@ void i915_gem_shrinker_taints_mutex(struct drm_i915_private *i915,
 	mutex_release(&mutex->dep_map, _RET_IP_);
 
 	fs_reclaim_release(GFP_KERNEL);
-<<<<<<< HEAD
-
-	if (unlock)
-		mutex_release(&i915->drm.struct_mutex.dep_map, _RET_IP_);
 #endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 /**

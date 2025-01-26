@@ -140,11 +140,6 @@ static int adjust_stolen(struct drm_i915_private *i915,
 		}
 	}
 
-<<<<<<< HEAD
-#ifdef __NetBSD__		/* XXX */
-	__USE(r);
-#else
-=======
 	if (!valid_stolen_size(i915, dsm))
 		return -EINVAL;
 
@@ -166,7 +161,9 @@ static int request_smem_stolen(struct drm_i915_private *i915,
 	if (HAS_LMEM(i915) || HAS_LMEMBAR_SMEM_STOLEN(i915))
 		return 0;
 
->>>>>>> vendor/linux-drm-v6.6.35
+#ifdef __NetBSD__		/* XXX i915 stolen */
+	__USE(r);
+#else
 	/*
 	 * Verify that nothing else uses this physical address. Stolen
 	 * memory should be reserved by the BIOS and hidden from the
@@ -402,13 +399,7 @@ static void icl_get_stolen_reserved(struct drm_i915_private *i915,
 {
 	u64 reg_val = intel_uncore_read64(uncore, GEN6_STOLEN_RESERVED);
 
-<<<<<<< HEAD
-	DRM_DEBUG_DRIVER("GEN6_STOLEN_RESERVED = 0x%016"PRIx64"\n", reg_val);
-
-	*base = reg_val & GEN11_STOLEN_RESERVED_ADDR_MASK;
-=======
-	drm_dbg(&i915->drm, "GEN6_STOLEN_RESERVED = 0x%016llx\n", reg_val);
->>>>>>> vendor/linux-drm-v6.6.35
+	drm_dbg(&i915->drm, "GEN6_STOLEN_RESERVED = 0x%016"PRIx64"\n", reg_val);
 
 	switch (reg_val & GEN8_STOLEN_RESERVED_SIZE_MASK) {
 	case GEN8_STOLEN_RESERVED_1M:
@@ -503,23 +494,6 @@ static int init_reserved_stolen(struct drm_i915_private *i915)
 		goto bail_out;
 	}
 
-<<<<<<< HEAD
-	/* It is possible for the reserved area to end before the end of stolen
-	 * memory, so just consider the start. */
-	reserved_total = stolen_top - reserved_base;
-
-	DRM_DEBUG_DRIVER("Memory reserved for graphics device: %"PRIu64"K, usable: %"PRIu64"K\n",
-			 (u64)resource_size(&i915->dsm) >> 10,
-			 ((u64)resource_size(&i915->dsm) - reserved_total) >> 10);
-
-	i915->stolen_usable_size =
-		resource_size(&i915->dsm) - reserved_total;
-
-	/* Basic memrange allocator for stolen space. */
-	drm_mm_init(&i915->mm.stolen, 0, i915->stolen_usable_size);
-
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	return 0;
 
 bail_out:
@@ -566,7 +540,7 @@ static int i915_gem_init_stolen(struct intel_memory_region *mem)
 	i915->dsm.usable_size = resource_size(&mem->region);
 
 	drm_dbg(&i915->drm,
-		"Memory reserved for graphics device: %lluK, usable: %lluK\n",
+		"Memory reserved for graphics device: %"PRIu64"K, usable: %"PRIu64"K\n",
 		(u64)resource_size(&i915->dsm.stolen) >> 10,
 		(u64)i915->dsm.usable_size >> 10);
 
@@ -753,18 +727,15 @@ static void i915_gem_object_put_pages_stolen(struct drm_i915_gem_object *obj,
 {
 	struct drm_i915_private *i915 = to_i915(obj->base.dev);
 	/* Should only be called from i915_gem_object_release_stolen() */
-<<<<<<< HEAD
 #ifdef __NetBSD__
 	bus_dmamap_unload(obj->base.dev->dmat, pages->sgl->sg_dmamap);
-#endif
-=======
-
+#else
 	dbg_poison(to_gt(i915)->ggtt,
 		   sg_dma_address(pages->sgl),
 		   sg_dma_len(pages->sgl),
 		   POISON_FREE);
+#endif
 
->>>>>>> vendor/linux-drm-v6.6.35
 	sg_free_table(pages);
 	kfree(pages);
 }

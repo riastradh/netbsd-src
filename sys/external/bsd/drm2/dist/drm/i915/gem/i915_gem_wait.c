@@ -99,9 +99,6 @@ static void fence_set_priority(struct dma_fence *fence,
 {
 	struct i915_request *rq;
 	struct intel_engine_cs *engine;
-#ifdef __NetBSD__
-	int s;
-#endif
 
 	if (dma_fence_is_signaled(fence) || !dma_fence_is_i915(fence))
 		return;
@@ -109,26 +106,10 @@ static void fence_set_priority(struct dma_fence *fence,
 	rq = to_request(fence);
 	engine = rq->engine;
 
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	s = splsoftserial();
-#else
-	local_bh_disable();
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 	rcu_read_lock(); /* RCU serialisation for set-wedged protection */
 	if (engine->sched_engine->schedule)
 		engine->sched_engine->schedule(rq, attr);
 	rcu_read_unlock();
-<<<<<<< HEAD
-#ifdef __NetBSD__
-	splx(s);
-#else
-	local_bh_enable(); /* kick the tasklets if queues were reprioritised */
-#endif
-=======
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 static inline bool __dma_fence_is_chain(const struct dma_fence *fence)
