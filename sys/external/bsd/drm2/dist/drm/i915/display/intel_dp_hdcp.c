@@ -46,8 +46,13 @@ static void intel_dp_hdcp_wait_for_cp_irq(struct intel_hdcp *hdcp, int timeout)
 	long ret;
 
 #define C (hdcp->cp_irq_count_cached != atomic_read(&hdcp->cp_irq_count))
-	ret = wait_event_interruptible_timeout(hdcp->cp_irq_queue, C,
-					       msecs_to_jiffies(timeout));
+	unsigned long irqflags;
+	spin_lock_irqsave(&hdcp->cp_irq_lock, irqflags);
+	DRM_SPIN_TIMED_WAIT_UNTIL(ret, &hdcp->cp_irq_queue,
+	    &hdcp->cp_irq_lock,
+	    msecs_to_jiffies(timeout),
+	    C);
+	spin_unlock_irqrestore(&hdcp->cp_irq_lock, irqflags);
 
 	if (!ret)
 		DRM_DEBUG_KMS("Timedout at waiting for CP_IRQ\n");

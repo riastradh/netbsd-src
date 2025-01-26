@@ -724,6 +724,7 @@ void intel_dp_aux_fini(struct intel_dp *intel_dp)
 	if (cpu_latency_qos_request_active(&intel_dp->pm_qos))
 		cpu_latency_qos_remove_request(&intel_dp->pm_qos);
 
+	drm_dp_aux_fini(&intel_dp->aux);
 	kfree(intel_dp->aux.name);
 }
 
