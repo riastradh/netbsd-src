@@ -1384,12 +1384,8 @@ static void intel_gt_reset_global(struct intel_gt *gt,
 	kobject_uevent_env(kobj, KOBJ_CHANGE, error_event);
 #endif
 
-<<<<<<< HEAD
-	DRM_DEBUG_DRIVER("resetting chip\n");
+	GT_TRACE(gt, "resetting chip, engines=%"PRIx32"\n", engine_mask);
 #ifndef __NetBSD__
-=======
-	GT_TRACE(gt, "resetting chip, engines=%x\n", engine_mask);
->>>>>>> vendor/linux-drm-v6.6.35
 	kobject_uevent_env(kobj, KOBJ_CHANGE, reset_event);
 #endif
 
@@ -1542,21 +1538,15 @@ static int _intel_gt_reset_lock(struct intel_gt *gt, int *srcu, bool retry)
 	while (test_bit(I915_RESET_BACKOFF, &gt->reset.flags)) {
 		rcu_read_unlock();
 
-<<<<<<< HEAD
+		if (!retry)
+			return -EBUSY;
+
 		int ret;
 		spin_lock(&gt->reset.lock);
 		DRM_SPIN_WAIT_UNTIL(ret, &gt->reset.queue, &gt->reset.lock,
 		    !test_bit(I915_RESET_BACKOFF, &gt->reset.flags));
 		spin_unlock(&gt->reset.lock);
 		if (ret)
-=======
-		if (!retry)
-			return -EBUSY;
-
-		if (wait_event_interruptible(gt->reset.queue,
-					     !test_bit(I915_RESET_BACKOFF,
-						       &gt->reset.flags)))
->>>>>>> vendor/linux-drm-v6.6.35
 			return -EINTR;
 
 		rcu_read_lock();

@@ -28,15 +28,12 @@ __KERNEL_RCSID(0, "$NetBSD: intel_rps.c,v 1.5 2021/12/19 12:32:15 riastradh Exp 
 #include "intel_mchbar_regs.h"
 #include "intel_pcode.h"
 #include "intel_rps.h"
-<<<<<<< HEAD
-#include "intel_sideband.h"
-/* #include "../../../platform/x86/intel_ips.h" */
+#include "vlv_sideband.h"
+#ifndef __NetBSD__
+#include "../../../platform/x86/intel_ips.h"
+#endif
 
 #include <linux/nbsd-namespace.h>
-=======
-#include "vlv_sideband.h"
-#include "../../../platform/x86/intel_ips.h"
->>>>>>> vendor/linux-drm-v6.6.35
 
 #define BUSY_MAX_EI	20u /* ms */
 
@@ -2066,7 +2063,6 @@ void intel_rps_init(struct intel_rps *rps)
 		rps->pm_intrmsk_mbz |= ARAT_EXPIRED_INTRMSK;
 }
 
-<<<<<<< HEAD
 void intel_rps_fini(struct intel_rps *rps)
 {
 
@@ -2074,8 +2070,6 @@ void intel_rps_fini(struct intel_rps *rps)
 	mutex_destroy(&rps->lock);
 }
 
-u32 intel_rps_get_cagf(struct intel_rps *rps, u32 rpstat)
-=======
 void intel_rps_sanitize(struct intel_rps *rps)
 {
 	if (rps_uses_slpc(rps))
@@ -2096,7 +2090,6 @@ u32 intel_rps_read_rpstat(struct intel_rps *rps)
 }
 
 static u32 intel_rps_get_cagf(struct intel_rps *rps, u32 rpstat)
->>>>>>> vendor/linux-drm-v6.6.35
 {
 	struct drm_i915_private *i915 = rps_to_i915(rps);
 	u32 cagf;

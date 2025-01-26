@@ -3363,7 +3363,7 @@ get_default_sseu_config(struct intel_sseu *out_sseu,
 		 * all available subslices per slice.
 		 */
 		out_sseu->subslice_mask =
-			~(~0 << (hweight8(out_sseu->subslice_mask) / 2));
+			~(~0u << (hweight8(out_sseu->subslice_mask) / 2));
 		out_sseu->slice_mask = 0x1;
 	}
 }

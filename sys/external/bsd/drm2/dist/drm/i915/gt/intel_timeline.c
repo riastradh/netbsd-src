@@ -19,14 +19,9 @@ __KERNEL_RCSID(0, "$NetBSD: intel_timeline.c,v 1.5 2021/12/19 12:32:15 riastradh
 #include "intel_ring.h"
 #include "intel_timeline.h"
 
-<<<<<<< HEAD
 #include <linux/nbsd-namespace.h>
 
-#define ptr_set_bit(ptr, bit) ((typeof(ptr))((unsigned long)(ptr) | BIT(bit)))
-#define ptr_test_bit(ptr, bit) ((unsigned long)(ptr) & BIT(bit))
-=======
 #define TIMELINE_SEQNO_BYTES 8
->>>>>>> vendor/linux-drm-v6.6.35
 
 static struct i915_vma *hwsp_alloc(struct intel_gt *gt)
 {
@@ -141,10 +136,6 @@ static void intel_timeline_fini(struct rcu_head *rcu)
 		i915_gem_object_unpin_map(timeline->hwsp_ggtt->obj);
 
 	i915_vma_put(timeline->hwsp_ggtt);
-<<<<<<< HEAD
-
-	mutex_destroy(&timeline->mutex);
-=======
 	i915_active_fini(&timeline->active);
 
 	/*
@@ -155,8 +146,9 @@ static void intel_timeline_fini(struct rcu_head *rcu)
 	 */
 	i915_syncmap_free(&timeline->sync);
 
+	mutex_destroy(&timeline->mutex);
+
 	kfree(timeline);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 struct intel_timeline *
@@ -422,12 +414,9 @@ void intel_gt_fini_timelines(struct intel_gt *gt)
 	struct intel_gt_timelines *timelines = &gt->timelines;
 
 	GEM_BUG_ON(!list_empty(&timelines->active_list));
-<<<<<<< HEAD
-	GEM_BUG_ON(!list_empty(&timelines->hwsp_free_list));
 
 	spin_lock_destroy(&timelines->hwsp_lock);
 	spin_lock_destroy(&timelines->lock);
-=======
 }
 
 void intel_gt_show_timelines(struct intel_gt *gt,
@@ -508,7 +497,6 @@ void intel_gt_show_timelines(struct intel_gt *gt,
 
 	list_for_each_entry_safe(tl, tn, &free, link)
 		__intel_timeline_free(&tl->kref);
->>>>>>> vendor/linux-drm-v6.6.35
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_SELFTEST)
