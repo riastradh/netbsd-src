@@ -1063,6 +1063,8 @@ static bool try_qad_pin(struct i915_vma *vma, unsigned int flags)
 	return true;
 }
 
+#ifndef __NetBSD__		/* XXX rotate/remap pages */
+
 static struct scatterlist *
 rotate_pages(struct drm_i915_gem_object *obj, unsigned int offset,
 	     unsigned int width, unsigned int height,
@@ -1363,10 +1365,116 @@ err_st_alloc:
 	return ERR_PTR(ret);
 }
 
+#endif	/* __NetBSD__ */
+
 static noinline struct sg_table *
 intel_partial_pages(const struct i915_gtt_view *view,
 		    struct drm_i915_gem_object *obj)
 {
+#ifdef __NetBSD__
+	struct sg_table *st = NULL;
+	int ret = -ENOMEM;
+
+	KASSERTMSG(view->partial.offset <= obj->base.size >> PAGE_SHIFT,
+	    "obj=%p size=0x%zx; view offset=0x%zx size=0x%zx",
+	    obj,
+	    (size_t)obj->base.size >> PAGE_SHIFT,
+	    (size_t)view->partial.offset,
+	    (size_t)view->partial.size);
+	KASSERTMSG((view->partial.size <=
+		(obj->base.size >> PAGE_SHIFT) - view->partial.offset),
+	    "obj=%p size=0x%zx; view offset=0x%zx size=0x%zx",
+	    obj,
+	    (size_t)obj->base.size >> PAGE_SHIFT,
+	    (size_t)view->partial.offset,
+	    (size_t)view->partial.size);
+	KASSERTMSG(view->partial.size <= INT_MAX, "view size=0x%zx",
+	    (size_t)view->partial.size);
+
+	st = kmalloc(sizeof(*st), GFP_KERNEL);
+	if (st == NULL)
+		goto fail;
+	ret = sg_alloc_table(st, view->partial.size, GFP_KERNEL);
+	if (ret) {
+		kfree(st);
+		st = NULL;
+		goto fail;
+	}
+
+	/* XXX errno NetBSD->Linux */
+	if (obj->mm.pages->sgl->sg_dmamap) { /* XXX KASSERT?  */
+		ret = -bus_dmamap_create(obj->base.dev->dmat,
+		    (bus_size_t)view->partial.size << PAGE_SHIFT,
+		    view->partial.size, PAGE_SIZE, 0, BUS_DMA_NOWAIT,
+		    &st->sgl->sg_dmamap);
+		if (ret) {
+			st->sgl->sg_dmamap = NULL;
+			goto fail;
+		}
+		st->sgl->sg_dmat = obj->base.dev->dmat;
+	}
+
+	/*
+	 * Copy over the pages.  The view's offset and size are in
+	 * units of pages already.
+	 */
+	KASSERT(st->sgl->sg_npgs == view->partial.size);
+	memcpy(st->sgl->sg_pgs,
+	    obj->mm.pages->sgl->sg_pgs + view->partial.offset,
+	    sizeof(st->sgl->sg_pgs[0]) * view->partial.size);
+
+	/*
+	 * Copy over the DMA addresses.  For simplicity, we don't do
+	 * anything to compress contiguous pages into larger segments.
+	 */
+	if (obj->mm.pages->sgl->sg_dmamap) {
+		bus_size_t offset = (bus_size_t)view->partial.offset
+		    << PAGE_SHIFT;
+		unsigned i, j, k;
+
+		st->sgl->sg_dmamap->dm_nsegs = view->partial.size;
+		for (i = j = 0; i < view->partial.size; j++) {
+			KASSERT(j < obj->mm.pages->sgl->sg_dmamap->dm_nsegs);
+			const bus_dma_segment_t *iseg =
+			    &obj->mm.pages->sgl->sg_dmamap->dm_segs[j];
+
+			KASSERT(iseg->ds_len % PAGE_SIZE == 0);
+
+			/* Skip segments prior to the start offset.  */
+			if (offset >= iseg->ds_len) {
+				offset -= iseg->ds_len;
+				continue;
+			}
+			for (k = 0;
+			     (i < view->partial.size &&
+				 k < iseg->ds_len >> PAGE_SHIFT);
+			     k++) {
+				KASSERT(i < view->partial.size);
+				bus_dma_segment_t *oseg =
+				    &st->sgl->sg_dmamap->dm_segs[i++];
+				oseg->ds_addr = iseg->ds_addr + offset +
+				    k*PAGE_SIZE;
+				oseg->ds_len = PAGE_SIZE;
+			}
+
+			/*
+			 * After the first segment which we possibly
+			 * use only a suffix of, the remainder we will
+			 * take from the beginning.
+			 */
+			offset = 0;
+		}
+	}
+
+	/* Success!  */
+	return st;
+
+fail:	if (st) {
+		sg_free_table(st);
+		kfree(st);
+	}
+	return ERR_PTR(ret);
+#else
 	struct sg_table *st;
 	struct scatterlist *sg;
 	unsigned int count = view->partial.size;
@@ -1393,6 +1501,7 @@ err_sg_alloc:
 	kfree(st);
 err_st_alloc:
 	return ERR_PTR(ret);
+#endif
 }
 
 static int
@@ -1418,12 +1527,20 @@ __i915_vma_get_pages(struct i915_vma *vma)
 
 	case I915_GTT_VIEW_ROTATED:
 		pages =
+#ifdef __NetBSD__		/* XXX rotate/remap pages */
+			ERR_PTR(-ENODEV);
+#else
 			intel_rotate_pages(&vma->gtt_view.rotated, vma->obj);
+#endif
 		break;
 
 	case I915_GTT_VIEW_REMAPPED:
 		pages =
+#ifdef __NetBSD__		/* XXX rotate/remap pages */
+			ERR_PTR(-ENODEV);
+#else
 			intel_remap_pages(&vma->gtt_view.remapped, vma->obj);
+#endif
 		break;
 
 	case I915_GTT_VIEW_PARTIAL:
