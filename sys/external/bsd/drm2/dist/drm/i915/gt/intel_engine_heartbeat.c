@@ -203,15 +203,11 @@ static void heartbeat(struct work_struct *wrk)
 			int s = splsoftserial();
 #else
 			local_bh_disable();
-<<<<<<< HEAD
 #endif
-			engine->schedule(rq, &attr);
+			engine->sched_engine->schedule(rq, &attr);
 #ifdef __NetBSD__
 			splx(s);
 #else
-=======
-			engine->sched_engine->schedule(rq, &attr);
->>>>>>> vendor/linux-drm-v6.6.35
 			local_bh_enable();
 #endif
 		} else {

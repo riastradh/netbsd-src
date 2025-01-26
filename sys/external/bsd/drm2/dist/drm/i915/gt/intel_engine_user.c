@@ -277,13 +277,7 @@ void intel_engines_driver_register(struct drm_i915_private *i915)
 #endif
 	list_for_each_safe(it, next, &engines) {
 		struct intel_engine_cs *engine =
-<<<<<<< HEAD
 			container_of(it, typeof(*engine), uabi_node.list);
-		char old[sizeof(engine->name)];
-=======
-			container_of((struct rb_node *)it, typeof(*engine),
-				     uabi_node);
->>>>>>> vendor/linux-drm-v6.6.35
 
 		if (intel_gt_has_unrecoverable_error(engine->gt))
 			continue; /* ignore incomplete engines */
@@ -381,16 +375,12 @@ void intel_engines_driver_register(struct drm_i915_private *i915)
 			}
 		}
 
-<<<<<<< HEAD
-		if (WARN(errors, "Invalid UABI engine mapping found"))
+		if (drm_WARN(&i915->drm, errors,
+			     "Invalid UABI engine mapping found"))
 #ifdef __NetBSD__
 			rb_tree_init(&i915->uabi_engines.rbr_tree,
 			    &engine_ops);
 #else
-=======
-		if (drm_WARN(&i915->drm, errors,
-			     "Invalid UABI engine mapping found"))
->>>>>>> vendor/linux-drm-v6.6.35
 			i915->uabi_engines = RB_ROOT;
 #endif
 	}
