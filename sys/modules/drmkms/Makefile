@@ -11,6 +11,7 @@ MKLDSCRIPT=yes
 .PATH:	${S}/external/bsd/drm2/pci
 
 .PATH:	${S}/external/bsd/drm2/dist/drm
+.PATH:	${S}/external/bsd/drm2/dist/drm/display
 .PATH:	${S}/external/bsd/drm2/dist/drm/scheduler
 
 # NetBSD additions.

@@ -98,6 +98,7 @@ COPTS.amdgpu_rn_clk_mgr.c+=	${COPTS.amdgpu_float}
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/bios/dce112
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/bios/dce80
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/calcs
+.PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/dml/calcs
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/clk_mgr
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/clk_mgr/dce100
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/dc/clk_mgr/dce110
@@ -143,6 +144,9 @@ COPTS.amdgpu_rn_clk_mgr.c+=	${COPTS.amdgpu_float}
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/modules/hdcp
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/modules/info_packet
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../display/modules/power
+.PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../pm/powerplay
+.PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../pm/powerplay/hwmgr
+.PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../pm/powerplay/smumgr
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../powerplay
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../powerplay/hwmgr
 .PATH:	${S}/external/bsd/drm2/dist/drm/amd/amdgpu/../powerplay/smumgr
